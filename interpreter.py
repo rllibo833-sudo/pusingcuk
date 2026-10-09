@@ -294,6 +294,15 @@ def parse(lines, pos=0, stops=()):
             )
             continue
 
+        if text.startswith("tanya "):
+            match = re.fullmatch(
+                r"tanya\s+([A-Za-z_]\w*)\s*=\s*(.+)", text
+            )
+            if not match:
+                fail(line_no, "gunakan tanya nama = ekspresi")
+            nodes.append(("input", line_no, match.group(1), match.group(2)))
+            continue
+
         if text.startswith("hedeh "):
             nodes.append(("print", line_no, text[6:].strip()))
             continue
@@ -375,6 +384,14 @@ def execute(nodes, variables, budget=None, functions=None, depth=0, in_function=
                 fail(line, "indeks daftar di luar batas")
             daftar[index] = expression(source, variables, line, functions, budget, depth)
 
+        elif kind == "input":
+            _, line, name, prompt_source = node
+            if name in variables:
+                fail(line, f"variabel '{name}' sudah dibuat")
+            prompt = expression(
+                prompt_source, variables, line, functions, budget, depth
+            )
+            variables[name] = input(str(prompt))
         elif kind == "print":
             print(expression(node[2], variables, line, functions, budget, depth))
 

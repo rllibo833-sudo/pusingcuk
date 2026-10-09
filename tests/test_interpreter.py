@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 from contextlib import redirect_stdout
 from io import StringIO
 
@@ -52,6 +53,15 @@ hedeh panjang(buah)
 hedeh panjang([])
 selesai jancuk"""
         self.assertEqual(self.run_code(code), "3\n0\n")
+    def test_tanya_input(self):
+        code = """jancuk
+tanya nama = "Siapa nama kamu? "
+hedeh "Halo, " + nama
+selesai jancuk"""
+        with patch("builtins.input", return_value="Fadli") as mocked:
+            self.assertEqual(self.run_code(code), "Halo, Fadli\n")
+        mocked.assert_called_once_with("Siapa nama kamu? ")
+
     def test_print(self):
         code = '''jancuk
 hedeh "Halo"

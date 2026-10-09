@@ -4,3 +4,10 @@ __pycache__/
 # Local backup files
 *.backup
 *.before_*
+
+# Local safety snapshots
+backups/
+
+# Local learning programs
+belajar.pusingcuk
+belajar_tanya.pusingcuk
