@@ -254,6 +254,15 @@ selesai jancuk"""
         self.assertEqual(self.run_code(code), "5\n")
 
 
+    def test_user_function_accepts_list_argument(self):
+        code = """jancuk
+fungsi ambil(daftar)
+    balek daftar[0]
+selesai fungsi
+hedeh ambil([10, 20])
+selesai jancuk"""
+        self.assertEqual(self.run_code(code), "10\n")
+
     def test_user_function_wrong_argument_count(self):
         code = """jancuk
 fungsi tambah(a, b)
