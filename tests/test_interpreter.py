@@ -253,5 +253,33 @@ hedeh tambah(2, 3)
 selesai jancuk"""
         self.assertEqual(self.run_code(code), "5\n")
 
+
+    def test_user_function_wrong_argument_count(self):
+        code = """jancuk
+fungsi tambah(a, b)
+    balek a + b
+selesai fungsi
+hedeh tambah(2)
+selesai jancuk"""
+        with self.assertRaisesRegex(SyntaxError, "membutuhkan 2 argumen"):
+            self.run_code(code)
+
+    def test_unknown_user_function_is_rejected(self):
+        code = """jancuk
+hedeh tidak_ada(1)
+selesai jancuk"""
+        with self.assertRaisesRegex(SyntaxError, "fungsi tidak dikenal"):
+            self.run_code(code)
+
+    def test_recursive_function_depth_is_limited(self):
+        code = """jancuk
+fungsi ulang(n)
+    balek ulang(n + 1)
+selesai fungsi
+hedeh ulang(0)
+selesai jancuk"""
+        with self.assertRaisesRegex(SyntaxError, "batas kedalaman"):
+            self.run_code(code)
+
 if __name__ == "__main__":
     unittest.main()
