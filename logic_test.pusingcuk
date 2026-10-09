@@ -1,0 +1,16 @@
+jancuk
+lah umur = 20
+lah punya_ktp = benar
+
+njir umur >= 17 dan punya_ktp
+    hedeh "Syarat terpenuhi"
+kampret
+    hedeh "Syarat belum terpenuhi"
+selesai njir
+
+njir bukan salah atau umur < 10
+    hedeh "Logika berhasil"
+selesai njir
+
+hedeh "Kata benar tetap menjadi teks"
+selesai jancuk
