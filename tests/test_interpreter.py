@@ -186,5 +186,11 @@ selesai jancuk"""
             self.run_code(code)
 
 
+    def test_deep_expression_is_rejected_safely(self):
+        code = "jancuk\nhedeh " + "not " * 1500 + "benar\nselesai jancuk"
+        with self.assertRaisesRegex(SyntaxError, "ekspresi terlalu dalam"):
+            self.run_code(code)
+
+
 if __name__ == "__main__":
     unittest.main()

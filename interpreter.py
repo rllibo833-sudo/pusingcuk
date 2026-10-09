@@ -61,6 +61,8 @@ def expression(source, variables, line):
 
     try:
         tree = ast.parse(source, mode="eval")
+    except RecursionError:
+        fail(line, "ekspresi terlalu dalam")
     except SyntaxError:
         fail(line, "ekspresi tidak valid")
 
@@ -146,6 +148,8 @@ def expression(source, variables, line):
         return visit(tree.body)
     except SyntaxError:
         raise
+    except RecursionError:
+        fail(line, "ekspresi terlalu dalam")
     except Exception as exc:
         fail(line, f"ekspresi gagal: {exc}")
 
