@@ -56,5 +56,53 @@ selesai jancuk'''
             self.run_code(code)
 
 
+    def test_if_without_closing(self):
+        code = """jancuk
+njir benar
+hedeh "Halo"
+selesai jancuk"""
+        with self.assertRaises(SyntaxError):
+            self.run_code(code)
+
+    def test_else_without_if(self):
+        code = """jancuk
+kampret
+hedeh "Halo"
+selesai jancuk"""
+        with self.assertRaises(SyntaxError):
+            self.run_code(code)
+
+    def test_loop_without_closing(self):
+        code = """jancuk
+mumet benar
+hedeh "Halo"
+selesai jancuk"""
+        with self.assertRaises(SyntaxError):
+            self.run_code(code)
+
+    def test_wrong_block_closer(self):
+        code = """jancuk
+njir benar
+hedeh "Halo"
+selesai mumet
+selesai jancuk"""
+        with self.assertRaises(SyntaxError):
+            self.run_code(code)
+
+    def test_nested_if_inside_loop(self):
+        code = """jancuk
+lah i = 1
+mumet i <= 2
+njir i == 1
+hedeh "satu"
+kampret
+hedeh "dua"
+selesai njir
+i = i + 1
+selesai mumet
+selesai jancuk"""
+        self.assertEqual(self.run_code(code), "satu\ndua\n")
+
+
 if __name__ == "__main__":
     unittest.main()
