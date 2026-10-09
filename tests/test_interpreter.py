@@ -204,5 +204,20 @@ selesai jancuk"""
             self.run_code(code)
 
 
+
+    def test_oversized_string_and_list_operations_are_rejected(self):
+        cases = [
+            ('"a" * 100001', "hasil perkalian terlalu besar"),
+            ('[1] * 100001', "hasil perkalian terlalu besar"),
+            ('"a" * 60000 + "b" * 60000', "hasil penggabungan terlalu besar"),
+            ('[1] * 60000 + [1] * 60000', "hasil penggabungan terlalu besar"),
+        ]
+        for expression, message in cases:
+            with self.subTest(expression=expression):
+                code = f"jancuk\nhedeh {expression}\nselesai jancuk"
+                with self.assertRaisesRegex(SyntaxError, message):
+                    self.run_code(code)
+
+
 if __name__ == "__main__":
     unittest.main()
