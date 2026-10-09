@@ -62,15 +62,37 @@ def expression(source, variables, line):
         fail(line, "ekspresi tidak valid")
 
     def visit(node):
+        if isinstance(node, ast.Name):
+            if node.id not in variables:
+                fail(line, f"variabel '{node.id}' belum ada")
+            return variables[node.id]
         if isinstance(node, ast.Constant):
             if isinstance(node.value, (str, int, float, bool)):
                 return node.value
             fail(line, "tipe nilai tidak didukung")
 
-        if isinstance(node, ast.Name):
-            if node.id not in variables:
-                fail(line, f"variabel '{node.id}' belum ada")
-            return variables[node.id]
+        if isinstance(node, ast.List):
+            if any(isinstance(item, ast.List) for item in node.elts):
+                fail(line, "daftar bersarang belum didukung")
+            return [visit(item) for item in node.elts]
+
+        if isinstance(node, ast.Subscript):
+            daftar = visit(node.value)
+
+            if not isinstance(daftar, list):
+                fail(line, "indeks hanya dapat digunakan pada daftar")
+
+            if not isinstance(node.slice, ast.Constant):
+                fail(line, "indeks harus berupa bilangan bulat")
+
+            indeks = node.slice.value
+            if type(indeks) is not int:
+                fail(line, "indeks harus berupa bilangan bulat")
+
+            if indeks < 0 or indeks >= len(daftar):
+                fail(line, "indeks daftar di luar batas")
+
+            return daftar[indeks]
 
         if isinstance(node, ast.BinOp) and type(node.op) in BINOPS:
             return BINOPS[type(node.op)](
@@ -79,6 +101,18 @@ def expression(source, variables, line):
 
         if isinstance(node, ast.UnaryOp) and type(node.op) in UNARYOPS:
             return UNARYOPS[type(node.op)](visit(node.operand))
+
+        if isinstance(node, ast.Call):
+            if not isinstance(node.func, ast.Name):
+                fail(line, "pemanggilan fungsi tidak didukung")
+            if node.func.id == "panjang":
+                if len(node.args) != 1 or node.keywords:
+                    fail(line, "panjang() membutuhkan satu daftar")
+                daftar = visit(node.args[0])
+                if not isinstance(daftar, list):
+                    fail(line, "panjang() hanya menerima daftar")
+                return len(daftar)
+            fail(line, "fungsi tidak dikenal")
 
         if isinstance(node, ast.Compare):
             left = visit(node.left)
@@ -171,6 +205,21 @@ def parse(lines, pos=0, stops=()):
             continue
 
         match = re.fullmatch(
+            r"([A-Za-z_]\w*)\s*\[\s*(\d+)\s*\]\s*=(?!=)\s*(.+)",
+            text,
+        )
+        if match:
+            nodes.append(
+                (
+                    "list_assign",
+                    line_no,
+                    match.group(1),
+                    int(match.group(2)),
+                    match.group(3),
+                )
+            )
+            continue
+        match = re.fullmatch(
             r"([A-Za-z_]\w*)\s*=(?!=)\s*(.+)", text
         )
         if match:
@@ -199,6 +248,17 @@ def execute(nodes, variables):
             if name not in variables:
                 fail(line, f"variabel '{name}' belum dibuat")
             variables[name] = expression(source, variables, line)
+
+        elif kind == "list_assign":
+            _, line, name, index, source = node
+            if name not in variables:
+                fail(line, f"variabel '{name}' belum dibuat")
+            daftar = variables[name]
+            if not isinstance(daftar, list):
+                fail(line, "indeks hanya dapat digunakan pada daftar")
+            if index < 0 or index >= len(daftar):
+                fail(line, "indeks daftar di luar batas")
+            daftar[index] = expression(source, variables, line)
 
         elif kind == "print":
             print(expression(node[2], variables, line))

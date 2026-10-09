@@ -1,0 +1,6 @@
+jancuk
+lah buah = ["apel", "jeruk"]
+buah[1] = "durian"
+hedeh buah[0]
+hedeh buah[1]
+selesai jancuk

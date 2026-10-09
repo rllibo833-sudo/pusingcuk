@@ -12,6 +12,34 @@ class PusingcukTests(unittest.TestCase):
             interpreter.run(source)
         return output.getvalue()
 
+
+    def test_list_read(self):
+        code = """jancuk
+lah buah = ["apel", "jeruk"]
+hedeh buah[0]
+hedeh buah[1]
+selesai jancuk"""
+        self.assertEqual(self.run_code(code), "apel\njeruk\n")
+    def test_list_assignment(self):
+        code = """jancuk
+lah buah = ["apel", "jeruk"]
+buah[1] = "durian"
+hedeh buah[0]
+hedeh buah[1]
+selesai jancuk"""
+        self.assertEqual(self.run_code(code), "apel\ndurian\n")
+    def test_list_index_out_of_range(self):
+        code = """jancuk
+lah angka = [10]
+hedeh angka[1]
+selesai jancuk"""
+        failed = False
+        try:
+            self.run_code(code)
+        except BaseException:
+            failed = True
+        self.assertTrue(failed, "Indeks di luar batas seharusnya gagal")
+
     def test_print(self):
         code = '''jancuk
 hedeh "Halo"
