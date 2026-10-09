@@ -106,9 +106,14 @@ def expression(source, variables, line):
             return daftar[indeks]
 
         if isinstance(node, ast.BinOp) and type(node.op) in BINOPS:
-            return BINOPS[type(node.op)](
-                visit(node.left), visit(node.right)
-            )
+            kiri = visit(node.left)
+            kanan = visit(node.right)
+            if isinstance(node.op, ast.Mult):
+                if isinstance(kiri, (str, list)) and type(kanan) is int and len(kiri) * max(kanan, 0) > 100000:
+                    fail(line, "hasil perkalian terlalu besar (maksimal 100000 elemen)")
+                if isinstance(kanan, (str, list)) and type(kiri) is int and len(kanan) * max(kiri, 0) > 100000:
+                    fail(line, "hasil perkalian terlalu besar (maksimal 100000 elemen)")
+            return BINOPS[type(node.op)](kiri, kanan)
 
         if isinstance(node, ast.UnaryOp) and type(node.op) in UNARYOPS:
             return UNARYOPS[type(node.op)](visit(node.operand))
