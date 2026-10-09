@@ -198,5 +198,11 @@ selesai jancuk"""
             self.run_code(code)
 
 
+    def test_type_error_has_clear_message(self):
+        code = "jancuk\nhedeh 1 + \"teks\"\nselesai jancuk"
+        with self.assertRaisesRegex(SyntaxError, "tipe data tidak cocok"):
+            self.run_code(code)
+
+
 if __name__ == "__main__":
     unittest.main()

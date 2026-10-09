@@ -152,6 +152,8 @@ def expression(source, variables, line):
         fail(line, "ekspresi terlalu dalam")
     except ZeroDivisionError:
         fail(line, "pembagian dengan nol")
+    except TypeError:
+        fail(line, "tipe data tidak cocok untuk operasi ini")
     except Exception as exc:
         fail(line, f"ekspresi gagal: {exc}")
 
