@@ -1,0 +1,22 @@
+jancuk
+
+lah nama = "Budi"
+lah umur = 20
+
+hedeh "Halo, dunia!"
+hedeh nama
+
+njir umur >= 18
+    hedeh "Sudah dewasa"
+kampret
+    hedeh "Masih di bawah umur"
+selesai njir
+
+lah i = 1
+mumet i <= 3
+    hedeh i
+    i = i + 1
+selesai mumet
+
+hedeh i
+selesai jancuk

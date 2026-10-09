@@ -1,0 +1,220 @@
+
+import ast
+import operator
+import re
+import sys
+from pathlib import Path
+
+BINOPS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.FloorDiv: operator.floordiv,
+    ast.Mod: operator.mod,
+}
+CMPOPS = {
+    ast.Eq: operator.eq,
+    ast.NotEq: operator.ne,
+    ast.Lt: operator.lt,
+    ast.LtE: operator.le,
+    ast.Gt: operator.gt,
+    ast.GtE: operator.ge,
+}
+UNARYOPS = {
+    ast.UAdd: operator.pos,
+    ast.USub: operator.neg,
+    ast.Not: operator.not_,
+}
+
+
+def fail(line, message):
+    raise SyntaxError(f"Baris {line}: {message}")
+
+
+def expression(source, variables, line):
+    source = re.sub(r"\bbenar\b", "True", source)
+    source = re.sub(r"\bsalah\b", "False", source)
+
+    try:
+        tree = ast.parse(source, mode="eval")
+    except SyntaxError:
+        fail(line, "ekspresi tidak valid")
+
+    def visit(node):
+        if isinstance(node, ast.Constant):
+            if isinstance(node.value, (str, int, float, bool)):
+                return node.value
+            fail(line, "tipe nilai tidak didukung")
+
+        if isinstance(node, ast.Name):
+            if node.id not in variables:
+                fail(line, f"variabel '{node.id}' belum ada")
+            return variables[node.id]
+
+        if isinstance(node, ast.BinOp) and type(node.op) in BINOPS:
+            return BINOPS[type(node.op)](
+                visit(node.left), visit(node.right)
+            )
+
+        if isinstance(node, ast.UnaryOp) and type(node.op) in UNARYOPS:
+            return UNARYOPS[type(node.op)](visit(node.operand))
+
+        if isinstance(node, ast.Compare):
+            left = visit(node.left)
+            for op, comparator in zip(node.ops, node.comparators):
+                if type(op) not in CMPOPS:
+                    fail(line, "operator perbandingan tidak didukung")
+                right = visit(comparator)
+                if not CMPOPS[type(op)](left, right):
+                    return False
+                left = right
+            return True
+
+        if isinstance(node, ast.BoolOp):
+            if isinstance(node.op, ast.And):
+                return all(visit(v) for v in node.values)
+            if isinstance(node.op, ast.Or):
+                return any(visit(v) for v in node.values)
+
+        fail(line, "ekspresi tidak didukung")
+
+    try:
+        return visit(tree.body)
+    except SyntaxError:
+        raise
+    except Exception as exc:
+        fail(line, f"ekspresi gagal: {exc}")
+
+
+def parse(lines, pos=0, stops=()):
+    nodes = []
+
+    while pos < len(lines):
+        line_no, raw = lines[pos]
+        text = raw.strip()
+        pos += 1
+
+        if not text or text.startswith("#"):
+            continue
+
+        if text in stops:
+            return nodes, pos - 1, text
+
+        if text.startswith("njir "):
+            condition = text[5:].strip()
+            yes, pos, ending = parse(
+                lines, pos, ("kampret", "selesai njir")
+            )
+            no = []
+
+            if ending == "kampret":
+                no, pos, ending = parse(
+                    lines, pos + 1, ("selesai njir",)
+                )
+
+            if ending != "selesai njir":
+                fail(line_no, "blok njir belum ditutup")
+
+            nodes.append(("if", line_no, condition, yes, no))
+            pos += 1
+            continue
+
+        if text.startswith("mumet "):
+            condition = text[6:].strip()
+            body, pos, ending = parse(
+                lines, pos, ("selesai mumet",)
+            )
+            if ending != "selesai mumet":
+                fail(line_no, "blok mumet belum ditutup")
+
+            nodes.append(("while", line_no, condition, body))
+            pos += 1
+            continue
+
+        if text == "kampret" or text.startswith("selesai "):
+            fail(line_no, f"penutup blok tidak terduga: {text}")
+
+        if text.startswith("lah "):
+            match = re.fullmatch(
+                r"lah\s+([A-Za-z_]\w*)\s*=\s*(.+)", text
+            )
+            if not match:
+                fail(line_no, "gunakan lah nama = ekspresi")
+            nodes.append(
+                ("let", line_no, match.group(1), match.group(2))
+            )
+            continue
+
+        if text.startswith("hedeh "):
+            nodes.append(("print", line_no, text[6:].strip()))
+            continue
+
+        fail(line_no, f"perintah tidak dikenal: {text}")
+
+    return nodes, pos, None
+
+
+def execute(nodes, variables):
+    for node in nodes:
+        kind, line = node[0], node[1]
+
+        if kind == "let":
+            _, line, name, source = node
+            variables[name] = expression(source, variables, line)
+
+        elif kind == "print":
+            print(expression(node[2], variables, line))
+
+        elif kind == "if":
+            _, line, condition, yes, no = node
+            branch = yes if expression(
+                condition, variables, line
+            ) else no
+            execute(branch, variables)
+
+        elif kind == "while":
+            _, line, condition, body = node
+            count = 0
+            while expression(condition, variables, line):
+                if count >= 10000:
+                    fail(line, "batas 10000 iterasi tercapai")
+                execute(body, variables)
+                count += 1
+
+
+def run(source):
+    lines = [
+        (i, text)
+        for i, text in enumerate(source.splitlines(), 1)
+    ]
+    lines = [(i, t) for i, t in lines if t.strip()]
+
+    if len(lines) < 2 or lines[0][1].strip() != "jancuk":
+        raise SyntaxError("Program harus dimulai dengan 'jancuk'")
+
+    if lines[-1][1].strip() != "selesai jancuk":
+        raise SyntaxError("Program harus diakhiri 'selesai jancuk'")
+
+    nodes, pos, ending = parse(lines[1:-1])
+
+    if ending is not None or pos != len(lines) - 2:
+        raise SyntaxError("Struktur program tidak valid")
+
+    execute(nodes, {})
+
+
+def main():
+    if len(sys.argv) != 2:
+        print("Pemakaian: python interpreter.py program.pusingcuk")
+        sys.exit(1)
+
+    try:
+        run(Path(sys.argv[1]).read_text(encoding="utf-8"))
+    except (OSError, SyntaxError) as exc:
+        print(f"pusingcuk error: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
