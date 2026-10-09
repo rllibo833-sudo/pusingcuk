@@ -113,6 +113,8 @@ def expression(source, variables, line):
                     fail(line, "hasil perkalian terlalu besar (maksimal 100000 elemen)")
                 if isinstance(kanan, (str, list)) and type(kiri) is int and len(kanan) * max(kiri, 0) > 100000:
                     fail(line, "hasil perkalian terlalu besar (maksimal 100000 elemen)")
+            if isinstance(node.op, ast.Add) and isinstance(kiri, (str, list)) and type(kanan) is type(kiri) and len(kiri) + len(kanan) > 100000:
+                fail(line, "hasil penggabungan terlalu besar (maksimal 100000 elemen)")
             return BINOPS[type(node.op)](kiri, kanan)
 
         if isinstance(node, ast.UnaryOp) and type(node.op) in UNARYOPS:
