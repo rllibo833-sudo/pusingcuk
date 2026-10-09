@@ -211,7 +211,7 @@ def parse(lines, pos=0, stops=()):
             continue
 
         match = re.fullmatch(
-            r"([A-Za-z_]\w*)\s*\[\s*(\d+)\s*\]\s*=(?!=)\s*(.+)",
+            r"([A-Za-z_]\w*)\s*\[\s*(-?\d+)\s*\]\s*=(?!=)\s*(.+)",
             text,
         )
         if match:

@@ -33,13 +33,25 @@ selesai jancuk"""
 lah angka = [10]
 hedeh angka[1]
 selesai jancuk"""
-        failed = False
-        try:
+        with self.assertRaisesRegex(SyntaxError, "indeks daftar di luar batas"):
             self.run_code(code)
-        except BaseException:
-            failed = True
-        self.assertTrue(failed, "Indeks di luar batas seharusnya gagal")
 
+
+    def test_list_negative_assignment_out_of_range(self):
+        code = """jancuk
+lah buah = ["apel"]
+buah[-1] = "jeruk"
+selesai jancuk"""
+        with self.assertRaisesRegex(SyntaxError, "indeks daftar di luar batas"):
+            self.run_code(code)
+
+    def test_panjang_list(self):
+        code = """jancuk
+lah buah = ["apel", "jeruk", "durian"]
+hedeh panjang(buah)
+hedeh panjang([])
+selesai jancuk"""
+        self.assertEqual(self.run_code(code), "3\n0\n")
     def test_print(self):
         code = '''jancuk
 hedeh "Halo"
