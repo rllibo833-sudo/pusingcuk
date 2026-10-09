@@ -43,9 +43,10 @@ def expression(source, variables, line):
         "bukan": "not",
     }
 
-    tokens = tokenize.generate_tokens(
-        io.StringIO(source).readline
-    )
+    try:
+        tokens = list(tokenize.generate_tokens(io.StringIO(source).readline))
+    except tokenize.TokenError:
+        fail(line, "ekspresi tidak valid: token tidak lengkap")
     converted = []
     for token in tokens:
         value = token.string
@@ -239,9 +240,14 @@ def parse(lines, pos=0, stops=()):
     return nodes, pos, None
 
 
-def execute(nodes, variables):
+def execute(nodes, variables, budget=None):
+    if budget is None:
+        budget = [0]
     for node in nodes:
         kind, line = node[0], node[1]
+        budget[0] += 1
+        if budget[0] > 100000:
+            fail(line, "batas total 100000 langkah tercapai")
 
         if kind == "let":
             _, line, name, source = node
@@ -274,15 +280,18 @@ def execute(nodes, variables):
             branch = yes if expression(
                 condition, variables, line
             ) else no
-            execute(branch, variables)
+            execute(branch, variables, budget)
 
         elif kind == "while":
             _, line, condition, body = node
             count = 0
             while expression(condition, variables, line):
+                budget[0] += 1
+                if budget[0] > 100000:
+                    fail(line, "batas total 100000 langkah tercapai")
                 if count >= 10000:
                     fail(line, "batas 10000 iterasi tercapai")
-                execute(body, variables)
+                execute(body, variables, budget)
                 count += 1
 
 
@@ -314,7 +323,7 @@ def main():
 
     try:
         run(Path(sys.argv[1]).read_text(encoding="utf-8"))
-    except (OSError, SyntaxError) as exc:
+    except (OSError, SyntaxError, tokenize.TokenError) as exc:
         print(f"pusingcuk error: {exc}", file=sys.stderr)
         sys.exit(1)
 

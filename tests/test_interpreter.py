@@ -154,5 +154,31 @@ selesai jancuk"""
         self.assertIn("batas 10000 iterasi tercapai", str(context.exception))
 
 
+    def test_nested_loop_total_execution_limit(self):
+        code = """jancuk
+lah i = 0
+lah j = 0
+mumet i < 400
+    j = 0
+    mumet j < 400
+        j = j + 1
+    selesai mumet
+    i = i + 1
+selesai mumet
+selesai jancuk"""
+        with self.assertRaisesRegex(
+            SyntaxError, "batas total 100000 langkah tercapai"
+        ):
+            self.run_code(code)
+
+
+    def test_unterminated_string_is_reported_as_syntax_error(self):
+        code = 'jancuk\nhedeh "abc\nselesai jancuk'
+        with self.assertRaisesRegex(
+            SyntaxError, "ekspresi tidak valid: token tidak lengkap"
+        ):
+            self.run_code(code)
+
+
 if __name__ == "__main__":
     unittest.main()
