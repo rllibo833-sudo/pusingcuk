@@ -244,6 +244,14 @@ selesai jancuk"""
                 with self.assertRaisesRegex(SyntaxError, message):
                     self.run_code(code)
 
+    def test_user_function_returns_value(self):
+        code = """jancuk
+fungsi tambah(a, b)
+    balek a + b
+selesai fungsi
+hedeh tambah(2, 3)
+selesai jancuk"""
+        self.assertEqual(self.run_code(code), "5\n")
 
 if __name__ == "__main__":
     unittest.main()

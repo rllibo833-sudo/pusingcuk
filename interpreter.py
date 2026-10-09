@@ -35,7 +35,32 @@ def fail(line, message):
     raise SyntaxError(f"Baris {line}: {message}")
 
 
-def expression(source, variables, line):
+class ReturnSignal(Exception):
+    def __init__(self, value):
+        self.value = value
+
+
+def call_user_function(name, args, functions, budget, line, depth):
+    if name not in functions:
+        fail(line, "fungsi tidak dikenal")
+    if depth >= 100:
+        fail(line, "batas kedalaman pemanggilan fungsi tercapai")
+    params, body, _ = functions[name]
+    if len(args) != len(params):
+        fail(line, f"fungsi '{name}' membutuhkan {len(params)} argumen")
+    local = dict(zip(params, args))
+    try:
+        execute(body, local, budget, functions, depth + 1, True)
+    except ReturnSignal as result:
+        return result.value
+    return None
+
+
+def expression(source, variables, line, functions=None, budget=None, depth=0):
+    if functions is None:
+        functions = {}
+    if budget is None:
+        budget = [0]
     if len(source) > 10000:
         fail(line, "ekspresi terlalu panjang (maksimal 10000 karakter)")
     replacements = {
@@ -140,6 +165,13 @@ def expression(source, variables, line):
                 if not isinstance(daftar, list):
                     fail(line, "panjang() hanya menerima daftar")
                 return len(daftar)
+            if node.func.id in functions:
+                if node.keywords:
+                    fail(line, "fungsi hanya menerima argumen posisi")
+                args = [visit(arg) for arg in node.args]
+                return call_user_function(
+                    node.func.id, args, functions, budget, line, depth
+                )
             fail(line, "fungsi tidak dikenal")
 
         if isinstance(node, ast.Compare):
@@ -188,6 +220,34 @@ def parse(lines, pos=0, stops=()):
 
         if text in stops:
             return nodes, pos - 1, text
+
+        if text.startswith("fungsi "):
+            match = re.fullmatch(
+                r"fungsi\s+([A-Za-z_]\w*)\s*\(([^()]*)\)", text
+            )
+            if not match:
+                fail(line_no, "format fungsi tidak valid")
+            name, raw_params = match.groups()
+            params = [] if not raw_params.strip() else [
+                item.strip() for item in raw_params.split(",")
+            ]
+            if any(not re.fullmatch(r"[A-Za-z_]\w*", item) for item in params):
+                fail(line_no, "nama parameter fungsi tidak valid")
+            if len(set(params)) != len(params):
+                fail(line_no, "parameter fungsi berulang")
+            body, pos, ending = parse(lines, pos, ("selesai fungsi",))
+            if ending != "selesai fungsi":
+                fail(line_no, "fungsi belum ditutup")
+            nodes.append(("function", line_no, name, params, body))
+            pos += 1
+            continue
+
+        if text.startswith("balek "):
+            value = text[6:].strip()
+            if not value:
+                fail(line_no, "gunakan balek ekspresi")
+            nodes.append(("return", line_no, value))
+            continue
 
         if text.startswith("njir "):
             condition = text[5:].strip()
@@ -267,26 +327,42 @@ def parse(lines, pos=0, stops=()):
     return nodes, pos, None
 
 
-def execute(nodes, variables, budget=None):
+def execute(nodes, variables, budget=None, functions=None, depth=0, in_function=False):
     if budget is None:
         budget = [0]
+    if functions is None:
+        functions = {}
     for node in nodes:
         kind, line = node[0], node[1]
         budget[0] += 1
         if budget[0] > 100000:
             fail(line, "batas total 100000 langkah tercapai")
 
-        if kind == "let":
+        if kind == "function":
+            _, line, name, params, body = node
+            if name == "panjang":
+                fail(line, "nama fungsi 'panjang' sudah digunakan")
+            if name in functions:
+                fail(line, f"fungsi '{name}' sudah dibuat")
+            functions[name] = (params, body, line)
+        elif kind == "return":
+            _, line, source = node
+            if not in_function:
+                fail(line, "balek hanya boleh di dalam fungsi")
+            raise ReturnSignal(
+                expression(source, variables, line, functions, budget, depth)
+            )
+        elif kind == "let":
             _, line, name, source = node
             if name in variables:
                 fail(line, f"variabel '{name}' sudah dibuat")
-            variables[name] = expression(source, variables, line)
+            variables[name] = expression(source, variables, line, functions, budget, depth)
 
         elif kind == "assign":
             _, line, name, source = node
             if name not in variables:
                 fail(line, f"variabel '{name}' belum dibuat")
-            variables[name] = expression(source, variables, line)
+            variables[name] = expression(source, variables, line, functions, budget, depth)
 
         elif kind == "list_assign":
             _, line, name, index, source = node
@@ -297,28 +373,26 @@ def execute(nodes, variables, budget=None):
                 fail(line, "indeks hanya dapat digunakan pada daftar")
             if index < 0 or index >= len(daftar):
                 fail(line, "indeks daftar di luar batas")
-            daftar[index] = expression(source, variables, line)
+            daftar[index] = expression(source, variables, line, functions, budget, depth)
 
         elif kind == "print":
-            print(expression(node[2], variables, line))
+            print(expression(node[2], variables, line, functions, budget, depth))
 
         elif kind == "if":
             _, line, condition, yes, no = node
-            branch = yes if expression(
-                condition, variables, line
-            ) else no
-            execute(branch, variables, budget)
+            branch = yes if expression(condition, variables, line, functions, budget, depth) else no
+            execute(branch, variables, budget, functions, depth, in_function)
 
         elif kind == "while":
             _, line, condition, body = node
             count = 0
-            while expression(condition, variables, line):
+            while expression(condition, variables, line, functions, budget, depth):
                 budget[0] += 1
                 if budget[0] > 100000:
                     fail(line, "batas total 100000 langkah tercapai")
                 if count >= 10000:
                     fail(line, "batas 10000 iterasi tercapai")
-                execute(body, variables, budget)
+                execute(body, variables, budget, functions, depth, in_function)
                 count += 1
 
 
