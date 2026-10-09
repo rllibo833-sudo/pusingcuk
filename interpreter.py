@@ -72,6 +72,8 @@ def expression(source, variables, line):
                 fail(line, f"variabel '{node.id}' belum ada")
             return variables[node.id]
         if isinstance(node, ast.Constant):
+            if type(node.value) is int and node.value.bit_length() > 4096:
+                fail(line, "angka terlalu besar (maksimal 4096 bit)")
             if isinstance(node.value, (str, int, float, bool)):
                 return node.value
             fail(line, "tipe nilai tidak didukung")
@@ -115,7 +117,10 @@ def expression(source, variables, line):
                     fail(line, "hasil perkalian terlalu besar (maksimal 100000 elemen)")
             if isinstance(node.op, ast.Add) and isinstance(kiri, (str, list)) and type(kanan) is type(kiri) and len(kiri) + len(kanan) > 100000:
                 fail(line, "hasil penggabungan terlalu besar (maksimal 100000 elemen)")
-            return BINOPS[type(node.op)](kiri, kanan)
+            hasil = BINOPS[type(node.op)](kiri, kanan)
+            if type(hasil) is int and hasil.bit_length() > 4096:
+                fail(line, "hasil angka terlalu besar (maksimal 4096 bit)")
+            return hasil
 
         if isinstance(node, ast.UnaryOp) and type(node.op) in UNARYOPS:
             return UNARYOPS[type(node.op)](visit(node.operand))

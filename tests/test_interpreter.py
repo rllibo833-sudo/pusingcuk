@@ -219,5 +219,18 @@ selesai jancuk"""
                     self.run_code(code)
 
 
+
+    def test_oversized_integer_is_rejected(self):
+        cases = [
+            (str(1 << 4096), "angka terlalu besar"),
+            (f"{1 << 4095} * 2", "hasil angka terlalu besar"),
+        ]
+        for expression, message in cases:
+            with self.subTest(expression=message):
+                code = f"jancuk\nhedeh {expression}\nselesai jancuk"
+                with self.assertRaisesRegex(SyntaxError, message):
+                    self.run_code(code)
+
+
 if __name__ == "__main__":
     unittest.main()
