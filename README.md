@@ -60,6 +60,9 @@ Jika perintah pusingcuk belum tersedia:
 - mumet: memulai perulangan while
 - selesai mumet: mengakhiri perulangan
 - selesai jancuk: mengakhiri program
+- tanya: meminta masukan dari pengguna
+- fungsi: mendefinisikan fungsi
+- balek: mengembalikan nilai dari fungsi
 
 ## Nilai dan operator
 
@@ -76,6 +79,15 @@ Nilai yang didukung mencakup string, angka, dan boolean.
 - Elemen diakses berdasarkan indeks, dimulai dari 0.
 - Elemen list dapat diubah melalui indeks.
 - Fungsi `panjang(list)` mengembalikan jumlah elemen.
+
+## Contoh masukan pengguna
+
+```pusingcuk
+jancuk
+tanya nama = "Siapa nama kamu? "
+hedeh "Halo, " + nama
+selesai jancuk
+```
 
 ## Pengujian
 
