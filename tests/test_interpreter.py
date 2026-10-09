@@ -104,5 +104,15 @@ selesai jancuk"""
         self.assertEqual(self.run_code(code), "satu\ndua\n")
 
 
+    def test_loop_iteration_limit(self):
+        code = """jancuk
+mumet benar
+selesai mumet
+selesai jancuk"""
+        with self.assertRaises(SyntaxError) as context:
+            self.run_code(code)
+        self.assertIn("batas 10000 iterasi tercapai", str(context.exception))
+
+
 if __name__ == "__main__":
     unittest.main()
