@@ -82,11 +82,17 @@ def expression(source, variables, line):
             if not isinstance(daftar, list):
                 fail(line, "indeks hanya dapat digunakan pada daftar")
 
-            if not isinstance(node.slice, ast.Constant):
-                fail(line, "indeks harus berupa bilangan bulat")
-
-            indeks = node.slice.value
-            if type(indeks) is not int:
+            indeks_node = node.slice
+            if (
+                isinstance(indeks_node, ast.UnaryOp)
+                and isinstance(indeks_node.op, ast.USub)
+                and isinstance(indeks_node.operand, ast.Constant)
+                and type(indeks_node.operand.value) is int
+            ):
+                indeks = -indeks_node.operand.value
+            elif isinstance(indeks_node, ast.Constant) and type(indeks_node.value) is int:
+                indeks = indeks_node.value
+            else:
                 fail(line, "indeks harus berupa bilangan bulat")
 
             if indeks < 0 or indeks >= len(daftar):
