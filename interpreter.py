@@ -150,6 +150,8 @@ def expression(source, variables, line):
         raise
     except RecursionError:
         fail(line, "ekspresi terlalu dalam")
+    except ZeroDivisionError:
+        fail(line, "pembagian dengan nol")
     except Exception as exc:
         fail(line, f"ekspresi gagal: {exc}")
 
