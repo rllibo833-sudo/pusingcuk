@@ -69,15 +69,30 @@ Indeks dimulai dari 0. Elemen dapat dibaca dan diubah melalui indeks.
 Fungsi `panjang(list)` mengembalikan jumlah elemen.
 Akses indeks di luar batas menghasilkan kesalahan.
 
-## 8. Komentar
+## 8. Fungsi buatan pengguna
+
+Fungsi dideklarasikan dengan `fungsi nama(parameter)` dan diakhiri dengan `selesai fungsi`. Gunakan `balek ekspresi` untuk mengembalikan nilai. Jumlah argumen harus sesuai dengan jumlah parameter. Kedalaman pemanggilan fungsi dibatasi oleh interpreter.
+
+Contoh:
+
+```pusingcuk
+jancuk
+fungsi tambah(a, b)
+    balek a + b
+selesai fungsi
+hedeh tambah(2, 3)
+selesai jancuk
+```
+
+## 9. Komentar
 
 Baris yang setelah spasi awalnya dimulai dengan # dianggap komentar.
 
-## 9. Penanganan kesalahan
+## 10. Penanganan kesalahan
 
 Interpreter melaporkan kesalahan dengan nomor baris jika tersedia.
 
-## 10. Status spesifikasi
+## 11. Status spesifikasi
 
 Dokumen ini mencatat perilaku implementasi saat ini.
 Fitur yang belum diuji tidak dianggap telah didukung.

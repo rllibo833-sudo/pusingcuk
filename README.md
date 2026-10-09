@@ -86,7 +86,8 @@ Jalankan seluruh tes:
 ## Batasan saat ini
 
 - Interpreter masih menggunakan Python untuk parsing ekspresi.
-- Belum ada fungsi buatan pengguna atau sistem modul.
+- Fungsi buatan pengguna didukung dengan `fungsi` dan `balek`.
+- Sistem modul belum tersedia.
 - Belum ada sistem tipe statis.
 - Belum siap untuk menjalankan kode yang tidak tepercaya.
 - Sintaks dan implementasi masih dapat berubah.
