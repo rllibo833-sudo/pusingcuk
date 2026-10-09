@@ -50,7 +50,7 @@ Cabang kampret bersifat opsional.
         i = i + 1
     selesai mumet
 
-Interpreter memiliki batas 10000 iterasi per loop.
+Interpreter memiliki batas 10000 iterasi per loop dan 100000 langkah eksekusi total.
 
 ## 7. Operator
 
@@ -61,6 +61,13 @@ Perbandingan: == != < <= > >=
 Logika: dan, atau, bukan
 
 Boolean: benar, salah
+
+### List dan indeks
+
+List ditulis menggunakan tanda kurung siku, misalnya `[10, 20, 30]`.
+Indeks dimulai dari 0. Elemen dapat dibaca dan diubah melalui indeks.
+Fungsi `panjang(list)` mengembalikan jumlah elemen.
+Akses indeks di luar batas menghasilkan kesalahan.
 
 ## 8. Komentar
 

@@ -67,6 +67,13 @@ Nilai yang didukung mencakup string, angka, dan boolean.
 - ==, !=, <, <=, >, >=: perbandingan
 - dan, atau, bukan: logika
 
+### List dan indeks
+
+- List ditulis menggunakan tanda kurung siku, misalnya `[10, 20, 30]`.
+- Elemen diakses berdasarkan indeks, dimulai dari 0.
+- Elemen list dapat diubah melalui indeks.
+- Fungsi `panjang(list)` mengembalikan jumlah elemen.
+
 ## Pengujian
 
 Jalankan seluruh tes:
