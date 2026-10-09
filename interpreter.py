@@ -35,6 +35,8 @@ def fail(line, message):
 
 
 def expression(source, variables, line):
+    if len(source) > 10000:
+        fail(line, "ekspresi terlalu panjang (maksimal 10000 karakter)")
     replacements = {
         "benar": "True",
         "salah": "False",

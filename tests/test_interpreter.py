@@ -180,5 +180,11 @@ selesai jancuk"""
             self.run_code(code)
 
 
+    def test_expression_length_limit(self):
+        code = "jancuk\nhedeh \"" + "a" * 10001 + "\"\nselesai jancuk"
+        with self.assertRaisesRegex(SyntaxError, "ekspresi terlalu panjang"):
+            self.run_code(code)
+
+
 if __name__ == "__main__":
     unittest.main()
