@@ -1,6 +1,7 @@
 
 import ast
 import io
+import math
 import operator
 import re
 import sys
@@ -74,6 +75,8 @@ def expression(source, variables, line):
         if isinstance(node, ast.Constant):
             if type(node.value) is int and node.value.bit_length() > 4096:
                 fail(line, "angka terlalu besar (maksimal 4096 bit)")
+            if type(node.value) is float and not math.isfinite(node.value):
+                fail(line, "angka desimal tidak valid atau terlalu besar")
             if isinstance(node.value, (str, int, float, bool)):
                 return node.value
             fail(line, "tipe nilai tidak didukung")
@@ -120,6 +123,8 @@ def expression(source, variables, line):
             hasil = BINOPS[type(node.op)](kiri, kanan)
             if type(hasil) is int and hasil.bit_length() > 4096:
                 fail(line, "hasil angka terlalu besar (maksimal 4096 bit)")
+            if type(hasil) is float and not math.isfinite(hasil):
+                fail(line, "hasil angka desimal terlalu besar atau tidak valid")
             return hasil
 
         if isinstance(node, ast.UnaryOp) and type(node.op) in UNARYOPS:

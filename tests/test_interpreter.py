@@ -232,5 +232,18 @@ selesai jancuk"""
                     self.run_code(code)
 
 
+
+    def test_non_finite_float_is_rejected(self):
+        cases = [
+            ("1e309", "angka desimal tidak valid atau terlalu besar"),
+            ("1e308 * 1e308", "hasil angka desimal terlalu besar atau tidak valid"),
+        ]
+        for expression, message in cases:
+            with self.subTest(expression=expression):
+                code = f"jancuk\nhedeh {expression}\nselesai jancuk"
+                with self.assertRaisesRegex(SyntaxError, message):
+                    self.run_code(code)
+
+
 if __name__ == "__main__":
     unittest.main()
