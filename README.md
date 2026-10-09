@@ -12,6 +12,9 @@ Versi: 0.2-dev
 
 Implementasi saat ini berupa interpreter Python.
 
+Interpreter aktif: `interpreter.py`.
+`interpreter_v01.py` dan `interpreter_v02_backup.py` disimpan sebagai arsip historis, bukan entry point utama.
+
 ## Menjalankan program
 
 Jalankan file program:
