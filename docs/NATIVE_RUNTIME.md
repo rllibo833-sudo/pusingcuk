@@ -23,6 +23,10 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 
 Fixture kamus sukses berada di `tests/native/dictionaries.pusingcuk`; kasus kunci tidak valid dan kunci hilang masing-masing ada di `tests/native/dictionary_invalid_key.pusingcuk` dan `tests/native/dictionary_missing_key.pusingcuk`. Semuanya dijalankan oleh `make test-native`.
 
+## Contoh aplikasi native
+
+Contoh rekap anggaran yang menggunakan kamus, iterasi kunci, dan perhitungan total tersedia di `examples/native/rekap_anggaran.pusingcuk`. Panduan pemasangan executable pada Termux tersedia di [NATIVE_TERMUX.md](NATIVE_TERMUX.md).
+
 ## Build dan jalankan
 
 ```sh
