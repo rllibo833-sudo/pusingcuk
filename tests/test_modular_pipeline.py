@@ -134,6 +134,21 @@ hedeh panjang(kata)
 selesai jancuk"""
         self.assertEqual(capture(source), "u\n6\n")
 
+    def test_dictionary_iteration_yields_keys(self):
+        source = """jancuk
+lah pengguna = {"nama": "Budi", "umur": 20}
+untuk kunci dalam pengguna
+    hedeh kunci
+selesai untuk
+selesai jancuk"""
+        self.assertEqual(capture(source), "nama\\numur\\n")
+
+    def test_empty_dictionary_and_missing_key(self):
+        self.assertEqual(capture('jancuk\\nlah kosong = {}\\nhedeh panjang(kosong)\\nselesai jancuk'), "0\\n")
+        source = 'jancuk\\nlah pengguna = {"nama": "Budi"}\\nhedeh pengguna["umur"]\\nselesai jancuk'
+        with self.assertRaisesRegex(RuntimeError, "kunci kamus tidak ditemukan"):
+            Evaluator().run(source)
+
     def test_for_loop_rejects_non_iterable(self):
         source = """jancuk
 untuk angka dalam 12
