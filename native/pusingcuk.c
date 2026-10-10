@@ -537,11 +537,11 @@ static int run_range(int first,int last) {
                     fail("gagal membaca input pengguna"); 
                 } else {
                     size_t len=strlen(input);
-                    if(len && input[len-1]=='\\n') input[--len]=0;
-                    if(len && input[len-1]=='\\r') input[--len]=0;
+                    if(len && input[len-1]=='\n') input[--len]=0;
+                    if(len && input[len-1]=='\r') input[--len]=0;
                     if(len==sizeof input-1 && !feof(stdin)) {
                         int ch;
-                        while((ch=getchar())!='\\n' && ch!=EOF) {}
+                        while((ch=getchar())!='\n' && ch!=EOF) {}
                         fail("input terlalu panjang");
                     } else {
                         setvar(name,string(input));
