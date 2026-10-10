@@ -208,5 +208,37 @@ selesai jancuk"""
         self.assertEqual(result.stdout, "")
 
 
+
+    def test_builtin_function_names_cannot_be_redefined(self):
+        for name in ("panjang", "rentang"):
+            with self.subTest(name=name):
+                source = f"jancuk\\nfungsi {name}(x)\\n    balek x\\nselesai fungsi\\nselesai jancuk"
+                with self.assertRaisesRegex(RuntimeError, f"nama fungsi '{name}' sudah digunakan"):
+                    Evaluator().run(source)
+
+    def test_for_loop_can_be_nested(self):
+        source = """jancuk
+untuk luar dalam rentang(1, 3)
+    untuk dalam_angka dalam rentang(1, 3)
+        hedeh luar * 10 + dalam_angka
+    selesai untuk
+selesai untuk
+selesai jancuk"""
+        self.assertEqual(capture(source), "11\\n12\\n21\\n22\\n")
+
+    def test_dictionary_rejects_unhashable_key(self):
+        source = "jancuk\\nlah data = {[1, 2]: \"nilai\"}\\nselesai jancuk"
+        with self.assertRaisesRegex(RuntimeError, "kunci kamus harus dapat digunakan"):
+            Evaluator().run(source)
+
+    def test_range_requires_integer_arguments(self):
+        source = """jancuk
+untuk angka dalam rentang(1, 3.5)
+    hedeh angka
+selesai untuk
+selesai jancuk"""
+        with self.assertRaisesRegex(RuntimeError, "argumen rentang harus bilangan bulat"):
+            Evaluator().run(source)
+
 if __name__ == "__main__":
     unittest.main()
