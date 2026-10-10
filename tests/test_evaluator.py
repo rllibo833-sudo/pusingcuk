@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 from evaluator import capture, run
 
 
@@ -59,6 +60,13 @@ class EvaluatorTests(unittest.TestCase):
         self.assertEqual(capture(program(
             "hedeh benar\nhedeh salah"
         )), "okelah\ntidak\n")
+
+    def test_tanya_input(self):
+        source = program('tanya nama = "Nama? "\nhedeh "Halo, " + nama')
+        output = __import__("io").StringIO()
+        with patch("builtins.input", return_value="Budi"), patch("sys.stdout", output):
+            run(source)
+        self.assertEqual(output.getvalue(), "Halo, Budi\n")
 
 
 if __name__ == "__main__":
