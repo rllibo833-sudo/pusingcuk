@@ -51,7 +51,6 @@ test-native: native
 	actual="$$($(NATIVE_BIN) tests/native/nested_functions.pusingcuk)"; \
 	expected="$$(printf '11\n10')"; \
 	test "$$actual" = "$$expected"; \
-		test "$$actual" = "$$expected"; \
 	actual="$$($(NATIVE_BIN) tests/native/dictionary_key_types.pusingcuk)"; \
 	expected="$$(printf 'angka\nboolean\n2\ntidak')"; \
 	test "$$actual" = "$$expected"; \
