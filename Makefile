@@ -40,8 +40,8 @@ test-native: native
 	fi; \
 	$(NATIVE_BIN) examples/native/rekap_anggaran.pusingcuk > /tmp/pusingcuk-budget.out; \
 	grep -q 'Status: anggaran aman' /tmp/pusingcuk-budget.out; \
-	grep -q '^1200000$' /tmp/pusingcuk-budget.out; \
-	grep -q '^1300000$' /tmp/pusingcuk-budget.out; \
+	grep -q '^1200000$$' /tmp/pusingcuk-budget.out; \
+	grep -q '^1300000$$' /tmp/pusingcuk-budget.out; \
 	$(NATIVE_BIN) tests/native/list_reallocation.pusingcuk > /tmp/pusingcuk-list-reallocation.out; \
 	printf '1\n' > /tmp/pusingcuk-list-reallocation.expected; \
 	diff -u /tmp/pusingcuk-list-reallocation.expected /tmp/pusingcuk-list-reallocation.out; \
