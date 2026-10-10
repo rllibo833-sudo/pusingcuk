@@ -1,0 +1,11 @@
+inthiseco
+lah teks = "kamu"
+jir teks[1]
+lah padi = "padi🌾"
+jir padi[4]
+untuk huruf dalam "Gen Z"
+    jir huruf
+gitu untuk
+tanya nama = "Nama? "
+jir "Halo, " + nama
+gitu inthiseco
