@@ -63,10 +63,8 @@ class EvaluatorTests(unittest.TestCase):
 
     def test_tanya_input(self):
         source = program('tanya nama = "Nama? "\nhedeh "Halo, " + nama')
-        output = __import__("io").StringIO()
-        with patch("builtins.input", return_value="Budi"), patch("sys.stdout", output):
-            run(source)
-        self.assertEqual(output.getvalue(), "Halo, Budi\n")
+        with patch("builtins.input", return_value="Budi"):
+            self.assertEqual(capture(source), "Halo, Budi\n")
 
 
 if __name__ == "__main__":
