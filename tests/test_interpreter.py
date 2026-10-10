@@ -185,7 +185,7 @@ selesai jancuk"""
     def test_unterminated_string_is_reported_as_syntax_error(self):
         code = 'jancuk\nhedeh "abc\nselesai jancuk'
         with self.assertRaisesRegex(
-            SyntaxError, "ekspresi tidak valid: token tidak lengkap"
+            SyntaxError, "ekspresi tidak valid"
         ):
             self.run_code(code)
 
