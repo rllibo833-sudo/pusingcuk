@@ -8,7 +8,7 @@ Termux dan Python.
 
 ## Status
 
-Versi: 0.3-dev
+Versi: 0.4-dev
 
 Implementasi saat ini berupa interpreter Python.
 
@@ -124,3 +124,12 @@ Tes terminal juga memeriksa contoh `:contoh`, program buatan sendiri, dan alur i
 Membangun bahasa pemrograman yang konsisten, dapat diuji,
 dan semakin mandiri dari implementasi Python.
 # pusingcuk
+
+ 
+## Koleksi dan perulangan tambahan (0.4-dev)
+
+Kamus menggunakan sintaks {kunci: nilai}, misalnya {"nama": "Budi", "umur": 20}. Nilai dapat dibaca atau diubah lewat kamus[kunci]. Daftar dan teks dapat dibaca melalui indeks mulai dari 0.
+
+Perulangan untuk item dalam koleksi mendukung daftar, teks, kamus (menghasilkan kunci), dan rentang(...). Fungsi panjang(nilai) menerima daftar, teks, atau kamus. rentang(akhir), rentang(mulai, akhir), dan rentang(mulai, akhir, langkah) memakai batas akhir eksklusif seperti Python.
+
+Contoh program tersedia di examples/rekap_anggaran.pusingcuk.
