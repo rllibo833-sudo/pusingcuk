@@ -36,7 +36,7 @@ make run-native FILE=tests/native/strings_input.pusingcuk
 make test-native
 ```
 
-Binary default ditempatkan di `/tmp/pusingcuk-native`, bukan di pohon repositori. Untuk menguji input, program membaca satu baris dari stdin; batas panjang teks mengikuti buffer native saat ini.
+Binary default ditempatkan di root repositori sebagai `pusingcuk-native` (sesuai `NATIVE_BIN` pada Makefile). Atur `NATIVE_BIN` jika ingin menyimpan binary di lokasi lain. Binary hasil build dan keluaran tes adalah artefak lokal, bukan berkas yang perlu di-commit. Untuk menguji input, program membaca satu baris dari stdin; batas panjang teks mengikuti buffer native saat ini.
 
 ## Batasan dan keamanan
 
