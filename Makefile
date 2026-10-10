@@ -20,8 +20,14 @@ test-native: native
 	actual="$$($(NATIVE_BIN) tests/native/for_range.pusingcuk)"; \
 	expected="$$(printf '2\n4\n6\n1\n3\n3\n2\n1')"; \
 	test "$$actual" = "$$expected"; \
+	actual="$$(printf 'Budi\n' | $(NATIVE_BIN) tests/native/strings_input.pusingcuk)"; \
+	expected="$$(printf 'a\n🌾\nG\ne\nn\n \nZ\nNama? Halo, Budi')"; \
+	test "$$actual" = "$$expected"; \
 	if $(NATIVE_BIN) tests/native/range_zero_step.pusingcuk >/dev/null 2>&1; then \
 		echo 'rentang dengan langkah nol seharusnya gagal' >&2; exit 1; \
+	fi; \
+	if $(NATIVE_BIN) tests/native/string_index_out_of_range.pusingcuk >/dev/null 2>&1; then \
+		echo 'indeks teks di luar batas seharusnya gagal' >&2; exit 1; \
 	fi; \
 	$(NATIVE_BIN) tests/native/list_reallocation.pusingcuk > /tmp/pusingcuk-list-reallocation.out; \
 	printf '1\n' > /tmp/pusingcuk-list-reallocation.expected; \

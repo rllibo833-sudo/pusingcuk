@@ -125,12 +125,34 @@ static int list_index(Val v, Val idx, size_t *out) {
     if (v.t != LIST || !v.list) {
         fail("nilai bukan list"); return 0;
     }
-    if (idx.t != NUM || idx.n < 0 ||
+    if (idx.t != NUM || !isfinite(idx.n) || idx.n < 0 ||
         idx.n >= (double)v.list->len ||
-        idx.n != (double)(size_t)idx.n) {
+        idx.n != trunc(idx.n)) {
         fail("indeks list di luar batas atau bukan bilangan bulat"); return 0;
     }
     *out = (size_t)idx.n; return 1;
+}
+
+/* Move by UTF-8 code point so text indexing/iteration does not split characters. */
+static size_t utf8_next(const char *s, size_t offset) {
+    if (!s[offset]) return offset;
+    size_t next = offset + 1;
+    while (s[next] && (((unsigned char)s[next] & 0xC0) == 0x80)) next++;
+    return next;
+}
+static int string_index(Val v, Val idx, size_t *start, size_t *end) {
+    if (v.t != STR) { fail("nilai bukan teks"); return 0; }
+    if (idx.t != NUM || !isfinite(idx.n) || idx.n < 0 || idx.n != trunc(idx.n)) {
+        fail("indeks teks harus bilangan bulat nonnegatif"); return 0;
+    }
+    size_t offset = 0;
+    for (size_t i = 0; v.s[offset]; i++) {
+        size_t next = utf8_next(v.s, offset);
+        if ((double)i == idx.n) { *start = offset; *end = next; return 1; }
+        offset = next;
+    }
+    fail("indeks teks di luar batas");
+    return 0;
 }
 
 
@@ -246,6 +268,13 @@ static Val primary(void) {
         if (take("[")) {
             Val idx=expr();
             if (!take("]")) fail("kurung siku tutup ']' diharapkan");
+            if (value.t == STR) {
+                size_t start=0, end=0;
+                if (!string_index(value,idx,&start,&end)) return string("");
+                char ch[SZ]; size_t len=end-start;
+                memcpy(ch,value.s+start,len); ch[len]=0;
+                return string(ch);
+            }
             size_t at=0;
             if (!list_index(value,idx,&at)) return num(0);
             return value.list->items[at];
@@ -442,6 +471,19 @@ static int run_range(int first,int last) {
                     setvar(name, iterable.list->items[j]);
                     run_range(i+1,end);
                 }
+            } else if (!err && iterable.t == STR) {
+                size_t offset=0;
+                int iter=0;
+                while (!err && iterable.s[offset]) {
+                    if (++iter > MAX_ITER) { fail("batas 10000 iterasi teks terlampaui"); break; }
+                    if (++steps > MAX_STEPS) { fail("batas 100000 langkah terlampaui"); break; }
+                    size_t next=utf8_next(iterable.s,offset);
+                    char ch[SZ]; size_t len=next-offset;
+                    memcpy(ch,iterable.s+offset,len); ch[len]=0;
+                    setvar(name,string(ch));
+                    run_range(i+1,end);
+                    offset=next;
+                }
             } else if (!err && iterable.t == RANGE) {
                 int iter=0;
                 for (double x=iterable.range_start;
@@ -453,7 +495,7 @@ static int run_range(int first,int last) {
                     run_range(i+1,end);
                 }
             } else if (!err) {
-                fail("perulangan native saat ini menerima list atau rentang()");
+                fail("perulangan native saat ini menerima list, teks, atau rentang()");
             }
             i=end;
         } else if(word("mumet")) {
@@ -479,6 +521,33 @@ static int run_range(int first,int last) {
             Val v=expr();
             if(!endline()) fail("karakter tambahan setelah ekspresi");
             if(!err) setvar(name,v);
+        } else if(word("tanya")) {
+            char name[128]={0};
+            if(!identifier(name,sizeof name)) fail("nama variabel input diharapkan");
+            if(!err && hasvar(name)) fail("variabel input sudah dibuat");
+            if(!take("=")) fail("tanda '=' diharapkan setelah nama input");
+            Val prompt=expr();
+            if(!endline()) fail("karakter tambahan setelah prompt input");
+            if(!err && prompt.t!=STR) fail("prompt tanya harus berupa teks");
+            if(!err) {
+                char input[SZ];
+                fputs(prompt.s,stdout);
+                fflush(stdout);
+                if(!fgets(input,sizeof input,stdin)) {
+                    fail("gagal membaca input pengguna"); 
+                } else {
+                    size_t len=strlen(input);
+                    if(len && input[len-1]=='\n') input[--len]=0;
+                    if(len && input[len-1]=='\r') input[--len]=0;
+                    if(len==sizeof input-1 && !feof(stdin)) {
+                        int ch;
+                        while((ch=getchar())!='\n' && ch!=EOF) {}
+                        fail("input terlalu panjang");
+                    } else {
+                        setvar(name,string(input));
+                    }
+                }
+            }
         } else if(word("hedeh")) {
             Val v=expr();
             if(!endline()) fail("karakter tambahan setelah ekspresi");

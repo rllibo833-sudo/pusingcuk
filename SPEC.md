@@ -37,7 +37,7 @@ Assignment hanya boleh dilakukan pada variabel yang sudah dibuat.
     tanya nama = "Nama? "
     hedeh "Halo, " + nama
 
-`tanya` menampilkan prompt string dan membaca jawaban sebagai teks dari input standar. Input interaktif melalui Pusingcuk Studio belum diverifikasi.
+`tanya` menampilkan prompt teks dan membaca satu baris dari input standar. Ini tersedia pada runtime modular dan native CLI; input interaktif melalui Pusingcuk Studio belum diverifikasi. Runtime native mendukung indeks teks nonnegatif berbasis code point UTF-8; indeks negatif belum didukung.
 
 ## 6. Kondisi
 
@@ -87,7 +87,7 @@ Contoh:
     selesai untuk
     selesai jancuk
 
-Perulangan modular untuk nama dalam koleksi mengunjungi setiap elemen daftar atau teks, setiap kunci kamus, atau setiap bilangan dalam rentang. Runtime native C saat ini mendukung iterasi list dan `rentang()`; iterasi teks dan kamus belum tersedia di native.
+Perulangan modular untuk nama dalam koleksi mengunjungi setiap elemen daftar atau teks, setiap kunci kamus, atau setiap bilangan dalam rentang. Runtime native C yang diuji mendukung iterasi list, teks (per code point UTF-8), dan `rentang()`; iterasi kamus belum tersedia di native.
 
 `rentang(akhir)`, `rentang(mulai, akhir)`, dan `rentang(mulai, akhir, langkah)` menerima satu sampai tiga argumen bilangan bulat. Batas akhir tidak termasuk hasil. Langkah tidak boleh nol. Setiap perulangan dibatasi 10000 iterasi dan seluruh program dibatasi 100000 langkah native/modular.
 
