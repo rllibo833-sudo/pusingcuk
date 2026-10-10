@@ -85,12 +85,32 @@ Nilai yang didukung mencakup string, angka, dan boolean.
 - ==, !=, <, <=, >, >=: perbandingan
 - dan, atau, bukan: logika
 
-### List dan indeks
+### Daftar, kamus, teks, dan indeks
 
-- List ditulis menggunakan tanda kurung siku, misalnya `[10, 20, 30]`.
-- Elemen diakses berdasarkan indeks, dimulai dari 0.
-- Elemen list dapat diubah melalui indeks.
-- Fungsi `panjang(list)` mengembalikan jumlah elemen.
+- Daftar ditulis dengan tanda kurung siku, misalnya `[10, 20, 30]`.
+- Kamus ditulis dengan pasangan `kunci: nilai`, misalnya `{"nama": "Budi", "umur": 20}`.
+- Indeks daftar dan teks dimulai dari 0; nilai daftar dapat diubah melalui indeks.
+- Nilai kamus dapat dibaca dan diubah melalui kunci.
+- `panjang(nilai)` menerima daftar, teks, atau kamus.
+
+### Perulangan `untuk` dan rentang
+
+- Bentuk: `untuk nama dalam koleksi`, ditutup dengan `selesai untuk`.
+- Koleksi yang didukung: daftar, teks, kamus (iterasi menghasilkan kunci), dan hasil `rentang(...)`.
+- `rentang(akhir)`, `rentang(mulai, akhir)`, atau `rentang(mulai, akhir, langkah)` menerima bilangan bulat; batas akhir tidak termasuk dan langkah tidak boleh nol.
+- Perulangan tunduk pada batas total langkah evaluator.
+
+Contoh:
+
+```pusingcuk
+jancuk
+untuk angka dalam rentang(1, 5)
+    hedeh angka
+selesai untuk
+selesai jancuk
+```
+
+Contoh program lain tersedia di `examples/rekap_anggaran.pusingcuk`.
 
 ## Contoh masukan pengguna
 
@@ -123,13 +143,3 @@ Tes terminal juga memeriksa contoh `:contoh`, program buatan sendiri, dan alur i
 
 Membangun bahasa pemrograman yang konsisten, dapat diuji,
 dan semakin mandiri dari implementasi Python.
-# pusingcuk
-
- 
-## Koleksi dan perulangan tambahan (0.4-dev)
-
-Kamus menggunakan sintaks {kunci: nilai}, misalnya {"nama": "Budi", "umur": 20}. Nilai dapat dibaca atau diubah lewat kamus[kunci]. Daftar dan teks dapat dibaca melalui indeks mulai dari 0.
-
-Perulangan untuk item dalam koleksi mendukung daftar, teks, kamus (menghasilkan kunci), dan rentang(...). Fungsi panjang(nilai) menerima daftar, teks, atau kamus. rentang(akhir), rentang(mulai, akhir), dan rentang(mulai, akhir, langkah) memakai batas akhir eksklusif seperti Python.
-
-Contoh program tersedia di examples/rekap_anggaran.pusingcuk.
