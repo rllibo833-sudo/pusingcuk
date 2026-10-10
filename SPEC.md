@@ -32,7 +32,14 @@ Assignment hanya boleh dilakukan pada variabel yang sudah dibuat.
     hedeh umur
     hedeh umur + 1
 
-## 5. Kondisi
+## 5. Input pengguna
+
+    tanya nama = "Nama? "
+    hedeh "Halo, " + nama
+
+`tanya` menampilkan prompt string dan membaca jawaban sebagai teks dari input standar. Input interaktif melalui Pusingcuk Studio belum diverifikasi.
+
+## 6. Kondisi
 
     njir umur >= 18
         hedeh "Dewasa"
@@ -42,7 +49,7 @@ Assignment hanya boleh dilakukan pada variabel yang sudah dibuat.
 
 Cabang kampret bersifat opsional.
 
-## 6. Perulangan
+## 7. Perulangan
 
     lah i = 1
     mumet i <= 3
@@ -52,7 +59,7 @@ Cabang kampret bersifat opsional.
 
 Interpreter memiliki batas 10000 iterasi per loop dan 100000 langkah eksekusi total.
 
-## 7. Operator
+## 8. Operator
 
 Matematika: + - * / // %
 
@@ -69,7 +76,7 @@ Indeks dimulai dari 0. Elemen dapat dibaca dan diubah melalui indeks.
 Fungsi `panjang(list)` mengembalikan jumlah elemen.
 Akses indeks di luar batas menghasilkan kesalahan.
 
-## 8. Fungsi buatan pengguna
+## 9. Fungsi buatan pengguna
 
 Fungsi dideklarasikan dengan `fungsi nama(parameter)` dan diakhiri dengan `selesai fungsi`. Gunakan `balek ekspresi` untuk mengembalikan nilai. Jumlah argumen harus sesuai dengan jumlah parameter. Kedalaman pemanggilan fungsi dibatasi oleh interpreter.
 
@@ -84,15 +91,15 @@ hedeh tambah(2, 3)
 selesai jancuk
 ```
 
-## 9. Komentar
+## 10. Komentar
 
 Baris yang setelah spasi awalnya dimulai dengan # dianggap komentar.
 
-## 10. Penanganan kesalahan
+## 11. Penanganan kesalahan
 
 Interpreter melaporkan kesalahan dengan nomor baris jika tersedia.
 
-## 11. Status spesifikasi
+## 12. Status spesifikasi
 
 Dokumen ini mencatat perilaku implementasi saat ini.
 Fitur yang belum diuji tidak dianggap telah didukung.
