@@ -1,0 +1,15 @@
+jancuk
+lah angka = 10
+
+fungsi tambah(a, b)
+    balek a + b
+selesai fungsi
+
+fungsi luar(angka)
+    lah hasil = tambah(angka, 5)
+    balek hasil + angka
+selesai fungsi
+
+hedeh luar(3)
+hedeh angka
+selesai jancuk

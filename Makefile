@@ -48,6 +48,10 @@ test-native: native
 	actual="$$($(NATIVE_BIN) tests/native/functions.pusingcuk)"; \
 	expected="$$(printf '5\n120\n3\n9')"; \
 	if [ "$$actual" != "$$expected" ]; then printf "fungsi actual=[%s] expected=[%s]\\n" "$$actual" "$$expected" >&2; exit 1; fi; \
+	actual="$$($(NATIVE_BIN) tests/native/nested_functions.pusingcuk)"; \
+	expected="$$(printf '11\n10')"; \
+	test "$$actual" = "$$expected"; \
+		test "$$actual" = "$$expected"; \
 	actual="$$($(NATIVE_BIN) tests/native/dictionary_key_types.pusingcuk)"; \
 	expected="$$(printf 'angka\nboolean\n2\ntidak')"; \
 	test "$$actual" = "$$expected"; \
