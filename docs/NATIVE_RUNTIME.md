@@ -19,7 +19,7 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 | Literal kamus, kunci teks/angka/boolean, baca/ubah/tambah kunci | Teruji |
 | `panjang(kamus)`, truthiness kamus kosong/terisi, iterasi kunci | Teruji |
 | Error untuk kunci yang tidak didukung dan kunci yang tidak ditemukan | Teruji |
-| Fungsi buatan pengguna (`fungsi`, parameter, `balek`, rekursi) | Teruji oleh CI Ubuntu; belum diuji pada perangkat Termux nyata |
+| Fungsi buatan pengguna (`fungsi`, parameter, `balek`, rekursi) | Teruji oleh CI GCC/Clang di Ubuntu; perangkat Termux nyata belum diverifikasi |
 | Sistem modul | Belum tersedia di native |
 
 Fixture kamus sukses berada di `tests/native/dictionaries.pusingcuk`; kasus kunci tidak valid dan kunci hilang masing-masing ada di `tests/native/dictionary_invalid_key.pusingcuk` dan `tests/native/dictionary_missing_key.pusingcuk`. Fixture fungsi dan rekursi ada di `tests/native/functions.pusingcuk`; jumlah argumen yang salah diuji di `tests/native/function_wrong_arity.pusingcuk`. Semuanya dijalankan oleh `make test-native`.
@@ -42,9 +42,9 @@ Binary default ditempatkan di root repositori sebagai `pusingcuk-native` (sesuai
 
 - Kamus native dibatasi hingga 256 entri dan menerima kunci teks, angka, atau boolean.
 - Kunci yang tidak didukung serta pembacaan kunci yang tidak ditemukan menghasilkan error.
-- Native C belum setara penuh dengan pipeline modular Python. Fungsi native dibatasi 128 deklarasi tingkat atas, 32 parameter/argumen per fungsi, dan kedalaman panggilan 100; sistem modul belum tersedia.
+- Runtime native C belum setara penuh dengan pipeline modular Python. Fungsi native dibatasi 128 deklarasi tingkat atas, 32 parameter/argumen per fungsi, dan kedalaman panggilan 100; sistem modul belum tersedia.
 - Indeks teks native menerima indeks bilangan bulat nonnegatif; indeks negatif belum didukung.
-- Teks memakai buffer tetap, sehingga string terlalu panjang ditolak atau dipotong sesuai jalur yang ada; jangan menganggapnya sebagai implementasi Unicode lengkap.
+- Teks native disimpan dalam buffer tetap berukuran 1024 byte. Operasi yang membangun teks harus diperiksa terhadap batas ini; dukungan indeks/iterasi code point UTF-8 tidak berarti runtime telah memvalidasi semua urutan UTF-8 atau menyediakan normalisasi Unicode.
 - Batas loop dan langkah eksekusi membantu mengendalikan beban, tetapi **bukan sandbox**. Jangan jalankan program tak tepercaya dengan asumsi terisolasi.
 - Setiap fitur native baru wajib memiliki fixture yang dijalankan oleh `make test-native`, termasuk kasus error bila relevan. Dokumentasi tidak boleh mengklaim dukungan hanya karena interpreter Python mendukung fitur tersebut.
 
