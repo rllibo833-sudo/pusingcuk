@@ -24,7 +24,7 @@ test-native: native
 	expected="$$(printf 'a\n🌾\nG\ne\nn\n \nZ\nNama? Halo, Budi')"; \
 	test "$$actual" = "$$expected"; \
 	actual="$$($(NATIVE_BIN) tests/native/dictionaries.pusingcuk)"; \
-	expected="$$(printf 'Budi\n20\n21\n3\nnama\numur\nstatus')"; \
+	expected="$$(printf 'Budi\n20\n21\nsatu\nya\n5\nnama\numur\n1\nokelah\nstatus\nkamus terisi\nkamus kosong')"; \
 	if [ "$$actual" != "$$expected" ]; then printf "%s\\n" "$$actual" > /tmp/pusingcuk-dict.actual; printf "%s\\n" "$$expected" > /tmp/pusingcuk-dict.expected; diff -u /tmp/pusingcuk-dict.expected /tmp/pusingcuk-dict.actual; exit 1; fi; \
 	if $(NATIVE_BIN) tests/native/dictionary_missing_key.pusingcuk >/dev/null 2>&1; then \
 		echo 'kunci kamus yang tidak ada seharusnya gagal' >&2; exit 1; \
