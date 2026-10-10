@@ -78,6 +78,33 @@ Jika perintah pusingcuk belum tersedia:
 - fungsi: mendefinisikan fungsi
 - balek: mengembalikan nilai dari fungsi
 
+### Kosakata Gen Z dan Gen Alpha
+
+Pusingcuk menerima kata slang sebagai alias yang tetap kompatibel dengan sintaks lama:
+
+| Kata | Setara dengan | Fungsi |
+|---|---|---|
+| `jir` | `hedeh` | Menampilkan nilai |
+| `adooh` | `kampret` | Cabang alternatif pada kondisi |
+| `gitu` | `selesai` | Menutup blok, diikuti jenis blok |
+| `inthiseco` | `jancuk` | Memulai program; penutupnya `gitu inthiseco` |
+| `janggal` | `bukan` | Negasi logika |
+
+Contoh:
+
+```pusingcuk
+inthiseco
+lah umur = 17
+njir janggal (umur >= 18)
+    jir "Belum dewasa, jir."
+adooh
+    jir "Sudah dewasa."
+gitu njir
+gitu inthiseco
+```
+
+Daftar istilah dan alasan pemilihannya ada di [Kosakata Slang Pusingcuk](docs/KOSAKATA_GENZ.md). Alias ini tidak menghapus kata lama, jadi program yang sudah ada tetap kompatibel.
+
 ## Nilai dan operator
 
 Nilai yang didukung mencakup teks, angka, boolean, daftar, dan kamus. Built-in `panjang` menghitung panjang teks, daftar, atau kamus; `rentang` membuat rentang bilangan bulat untuk perulangan.

@@ -250,5 +250,39 @@ selesai jancuk"""
         with self.assertRaisesRegex(RuntimeError, "batas 10000 iterasi tercapai"):
             Evaluator().run(source)
 
+    def test_lexer_canonicalizes_genz_aliases(self):
+        tokens = lex("inthiseco jir adooh gitu janggal")
+        self.assertEqual(
+            [(token.kind, token.value) for token in tokens],
+            [
+                ("KEYWORD", "jancuk"),
+                ("KEYWORD", "hedeh"),
+                ("KEYWORD", "kampret"),
+                ("KEYWORD", "selesai"),
+                ("KEYWORD", "bukan"),
+                ("EOF", None),
+            ],
+        )
+
+    def test_genz_aliases_work_in_the_modular_interpreter(self):
+        source = """inthiseco
+jir "Pusingcuk native"
+jir janggal benar
+njir benar
+    jir "cabang utama"
+adooh
+    jir "salah"
+gitu njir
+njir salah
+    jir "salah"
+adooh
+    jir "adooh aktif"
+gitu njir
+gitu inthiseco"""
+        self.assertEqual(
+            capture(source),
+            "Pusingcuk native\ntidak\ncabang utama\nadooh aktif\n",
+        )
+
 if __name__ == "__main__":
     unittest.main()

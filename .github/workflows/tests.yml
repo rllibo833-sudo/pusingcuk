@@ -25,3 +25,17 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Jalankan semua tes
         run: python -m unittest discover -s tests -v
+
+  native-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ambil kode
+        uses: actions/checkout@v4
+      - name: Kompilasi runtime C mandiri
+        run: cc -std=c11 -Wall -Wextra native/pusingcuk.c -lm -o /tmp/pusingcuk-native
+      - name: Uji kosakata slang pada runtime C
+        shell: bash
+        run: |
+          actual="$(/tmp/pusingcuk-native tests/native/slang_aliases.pusingcuk)"
+          expected="$(printf 'Pusingcuk native\ntidak\ncabang utama\nadooh aktif')"
+          test "$actual" = "$expected"

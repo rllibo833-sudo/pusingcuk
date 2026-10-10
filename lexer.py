@@ -3,6 +3,14 @@
 from dataclasses import dataclass
 
 
+KEYWORD_ALIASES = {
+    "jir": "hedeh",
+    "adooh": "kampret",
+    "gitu": "selesai",
+    "inthiseco": "jancuk",
+    "janggal": "bukan",
+}
+
 KEYWORDS = frozenset({
     "jancuk",
     "selesai",
@@ -21,7 +29,7 @@ KEYWORDS = frozenset({
     "bukan",
     "benar",
     "salah",
-})
+}) | frozenset(KEYWORD_ALIASES)
 
 MULTI_OPERATORS = ("==", "!=", "<=", ">=", "//")
 SINGLE_OPERATORS = frozenset("+-*/%=<>")
@@ -124,6 +132,7 @@ class Lexer:
 
         value = self.source[start:self.position]
         kind = "KEYWORD" if value in KEYWORDS else "IDENT"
+        value = KEYWORD_ALIASES.get(value, value)
 
         return Token(kind, value, line, column)
 

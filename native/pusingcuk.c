@@ -36,10 +36,31 @@ static int take(const char *s) {
     return 0;
 }
 static int word(const char *s) {
-    ws(); size_t n=strlen(s);
-    if (strncmp(p,s,n)) return 0;
-    if (isalnum((unsigned char)p[n]) || p[n]=='_') return 0;
-    p+=n; return 1;
+    static const struct { const char *alias, *canonical; } aliases[] = {
+        {"jir", "hedeh"},
+        {"adooh", "kampret"},
+        {"gitu", "selesai"},
+        {"inthiseco", "jancuk"},
+        {"janggal", "bukan"},
+    };
+    ws();
+    size_t n = strlen(s);
+    if (!strncmp(p, s, n) &&
+        !isalnum((unsigned char)p[n]) && p[n] != '_') {
+        p += n;
+        return 1;
+    }
+    for (size_t i = 0; i < sizeof aliases / sizeof aliases[0]; i++) {
+        size_t alias_len = strlen(aliases[i].alias);
+        if (!strcmp(s, aliases[i].canonical) &&
+            !strncmp(p, aliases[i].alias, alias_len) &&
+            !isalnum((unsigned char)p[alias_len]) &&
+            p[alias_len] != '_') {
+            p += alias_len;
+            return 1;
+        }
+    }
+    return 0;
 }
 static int endline(void) { ws(); return !*p || *p=='\n' || *p=='\r' || *p=='#'; }
 static int truth(Val v) {
