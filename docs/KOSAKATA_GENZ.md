@@ -39,12 +39,12 @@ gitu inthiseco
 | `jir` / `hedeh` | Menampilkan nilai | Didukung |
 | `njir` / `adooh` | Kondisi dan cabang alternatif | Didukung |
 | `mumet` | Perulangan selama kondisi benar | Didukung |
-| `untuk ... dalam ...` | Mengunjungi elemen koleksi | List, teks UTF-8, dan `rentang()` didukung |
-| `panjang(nilai)` | Menghitung jumlah item/karakter | List, teks, rentang didukung |
+| `untuk ... dalam ...` | Mengunjungi elemen koleksi | List, teks UTF-8, kamus (menghasilkan kunci), dan `rentang()` didukung |
+| `panjang(nilai)` | Menghitung jumlah item/karakter/entri | List, teks, kamus, dan rentang didukung |
 | `rentang(...)` | Membuat rentang bilangan bulat dengan batas akhir eksklusif | Didukung; 1–3 argumen bulat |
 | `tanya` | Membaca masukan pengguna | Didukung melalui stdin; diuji lewat fixture native |
-| `fungsi` / `balek` | Mendefinisikan dan mengembalikan nilai fungsi | Belum didukung native |
-| Kamus `{kunci: nilai}` | Menyimpan pasangan kunci-nilai | Belum didukung native |
+| `fungsi` / `balek` | Mendefinisikan dan mengembalikan nilai fungsi | Didukung pada subset native teruji; lihat matriks runtime |
+| Kamus `{kunci: nilai}` | Menyimpan pasangan kunci-nilai | Didukung pada subset native teruji; kunci teks/angka/boolean, batas 256 entri |
 
 ## Contoh runtime native
 
