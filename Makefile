@@ -42,4 +42,10 @@ test-native: native
 	grep -q 'Status: anggaran aman' /tmp/pusingcuk-budget.out; \
 	$(NATIVE_BIN) tests/native/list_reallocation.pusingcuk > /tmp/pusingcuk-list-reallocation.out; \
 	printf '1\n' > /tmp/pusingcuk-list-reallocation.expected; \
-	diff -u /tmp/pusingcuk-list-reallocation.expected /tmp/pusingcuk-list-reallocation.out
+	diff -u /tmp/pusingcuk-list-reallocation.expected /tmp/pusingcuk-list-reallocation.out; \
+	actual="$($(NATIVE_BIN) tests/native/functions.pusingcuk)"; \
+	expected="$(printf '5\n120')"; \
+	test "$actual" = "$expected"; \
+	if $(NATIVE_BIN) tests/native/function_wrong_arity.pusingcuk >/dev/null 2>&1; then \
+		echo 'pemanggilan fungsi dengan jumlah argumen salah seharusnya gagal' >&2; exit 1; \
+	fi
