@@ -33,7 +33,7 @@ class RuntimeConformanceTests(unittest.TestCase):
         )
         if build.returncode != 0:
             raise RuntimeError(
-                "Build runtime native gagal sebelum tes konformansi:\\n"
+                "Build runtime native gagal sebelum tes konformansi:\n"
                 + build.stdout + build.stderr
             )
 

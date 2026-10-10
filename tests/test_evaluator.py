@@ -32,9 +32,9 @@ class EvaluatorTests(unittest.TestCase):
 
     def test_function_can_be_called_before_definition(self):
         self.assertEqual(capture(program(
-            "hedeh tambah(4, 5)\\n"
-            "fungsi tambah(a, b)\\nbalek a + b\\nselesai fungsi"
-        )), "9\\n")
+            "hedeh tambah(4, 5)\n"
+            "fungsi tambah(a, b)\nbalek a + b\nselesai fungsi"
+        )), "9\n")
 
     def test_undefined_variable(self):
         with self.assertRaisesRegex(RuntimeError, "belum dibuat"):
