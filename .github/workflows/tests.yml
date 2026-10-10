@@ -9,9 +9,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: pusingcuk-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -23,13 +28,22 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Jalankan semua tes
+      - name: Jalankan semua tes referensi
         run: python -m unittest discover -s tests -v
 
   native-runtime:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gcc, clang]
+    env:
+      CC: ${{ matrix.compiler }}
     steps:
       - name: Ambil kode
         uses: actions/checkout@v4
-      - name: Uji runtime native mandiri
+      - name: Verifikasi compiler
+        run: ${{ matrix.compiler }} --version
+      - name: Kompilasi dan uji runtime native
         run: make test-native
