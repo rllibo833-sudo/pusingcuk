@@ -1,4 +1,4 @@
-# Spesifikasi Sintaks pusingcuk v0.2-dev
+# Spesifikasi Sintaks Pusingcuk v0.4-dev
 
 ## 1. Struktur program
 
@@ -103,3 +103,14 @@ Interpreter melaporkan kesalahan dengan nomor baris jika tersedia.
 
 Dokumen ini mencatat perilaku implementasi saat ini.
 Fitur yang belum diuji tidak dianggap telah didukung.
+
+
+## 13. Koleksi dan perulangan untuk (0.4-dev)
+
+Kamus ditulis dengan kurung kurawal dan pasangan kunci: nilai, contohnya {"nama": "Budi", "umur": 20}. Kunci dapat berupa nilai yang bisa digunakan sebagai kunci kamus. Nilai dapat diambil dan diubah melalui indeks kamus. Fungsi panjang menerima daftar, teks, atau kamus.
+
+Perulangan untuk nama dalam koleksi menjalankan badan perulangan untuk setiap elemen daftar atau teks, setiap kunci kamus, atau setiap bilangan dari rentang.
+
+rentang(akhir), rentang(mulai, akhir), dan rentang(mulai, akhir, langkah) menerima satu sampai tiga argumen bilangan bulat. Batas akhir tidak termasuk hasil; langkah tidak boleh nol. Iterasi tunduk pada batas total langkah evaluator.
+
+Catatan: fitur ini diterapkan pada pipeline Python modular. Kesetaraan native C belum diverifikasi.
