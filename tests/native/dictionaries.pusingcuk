@@ -1,12 +1,23 @@
 inthiseco
-lah data = {"nama": "Budi", "umur": 20}
+lah data = {"nama": "Budi", "umur": 20, 1: "satu", benar: "ya"}
 jir data["nama"]
 jir data["umur"]
 data["umur"] = 21
 jir data["umur"]
+jir data[1]
+jir data[benar]
 data["status"] = "aktif"
 jir panjang(data)
 untuk kunci dalam data
     jir kunci
 gitu untuk
+njir data
+    jir "kamus terisi"
+gitu njir
+lah kosong = {}
+njir kosong
+    jir "kamus tidak kosong"
+adooh
+    jir "kamus kosong"
+gitu njir
 gitu inthiseco
