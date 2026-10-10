@@ -13,7 +13,7 @@ run-native: native
 	"$(NATIVE_BIN)" "$(FILE)"
 
 test-native: native
-	@set -eux; \
+	@set -eu; \
 	actual="$$($(NATIVE_BIN) tests/native/slang_aliases.pusingcuk)"; \
 	expected="$$(printf 'Pusingcuk native\ntidak\ncabang utama\nadooh aktif')"; \
 	test "$$actual" = "$$expected"; \
