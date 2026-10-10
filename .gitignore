@@ -11,3 +11,12 @@ backups/
 # Local learning programs
 belajar.pusingcuk
 belajar_tanya.pusingcuk
+
+# Local compiled binaries
+/pusingcuk-test
+/native_list_test
+/native_test
+/native/pusingcuk
+/native/pusingcuk.c.bak-*
+__pycache__/
+*.pyc

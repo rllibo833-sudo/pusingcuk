@@ -1,0 +1,8 @@
+jancuk
+lah angka = [10, 20, 30]
+hedeh panjang(angka)
+hedeh angka[1]
+angka[1] = 99
+hedeh angka[1]
+hedeh panjang([])
+selesai jancuk

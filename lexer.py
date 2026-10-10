@@ -1,0 +1,272 @@
+"""Lexer mandiri untuk bahasa pemrograman Pusingcuk v0.3-dev."""
+
+from dataclasses import dataclass
+
+
+KEYWORDS = frozenset({
+    "jancuk",
+    "selesai",
+    "lah",
+    "hedeh",
+    "njir",
+    "kampret",
+    "mumet",
+    "tanya",
+    "fungsi",
+    "balek",
+    "dan",
+    "atau",
+    "bukan",
+    "benar",
+    "salah",
+})
+
+MULTI_OPERATORS = ("==", "!=", "<=", ">=", "//")
+SINGLE_OPERATORS = frozenset("+-*/%=<>")
+PUNCTUATION = frozenset("()[],")
+
+
+class LexerError(ValueError):
+    """Kesalahan ketika membaca karakter sumber."""
+
+
+@dataclass(frozen=True)
+class Token:
+    kind: str
+    value: object
+    line: int
+    column: int
+
+    def __repr__(self):
+        return (
+            f"Token({self.kind!r}, {self.value!r}, "
+            f"baris={self.line}, kolom={self.column})"
+        )
+
+
+class Lexer:
+    def __init__(self, source):
+        if not isinstance(source, str):
+            raise TypeError("Sumber lexer harus berupa string.")
+
+        self.source = source
+        self.position = 0
+        self.line = 1
+        self.column = 1
+        self.length = len(source)
+
+    def _peek(self, offset=0):
+        index = self.position + offset
+        if index >= self.length:
+            return ""
+        return self.source[index]
+
+    def _advance(self):
+        char = self._peek()
+        if not char:
+            return ""
+
+        self.position += 1
+
+        if char == "\n":
+            self.line += 1
+            self.column = 1
+        else:
+            self.column += 1
+
+        return char
+
+    def _error(self, line, column, message):
+        raise LexerError(
+            f"Baris {line}, kolom {column}: {message}"
+        )
+
+    def _read_number(self):
+        line, column = self.line, self.column
+        start = self.position
+
+        while self._peek().isdigit():
+            self._advance()
+
+        kind = "INTEGER"
+
+        if self._peek() == "." and self._peek(1).isdigit():
+            kind = "FLOAT"
+            self._advance()
+
+            while self._peek().isdigit():
+                self._advance()
+
+        text = self.source[start:self.position]
+
+        if kind == "INTEGER":
+            value = int(text)
+        else:
+            value = float(text)
+
+        return Token(kind, value, line, column)
+
+    def _read_identifier(self):
+        line, column = self.line, self.column
+        start = self.position
+
+        self._advance()
+
+        while True:
+            char = self._peek()
+            if not char or not (
+                char.isascii() and (char.isalnum() or char == "_")
+            ):
+                break
+            self._advance()
+
+        value = self.source[start:self.position]
+        kind = "KEYWORD" if value in KEYWORDS else "IDENT"
+
+        return Token(kind, value, line, column)
+
+    def _read_string(self):
+        line, column = self.line, self.column
+        quote = self._advance()
+        chars = []
+
+        escapes = {
+            "n": "\n",
+            "t": "\t",
+            "r": "\r",
+            "\\": "\\",
+            '"': '"',
+            "'": "'",
+        }
+
+        while True:
+            char = self._peek()
+
+            if not char:
+                self._error(
+                    line, column, "string belum ditutup"
+                )
+
+            if char == "\n":
+                self._error(
+                    line, column,
+                    "string tidak boleh melewati baris tanpa escape"
+                )
+
+            self._advance()
+
+            if char == quote:
+                break
+
+            if char == "\\":
+                escaped = self._peek()
+
+                if not escaped:
+                    self._error(
+                        line, column, "escape string tidak lengkap"
+                    )
+
+                if escaped == "\n":
+                    self._error(
+                        self.line, self.column,
+                        "escape baris baru belum didukung"
+                    )
+
+                self._advance()
+
+                if escaped not in escapes:
+                    self._error(
+                        self.line,
+                        max(1, self.column - 1),
+                        f"escape tidak dikenal: \\{escaped}",
+                    )
+
+                chars.append(escapes[escaped])
+            else:
+                chars.append(char)
+
+        return Token("STRING", "".join(chars), line, column)
+
+    def tokenize(self):
+        tokens = []
+
+        while self.position < self.length:
+            char = self._peek()
+
+            if char in " \t\r":
+                self._advance()
+                continue
+
+            if char == "\n":
+                tokens.append(
+                    Token("NEWLINE", "\n", self.line, self.column)
+                )
+                self._advance()
+                continue
+
+            if char == "#":
+                while self._peek() and self._peek() != "\n":
+                    self._advance()
+                continue
+
+            if char in ("'", '"'):
+                tokens.append(self._read_string())
+                continue
+
+            if char.isdigit():
+                tokens.append(self._read_number())
+                continue
+
+            if char.isascii() and (
+                char.isalpha() or char == "_"
+            ):
+                tokens.append(self._read_identifier())
+                continue
+
+            matched = False
+
+            for operator in MULTI_OPERATORS:
+                if self.source.startswith(
+                    operator, self.position
+                ):
+                    line, column = self.line, self.column
+
+                    for _ in operator:
+                        self._advance()
+
+                    tokens.append(
+                        Token("OP", operator, line, column)
+                    )
+                    matched = True
+                    break
+
+            if matched:
+                continue
+
+            if char in SINGLE_OPERATORS:
+                tokens.append(
+                    Token("OP", char, self.line, self.column)
+                )
+                self._advance()
+                continue
+
+            if char in PUNCTUATION:
+                tokens.append(
+                    Token("PUNCT", char, self.line, self.column)
+                )
+                self._advance()
+                continue
+
+            self._error(
+                self.line,
+                self.column,
+                f"karakter tidak dikenal: {char!r}",
+            )
+
+        tokens.append(Token("EOF", None, self.line, self.column))
+        return tokens
+
+
+def lex(source):
+    """Fungsi praktis untuk mengubah teks menjadi daftar token."""
+    return Lexer(source).tokenize()

@@ -1,0 +1,233 @@
+"""Parser Pusingcuk: token lexer -> AST."""
+from lexer import lex, LexerError
+from ast_nodes import node
+
+
+class ParserError(ValueError):
+    pass
+
+
+class Parser:
+    def __init__(self, source_or_tokens):
+        self.tokens = (
+            lex(source_or_tokens)
+            if isinstance(source_or_tokens, str)
+            else source_or_tokens
+        )
+        self.i = 0
+
+    @property
+    def tok(self):
+        return self.tokens[min(self.i, len(self.tokens) - 1)]
+
+    def at(self, value=None, kind=None):
+        t = self.tok
+        return (value is None or t.value == value) and (
+            kind is None or t.kind == kind
+        )
+
+    def take(self):
+        t = self.tok
+        if t.kind != "EOF":
+            self.i += 1
+        return t
+
+    def fail(self, message):
+        raise ParserError(
+            f"Baris {self.tok.line}, kolom {self.tok.column}: {message}"
+        )
+
+    def need(self, value=None, kind=None):
+        if not self.at(value, kind):
+            self.fail(f"token tidak sesuai; ditemukan {self.tok.value!r}")
+        return self.take()
+
+    def skip_lines(self):
+        while self.at(kind="NEWLINE"):
+            self.take()
+
+    def name(self):
+        return self.need(kind="IDENT").value
+
+    def parse(self):
+        self.skip_lines()
+        self.need("jancuk")
+        self.skip_lines()
+        body = self.statements({("selesai", "jancuk")})
+        self.need("selesai")
+        self.need("jancuk")
+        self.skip_lines()
+        self.need(kind="EOF")
+        return node("Program", body[0].line if body else 1, body=body)
+
+    def statements(self, stops):
+        result = []
+        self.skip_lines()
+        while not self.at(kind="EOF"):
+            if any(self.at(v) for v, _ in stops):
+                break
+            start = self.tok
+            result.append(self.statement())
+            if self.at(kind="NEWLINE"):
+                self.skip_lines()
+            elif not self.at(kind="EOF") and not any(
+                self.at(v) for v, _ in stops
+            ):
+                self.fail("harus ada baris baru setelah pernyataan")
+            if self.tok is start:
+                self.fail("parser tidak dapat melanjutkan")
+        return result
+
+    def statement(self):
+        t = self.tok
+        if self.at("lah"):
+            self.take()
+            name = self.name()
+            self.need("=")
+            return node("Declare", t.line, name=name, value=self.expr())
+        if self.at("hedeh"):
+            self.take()
+            return node("Print", t.line, value=self.expr())
+        if self.at("njir"):
+            self.take()
+            condition = self.expr()
+            self.skip_lines()
+            yes = self.statements({("kampret", None), ("selesai", None)})
+            no = []
+            if self.at("kampret"):
+                self.take()
+                self.skip_lines()
+                no = self.statements({("selesai", None)})
+            self.need("selesai")
+            self.need("njir")
+            return node("If", t.line, condition=condition,
+                        then_body=yes, else_body=no)
+        if self.at("mumet"):
+            self.take()
+            condition = self.expr()
+            self.skip_lines()
+            body = self.statements({("selesai", None)})
+            self.need("selesai")
+            self.need("mumet")
+            return node("While", t.line, condition=condition, body=body)
+        if self.at("fungsi"):
+            self.take()
+            name = self.name()
+            self.need("(")
+            params = []
+            if not self.at(")"):
+                params.append(self.name())
+                while self.at(","):
+                    self.take()
+                    params.append(self.name())
+            self.need(")")
+            self.skip_lines()
+            body = self.statements({("selesai", None)})
+            self.need("selesai")
+            self.need("fungsi")
+            return node("Function", t.line, name=name,
+                        params=params, body=body)
+        if self.at("balek"):
+            self.take()
+            value = None if self.at(kind="NEWLINE") else self.expr()
+            return node("Return", t.line, value=value)
+        if self.at(kind="IDENT"):
+            name = self.take().value
+            if self.at("("):
+                return self.call(name, t.line)
+
+            target = node("Variable", t.line, name=name)
+            while self.at("["):
+                self.take()
+                index = self.expr()
+                self.need("]")
+                target = node("Index", t.line,
+                              collection=target, index=index)
+
+            if self.at("="):
+                self.take()
+                value = self.expr()
+                if target.kind == "Variable":
+                    return node("Assign", t.line,
+                                name=name, value=value)
+                return node("IndexAssign", t.line,
+                            collection=target.collection,
+                            index=target.index, value=value)
+
+            self.fail("identifier harus berupa assignment atau pemanggilan")
+        self.fail(f"pernyataan tidak dikenal: {t.value!r}")
+
+    PRECEDENCE = {
+        "atau": 1, "dan": 2,
+        "==": 3, "!=": 3, "<": 3, "<=": 3, ">": 3, ">=": 3,
+        "+": 4, "-": 4,
+        "*": 5, "/": 5, "//": 5, "%": 5,
+    }
+
+    def expr(self, minimum=0):
+        t = self.take()
+        if t.kind in ("INTEGER", "FLOAT", "STRING"):
+            left = node("Literal", t.line, value=t.value)
+        elif t.kind == "IDENT":
+            if self.at("("):
+                left = self.call(t.value, t.line)
+            else:
+                left = node("Variable", t.line, name=t.value)
+        elif t.value in ("benar", "salah"):
+            left = node("Literal", t.line, value=(t.value == "benar"))
+        elif t.value == "bukan":
+            left = node("Unary", t.line, op="bukan", value=self.expr(6))
+        elif t.value == "-":
+            left = node("Unary", t.line, op="-", value=self.expr(6))
+        elif t.value == "(":
+            left = self.expr()
+            self.need(")")
+        elif t.value == "[":
+            items = []
+            if not self.at("]"):
+                items.append(self.expr())
+                while self.at(","):
+                    self.take()
+                    if self.at("]"):
+                        break
+                    items.append(self.expr())
+            self.need("]")
+            left = node("List", t.line, items=items)
+        else:
+            self.fail(f"ekspresi tidak valid: {t.value!r}")
+
+        while True:
+            if self.at("["):
+                bracket = self.take()
+                index = self.expr()
+                self.need("]")
+                left = node("Index", bracket.line,
+                            collection=left, index=index)
+                continue
+
+            op = self.tok.value
+            precedence = self.PRECEDENCE.get(op, -1)
+            if precedence < minimum:
+                break
+            ot = self.take()
+            right = self.expr(precedence + 1)
+            left = node("Binary", ot.line, op=op, left=left, right=right)
+        return left
+
+    def call(self, name, line):
+        self.need("(")
+        args = []
+        if not self.at(")"):
+            args.append(self.expr())
+            while self.at(","):
+                self.take()
+                args.append(self.expr())
+        self.need(")")
+        return node("Call", line, name=name, args=args)
+
+
+def parse(source):
+    try:
+        return Parser(source).parse()
+    except LexerError as exc:
+        raise ParserError(str(exc)) from exc
