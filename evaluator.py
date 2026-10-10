@@ -129,6 +129,13 @@ class Evaluator:
                 if idx < 0 or idx >= len(obj):
                     self.fail(line, "indeks daftar di luar batas")
                 obj[idx] = self.expr(n.value, env, depth)
+            elif k == "Input":
+                if n.name in env:
+                    self.fail(line, "variabel '" + n.name + "' sudah dibuat")
+                prompt = self.expr(n.prompt, env, depth)
+                if not isinstance(prompt, str):
+                    self.fail(line, "prompt tanya harus berupa string")
+                env[n.name] = input(prompt)
             elif k == "Print":
                 value = self.expr(n.value, env, depth)
                 if value is True:
