@@ -1,8 +1,69 @@
 """Evaluator terpisah untuk AST dari parser.py."""
 from contextlib import redirect_stdout
+from collections.abc import MutableMapping
 from io import StringIO
 from ast_nodes import Node
 from parser import parse
+
+
+class PusingDict(MutableMapping):
+    """Language dictionary: booleans are distinct from numeric keys, unlike Python dict."""
+    def __init__(self):
+        self._entries = []
+
+    @staticmethod
+    def _supported(key):
+        return isinstance(key, (str, int, float, bool))
+
+    def _index(self, key):
+        if not self._supported(key):
+            raise TypeError("kunci kamus harus berupa teks, angka, atau boolean")
+        for index, (existing, _value) in enumerate(self._entries):
+            if isinstance(existing, bool) or isinstance(key, bool):
+                same = type(existing) is type(key) and existing == key
+            elif isinstance(existing, (int, float)) and isinstance(key, (int, float)):
+                same = existing == key
+            else:
+                same = type(existing) is type(key) and existing == key
+            if same:
+                return index
+        return -1
+
+    def __getitem__(self, key):
+        index = self._index(key)
+        if index < 0:
+            raise KeyError(key)
+        return self._entries[index][1]
+
+    def __setitem__(self, key, value):
+        index = self._index(key)
+        if index < 0:
+            self._entries.append((key, value))
+        else:
+            self._entries[index] = (self._entries[index][0], value)
+
+    def __delitem__(self, key):
+        index = self._index(key)
+        if index < 0:
+            raise KeyError(key)
+        del self._entries[index]
+
+    def __iter__(self):
+        return (key for key, _value in self._entries)
+
+    def __len__(self):
+        return len(self._entries)
+
+    def __repr__(self):
+        return "{" + ", ".join(f"{key!r}: {value!r}" for key, value in self._entries) + "}"
+
+
+def language_equal(left, right):
+    # In Pusingcuk, boolean and numeric values are different types.
+    if isinstance(left, bool) != isinstance(right, bool):
+        if isinstance(left, (bool, int, float)) and isinstance(right, (bool, int, float)):
+            return False
+    return left == right
 
 
 class ReturnSignal(Exception):
@@ -35,7 +96,7 @@ class Evaluator:
             if k == "List":
                 return [self.expr(x, env, depth) for x in n.items]
             if k == "Dict":
-                result = {}
+                result = PusingDict()
                 for key_node, value_node in n.items:
                     key = self.expr(key_node, env, depth)
                     value = self.expr(value_node, env, depth)
@@ -53,7 +114,7 @@ class Evaluator:
                     if idx < 0 or idx >= len(obj):
                         self.fail(line, "indeks di luar batas")
                     return obj[idx]
-                if isinstance(obj, dict):
+                if isinstance(obj, PusingDict):
                     try:
                         return obj[idx]
                     except (KeyError, TypeError):
@@ -77,7 +138,7 @@ class Evaluator:
                     "+": lambda: a + b, "-": lambda: a - b,
                     "*": lambda: a * b, "/": lambda: a / b,
                     "//": lambda: a // b, "%": lambda: a % b,
-                    "==": lambda: a == b, "!=": lambda: a != b,
+                    "==": lambda: language_equal(a, b), "!=": lambda: not language_equal(a, b),
                     "<": lambda: a < b, "<=": lambda: a <= b,
                     ">": lambda: a > b, ">=": lambda: a >= b,
                 }
@@ -89,7 +150,7 @@ class Evaluator:
                 if n.name == "panjang":
                     if len(args) != 1:
                         self.fail(line, "fungsi 'panjang' membutuhkan 1 argumen")
-                    if not isinstance(args[0], (list, str, dict)):
+                    if not isinstance(args[0], (list, str, PusingDict)):
                         self.fail(line, "panjang menerima daftar, teks, atau kamus")
                     return len(args[0])
                 if n.name == "rentang":
@@ -129,7 +190,7 @@ class Evaluator:
             obj = self.expr(target, env, depth)
         else:
             self.fail(line, "target indeks tidak valid")
-        if not isinstance(obj, (list, dict)):
+        if not isinstance(obj, (list, PusingDict)):
             self.fail(line, "assignment indeks hanya mendukung daftar atau kamus")
         return obj
 
@@ -155,7 +216,7 @@ class Evaluator:
                     if idx < 0 or idx >= len(obj):
                         self.fail(line, "indeks daftar di luar batas")
                     obj[idx] = value
-                elif isinstance(obj, dict):
+                elif isinstance(obj, PusingDict):
                     try:
                         obj[idx] = value
                     except TypeError:
@@ -187,7 +248,7 @@ class Evaluator:
                     count += 1
             elif k == "For":
                 iterable = self.expr(n.iterable, env, depth)
-                if not isinstance(iterable, (list, tuple, str, dict, range)):
+                if not isinstance(iterable, (list, tuple, str, PusingDict, range)):
                     self.fail(line, "untuk membutuhkan daftar, teks, kamus, atau rentang")
                 count = 0
                 for item in iterable:

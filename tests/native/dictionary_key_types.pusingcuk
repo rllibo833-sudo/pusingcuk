@@ -1,0 +1,9 @@
+jancuk
+lah data = {1: "angka", benar: "boolean"}
+hedeh data[1]
+hedeh data[benar]
+data[1] = "angka baru"
+data[benar] = "boolean baru"
+hedeh panjang(data)
+hedeh benar == 1
+selesai jancuk
