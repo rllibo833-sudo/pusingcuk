@@ -1,0 +1,30 @@
+# Contoh nyata pertama: rekap anggaran bulanan sederhana.
+# Ubah angka di bawah ini sesuai kebutuhan, lalu jalankan dengan CLI Pusingcuk.
+
+jancuk
+lah pendapatan = 2500000
+lah pangan = 750000
+lah transport = 250000
+lah listrik = 200000
+
+fungsi hitung_pengeluaran(pangan, transport, listrik)
+    balek pangan + transport + listrik
+selesai fungsi
+
+lah total = hitung_pengeluaran(pangan, transport, listrik)
+lah sisa = pendapatan - total
+
+hedeh "REKAP ANGGARAN BULANAN"
+hedeh "Pendapatan (rupiah):"
+hedeh pendapatan
+hedeh "Pengeluaran (rupiah):"
+hedeh total
+hedeh "Sisa (rupiah):"
+hedeh sisa
+
+njir sisa >= 0
+    hedeh "Status: anggaran tidak defisit"
+kampret
+    hedeh "Status: defisit"
+selesai njir
+selesai jancuk
