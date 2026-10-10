@@ -25,4 +25,4 @@ echo
 echo "Runtime native terpasang: $TARGET"
 echo "Coba jalankan dari root repositori:"
 echo "  pusingcuk-native examples/native/rekap_anggaran.pusingcuk"
-echo "Catatan: runtime native mendukung subset bahasa; fungsi buatan pengguna dan modul belum tersedia."
+echo "Catatan: runtime native mendukung subset fitur yang diuji; sistem modul belum tersedia."
