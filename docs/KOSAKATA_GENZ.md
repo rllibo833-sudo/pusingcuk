@@ -39,10 +39,10 @@ gitu inthiseco
 | `jir` / `hedeh` | Menampilkan nilai | Didukung |
 | `njir` / `adooh` | Kondisi dan cabang alternatif | Didukung |
 | `mumet` | Perulangan selama kondisi benar | Didukung |
-| `untuk ... dalam ...` | Mengunjungi elemen koleksi | List dan `rentang()` didukung |
+| `untuk ... dalam ...` | Mengunjungi elemen koleksi | List, teks UTF-8, dan `rentang()` didukung |
 | `panjang(nilai)` | Menghitung jumlah item/karakter | List, teks, rentang didukung |
 | `rentang(...)` | Membuat rentang bilangan bulat dengan batas akhir eksklusif | Didukung; 1–3 argumen bulat |
-| `tanya` | Membaca masukan pengguna | Belum didukung native |
+| `tanya` | Membaca masukan pengguna | Didukung melalui stdin; diuji lewat fixture native |
 | `fungsi` / `balek` | Mendefinisikan dan mengembalikan nilai fungsi | Belum didukung native |
 | Kamus `{kunci: nilai}` | Menyimpan pasangan kunci-nilai | Belum didukung native |
 
