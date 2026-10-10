@@ -1,186 +1,142 @@
-# pusingcuk
+# Pusingcuk
 
-**pusingcuk** adalah bahasa pemrograman eksperimental bergaya esoterik
-yang terinspirasi dari slang frustrasi developer Indonesia.
+Pusingcuk adalah bahasa pemrograman eksperimental dengan kosakata ramah bahasa Indonesia dan slang lokal. Tujuannya adalah mudah dipelajari, tetap dapat dikembangkan secara serius, dan perlahan bisa dijalankan native tanpa Python saat runtime.
 
-Proyek ini dikembangkan dan dijalankan melalui Android menggunakan
-Termux dan Python.
+## Status proyek
 
-## Status
+Versi: 0.4-dev.
 
-Versi: 0.4-dev
+Saat ini ada dua jalur eksekusi:
+- **Interpreter modular Python** sebagai jalur referensi pengembangan: `pusingcuk_new.py`, dengan lexer, parser, AST, dan evaluator.
+- **Runtime native C** untuk subset bahasa yang sudah memiliki fixture. Setelah dikompilasi, executable native berjalan tanpa Python.
 
-Implementasi saat ini berupa interpreter Python.
+Kedua jalur belum sepenuhnya setara. Jangan menganggap fitur yang tersedia di interpreter modular otomatis tersedia di native. Daftar kemampuan dan batasnya ada di [matriks runtime native](docs/NATIVE_RUNTIME.md). Sistem modul belum tersedia.
 
-Entry point pipeline Python modular: `pusingcuk_new.py` (lexer, parser, AST, evaluator). Pusingcuk Studio memakai pipeline ini. `interpreter.py` tetap merupakan implementasi lama.
-`interpreter_v01.py` dan `interpreter_v02_backup.py` disimpan sebagai arsip historis, bukan entry point utama.
+Implementasi historis yang tidak menjadi entry point utama disimpan di `archive/legacy/` untuk referensi saja. File arsip tidak termasuk jalur yang didukung dan tidak boleh dijadikan dasar klaim fitur.
 
 ## Mulai untuk pemula
 
-Belum pernah coding? Mulai dari [Panduan Pusingcuk dari Nol](docs/PEMULA.md). Isinya cara membuka terminal di Termux, mengetik program pertama, memakai `tanya`, dan membaca error tanpa perlu mengunduh ZIP.
+Ikuti [Panduan Pusingcuk dari Nol](docs/PEMULA.md). Panduan itu mengutamakan jalur Termux native tanpa Python untuk menjalankan program.
 
-## Terminal interaktif sederhana
+## Jalankan interpreter modular (opsional)
 
-Jalankan terminal Pusingcuk dari folder repositori:
+Jalur ini memerlukan Python:
 
-    python terminal.py
+```sh
+python pusingcuk_new.py program.pusingcuk
+python terminal.py
+```
 
-Ketik program dari `jancuk` sampai `selesai jancuk`. Terminal menjalankan program setelah penutup itu dimasukkan. Gunakan `:bantuan`, `:contoh`, `:batal`, atau `:keluar` untuk perintah terminal. Input `tanya` dimasukkan setelah program mulai dijalankan.
+Terminal interaktif menerima `:bantuan`, `:contoh`, `:batal`, dan `:keluar`. Input `tanya` dimasukkan saat program berjalan.
 
 ## Runtime native tanpa Python
 
-Runtime C mandiri dapat dikompilasi dan dijalankan tanpa interpreter Python untuk subset sintaks yang didukung:
+Setelah memasang compiler C11 dan Make:
 
-    make native
-    make run-native FILE=tests/native/for_range.pusingcuk
-    make test-native
+```sh
+make native
+make run-native FILE=tests/native/for_range.pusingcuk
+make test-native
+```
 
-Compiler C11 diperlukan saat build; menjalankan executable hasil build tidak memerlukan Python. Runtime native dirancang mendukung nilai dasar, list, teks, kamus, kondisi, perulangan, input standar `tanya`, `panjang`, `rentang`, serta fungsi buatan pengguna dengan parameter dan `balek`; status verifikasi terbaru ada di [matriks runtime](docs/NATIVE_RUNTIME.md). Deklarasi fungsi tingkat atas dipindai sebelum eksekusi, sehingga fungsi dapat dipanggil sebelum definisinya dan dapat melakukan rekursi. Sistem modul belum tersedia di native. Lihat [panduan native Termux](docs/NATIVE_TERMUX.md), [contoh native](examples/native/rekap_anggaran.pusingcuk), dan [matriks kemampuan runtime native](docs/NATIVE_RUNTIME.md). Untuk memasang executable di Termux, jalankan `bash scripts/install-termux.sh` setelah memasang `clang` dan `make`. Runtime ini **bukan sandbox** untuk kode tak tepercaya.
+Di Termux, gunakan:
 
-## Menjalankan program
+```sh
+pkg update
+pkg install git clang make
+git clone https://github.com/rllibo833-sudo/pusingcuk.git
+cd pusingcuk
+bash scripts/install-termux.sh
+pusingcuk-native examples/native/rekap_anggaran.pusingcuk
+```
 
-Jalankan file program:
-
-    pusingcuk program.pusingcuk
-
-Jika perintah pusingcuk belum tersedia:
-
-    python pusingcuk_new.py program.pusingcuk
+Compiler dibutuhkan untuk build, bukan untuk setiap kali menjalankan executable. Runtime native mendukung nilai dasar, list, teks, kamus, kondisi, perulangan, input standar `tanya`, `panjang`, `rentang`, serta fungsi buatan pengguna dengan parameter dan `balek`. Deklarasi fungsi tingkat atas dipindai sebelum eksekusi, sehingga fungsi dapat dipanggil sebelum definisinya dan dapat melakukan rekursi. Detail batas runtime tercatat di [matriks runtime](docs/NATIVE_RUNTIME.md). Runtime ini **bukan sandbox** untuk kode tak tepercaya.
 
 ## Contoh program
 
-    jancuk
+```pusingcuk
+jancuk
+lah nama = "Budi"
+lah umur = 20
 
-    lah nama = "Budi"
-    lah umur = 20
+hedeh "Halo, dunia!"
+hedeh nama
 
-    hedeh "Halo, dunia!"
-    hedeh nama
+njir umur >= 18 dan benar
+    hedeh "Sudah dewasa"
+kampret
+    hedeh "Masih di bawah umur"
+selesai njir
 
-    njir umur >= 18 dan benar
-        hedeh "Sudah dewasa"
-    kampret
-        hedeh "Belum dewasa"
-    selesai njir
+lah i = 1
+mumet i <= 3
+    hedeh i
+    i = i + 1
+selesai mumet
 
-    lah i = 1
-    mumet i <= 3
-        hedeh i
-        i = i + 1
-    selesai mumet
+selesai jancuk
+```
 
-    selesai jancuk
+## Kosakata utama
 
-## Keyword
+- `jancuk`: memulai program
+- `hedeh`: menampilkan nilai
+- `lah`: mendeklarasikan variabel
+- `njir`: memulai kondisi
+- `kampret`: cabang alternatif
+- `mumet`: memulai perulangan while
+- `untuk nama dalam koleksi`: perulangan koleksi
+- `tanya`: meminta masukan teks
+- `fungsi`: mendefinisikan fungsi
+- `balek`: mengembalikan nilai fungsi
+- `selesai jancuk`: mengakhiri program
 
-- jancuk: memulai program
-- hedeh: mencetak nilai
-- lah: mendeklarasikan variabel
-- njir: memulai kondisi
-- kampret: cabang alternatif
-- selesai njir: mengakhiri kondisi
-- mumet: memulai perulangan while
-- selesai mumet: mengakhiri perulangan
-- untuk nama dalam koleksi: memulai perulangan koleksi
-- selesai untuk: mengakhiri perulangan koleksi
-- selesai jancuk: mengakhiri program
-- tanya: meminta masukan teks dari pengguna, misalnya `tanya nama = "Nama? "`
-- fungsi: mendefinisikan fungsi
-- balek: mengembalikan nilai dari fungsi
-
-### Kosakata Gen Z dan Gen Alpha
-
-Pusingcuk menerima kata slang sebagai alias yang tetap kompatibel dengan sintaks lama:
+### Alias slang
 
 | Kata | Setara dengan | Fungsi |
 |---|---|---|
 | `jir` | `hedeh` | Menampilkan nilai |
-| `adooh` | `kampret` | Cabang alternatif pada kondisi |
-| `gitu` | `selesai` | Menutup blok, diikuti jenis blok |
-| `inthiseco` | `jancuk` | Memulai program; penutupnya `gitu inthiseco` |
+| `adooh` | `kampret` | Cabang alternatif |
+| `gitu` | `selesai` | Menutup blok |
+| `inthiseco` | `jancuk` | Memulai program |
 | `janggal` | `bukan` | Negasi logika |
 
-Contoh:
+Alias tidak menghapus kata lama. Penjelasan ada di [Kosakata Slang Pusingcuk](docs/KOSAKATA_GENZ.md).
 
-```pusingcuk
-inthiseco
-lah umur = 17
-njir janggal (umur >= 18)
-    jir "Belum dewasa, jir."
-adooh
-    jir "Sudah dewasa."
-gitu njir
-gitu inthiseco
-```
+## Koleksi dan operator
 
-Daftar istilah dan alasan pemilihannya ada di [Kosakata Slang Pusingcuk](docs/KOSAKATA_GENZ.md). Alias ini tidak menghapus kata lama, jadi program yang sudah ada tetap kompatibel.
+Nilai yang didukung mencakup teks, angka, boolean, daftar, dan kamus. Operator matematika: `+`, `-`, `*`, `/`, `//`, `%`. Perbandingan: `==`, `!=`, `<`, `<=`, `>`, `>=`. Logika: `dan`, `atau`, `bukan`.
 
-## Nilai dan operator
-
-Nilai yang didukung mencakup teks, angka, boolean, daftar, dan kamus. Built-in `panjang` menghitung panjang teks, daftar, atau kamus; `rentang` membuat rentang bilangan bulat untuk perulangan.
-
-- benar dan salah: boolean
-- +, -, *, /, //, %: matematika
-- ==, !=, <, <=, >, >=: perbandingan
-- dan, atau, bukan: logika
-
-### Daftar, kamus, teks, dan indeks
-
-- Daftar ditulis dengan tanda kurung siku, misalnya `[10, 20, 30]`.
-- Kamus ditulis dengan pasangan `kunci: nilai`, misalnya `{"nama": "Budi", "umur": 20}`.
-- Indeks daftar dan teks dimulai dari 0; nilai daftar dapat diubah melalui indeks.
-- Nilai kamus dapat dibaca dan diubah melalui kunci; assignment melalui kunci yang belum ada menambahkan entri baru.
-- Kamus kosong bernilai salah dalam kondisi, sedangkan kamus berisi entri bernilai benar.
-- Runtime native membatasi kunci kamus pada teks, angka, dan boolean; kunci yang tidak didukung atau tidak ditemukan menghasilkan error.
-- `panjang(nilai)` menerima daftar, teks, atau kamus.
-
-### Perulangan `untuk` dan rentang
-
-- Bentuk: `untuk nama dalam koleksi`, ditutup dengan `selesai untuk`.
-- Koleksi yang didukung: daftar, teks, kamus (iterasi menghasilkan kunci), dan hasil `rentang(...)`.
-- `rentang(akhir)`, `rentang(mulai, akhir)`, atau `rentang(mulai, akhir, langkah)` menerima bilangan bulat; batas akhir tidak termasuk dan langkah tidak boleh nol.
-- Perulangan tunduk pada batas total langkah evaluator.
-
-Contoh:
-
-```pusingcuk
-jancuk
-untuk angka dalam rentang(1, 5)
-    hedeh angka
-selesai untuk
-selesai jancuk
-```
-
-Contoh program lain tersedia di `examples/rekap_anggaran.pusingcuk`.
-
-## Contoh masukan pengguna
-
-```pusingcuk
-jancuk
-tanya nama = "Siapa nama kamu? "
-hedeh "Halo, " + nama
-selesai jancuk
-```
+- Daftar menggunakan tanda siku, misalnya `[10, 20, 30]`.
+- Kamus menggunakan pasangan kunci-nilai, misalnya `{"nama": "Budi", "umur": 20}`.
+- Indeks daftar dan teks dimulai dari 0.
+- `panjang(nilai)` menerima jenis nilai yang tercantum pada matriks runtime.
+- `rentang(akhir)`, `rentang(mulai, akhir)`, dan `rentang(mulai, akhir, langkah)` menghasilkan rentang bilangan bulat; batas akhir tidak termasuk dan langkah tidak boleh nol.
 
 ## Pengujian
 
-Jalankan seluruh tes:
+Interpreter modular:
 
-    python -m unittest discover -s tests -v
+```sh
+python -m unittest discover -s tests -v
+```
 
-Tes terminal juga memeriksa contoh `:contoh`, program buatan sendiri, dan alur input `tanya`.
+Runtime native:
+
+```sh
+make test-native
+```
+
+Jika perubahan menyentuh kedua jalur, jalankan keduanya. Tes CI Ubuntu tidak menggantikan pengujian fisik Termux.
 
 ## Batasan saat ini
 
-- Interpreter masih menggunakan Python untuk parsing ekspresi.
-- Fungsi buatan pengguna didukung dengan `fungsi` dan `balek` di interpreter modular maupun runtime native; runtime native membatasi kedalaman panggilan hingga 100.
-- Input interaktif `tanya` pada Studio belum terverifikasi; gunakan CLI untuk input interaktif.
-- Sistem modul belum tersedia.
-- Belum ada sistem tipe statis.
-- Belum siap untuk menjalankan kode yang tidak tepercaya.
-- Sintaks dan implementasi masih dapat berubah.
+- Interpreter modular masih menggunakan Python.
+- Runtime native hanya mendukung subset yang didokumentasikan dan diuji.
+- Sistem modul, tipe statis, dan pustaka backend/frontend lengkap belum tersedia.
+- Input interaktif `tanya` di Pusingcuk Studio belum diverifikasi.
+- Bahasa ini belum siap untuk menjalankan kode tak tepercaya.
 
-## Tujuan proyek
+## Kontribusi
 
-Membangun bahasa pemrograman yang konsisten, dapat diuji,
-dan semakin mandiri dari implementasi Python.
+Baca [CONTRIBUTING.md](CONTRIBUTING.md) sebelum membuka PR. Gunakan branch terfokus, sertakan tes dan dokumentasi, jangan commit cache/binary/rahasia, dan tunggu review sebelum merge.
