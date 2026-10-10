@@ -200,9 +200,12 @@ class Evaluator:
             elif k == "Function":
                 if n.name in ("panjang", "rentang"):
                     self.fail(line, f"nama fungsi '{n.name}' sudah digunakan")
+                definition = (n.params, n.body, line)
                 if n.name in self.functions:
-                    self.fail(line, f"fungsi '{n.name}' sudah dibuat")
-                self.functions[n.name] = (n.params, n.body, line)
+                    if self.functions[n.name] != definition:
+                        self.fail(line, f"fungsi '{n.name}' sudah dibuat")
+                else:
+                    self.functions[n.name] = definition
             elif k == "Return":
                 if not in_function:
                     self.fail(line, "balek hanya boleh di dalam fungsi")
@@ -214,6 +217,21 @@ class Evaluator:
         self.functions.clear()
         self.budget = 0
         tree = parse(source)
+
+        # Register top-level functions before execution, matching native runtime.
+        for statement in tree.body:
+            if statement.kind != "Function":
+                continue
+            line = statement.line
+            name = statement.name
+            if name in ("panjang", "rentang"):
+                self.fail(line, f"nama fungsi '{name}' sudah digunakan")
+            if name in self.functions:
+                self.fail(line, f"fungsi '{name}' sudah dibuat")
+            self.functions[name] = (
+                statement.params, statement.body, line
+            )
+
         self.block(tree.body, {})
         return None
 
