@@ -1,0 +1,29 @@
+# Contoh native: rekap anggaran tanpa fungsi atau Python.
+# Jalankan: pusingcuk-native examples/native/rekap_anggaran.pusingcuk
+
+inthiseco
+lah pendapatan = 2500000
+lah pengeluaran = {"pangan": 750000, "transport": 250000, "listrik": 200000}
+lah total = 0
+
+jir "REKAP ANGGARAN BULANAN"
+jir "Pendapatan:"
+jir pendapatan
+jir "Rincian pengeluaran:"
+untuk kategori dalam pengeluaran
+    jir kategori
+    jir pengeluaran[kategori]
+    total = total + pengeluaran[kategori]
+gitu untuk
+
+jir "Total pengeluaran:"
+jir total
+jir "Sisa anggaran:"
+jir pendapatan - total
+
+njir pendapatan - total >= 0
+    jir "Status: anggaran aman"
+adooh
+    jir "Status: defisit"
+gitu njir
+gitu inthiseco

@@ -119,7 +119,11 @@ Interpreter melaporkan kesalahan dengan nomor baris jika tersedia.
 Dokumen ini mencatat perilaku implementasi saat ini.
 Fitur yang belum diuji tidak dianggap telah didukung.
 
-## 14. Alias kosakata slang
+## 14. Runtime native dan Termux
+
+Runtime C dapat dibangun dengan compiler C11 dan dijalankan sebagai executable tanpa Python untuk subset fitur yang tercantum dalam `docs/NATIVE_RUNTIME.md`. Di Termux, setelah memasang `clang` dan `make`, jalankan `bash scripts/install-termux.sh`, lalu gunakan `pusingcuk-native examples/native/rekap_anggaran.pusingcuk`. Fungsi buatan pengguna dan sistem modul belum tersedia di runtime native.
+
+## 15. Alias kosakata slang
 
 Lexer menerima alias berikut dan menormalkannya ke kata kunci kanonis sebelum parsing:
 
