@@ -1,6 +1,8 @@
 inthiseco
+lah angka = 9
 jir tambah(2, 3)
 jir faktorial(5)
+jir angka
 
 fungsi tambah(a, b)
     balek a + b
