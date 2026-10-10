@@ -13,4 +13,13 @@ run-native: native
 	"$(NATIVE_BIN)" "$(FILE)"
 
 test-native: native
-	@actual="$$($(NATIVE_BIN) tests/native/slang_aliases.pusingcuk)"; expected="$$(printf 'Pusingcuk native\ntidak\ncabang utama\nadooh aktif')"; test "$$actual" = "$$expected"
+	@set -eu; \
+	actual="$$($(NATIVE_BIN) tests/native/slang_aliases.pusingcuk)"; \
+	expected="$$(printf 'Pusingcuk native\ntidak\ncabang utama\nadooh aktif')"; \
+	test "$$actual" = "$$expected"; \
+	actual="$$($(NATIVE_BIN) tests/native/for_range.pusingcuk)"; \
+	expected="$$(printf '2\n4\n6\n1\n3\n3\n2\n1')"; \
+	test "$$actual" = "$$expected"; \
+	if $(NATIVE_BIN) tests/native/range_zero_step.pusingcuk >/dev/null 2>&1; then \
+		echo 'rentang dengan langkah nol seharusnya gagal' >&2; exit 1; \
+	fi

@@ -9,10 +9,10 @@
 #define NV 256
 #define SZ 1024
 
-typedef enum { NUM, STR, BOOL, LIST } Type;
+typedef enum { NUM, STR, BOOL, LIST, RANGE } Type;
 typedef struct Val Val;
 typedef struct List List;
-struct Val { Type t; double n; int b; char s[SZ]; List *list; };
+struct Val { Type t; double n; int b; char s[SZ]; List *list; double range_start, range_end, range_step; };
 #define MAX_LIST_ITEMS 256
 struct List { size_t len; Val items[MAX_LIST_ITEMS]; };
 typedef struct { char name[128]; Val v; } Var;
@@ -63,20 +63,37 @@ static int word(const char *s) {
     return 0;
 }
 static int endline(void) { ws(); return !*p || *p=='\n' || *p=='\r' || *p=='#'; }
+static double range_length(Val v);
 static int truth(Val v) {
     if (v.t==BOOL) return v.b;
     if (v.t==NUM) return v.n!=0;
+    if (v.t==LIST) return v.list && v.list->len != 0;
+    if (v.t==RANGE) return range_length(v) != 0;
     return v.s[0]!=0;
 }
 static int equal(Val a, Val b) {
     if (a.t!=b.t) return 0;
     if (a.t==NUM) return a.n==b.n;
     if (a.t==BOOL) return a.b==b.b;
+    if (a.t==RANGE) return a.range_start==b.range_start && a.range_end==b.range_end && a.range_step==b.range_step;
+    if (a.t==LIST) return a.list==b.list;
     return !strcmp(a.s,b.s);
 }
 static Val expr(void);
 static Val listval(List *l) {
     Val v = {0}; v.t = LIST; v.list = l; return v;
+}
+static Val rangeval(double start, double end, double step) {
+    Val v = {0}; v.t = RANGE;
+    v.range_start = start; v.range_end = end; v.range_step = step;
+    return v;
+}
+static double range_length(Val v) {
+    if (v.t != RANGE || v.range_step == 0) return 0;
+    double distance = v.range_step > 0
+        ? v.range_end - v.range_start : v.range_start - v.range_end;
+    if (distance <= 0) return 0;
+    return ceil(distance / fabs(v.range_step));
 }
 static int list_index(Val v, Val idx, size_t *out) {
     if (v.t != LIST || !v.list) {
@@ -148,15 +165,53 @@ static Val primary(void) {
         if (!strcmp(name,"benar")) return boolean(1);
         if (!strcmp(name,"salah")) return boolean(0);
         if (take("(")) {
-            Val arg = expr();
-            if (!take(")")) fail("kurung tutup ')' diharapkan");
-            if (!strcmp(name,"panjang")) {
-                if (arg.t != LIST || !arg.list) {
-                    fail("panjang() membutuhkan list"); return num(0);
+            Val args[3]; int argc = 0;
+            if (!take(")")) {
+                for (;;) {
+                    if (argc >= 3) {
+                        fail("fungsi native menerima maksimal tiga argumen");
+                        return num(0);
+                    }
+                    args[argc++] = expr();
+                    if (err) return num(0);
+                    if (take(")")) break;
+                    if (!take(",")) {
+                        fail("koma atau ')' diharapkan dalam argumen fungsi");
+                        return num(0);
+                    }
                 }
-                return num((double)arg.list->len);
             }
-            fail("fungsi belum didukung"); return num(0);
+            if (!strcmp(name,"panjang")) {
+                if (argc != 1) { fail("panjang() membutuhkan satu argumen"); return num(0); }
+                if (args[0].t == LIST && args[0].list)
+                    return num((double)args[0].list->len);
+                if (args[0].t == STR) {
+                    size_t count = 0;
+                    for (const unsigned char *q=(const unsigned char *)args[0].s; *q; q++)
+                        if ((*q & 0xC0) != 0x80) count++;
+                    return num((double)count);
+                }
+                if (args[0].t == RANGE) return num(range_length(args[0]));
+                fail("panjang() menerima list, teks, atau rentang"); return num(0);
+            }
+            if (!strcmp(name,"rentang")) {
+                if (argc < 1 || argc > 3) {
+                    fail("rentang() menerima satu sampai tiga argumen"); return num(0);
+                }
+                double start = 0, end = 0, step = 1;
+                if (argc == 1) end = args[0].n;
+                else { start = args[0].n; end = args[1].n; }
+                if (argc == 3) step = args[2].n;
+                for (int i=0; i<argc; i++) {
+                    if (args[i].t != NUM || !isfinite(args[i].n) ||
+                        args[i].n != trunc(args[i].n)) {
+                        fail("argumen rentang() harus bilangan bulat"); return num(0);
+                    }
+                }
+                if (step == 0) { fail("langkah rentang() tidak boleh nol"); return num(0); }
+                return rangeval(start, end, step);
+            }
+            fail("fungsi native belum didukung"); return num(0);
         }
         Val value = num(0);
         int found = 0;
@@ -285,6 +340,7 @@ static void printval(Val v) {
     if(v.t==BOOL) puts(v.b?"okelah":"tidak");
     else if(v.t==STR) puts(v.s);
     else if(v.t==LIST) printf("[list: %zu]\n", v.list ? v.list->len : 0);
+    else if(v.t==RANGE) printf("[rentang: %.0f]\n", range_length(v));
     else if(isfinite(v.n) && v.n==(long long)v.n) printf("%lld\n",(long long)v.n);
     else printf("%.10g\n",v.n);
 }
@@ -347,6 +403,36 @@ static int run_range(int first,int last) {
             i=end;
         } else if(word("kampret")) {
             fail("kampret tanpa njir");
+        } else if(word("untuk")) {
+            char name[128] = {0};
+            if (!identifier(name, sizeof name)) { fail("nama variabel perulangan diharapkan"); break; }
+            if (!word("dalam")) { fail("kata 'dalam' diharapkan setelah nama perulangan"); break; }
+            Val iterable = expr();
+            if (!endline()) fail("karakter tambahan setelah koleksi perulangan");
+            int mid=-1, end=block_end(i,"untuk",&mid);
+            if (end<0) break;
+            if (!err && iterable.t == LIST && iterable.list) {
+                size_t count = iterable.list->len;
+                if (count > MAX_ITER) { fail("list melebihi batas 10000 iterasi native"); }
+                for (size_t j=0; j<count && !err; j++) {
+                    if (++steps > MAX_STEPS) { fail("batas 100000 langkah terlampaui"); break; }
+                    setvar(name, iterable.list->items[j]);
+                    run_range(i+1,end);
+                }
+            } else if (!err && iterable.t == RANGE) {
+                int iter=0;
+                for (double x=iterable.range_start;
+                     !err && (iterable.range_step > 0 ? x < iterable.range_end : x > iterable.range_end);
+                     x += iterable.range_step) {
+                    if (++iter > MAX_ITER) { fail("batas 10000 iterasi rentang() terlampaui"); break; }
+                    if (++steps > MAX_STEPS) { fail("batas 100000 langkah terlampaui"); break; }
+                    setvar(name, num(x));
+                    run_range(i+1,end);
+                }
+            } else if (!err) {
+                fail("perulangan native saat ini menerima list atau rentang()");
+            }
+            i=end;
         } else if(word("mumet")) {
             int mid=-1, end=block_end(i,"mumet",&mid);
             if(end<0) break;

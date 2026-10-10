@@ -30,3 +30,34 @@ gitu inthiseco
 - Alias dinormalisasi pada tahap leksikal sehingga parser dan evaluator tetap punya satu makna kanonis.
 - Runtime native C hanya dijamin untuk subset yang memiliki tes native eksplisit. Ini bukan klaim kesetaraan penuh C dan Python.
 - Kata slang baru harus ditambahkan bersama spesifikasi, contoh, tes Python, dan tes native jika fitur itu termasuk subset native.
+
+## Kosakata inti dan fungsi bawaan
+
+| Kata/fungsi | Arti | Status runtime native C |
+|---|---|---|
+| `lah` | Membuat variabel baru | Didukung |
+| `jir` / `hedeh` | Menampilkan nilai | Didukung |
+| `njir` / `adooh` | Kondisi dan cabang alternatif | Didukung |
+| `mumet` | Perulangan selama kondisi benar | Didukung |
+| `untuk ... dalam ...` | Mengunjungi elemen koleksi | List dan `rentang()` didukung |
+| `panjang(nilai)` | Menghitung jumlah item/karakter | List, teks, rentang didukung |
+| `rentang(...)` | Membuat rentang bilangan bulat dengan batas akhir eksklusif | Didukung; 1–3 argumen bulat |
+| `tanya` | Membaca masukan pengguna | Belum didukung native |
+| `fungsi` / `balek` | Mendefinisikan dan mengembalikan nilai fungsi | Belum didukung native |
+| Kamus `{kunci: nilai}` | Menyimpan pasangan kunci-nilai | Belum didukung native |
+
+## Contoh runtime native
+
+```pusingcuk
+inthiseco
+lah angka = [2, 4, 6]
+untuk nilai dalam angka
+    jir nilai
+gitu untuk
+untuk i dalam rentang(1, 5, 2)
+    jir i
+gitu untuk
+gitu inthiseco
+```
+
+Kamus ini membedakan **fitur bahasa modular** dari **fitur native yang sudah diuji**. Status native hanya boleh dinaikkan setelah ada fixture dan CI yang membuktikannya.

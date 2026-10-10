@@ -87,9 +87,9 @@ Contoh:
     selesai untuk
     selesai jancuk
 
-Perulangan untuk nama dalam koleksi mengunjungi setiap elemen daftar atau teks, setiap kunci kamus, atau setiap bilangan dalam rentang.
+Perulangan modular untuk nama dalam koleksi mengunjungi setiap elemen daftar atau teks, setiap kunci kamus, atau setiap bilangan dalam rentang. Runtime native C saat ini mendukung iterasi list dan `rentang()`; iterasi teks dan kamus belum tersedia di native.
 
-`rentang(akhir)`, `rentang(mulai, akhir)`, dan `rentang(mulai, akhir, langkah)` menerima satu sampai tiga argumen bilangan bulat. Batas akhir tidak termasuk hasil, seperti Python. Langkah tidak boleh nol. Setiap perulangan dibatasi 10000 iterasi dan seluruh program dibatasi 100000 langkah evaluator.
+`rentang(akhir)`, `rentang(mulai, akhir)`, dan `rentang(mulai, akhir, langkah)` menerima satu sampai tiga argumen bilangan bulat. Batas akhir tidak termasuk hasil. Langkah tidak boleh nol. Setiap perulangan dibatasi 10000 iterasi dan seluruh program dibatasi 100000 langkah native/modular.
 
 ## 10. Fungsi buatan pengguna
 

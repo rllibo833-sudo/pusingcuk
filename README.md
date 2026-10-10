@@ -32,10 +32,10 @@ Ketik program dari `jancuk` sampai `selesai jancuk`. Terminal menjalankan progra
 Runtime C mandiri dapat dikompilasi dan dijalankan tanpa interpreter Python untuk subset sintaks yang didukung:
 
     make native
-    make run-native FILE=tests/native/slang_aliases.pusingcuk
+    make run-native FILE=tests/native/for_range.pusingcuk
     make test-native
 
-Compiler C11 diperlukan saat build; menjalankan executable hasil build tidak memerlukan Python. Runtime native masih memiliki cakupan lebih kecil daripada pipeline modular Python dan **bukan sandbox** untuk kode tak tepercaya. Dukungan fitur harus dibuktikan dengan fixture native, bukan diasumsikan dari interpreter Python.
+Compiler C11 diperlukan saat build; menjalankan executable hasil build tidak memerlukan Python. Runtime native mendukung nilai dasar, list, kondisi, `mumet`, perulangan `untuk` pada list/rentang, `panjang`, dan `rentang`. Kamus, fungsi buatan pengguna, serta input `tanya` belum tersedia di native. Runtime ini **bukan sandbox** untuk kode tak tepercaya; dukungan fitur dibuktikan lewat fixture native, bukan diasumsikan dari interpreter modular.
 
 ## Menjalankan program
 
