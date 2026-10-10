@@ -25,6 +25,39 @@ class TestLexer(unittest.TestCase):
             ],
         )
 
+    def test_slang_aliases_normalize_to_canonical_keywords(self):
+        source = "jir adooh gitu inthiseco janggal"
+        tokens = [
+            token for token in lex(source)
+            if token.kind != "EOF"
+        ]
+        self.assertEqual(
+            [(token.kind, token.value) for token in tokens],
+            [
+                ("KEYWORD", "hedeh"),
+                ("KEYWORD", "kampret"),
+                ("KEYWORD", "selesai"),
+                ("KEYWORD", "jancuk"),
+                ("KEYWORD", "bukan"),
+            ],
+        )
+
+    def test_aliases_do_not_match_identifier_prefixes(self):
+        tokens = [
+            token for token in lex("jiranku adoohx gituan inthisecoku janggalnya")
+            if token.kind != "EOF"
+        ]
+        self.assertEqual(
+            [(token.kind, token.value) for token in tokens],
+            [
+                ("IDENT", "jiranku"),
+                ("IDENT", "adoohx"),
+                ("IDENT", "gituan"),
+                ("IDENT", "inthisecoku"),
+                ("IDENT", "janggalnya"),
+            ],
+        )
+
     def test_all_operators_use_longest_match(self):
         tokens = lex("== != <= >= // + - * / % < >")
         operators = [
