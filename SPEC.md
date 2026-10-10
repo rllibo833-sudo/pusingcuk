@@ -75,7 +75,7 @@ Daftar ditulis menggunakan tanda kurung siku, misalnya `[10, 20, 30]`.
 Kamus ditulis dengan kurung kurawal dan pasangan kunci-nilai, misalnya `{"nama": "Budi", "umur": 20}`.
 Indeks daftar dan teks dimulai dari 0. Daftar dapat dibaca dan diubah melalui indeks. Nilai kamus dapat dibaca dan diubah melalui kunci.
 Fungsi `panjang(nilai)` menerima daftar, teks, atau kamus dan mengembalikan jumlah elemen atau karakter.
-Kunci kamus harus dapat digunakan sebagai kunci. Kunci yang tidak ditemukan dan indeks di luar batas menghasilkan kesalahan.
+Kunci kamus native dibatasi pada teks, angka, dan boolean. Kunci yang tidak ditemukan dan indeks di luar batas menghasilkan kesalahan.
 
 ## 9. Perulangan untuk
 
@@ -87,7 +87,7 @@ Contoh:
     selesai untuk
     selesai jancuk
 
-Perulangan modular untuk nama dalam koleksi mengunjungi setiap elemen daftar atau teks, setiap kunci kamus, atau setiap bilangan dalam rentang. Runtime native C yang diuji mendukung iterasi list, teks (per code point UTF-8), dan `rentang()`; iterasi kamus belum tersedia di native.
+Perulangan modular untuk nama dalam koleksi mengunjungi setiap elemen daftar atau teks, setiap kunci kamus, atau setiap bilangan dalam rentang. Runtime native C yang diuji mendukung iterasi list, teks (per code point UTF-8), kamus (menghasilkan kunci), dan `rentang()`.
 
 `rentang(akhir)`, `rentang(mulai, akhir)`, dan `rentang(mulai, akhir, langkah)` menerima satu sampai tiga argumen bilangan bulat. Batas akhir tidak termasuk hasil. Langkah tidak boleh nol. Setiap perulangan dibatasi 10000 iterasi dan seluruh program dibatasi 100000 langkah native/modular.
 

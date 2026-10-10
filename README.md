@@ -35,7 +35,7 @@ Runtime C mandiri dapat dikompilasi dan dijalankan tanpa interpreter Python untu
     make run-native FILE=tests/native/for_range.pusingcuk
     make test-native
 
-Compiler C11 diperlukan saat build; menjalankan executable hasil build tidak memerlukan Python. Runtime native yang diuji mendukung nilai dasar, list, teks, indeks list/teks (berdasarkan code point UTF-8), kondisi, `mumet`, perulangan `untuk` pada list/teks/rentang, input standar `tanya`, `panjang`, dan `rentang`. Kamus dan fungsi buatan pengguna masih belum tersedia di native. Lihat [matriks kemampuan runtime native](docs/NATIVE_RUNTIME.md) untuk status fitur dan batasannya. Runtime ini **bukan sandbox** untuk kode tak tepercaya; dukungan fitur dibuktikan lewat fixture native, bukan diasumsikan dari interpreter modular.
+Compiler C11 diperlukan saat build; menjalankan executable hasil build tidak memerlukan Python. Runtime native yang diuji mendukung nilai dasar, list, teks, indeks list/teks (berdasarkan code point UTF-8), baca/ubah indeks kamus, kondisi, `mumet`, perulangan `untuk` pada list/teks/kamus/rentang, input standar `tanya`, `panjang`, dan `rentang`. Fungsi buatan pengguna masih belum tersedia di native. Lihat [matriks kemampuan runtime native](docs/NATIVE_RUNTIME.md) untuk status fitur dan batasannya. Runtime ini **bukan sandbox** untuk kode tak tepercaya; dukungan fitur dibuktikan lewat fixture native, bukan diasumsikan dari interpreter modular.
 
 ## Menjalankan program
 

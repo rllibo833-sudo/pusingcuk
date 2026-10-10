@@ -1,0 +1,12 @@
+inthiseco
+lah data = {"nama": "Budi", "umur": 20}
+jir data["nama"]
+jir data["umur"]
+data["umur"] = 21
+jir data["umur"]
+data["status"] = "aktif"
+jir panjang(data)
+untuk kunci dalam data
+    jir kunci
+gitu untuk
+gitu inthiseco
