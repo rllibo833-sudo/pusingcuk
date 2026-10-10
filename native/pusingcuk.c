@@ -14,7 +14,10 @@ typedef struct Val Val;
 typedef struct List List;
 struct Val { Type t; double n; int b; char s[SZ]; List *list; double range_start, range_end, range_step; };
 #define MAX_LIST_ITEMS 256
-struct List { size_t len; Val items[MAX_LIST_ITEMS]; };
+struct List { size_t len, capacity; Val *items; };
+#define MAX_LIST_ALLOCATIONS 100000
+static List *allocated_lists[MAX_LIST_ALLOCATIONS];
+static size_t allocated_list_count;
 typedef struct { char name[128]; Val v; } Var;
 static Var vars[NV];
 static int nvars, err, line_no;
@@ -25,6 +28,29 @@ static void fail(const char *msg) {
     err = 1;
 }
 static Val num(double x) { Val v={0}; v.t=NUM; v.n=x; return v; }
+static List *new_list(void) {
+    if (allocated_list_count >= MAX_LIST_ALLOCATIONS) {
+        fail("batas alokasi list native terlampaui"); return NULL;
+    }
+    List *list = calloc(1, sizeof *list);
+    if (!list) { fail("memori list habis"); return NULL; }
+    allocated_lists[allocated_list_count++] = list;
+    return list;
+}
+static int append_list(List *list, Val value) {
+    if (list->len >= MAX_LIST_ITEMS) {
+        fail("list terlalu panjang"); return 0;
+    }
+    if (list->len == list->capacity) {
+        size_t next = list->capacity ? list->capacity * 2 : 4;
+        if (next > MAX_LIST_ITEMS) next = MAX_LIST_ITEMS;
+        Val *items = realloc(list->items, next * sizeof *items);
+        if (!items) { fail("memori list habis"); return 0; }
+        list->items = items; list->capacity = next;
+    }
+    list->items[list->len++] = value;
+    return 1;
+}
 static Val boolean(int x) { Val v={0}; v.t=BOOL; v.b=!!x; return v; }
 static Val string(const char *s) {
     Val v={0}; v.t=STR; snprintf(v.s,sizeof v.s,"%s",s); return v;
@@ -111,15 +137,12 @@ static int list_index(Val v, Val idx, size_t *out) {
 static Val primary(void) {
     ws();
     if (take("[")) {
-        List *l = calloc(1, sizeof *l);
-        if (!l) { fail("memori list habis"); return listval(NULL); }
+        List *l = new_list();
+        if (!l) return listval(NULL);
         if (!take("]")) {
             for (;;) {
-                if (l->len >= MAX_LIST_ITEMS) {
-                    fail("list terlalu panjang"); return listval(l);
-                }
-                l->items[l->len++] = expr();
-                if (err) return listval(l);
+                Val item = expr();
+                if (err || !append_list(l, item)) return listval(l);
                 if (take("]")) break;
                 if (!take(",")) {
                     fail("koma atau ']' diharapkan"); return listval(l);
@@ -512,5 +535,9 @@ int main(int argc,char **argv) {
     run_range(0,program_count);
     int result=err?1:0;
     for(int i=0;i<program_count;i++) free(program_lines[i]);
+    for(size_t i=0;i<allocated_list_count;i++) {
+        free(allocated_lists[i]->items);
+        free(allocated_lists[i]);
+    }
     return result;
 }
