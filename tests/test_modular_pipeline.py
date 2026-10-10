@@ -100,6 +100,58 @@ hedeh panjang(angka)
 selesai jancuk"""
         self.assertEqual(capture(source), "25\n3\n")
 
+    def test_dictionary_literal_lookup_and_update(self):
+        source = """jancuk
+lah pengguna = {"nama": "Budi", "aktif": benar}
+pengguna["nama"] = "Sari"
+hedeh pengguna["nama"]
+hedeh pengguna["aktif"]
+hedeh panjang(pengguna)
+selesai jancuk"""
+        self.assertEqual(capture(source), "Sari\\nokelah\\n2\\n")
+
+    def test_for_loop_and_range_builtin(self):
+        source = """jancuk
+untuk angka dalam rentang(1, 5)
+    hedeh angka
+selesai untuk
+selesai jancuk"""
+        self.assertEqual(capture(source), "1\\n2\\n3\\n4\\n")
+
+    def test_range_supports_step_and_negative_direction(self):
+        source = """jancuk
+untuk angka dalam rentang(5, 0, -2)
+    hedeh angka
+selesai untuk
+selesai jancuk"""
+        self.assertEqual(capture(source), "5\\n3\\n1\\n")
+
+    def test_string_index_and_length(self):
+        source = """jancuk
+lah kata = "pusing"
+hedeh kata[1]
+hedeh panjang(kata)
+selesai jancuk"""
+        self.assertEqual(capture(source), "u\\n6\\n")
+
+    def test_for_loop_rejects_non_iterable(self):
+        source = """jancuk
+untuk angka dalam 12
+    hedeh angka
+selesai untuk
+selesai jancuk"""
+        with self.assertRaisesRegex(RuntimeError, "untuk membutuhkan"):
+            Evaluator().run(source)
+
+    def test_range_rejects_zero_step(self):
+        source = """jancuk
+untuk angka dalam rentang(1, 4, 0)
+    hedeh angka
+selesai untuk
+selesai jancuk"""
+        with self.assertRaisesRegex(RuntimeError, "langkah rentang tidak boleh nol"):
+            Evaluator().run(source)
+
     def test_modular_evaluator_reports_undefined_variable(self):
         source = 'jancuk\nhedeh hantu\nselesai jancuk'
         with self.assertRaisesRegex(RuntimeError, r"Baris 2: variabel 'hantu' belum dibuat"):
