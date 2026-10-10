@@ -39,7 +39,10 @@ def main():
             print(HELP)
             continue
         if not lines and command == ":contoh":
-            print(EXAMPLE)
+            try:
+                run(EXAMPLE)
+            except (SyntaxError, RuntimeError, ValueError, TypeError, IndexError) as exc:
+                print(f"Kesalahan: {exc}", file=sys.stderr)
             continue
         if not lines and command == ":batal":
             print("Tidak ada program yang sedang ditulis.")
