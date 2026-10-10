@@ -38,7 +38,7 @@ class TerminalTests(unittest.TestCase):
         )
         result = self.run_terminal(source)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("\n7\n", result.stdout)
+        self.assertRegex(result.stdout, r"7\npusingcuk>")
 
     def test_tanya_reads_terminal_input(self):
         source = (
