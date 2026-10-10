@@ -8,11 +8,11 @@ Termux dan Python.
 
 ## Status
 
-Versi: 0.2-dev
+Versi: 0.3-dev
 
 Implementasi saat ini berupa interpreter Python.
 
-Interpreter aktif: `interpreter.py`.
+Entry point pipeline Python modular: `pusingcuk_new.py` (lexer, parser, AST, evaluator). Pusingcuk Studio memakai pipeline ini. `interpreter.py` tetap merupakan implementasi lama.
 `interpreter_v01.py` dan `interpreter_v02_backup.py` disimpan sebagai arsip historis, bukan entry point utama.
 
 ## Menjalankan program
@@ -23,7 +23,7 @@ Jalankan file program:
 
 Jika perintah pusingcuk belum tersedia:
 
-    python interpreter.py program.pusingcuk
+    python pusingcuk_new.py program.pusingcuk
 
 ## Contoh program
 
@@ -60,7 +60,7 @@ Jika perintah pusingcuk belum tersedia:
 - mumet: memulai perulangan while
 - selesai mumet: mengakhiri perulangan
 - selesai jancuk: mengakhiri program
-- tanya: meminta masukan dari pengguna
+- tanya: meminta masukan teks dari pengguna, misalnya `tanya nama = "Nama? "`
 - fungsi: mendefinisikan fungsi
 - balek: mengembalikan nilai dari fungsi
 
@@ -99,6 +99,7 @@ Jalankan seluruh tes:
 
 - Interpreter masih menggunakan Python untuk parsing ekspresi.
 - Fungsi buatan pengguna didukung dengan `fungsi` dan `balek`.
+- Input interaktif `tanya` pada Studio belum terverifikasi; gunakan CLI untuk input interaktif.
 - Sistem modul belum tersedia.
 - Belum ada sistem tipe statis.
 - Belum siap untuk menjalankan kode yang tidak tepercaya.
