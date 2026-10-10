@@ -22,4 +22,6 @@ test-native: native
 	test "$$actual" = "$$expected"; \
 	if $(NATIVE_BIN) tests/native/range_zero_step.pusingcuk >/dev/null 2>&1; then \
 		echo 'rentang dengan langkah nol seharusnya gagal' >&2; exit 1; \
-	fi
+	fi; \
+	actual="$($(NATIVE_BIN) tests/native/list_reallocation.pusingcuk)"; \
+	test "$actual" = "1"
