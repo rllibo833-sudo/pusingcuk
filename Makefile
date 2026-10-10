@@ -1,7 +1,7 @@
 CC ?= cc
 CFLAGS ?= -std=c11 -O2 -Wall -Wextra
 LDLIBS ?= -lm
-NATIVE_BIN ?= /tmp/pusingcuk-native
+NATIVE_BIN ?= $(CURDIR)/pusingcuk-native
 
 .PHONY: native run-native test-native
 
@@ -25,7 +25,7 @@ test-native: native
 	test "$$actual" = "$$expected"; \
 	actual="$$($(NATIVE_BIN) tests/native/dictionaries.pusingcuk)"; \
 	expected="$$(printf 'Budi\n20\n21\nsatu\nya\n5\nnama\numur\n1\nokelah\nstatus\nkamus terisi\nkamus kosong')"; \
-	if [ "$$actual" != "$$expected" ]; then printf "%s\\n" "$$actual" > /tmp/pusingcuk-dict.actual; printf "%s\\n" "$$expected" > /tmp/pusingcuk-dict.expected; diff -u /tmp/pusingcuk-dict.expected /tmp/pusingcuk-dict.actual; exit 1; fi; \
+	if [ "$$actual" != "$$expected" ]; then printf "%s\\n" "$$actual" > $(CURDIR)/pusingcuk-dict.actual; printf "%s\\n" "$$expected" > $(CURDIR)/pusingcuk-dict.expected; diff -u $(CURDIR)/pusingcuk-dict.expected $(CURDIR)/pusingcuk-dict.actual; exit 1; fi; \
 	if $(NATIVE_BIN) tests/native/dictionary_missing_key.pusingcuk >/dev/null 2>&1; then \
 		echo 'kunci kamus yang tidak ada seharusnya gagal' >&2; exit 1; \
 	fi; \
@@ -38,13 +38,13 @@ test-native: native
 	if $(NATIVE_BIN) tests/native/string_index_out_of_range.pusingcuk >/dev/null 2>&1; then \
 		echo 'indeks teks di luar batas seharusnya gagal' >&2; exit 1; \
 	fi; \
-	$(NATIVE_BIN) examples/native/rekap_anggaran.pusingcuk > /tmp/pusingcuk-budget.out; \
-	grep -q 'Status: anggaran aman' /tmp/pusingcuk-budget.out; \
-	grep -q '^1200000$$' /tmp/pusingcuk-budget.out; \
-	grep -q '^1300000$$' /tmp/pusingcuk-budget.out; \
-	$(NATIVE_BIN) tests/native/list_reallocation.pusingcuk > /tmp/pusingcuk-list-reallocation.out; \
-	printf '1\n' > /tmp/pusingcuk-list-reallocation.expected; \
-	diff -u /tmp/pusingcuk-list-reallocation.expected /tmp/pusingcuk-list-reallocation.out; \
+	$(NATIVE_BIN) examples/native/rekap_anggaran.pusingcuk > $(CURDIR)/pusingcuk-budget.out; \
+	grep -q 'Status: anggaran aman' $(CURDIR)/pusingcuk-budget.out; \
+	grep -q '^1200000$$' $(CURDIR)/pusingcuk-budget.out; \
+	grep -q '^1300000$$' $(CURDIR)/pusingcuk-budget.out; \
+	$(NATIVE_BIN) tests/native/list_reallocation.pusingcuk > $(CURDIR)/pusingcuk-list-reallocation.out; \
+	printf '1\n' > $(CURDIR)/pusingcuk-list-reallocation.expected; \
+	diff -u $(CURDIR)/pusingcuk-list-reallocation.expected $(CURDIR)/pusingcuk-list-reallocation.out; \
 	actual="$$($(NATIVE_BIN) tests/native/functions.pusingcuk)"; \
 	expected="$$(printf '5\n120\n3\n9')"; \
 	if [ "$$actual" != "$$expected" ]; then printf "fungsi actual=[%s] expected=[%s]\\n" "$$actual" "$$expected" >&2; exit 1; fi; \
