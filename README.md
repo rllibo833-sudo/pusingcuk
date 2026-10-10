@@ -15,6 +15,10 @@ Implementasi saat ini berupa interpreter Python.
 Entry point pipeline Python modular: `pusingcuk_new.py` (lexer, parser, AST, evaluator). Pusingcuk Studio memakai pipeline ini. `interpreter.py` tetap merupakan implementasi lama.
 `interpreter_v01.py` dan `interpreter_v02_backup.py` disimpan sebagai arsip historis, bukan entry point utama.
 
+## Mulai untuk pemula
+
+Belum pernah coding? Mulai dari [Panduan Pusingcuk dari Nol](docs/PEMULA.md). Isinya cara membuka terminal di Termux, mengetik program pertama, memakai `tanya`, dan membaca error tanpa perlu mengunduh ZIP.
+
 ## Terminal interaktif sederhana
 
 Jalankan terminal Pusingcuk dari folder repositori:
@@ -102,6 +106,8 @@ selesai jancuk
 Jalankan seluruh tes:
 
     python -m unittest discover -s tests -v
+
+Tes terminal juga memeriksa contoh `:contoh`, program buatan sendiri, dan alur input `tanya`.
 
 ## Batasan saat ini
 
