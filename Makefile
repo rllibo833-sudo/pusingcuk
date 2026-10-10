@@ -6,13 +6,13 @@ VERSION ?= 0.4.0-alpha.1
 PREFIX ?= /usr/local
 DESTDIR ?=
 
-.PHONY: native run-native test-native version install package
+.PHONY: native run-native test-native test-cli version install package
 
 version:
 	@printf '%s\n' '$(VERSION)'
 
 native:
-	$(CC) $(CFLAGS) native/pusingcuk.c $(LDLIBS) -o "$(NATIVE_BIN)"
+	$(CC) $(CFLAGS) -DPUSINGCUK_VERSION='"$(VERSION)"' native/pusingcuk.c $(LDLIBS) -o "$(NATIVE_BIN)"
 
 run-native: native
 	@test -n "$(FILE)" || (echo "Gunakan: make run-native FILE=program.pusingcuk" >&2; exit 2)
@@ -28,7 +28,13 @@ package: test-native
 	git archive --format=tar.gz --prefix="pusingcuk-$(VERSION)/" --output="dist/pusingcuk-$(VERSION)-source.tar.gz" HEAD
 	@printf 'Paket sumber dibuat: dist/pusingcuk-%s-source.tar.gz\n' '$(VERSION)'
 
-test-native: native
+test-cli: native
+	@test "$($(NATIVE_BIN) --version)" = "Pusingcuk native $(VERSION)"
+	@$(NATIVE_BIN) --help | grep -q -- '--version'
+	@if $(NATIVE_BIN) >/dev/null 2>&1; then echo 'runtime tanpa argumen seharusnya gagal' >&2; exit 1; else status=$?; test "$status" -eq 2; fi
+	@if $(NATIVE_BIN) --opsi-tidak-ada >/dev/null 2>&1; then echo 'opsi tidak dikenal seharusnya gagal' >&2; exit 1; else status=$?; test "$status" -eq 2; fi
+
+test-native: native test-cli
 	@set -eu; \
 	actual="$$($(NATIVE_BIN) tests/native/slang_aliases.pusingcuk)"; \
 	expected="$$(printf 'Pusingcuk native\ntidak\ncabang utama\nadooh aktif')"; \
