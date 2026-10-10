@@ -1,7 +1,6 @@
 inthiseco
 jir tambah(2, 3)
 jir faktorial(5)
-gitu inthiseco
 
 fungsi tambah(a, b)
     balek a + b
@@ -13,3 +12,4 @@ fungsi faktorial(n)
     gitu njir
     balek n * faktorial(n - 1)
 gitu fungsi
+gitu inthiseco
