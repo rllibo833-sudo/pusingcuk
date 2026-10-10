@@ -29,7 +29,7 @@ package: test-native
 	@printf 'Paket sumber dibuat: dist/pusingcuk-%s-source.tar.gz\n' '$(VERSION)'
 
 test-cli: native
-	@test "$($(NATIVE_BIN) --version)" = "Pusingcuk native $(VERSION)"
+	@test "$$($(NATIVE_BIN) --version)" = "Pusingcuk native $(VERSION)"
 	@$(NATIVE_BIN) --help | grep -q -- '--version'
 	@if $(NATIVE_BIN) >/dev/null 2>&1; then echo 'runtime tanpa argumen seharusnya gagal' >&2; exit 1; else status=$?; test "$status" -eq 2; fi
 	@if $(NATIVE_BIN) --opsi-tidak-ada >/dev/null 2>&1; then echo 'opsi tidak dikenal seharusnya gagal' >&2; exit 1; else status=$?; test "$status" -eq 2; fi
