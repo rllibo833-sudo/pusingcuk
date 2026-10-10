@@ -27,6 +27,16 @@ Jalankan terminal Pusingcuk dari folder repositori:
 
 Ketik program dari `jancuk` sampai `selesai jancuk`. Terminal menjalankan program setelah penutup itu dimasukkan. Gunakan `:bantuan`, `:contoh`, `:batal`, atau `:keluar` untuk perintah terminal. Input `tanya` dimasukkan setelah program mulai dijalankan.
 
+## Runtime native tanpa Python
+
+Runtime C mandiri dapat dikompilasi dan dijalankan tanpa interpreter Python untuk subset sintaks yang didukung:
+
+    make native
+    make run-native FILE=tests/native/slang_aliases.pusingcuk
+    make test-native
+
+Compiler C11 diperlukan saat build; menjalankan executable hasil build tidak memerlukan Python. Runtime native masih memiliki cakupan lebih kecil daripada pipeline modular Python dan **bukan sandbox** untuk kode tak tepercaya. Dukungan fitur harus dibuktikan dengan fixture native, bukan diasumsikan dari interpreter Python.
+
 ## Menjalankan program
 
 Jalankan file program:
