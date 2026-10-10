@@ -809,18 +809,18 @@ static Val call_user_function(const char *name, Val *args, int argc) {
 
 static void print_usage(FILE *out, const char *program) {
     fprintf(out,
-        "Pusingcuk native %s\\n"
-        "Penggunaan: %s [opsi]\\n"
-        "           %s <program.pusingcuk>\\n\\n"
-        "Opsi:\\n"
-        "  -h, --help       Tampilkan bantuan\\n"
-        "  -v, --version    Tampilkan versi runtime\\n",
+        "Pusingcuk native %s\n"
+        "Penggunaan: %s [opsi]\n"
+        "           %s <program.pusingcuk>\n\n"
+        "Opsi:\n"
+        "  -h, --help       Tampilkan bantuan\n"
+        "  -v, --version    Tampilkan versi runtime\n",
         PUSINGCUK_VERSION, program, program);
 }
 
 int main(int argc,char **argv) {
     if (argc == 2 && (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v"))) {
-        printf("Pusingcuk native %s\\n", PUSINGCUK_VERSION);
+        printf("Pusingcuk native %s\n", PUSINGCUK_VERSION);
         return 0;
     }
     if (argc == 2 && (!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h"))) {
@@ -832,7 +832,7 @@ int main(int argc,char **argv) {
         return 2;
     }
     if (argv[1][0] == '-' && strcmp(argv[1], "-")) {
-        fprintf(stderr, "Opsi tidak dikenal: %s\\n", argv[1]);
+        fprintf(stderr, "Opsi tidak dikenal: %s\n", argv[1]);
         print_usage(stderr, argv[0]);
         return 2;
     }
@@ -841,7 +841,7 @@ int main(int argc,char **argv) {
     char buf[4096];
     while(fgets(buf,sizeof buf,f)) {
         if(program_count>=MAX_LINES) {
-            fprintf(stderr,"Program terlalu panjang\\n"); fclose(f); return 2;
+            fprintf(stderr,"Program terlalu panjang\n"); fclose(f); return 2;
         }
         size_t n=strlen(buf);
         program_lines[program_count]=malloc(n+1);
