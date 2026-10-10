@@ -31,6 +31,7 @@ Binary default ditempatkan di `/tmp/pusingcuk-native`, bukan di pohon repositori
 
 ## Batasan dan keamanan
 
+- Kamus native dibatasi hingga 256 entri dan menerima kunci teks, angka, atau boolean.
 - Native C belum setara penuh dengan pipeline modular Python.
 - Indeks teks native menerima indeks bilangan bulat nonnegatif; indeks negatif belum didukung.
 - Teks memakai buffer tetap, sehingga string terlalu panjang ditolak atau dipotong sesuai jalur yang ada; jangan menganggapnya sebagai implementasi Unicode lengkap.
