@@ -21,6 +21,7 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 | Error untuk kunci yang tidak didukung dan kunci yang tidak ditemukan | Teruji |
 | Fungsi buatan pengguna (`fungsi`, parameter, `balek`, rekursi) | Ditambahkan; menunggu hasil CI PR ini |
 | Sistem modul | Belum tersedia di native |
+| Sistem modul | Belum tersedia di native |
 
 Fixture kamus sukses berada di `tests/native/dictionaries.pusingcuk`; kasus kunci tidak valid dan kunci hilang masing-masing ada di `tests/native/dictionary_invalid_key.pusingcuk` dan `tests/native/dictionary_missing_key.pusingcuk`. Fixture fungsi dan rekursi ada di `tests/native/functions.pusingcuk`; jumlah argumen yang salah diuji di `tests/native/function_wrong_arity.pusingcuk`. Semuanya dijalankan oleh `make test-native`.
 
