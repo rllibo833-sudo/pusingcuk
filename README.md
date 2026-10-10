@@ -129,7 +129,9 @@ Nilai yang didukung mencakup teks, angka, boolean, daftar, dan kamus. Built-in `
 - Daftar ditulis dengan tanda kurung siku, misalnya `[10, 20, 30]`.
 - Kamus ditulis dengan pasangan `kunci: nilai`, misalnya `{"nama": "Budi", "umur": 20}`.
 - Indeks daftar dan teks dimulai dari 0; nilai daftar dapat diubah melalui indeks.
-- Nilai kamus dapat dibaca dan diubah melalui kunci.
+- Nilai kamus dapat dibaca dan diubah melalui kunci; assignment melalui kunci yang belum ada menambahkan entri baru.
+- Kamus kosong bernilai salah dalam kondisi, sedangkan kamus berisi entri bernilai benar.
+- Runtime native membatasi kunci kamus pada teks, angka, dan boolean; kunci yang tidak didukung atau tidak ditemukan menghasilkan error.
 - `panjang(nilai)` menerima daftar, teks, atau kamus.
 
 ### Perulangan `untuk` dan rentang

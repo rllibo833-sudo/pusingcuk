@@ -16,8 +16,12 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 | `untuk` pada list, teks, kamus (menghasilkan kunci), dan `rentang()` | Teruji |
 | Built-in `panjang()` dan `rentang()` | Teruji pada argumen yang didukung |
 | `tanya nama = "Prompt"` dari stdin | Teruji melalui pipe dan CLI |
-| Kamus dengan kunci teks/angka/boolean, baca/ubah kunci, dan `panjang()` | Teruji |
+| Literal kamus, kunci teks/angka/boolean, baca/ubah/tambah kunci | Teruji |
+| `panjang(kamus)`, truthiness kamus kosong/terisi, iterasi kunci | Teruji |
+| Error untuk kunci yang tidak didukung dan kunci yang tidak ditemukan | Teruji |
 | Fungsi buatan pengguna dan sistem modul | Belum tersedia di native |
+
+Fixture kamus sukses berada di `tests/native/dictionaries.pusingcuk`; kasus kunci tidak valid dan kunci hilang masing-masing ada di `tests/native/dictionary_invalid_key.pusingcuk` dan `tests/native/dictionary_missing_key.pusingcuk`. Semuanya dijalankan oleh `make test-native`.
 
 ## Build dan jalankan
 
@@ -32,6 +36,7 @@ Binary default ditempatkan di `/tmp/pusingcuk-native`, bukan di pohon repositori
 ## Batasan dan keamanan
 
 - Kamus native dibatasi hingga 256 entri dan menerima kunci teks, angka, atau boolean.
+- Kunci yang tidak didukung serta pembacaan kunci yang tidak ditemukan menghasilkan error.
 - Native C belum setara penuh dengan pipeline modular Python.
 - Indeks teks native menerima indeks bilangan bulat nonnegatif; indeks negatif belum didukung.
 - Teks memakai buffer tetap, sehingga string terlalu panjang ditolak atau dipotong sesuai jalur yang ada; jangan menganggapnya sebagai implementasi Unicode lengkap.
