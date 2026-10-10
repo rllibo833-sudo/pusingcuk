@@ -71,10 +71,10 @@ Boolean: benar, salah
 
 ### Daftar, kamus, teks, dan indeks
 
-Daftar ditulis menggunakan tanda kurung siku, misalnya [10, 20, 30].
-Kamus ditulis dengan kurung kurawal dan pasangan kunci: nilai, misalnya {"nama": "Budi", "umur": 20}.
+Daftar ditulis menggunakan tanda kurung siku, misalnya `[10, 20, 30]`.
+Kamus ditulis dengan kurung kurawal dan pasangan kunci-nilai, misalnya `{"nama": "Budi", "umur": 20}`.
 Indeks daftar dan teks dimulai dari 0. Daftar dapat dibaca dan diubah melalui indeks. Nilai kamus dapat dibaca dan diubah melalui kunci.
-Fungsi panjang menerima daftar, teks, atau kamus dan mengembalikan jumlah elemen atau karakter.
+Fungsi `panjang(nilai)` menerima daftar, teks, atau kamus dan mengembalikan jumlah elemen atau karakter.
 Kunci kamus harus dapat digunakan sebagai kunci. Kunci yang tidak ditemukan dan indeks di luar batas menghasilkan kesalahan.
 
 ## 9. Perulangan untuk
@@ -89,7 +89,7 @@ Contoh:
 
 Perulangan untuk nama dalam koleksi mengunjungi setiap elemen daftar atau teks, setiap kunci kamus, atau setiap bilangan dalam rentang.
 
-rentang(akhir), rentang(mulai, akhir), dan rentang(mulai, akhir, langkah) menerima satu sampai tiga argumen bilangan bulat. Batas akhir tidak termasuk hasil, seperti Python. Langkah tidak boleh nol. Setiap iterasi tunduk pada batas total langkah evaluator.
+`rentang(akhir)`, `rentang(mulai, akhir)`, dan `rentang(mulai, akhir, langkah)` menerima satu sampai tiga argumen bilangan bulat. Batas akhir tidak termasuk hasil, seperti Python. Langkah tidak boleh nol. Setiap perulangan dibatasi 10000 iterasi dan seluruh program dibatasi 100000 langkah evaluator.
 
 ## 10. Fungsi buatan pengguna
 
@@ -118,4 +118,3 @@ Interpreter melaporkan kesalahan dengan nomor baris jika tersedia.
 
 Dokumen ini mencatat perilaku implementasi saat ini.
 Fitur yang belum diuji tidak dianggap telah didukung.
-
