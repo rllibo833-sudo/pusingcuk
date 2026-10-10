@@ -241,5 +241,14 @@ selesai jancuk"""
             Evaluator().run(source)
 
 
+
+    def test_for_loop_iteration_limit(self):
+        source = """jancuk
+untuk angka dalam rentang(10001)
+selesai untuk
+selesai jancuk"""
+        with self.assertRaisesRegex(RuntimeError, "batas 10000 iterasi tercapai"):
+            Evaluator().run(source)
+
 if __name__ == "__main__":
     unittest.main()
