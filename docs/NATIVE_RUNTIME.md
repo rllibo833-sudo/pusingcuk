@@ -26,7 +26,7 @@ Fixture kamus sukses berada di `tests/native/dictionaries.pusingcuk`; kasus kunc
 
 ## Contoh aplikasi native
 
-Contoh rekap anggaran yang menggunakan kamus, iterasi kunci, dan perhitungan total tersedia di `examples/native/rekap_anggaran.pusingcuk`. Panduan pemasangan executable pada Termux tersedia di [NATIVE_TERMUX.md](NATIVE_TERMUX.md).
+Contoh rekap anggaran yang memakai fungsi buatan, kamus, iterasi kunci, dan perhitungan total tersedia di `examples/native/rekap_anggaran.pusingcuk`. Panduan pemasangan executable pada Termux tersedia di [NATIVE_TERMUX.md](NATIVE_TERMUX.md).
 
 ## Build dan jalankan
 
