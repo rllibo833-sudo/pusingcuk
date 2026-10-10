@@ -1,0 +1,15 @@
+inthiseco
+fungsi tambah(a, b)
+    balek a + b
+gitu fungsi
+
+fungsi faktorial(n)
+    njir n <= 1
+        balek 1
+    gitu njir
+    balek n * faktorial(n - 1)
+gitu fungsi
+
+jir tambah(2, 3)
+jir faktorial(5)
+gitu inthiseco
