@@ -38,6 +38,8 @@ test-native: native
 	if $(NATIVE_BIN) tests/native/string_index_out_of_range.pusingcuk >/dev/null 2>&1; then \
 		echo 'indeks teks di luar batas seharusnya gagal' >&2; exit 1; \
 	fi; \
+	$(NATIVE_BIN) examples/native/rekap_anggaran.pusingcuk > /tmp/pusingcuk-budget.out; \
+	grep -q 'Status: anggaran aman' /tmp/pusingcuk-budget.out; \
 	$(NATIVE_BIN) tests/native/list_reallocation.pusingcuk > /tmp/pusingcuk-list-reallocation.out; \
 	printf '1\n' > /tmp/pusingcuk-list-reallocation.expected; \
 	diff -u /tmp/pusingcuk-list-reallocation.expected /tmp/pusingcuk-list-reallocation.out
