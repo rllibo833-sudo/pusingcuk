@@ -195,7 +195,7 @@ class Evaluator:
                     self.block(n.body, env, depth, in_function)
             elif k == "Function":
                 if n.name in ("panjang", "rentang"):
-                    self.fail(line, "nama fungsi 'panjang' sudah digunakan")
+                    self.fail(line, f"nama fungsi '{n.name}' sudah digunakan")
                 if n.name in self.functions:
                     self.fail(line, f"fungsi '{n.name}' sudah dibuat")
                 self.functions[n.name] = (n.params, n.body, line)
