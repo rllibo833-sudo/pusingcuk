@@ -34,16 +34,31 @@ class Evaluator:
                 return env[n.name]
             if k == "List":
                 return [self.expr(x, env, depth) for x in n.items]
+            if k == "Dict":
+                result = {}
+                for key_node, value_node in n.items:
+                    key = self.expr(key_node, env, depth)
+                    value = self.expr(value_node, env, depth)
+                    try:
+                        result[key] = value
+                    except (TypeError, ValueError):
+                        self.fail(key_node.line, "kunci kamus harus dapat digunakan sebagai kunci")
+                return result
             if k == "Index":
                 obj = self.expr(n.collection, env, depth)
                 idx = self.expr(n.index, env, depth)
-                if not isinstance(obj, list):
-                    self.fail(line, "indeks hanya dapat digunakan pada daftar")
-                if not isinstance(idx, int) or isinstance(idx, bool):
-                    self.fail(line, "indeks harus berupa bilangan bulat")
-                if idx < 0 or idx >= len(obj):
-                    self.fail(line, "indeks daftar di luar batas")
-                return obj[idx]
+                if isinstance(obj, (list, str)):
+                    if not isinstance(idx, int) or isinstance(idx, bool):
+                        self.fail(line, "indeks harus berupa bilangan bulat")
+                    if idx < 0 or idx >= len(obj):
+                        self.fail(line, "indeks di luar batas")
+                    return obj[idx]
+                if isinstance(obj, dict):
+                    try:
+                        return obj[idx]
+                    except (KeyError, TypeError):
+                        self.fail(line, "kunci kamus tidak ditemukan")
+                self.fail(line, "indeks hanya dapat digunakan pada daftar, teks, atau kamus")
             if k == "Unary":
                 v = self.expr(n.value, env, depth)
                 if n.op == "bukan":
@@ -74,9 +89,18 @@ class Evaluator:
                 if n.name == "panjang":
                     if len(args) != 1:
                         self.fail(line, "fungsi 'panjang' membutuhkan 1 argumen")
-                    if not isinstance(args[0], list):
-                        self.fail(line, "panjang hanya menerima daftar")
+                    if not isinstance(args[0], (list, str, dict)):
+                        self.fail(line, "panjang menerima daftar, teks, atau kamus")
                     return len(args[0])
+                if n.name == "rentang":
+                    if not 1 <= len(args) <= 3:
+                        self.fail(line, "fungsi 'rentang' membutuhkan 1 sampai 3 argumen")
+                    if any(not isinstance(x, int) or isinstance(x, bool) for x in args):
+                        self.fail(line, "argumen rentang harus bilangan bulat")
+                    try:
+                        return range(*args)
+                    except ValueError:
+                        self.fail(line, "langkah rentang tidak boleh nol")
                 if n.name not in self.functions:
                     self.fail(line, f"fungsi '{n.name}' tidak dikenal")
                 params, body, fline = self.functions[n.name]
@@ -105,8 +129,8 @@ class Evaluator:
             obj = self.expr(target, env, depth)
         else:
             self.fail(line, "target indeks tidak valid")
-        if not isinstance(obj, list):
-            self.fail(line, "indeks hanya dapat digunakan pada daftar")
+        if not isinstance(obj, (list, dict)):
+            self.fail(line, "assignment indeks hanya mendukung daftar atau kamus")
         return obj
 
     def block(self, body, env, depth=0, in_function=False):
@@ -126,9 +150,16 @@ class Evaluator:
                 idx = self.expr(n.index, env, depth)
                 if not isinstance(idx, int) or isinstance(idx, bool):
                     self.fail(line, "indeks harus berupa bilangan bulat")
-                if idx < 0 or idx >= len(obj):
-                    self.fail(line, "indeks daftar di luar batas")
-                obj[idx] = self.expr(n.value, env, depth)
+                value = self.expr(n.value, env, depth)
+                if isinstance(obj, list):
+                    if idx < 0 or idx >= len(obj):
+                        self.fail(line, "indeks daftar di luar batas")
+                    obj[idx] = value
+                elif isinstance(obj, dict):
+                    try:
+                        obj[idx] = value
+                    except TypeError:
+                        self.fail(line, "kunci kamus harus dapat digunakan sebagai kunci")
             elif k == "Input":
                 if n.name in env:
                     self.fail(line, "variabel '" + n.name + "' sudah dibuat")
@@ -154,8 +185,16 @@ class Evaluator:
                         self.fail(line, "batas 10000 iterasi tercapai")
                     self.block(n.body, env, depth, in_function)
                     count += 1
+            elif k == "For":
+                iterable = self.expr(n.iterable, env, depth)
+                if not isinstance(iterable, (list, tuple, str, dict, range)):
+                    self.fail(line, "untuk membutuhkan daftar, teks, kamus, atau rentang")
+                for item in iterable:
+                    self.step(line)
+                    env[n.name] = item
+                    self.block(n.body, env, depth, in_function)
             elif k == "Function":
-                if n.name == "panjang":
+                if n.name in ("panjang", "rentang"):
                     self.fail(line, "nama fungsi 'panjang' sudah digunakan")
                 if n.name in self.functions:
                     self.fail(line, f"fungsi '{n.name}' sudah dibuat")
