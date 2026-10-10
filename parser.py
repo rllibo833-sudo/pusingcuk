@@ -88,6 +88,11 @@ class Parser:
         if self.at("hedeh"):
             self.take()
             return node("Print", t.line, value=self.expr())
+        if self.at("tanya"):
+            self.take()
+            name = self.name()
+            self.need("=")
+            return node("Input", t.line, name=name, prompt=self.expr())
         if self.at("njir"):
             self.take()
             condition = self.expr()
