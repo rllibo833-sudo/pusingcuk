@@ -118,3 +118,15 @@ Interpreter melaporkan kesalahan dengan nomor baris jika tersedia.
 
 Dokumen ini mencatat perilaku implementasi saat ini.
 Fitur yang belum diuji tidak dianggap telah didukung.
+
+## 14. Alias kosakata slang
+
+Lexer menerima alias berikut dan menormalkannya ke kata kunci kanonis sebelum parsing:
+
+- `jir` → `hedeh`
+- `adooh` → `kampret`
+- `gitu` → `selesai`
+- `inthiseco` → `jancuk`
+- `janggal` → `bukan`
+
+Alias tidak mengubah makna sintaks dan tidak menghapus kata kunci lama. Runtime C mandiri diuji terhadap subset alias ini; fitur lain pada runtime C belum dinyatakan setara dengan interpreter modular.
