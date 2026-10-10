@@ -9,15 +9,20 @@
 #define NV 256
 #define SZ 1024
 
-typedef enum { NUM, STR, BOOL, LIST, RANGE } Type;
+typedef enum { NUM, STR, BOOL, LIST, RANGE, DICT } Type;
 typedef struct Val Val;
 typedef struct List List;
-struct Val { Type t; double n; int b; char s[SZ]; List *list; double range_start, range_end, range_step; };
+typedef struct Dict Dict;
+struct Val { Type t; double n; int b; char s[SZ]; List *list; Dict *dict; double range_start, range_end, range_step; };
 #define MAX_LIST_ITEMS 256
 struct List { size_t len, capacity; Val *items; };
+#define MAX_DICT_ITEMS 256
+struct Dict { size_t len; Val keys[MAX_DICT_ITEMS]; Val values[MAX_DICT_ITEMS]; };
 #define MAX_LIST_ALLOCATIONS 100000
 static List *allocated_lists[MAX_LIST_ALLOCATIONS];
 static size_t allocated_list_count;
+static Dict *allocated_dicts[MAX_LIST_ALLOCATIONS];
+static size_t allocated_dict_count;
 typedef struct { char name[128]; Val v; } Var;
 static Var vars[NV];
 static int nvars, err, line_no;
@@ -36,6 +41,15 @@ static List *new_list(void) {
     if (!list) { fail("memori list habis"); return NULL; }
     allocated_lists[allocated_list_count++] = list;
     return list;
+}
+static Dict *new_dict(void) {
+    if (allocated_dict_count >= MAX_LIST_ALLOCATIONS) {
+        fail("batas alokasi kamus native terlampaui"); return NULL;
+    }
+    Dict *dict = calloc(1, sizeof *dict);
+    if (!dict) { fail("memori kamus habis"); return NULL; }
+    allocated_dicts[allocated_dict_count++] = dict;
+    return dict;
 }
 static int append_list(List *list, Val value) {
     if (list->len >= MAX_LIST_ITEMS) {
@@ -94,6 +108,7 @@ static int truth(Val v) {
     if (v.t==BOOL) return v.b;
     if (v.t==NUM) return v.n!=0;
     if (v.t==LIST) return v.list && v.list->len != 0;
+    if (v.t==DICT) return v.dict && v.dict->len != 0;
     if (v.t==RANGE) return range_length(v) != 0;
     return v.s[0]!=0;
 }
@@ -103,7 +118,34 @@ static int equal(Val a, Val b) {
     if (a.t==BOOL) return a.b==b.b;
     if (a.t==RANGE) return a.range_start==b.range_start && a.range_end==b.range_end && a.range_step==b.range_step;
     if (a.t==LIST) return a.list==b.list;
+    if (a.t==DICT) return a.dict==b.dict;
     return !strcmp(a.s,b.s);
+}
+static int valid_dict_key(Val key) {
+    if (key.t==STR || key.t==NUM || key.t==BOOL) return 1;
+    fail("kunci kamus native harus teks, angka, atau boolean");
+    return 0;
+}
+static int dict_set(Dict *dict, Val key, Val value) {
+    if (!dict || !valid_dict_key(key)) return 0;
+    for (size_t i=0; i<dict->len; i++) {
+        if (equal(dict->keys[i],key)) { dict->values[i]=value; return 1; }
+    }
+    if (dict->len >= MAX_DICT_ITEMS) { fail("kamus terlalu besar"); return 0; }
+    dict->keys[dict->len]=key;
+    dict->values[dict->len]=value;
+    dict->len++;
+    return 1;
+}
+static Val dict_get(Dict *dict, Val key) {
+    if (!dict || !valid_dict_key(key)) return num(0);
+    for (size_t i=0; i<dict->len; i++)
+        if (equal(dict->keys[i],key)) return dict->values[i];
+    fail("kunci kamus tidak ditemukan");
+    return num(0);
+}
+static Val dictval(Dict *d) {
+    Val v={0}; v.t=DICT; v.dict=d; return v;
 }
 static Val expr(void);
 static Val listval(List *l) {
@@ -158,6 +200,22 @@ static int string_index(Val v, Val idx, size_t *start, size_t *end) {
 
 static Val primary(void) {
     ws();
+    if (take("{")) {
+        Dict *d = new_dict();
+        if (!d) return dictval(NULL);
+        if (!take("}")) {
+            for (;;) {
+                Val key = expr();
+                if (!take(":")) { fail("tanda ':' diharapkan setelah kunci kamus"); return dictval(d); }
+                Val value = expr();
+                if (err || !dict_set(d,key,value)) return dictval(d);
+                if (take("}")) break;
+                if (!take(",")) { fail("koma atau '}' diharapkan dalam kamus"); return dictval(d); }
+                if (take("}")) break;
+            }
+        }
+        return dictval(d);
+    }
     if (take("[")) {
         List *l = new_list();
         if (!l) return listval(NULL);
@@ -237,7 +295,8 @@ static Val primary(void) {
                     return num((double)count);
                 }
                 if (args[0].t == RANGE) return num(range_length(args[0]));
-                fail("panjang() menerima list, teks, atau rentang"); return num(0);
+                if (args[0].t == DICT && args[0].dict) return num((double)args[0].dict->len);
+                fail("panjang() menerima list, teks, kamus, atau rentang"); return num(0);
             }
             if (!strcmp(name,"rentang")) {
                 if (argc < 1 || argc > 3) {
@@ -275,6 +334,7 @@ static Val primary(void) {
                 memcpy(ch,value.s+start,len); ch[len]=0;
                 return string(ch);
             }
+            if (value.t == DICT) return dict_get(value.dict,idx);
             size_t at=0;
             if (!list_index(value,idx,&at)) return num(0);
             return value.list->items[at];
@@ -392,6 +452,7 @@ static void printval(Val v) {
     if(v.t==BOOL) puts(v.b?"okelah":"tidak");
     else if(v.t==STR) puts(v.s);
     else if(v.t==LIST) printf("[list: %zu]\n", v.list ? v.list->len : 0);
+    else if(v.t==DICT) printf("[kamus: %zu]\n", v.dict ? v.dict->len : 0);
     else if(v.t==RANGE) printf("[rentang: %.0f]\n", range_length(v));
     else if(isfinite(v.n) && v.n==(long long)v.n) printf("%lld\n",(long long)v.n);
     else printf("%.10g\n",v.n);
@@ -484,6 +545,14 @@ static int run_range(int first,int last) {
                     run_range(i+1,end);
                     offset=next;
                 }
+            } else if (!err && iterable.t == DICT && iterable.dict) {
+                size_t count=iterable.dict->len;
+                if (count > MAX_ITER) fail("kamus melebihi batas 10000 iterasi native");
+                for (size_t j=0; j<count && !err; j++) {
+                    if (++steps > MAX_STEPS) { fail("batas 100000 langkah terlampaui"); break; }
+                    setvar(name, iterable.dict->keys[j]);
+                    run_range(i+1,end);
+                }
             } else if (!err && iterable.t == RANGE) {
                 int iter=0;
                 for (double x=iterable.range_start;
@@ -495,7 +564,7 @@ static int run_range(int first,int last) {
                     run_range(i+1,end);
                 }
             } else if (!err) {
-                fail("perulangan native saat ini menerima list, teks, atau rentang()");
+                fail("perulangan native menerima list, teks, kamus, atau rentang()");
             }
             i=end;
         } else if(word("mumet")) {
@@ -570,9 +639,13 @@ static int run_range(int first,int last) {
                         if(!strcmp(vars[k].name,name)) {
                             if(!indexed) vars[k].v=v;
                             else {
-                                size_t at=0;
-                                if(list_index(vars[k].v,idx,&at))
-                                    vars[k].v.list->items[at]=v;
+                                if (vars[k].v.t == DICT) {
+                                    dict_set(vars[k].v.dict,idx,v);
+                                } else {
+                                    size_t at=0;
+                                    if(list_index(vars[k].v,idx,&at))
+                                        vars[k].v.list->items[at]=v;
+                                }
                             }
                             break;
                         }
@@ -608,5 +681,6 @@ int main(int argc,char **argv) {
         free(allocated_lists[i]->items);
         free(allocated_lists[i]);
     }
+    for(size_t i=0;i<allocated_dict_count;i++) free(allocated_dicts[i]);
     return result;
 }

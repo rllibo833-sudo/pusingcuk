@@ -13,10 +13,11 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 | List, baca/ubah indeks list | Teruji |
 | Indeks teks berdasarkan code point UTF-8 | Teruji untuk teks UTF-8 valid |
 | Kondisi `njir` / `adooh` dan loop `mumet` | Teruji |
-| `untuk` pada list, teks, dan `rentang()` | Teruji |
+| `untuk` pada list, teks, kamus (menghasilkan kunci), dan `rentang()` | Teruji |
 | Built-in `panjang()` dan `rentang()` | Teruji pada argumen yang didukung |
 | `tanya nama = "Prompt"` dari stdin | Teruji melalui pipe dan CLI |
-| Kamus, fungsi buatan pengguna, sistem modul | Belum tersedia di native |
+| Kamus dengan kunci teks/angka/boolean, baca/ubah kunci, dan `panjang()` | Teruji |
+| Fungsi buatan pengguna dan sistem modul | Belum tersedia di native |
 
 ## Build dan jalankan
 
@@ -30,6 +31,7 @@ Binary default ditempatkan di `/tmp/pusingcuk-native`, bukan di pohon repositori
 
 ## Batasan dan keamanan
 
+- Kamus native dibatasi hingga 256 entri dan menerima kunci teks, angka, atau boolean.
 - Native C belum setara penuh dengan pipeline modular Python.
 - Indeks teks native menerima indeks bilangan bulat nonnegatif; indeks negatif belum didukung.
 - Teks memakai buffer tetap, sehingga string terlalu panjang ditolak atau dipotong sesuai jalur yang ada; jangan menganggapnya sebagai implementasi Unicode lengkap.
@@ -40,6 +42,6 @@ Binary default ditempatkan di `/tmp/pusingcuk-native`, bukan di pohon repositori
 
 1. Tambahkan fitur kecil beserta tes native dan kontrak error.
 2. Bangun serta jalankan fixture dengan CI pada setiap PR.
-3. Implementasikan kamus dan fungsi buatan pengguna sebagai milestone terpisah; keduanya mengubah model nilai dan lingkungan eksekusi sehingga tidak aman ditumpuk tanpa tes.
+3. Implementasikan fungsi buatan pengguna sebagai milestone terpisah; fungsi membutuhkan desain scope, parameter, nilai balik, dan cleanup.
 4. Setelah cakupan native stabil, sediakan perintah instalasi yang mudah untuk Termux dan uji pada perangkat Android nyata.
 5. Jadikan Python opsional untuk pengembangan/test, bukan dependensi saat menjalankan program melalui executable native.

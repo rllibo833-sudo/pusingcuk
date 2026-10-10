@@ -23,6 +23,15 @@ test-native: native
 	actual="$$(printf 'Budi\n' | $(NATIVE_BIN) tests/native/strings_input.pusingcuk)"; \
 	expected="$$(printf 'a\n🌾\nG\ne\nn\n \nZ\nNama? Halo, Budi')"; \
 	test "$$actual" = "$$expected"; \
+	actual="$$($(NATIVE_BIN) tests/native/dictionaries.pusingcuk)"; \
+	expected="$$(printf 'Budi\n20\n21\n3\nnama\numur\nstatus')"; \
+	if [ "$$actual" != "$$expected" ]; then printf "%s\\n" "$$actual" > /tmp/pusingcuk-dict.actual; printf "%s\\n" "$$expected" > /tmp/pusingcuk-dict.expected; diff -u /tmp/pusingcuk-dict.expected /tmp/pusingcuk-dict.actual; exit 1; fi; \
+	if $(NATIVE_BIN) tests/native/dictionary_missing_key.pusingcuk >/dev/null 2>&1; then \
+		echo 'kunci kamus yang tidak ada seharusnya gagal' >&2; exit 1; \
+	fi; \
+	if $(NATIVE_BIN) tests/native/dictionary_invalid_key.pusingcuk >/dev/null 2>&1; then \
+		echo 'kunci kamus tak didukung seharusnya gagal' >&2; exit 1; \
+	fi; \
 	if $(NATIVE_BIN) tests/native/range_zero_step.pusingcuk >/dev/null 2>&1; then \
 		echo 'rentang dengan langkah nol seharusnya gagal' >&2; exit 1; \
 	fi; \
