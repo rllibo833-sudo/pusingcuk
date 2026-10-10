@@ -15,6 +15,14 @@ Implementasi saat ini berupa interpreter Python.
 Entry point pipeline Python modular: `pusingcuk_new.py` (lexer, parser, AST, evaluator). Pusingcuk Studio memakai pipeline ini. `interpreter.py` tetap merupakan implementasi lama.
 `interpreter_v01.py` dan `interpreter_v02_backup.py` disimpan sebagai arsip historis, bukan entry point utama.
 
+## Terminal interaktif sederhana
+
+Jalankan terminal Pusingcuk dari folder repositori:
+
+    python terminal.py
+
+Ketik program dari `jancuk` sampai `selesai jancuk`. Terminal menjalankan program setelah penutup itu dimasukkan. Gunakan `:bantuan`, `:contoh`, `:batal`, atau `:keluar` untuk perintah terminal. Input `tanya` dimasukkan setelah program mulai dijalankan.
+
 ## Menjalankan program
 
 Jalankan file program:
