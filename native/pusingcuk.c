@@ -566,6 +566,13 @@ static int register_function(int header, int end) {
     return 1;
 }
 
+static int function_registered_at(int header, int end) {
+    for (int i = 0; i < function_count; i++)
+        if (functions[i].first_line == header + 1 && functions[i].end_line == end)
+            return 1;
+    return 0;
+}
+
 static int run_range(int first,int last) {
     for(int i=first;i<last && !err && !returning;i++) {
         if(++steps>MAX_STEPS) {
@@ -642,7 +649,8 @@ static int run_range(int first,int last) {
         } else if(word("fungsi")) {
             int mid=-1, end=block_end(i,"fungsi",&mid);
             if(end<0) break;
-            if(register_function(i,end)) i=end;
+            if(!function_registered_at(i,end) && !register_function(i,end)) break;
+            i=end;
         } else if(word("balek")) {
             if(call_depth <= 0) { fail("balek hanya boleh di dalam fungsi"); break; }
             Val v=expr();
@@ -737,6 +745,26 @@ static int run_range(int first,int last) {
     return !err;
 }
 
+static int register_top_level_functions(void) {
+    int depth = 0;
+    for (int i = 0; i < program_count && !err; i++) {
+        if (depth == 0 && line_word(i, "fungsi")) {
+            int middle = -1;
+            int end = block_end(i, "fungsi", &middle);
+            if (end < 0 || !register_function(i, end)) return 0;
+            i = end;
+            continue;
+        }
+        if (line_word(i, "njir") || line_word(i, "mumet") || line_word(i, "untuk")) {
+            depth++;
+        } else if (depth > 0 &&
+                   (line_close(i, "njir") || line_close(i, "mumet") || line_close(i, "untuk"))) {
+            depth--;
+        }
+    }
+    return !err;
+}
+
 static Val call_user_function(const char *name, Val *args, int argc) {
     Function *fn = NULL;
     for (int i = 0; i < function_count; i++) {
@@ -791,7 +819,7 @@ int main(int argc,char **argv) {
     }
     if(ferror(f)) { perror("Gagal membaca program"); fclose(f); return 2; }
     fclose(f);
-    run_range(0,program_count);
+    if (register_top_level_functions()) run_range(0,program_count);
     int result=err?1:0;
     for(int i=0;i<program_count;i++) free(program_lines[i]);
     for(size_t i=0;i<allocated_list_count;i++) {
