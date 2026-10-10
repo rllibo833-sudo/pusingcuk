@@ -776,7 +776,8 @@ static Val call_user_function(const char *name, Val *args, int argc) {
 
     const char *saved_p = p;
     int saved_line = line_no;
-    Var saved_vars[NV];
+    Var *saved_vars = malloc(sizeof vars);
+    if (!saved_vars) { fail("memori scope fungsi habis"); return (Val){.t=NIL}; }
     memcpy(saved_vars, vars, sizeof vars);
     int saved_nvars = nvars;
     int saved_returning = returning;
@@ -792,6 +793,7 @@ static Val call_user_function(const char *name, Val *args, int argc) {
 
     Val result = returning ? return_value : (Val){.t=NIL};
     memcpy(vars, saved_vars, sizeof vars);
+    free(saved_vars);
     nvars = saved_nvars;
     returning = saved_returning;
     return_value = saved_return_value;
