@@ -8,7 +8,7 @@ Termux dan Python.
 
 ## Status
 
-Versi: 0.3-dev
+Versi: 0.4-dev
 
 Implementasi saat ini berupa interpreter Python.
 
@@ -71,6 +71,8 @@ Jika perintah pusingcuk belum tersedia:
 - selesai njir: mengakhiri kondisi
 - mumet: memulai perulangan while
 - selesai mumet: mengakhiri perulangan
+- untuk nama dalam koleksi: memulai perulangan koleksi
+- selesai untuk: mengakhiri perulangan koleksi
 - selesai jancuk: mengakhiri program
 - tanya: meminta masukan teks dari pengguna, misalnya `tanya nama = "Nama? "`
 - fungsi: mendefinisikan fungsi
@@ -78,19 +80,39 @@ Jika perintah pusingcuk belum tersedia:
 
 ## Nilai dan operator
 
-Nilai yang didukung mencakup string, angka, dan boolean.
+Nilai yang didukung mencakup teks, angka, boolean, daftar, dan kamus. Built-in `panjang` menghitung panjang teks, daftar, atau kamus; `rentang` membuat rentang bilangan bulat untuk perulangan.
 
 - benar dan salah: boolean
 - +, -, *, /, //, %: matematika
 - ==, !=, <, <=, >, >=: perbandingan
 - dan, atau, bukan: logika
 
-### List dan indeks
+### Daftar, kamus, teks, dan indeks
 
-- List ditulis menggunakan tanda kurung siku, misalnya `[10, 20, 30]`.
-- Elemen diakses berdasarkan indeks, dimulai dari 0.
-- Elemen list dapat diubah melalui indeks.
-- Fungsi `panjang(list)` mengembalikan jumlah elemen.
+- Daftar ditulis dengan tanda kurung siku, misalnya `[10, 20, 30]`.
+- Kamus ditulis dengan pasangan `kunci: nilai`, misalnya `{"nama": "Budi", "umur": 20}`.
+- Indeks daftar dan teks dimulai dari 0; nilai daftar dapat diubah melalui indeks.
+- Nilai kamus dapat dibaca dan diubah melalui kunci.
+- `panjang(nilai)` menerima daftar, teks, atau kamus.
+
+### Perulangan `untuk` dan rentang
+
+- Bentuk: `untuk nama dalam koleksi`, ditutup dengan `selesai untuk`.
+- Koleksi yang didukung: daftar, teks, kamus (iterasi menghasilkan kunci), dan hasil `rentang(...)`.
+- `rentang(akhir)`, `rentang(mulai, akhir)`, atau `rentang(mulai, akhir, langkah)` menerima bilangan bulat; batas akhir tidak termasuk dan langkah tidak boleh nol.
+- Perulangan tunduk pada batas total langkah evaluator.
+
+Contoh:
+
+```pusingcuk
+jancuk
+untuk angka dalam rentang(1, 5)
+    hedeh angka
+selesai untuk
+selesai jancuk
+```
+
+Contoh program lain tersedia di `examples/rekap_anggaran.pusingcuk`.
 
 ## Contoh masukan pengguna
 
@@ -123,4 +145,3 @@ Tes terminal juga memeriksa contoh `:contoh`, program buatan sendiri, dan alur i
 
 Membangun bahasa pemrograman yang konsisten, dapat diuji,
 dan semakin mandiri dari implementasi Python.
-# pusingcuk

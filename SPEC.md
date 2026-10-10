@@ -1,4 +1,4 @@
-# Spesifikasi Sintaks pusingcuk v0.2-dev
+# Spesifikasi Sintaks Pusingcuk v0.4-dev
 
 ## 1. Struktur program
 
@@ -69,14 +69,29 @@ Logika: dan, atau, bukan
 
 Boolean: benar, salah
 
-### List dan indeks
+### Daftar, kamus, teks, dan indeks
 
-List ditulis menggunakan tanda kurung siku, misalnya `[10, 20, 30]`.
-Indeks dimulai dari 0. Elemen dapat dibaca dan diubah melalui indeks.
-Fungsi `panjang(list)` mengembalikan jumlah elemen.
-Akses indeks di luar batas menghasilkan kesalahan.
+Daftar ditulis menggunakan tanda kurung siku, misalnya `[10, 20, 30]`.
+Kamus ditulis dengan kurung kurawal dan pasangan kunci-nilai, misalnya `{"nama": "Budi", "umur": 20}`.
+Indeks daftar dan teks dimulai dari 0. Daftar dapat dibaca dan diubah melalui indeks. Nilai kamus dapat dibaca dan diubah melalui kunci.
+Fungsi `panjang(nilai)` menerima daftar, teks, atau kamus dan mengembalikan jumlah elemen atau karakter.
+Kunci kamus harus dapat digunakan sebagai kunci. Kunci yang tidak ditemukan dan indeks di luar batas menghasilkan kesalahan.
 
-## 9. Fungsi buatan pengguna
+## 9. Perulangan untuk
+
+Contoh:
+
+    jancuk
+    untuk angka dalam rentang(1, 5)
+        hedeh angka
+    selesai untuk
+    selesai jancuk
+
+Perulangan untuk nama dalam koleksi mengunjungi setiap elemen daftar atau teks, setiap kunci kamus, atau setiap bilangan dalam rentang.
+
+`rentang(akhir)`, `rentang(mulai, akhir)`, dan `rentang(mulai, akhir, langkah)` menerima satu sampai tiga argumen bilangan bulat. Batas akhir tidak termasuk hasil, seperti Python. Langkah tidak boleh nol. Setiap perulangan dibatasi 10000 iterasi dan seluruh program dibatasi 100000 langkah evaluator.
+
+## 10. Fungsi buatan pengguna
 
 Fungsi dideklarasikan dengan `fungsi nama(parameter)` dan diakhiri dengan `selesai fungsi`. Gunakan `balek ekspresi` untuk mengembalikan nilai. Jumlah argumen harus sesuai dengan jumlah parameter. Kedalaman pemanggilan fungsi dibatasi oleh interpreter.
 
@@ -91,15 +106,15 @@ hedeh tambah(2, 3)
 selesai jancuk
 ```
 
-## 10. Komentar
+## 11. Komentar
 
 Baris yang setelah spasi awalnya dimulai dengan # dianggap komentar.
 
-## 11. Penanganan kesalahan
+## 12. Penanganan kesalahan
 
 Interpreter melaporkan kesalahan dengan nomor baris jika tersedia.
 
-## 12. Status spesifikasi
+## 13. Status spesifikasi
 
 Dokumen ini mencatat perilaku implementasi saat ini.
 Fitur yang belum diuji tidak dianggap telah didukung.

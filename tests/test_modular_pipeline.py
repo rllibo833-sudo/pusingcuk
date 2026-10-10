@@ -100,6 +100,73 @@ hedeh panjang(angka)
 selesai jancuk"""
         self.assertEqual(capture(source), "25\n3\n")
 
+    def test_dictionary_literal_lookup_and_update(self):
+        source = """jancuk
+lah pengguna = {"nama": "Budi", "aktif": benar}
+pengguna["nama"] = "Sari"
+hedeh pengguna["nama"]
+hedeh pengguna["aktif"]
+hedeh panjang(pengguna)
+selesai jancuk"""
+        self.assertEqual(capture(source), "Sari\nokelah\n2\n")
+
+    def test_for_loop_and_range_builtin(self):
+        source = """jancuk
+untuk angka dalam rentang(1, 5)
+    hedeh angka
+selesai untuk
+selesai jancuk"""
+        self.assertEqual(capture(source), "1\n2\n3\n4\n")
+
+    def test_range_supports_step_and_negative_direction(self):
+        source = """jancuk
+untuk angka dalam rentang(5, 0, -2)
+    hedeh angka
+selesai untuk
+selesai jancuk"""
+        self.assertEqual(capture(source), "5\n3\n1\n")
+
+    def test_string_index_and_length(self):
+        source = """jancuk
+lah kata = "pusing"
+hedeh kata[1]
+hedeh panjang(kata)
+selesai jancuk"""
+        self.assertEqual(capture(source), "u\n6\n")
+
+    def test_dictionary_iteration_yields_keys(self):
+        source = """jancuk
+lah pengguna = {"nama": "Budi", "umur": 20}
+untuk kunci dalam pengguna
+    hedeh kunci
+selesai untuk
+selesai jancuk"""
+        self.assertEqual(capture(source), "nama\numur\n")
+
+    def test_empty_dictionary_and_missing_key(self):
+        self.assertEqual(capture('jancuk\nlah kosong = {}\nhedeh panjang(kosong)\nselesai jancuk'), "0\n")
+        source = 'jancuk\nlah pengguna = {"nama": "Budi"}\nhedeh pengguna["umur"]\nselesai jancuk'
+        with self.assertRaisesRegex(RuntimeError, "kunci kamus tidak ditemukan"):
+            Evaluator().run(source)
+
+    def test_for_loop_rejects_non_iterable(self):
+        source = """jancuk
+untuk angka dalam 12
+    hedeh angka
+selesai untuk
+selesai jancuk"""
+        with self.assertRaisesRegex(RuntimeError, "untuk membutuhkan"):
+            Evaluator().run(source)
+
+    def test_range_rejects_zero_step(self):
+        source = """jancuk
+untuk angka dalam rentang(1, 4, 0)
+    hedeh angka
+selesai untuk
+selesai jancuk"""
+        with self.assertRaisesRegex(RuntimeError, "langkah rentang tidak boleh nol"):
+            Evaluator().run(source)
+
     def test_modular_evaluator_reports_undefined_variable(self):
         source = 'jancuk\nhedeh hantu\nselesai jancuk'
         with self.assertRaisesRegex(RuntimeError, r"Baris 2: variabel 'hantu' belum dibuat"):
@@ -140,6 +207,48 @@ selesai jancuk"""
         self.assertIn("berkas tidak ditemukan", result.stderr)
         self.assertEqual(result.stdout, "")
 
+
+
+    def test_builtin_function_names_cannot_be_redefined(self):
+        for name in ("panjang", "rentang"):
+            with self.subTest(name=name):
+                source = f"jancuk\nfungsi {name}(x)\n    balek x\nselesai fungsi\nselesai jancuk"
+                with self.assertRaisesRegex(RuntimeError, f"nama fungsi '{name}' sudah digunakan"):
+                    Evaluator().run(source)
+
+    def test_for_loop_can_be_nested(self):
+        source = """jancuk
+untuk luar dalam rentang(1, 3)
+    untuk dalam_angka dalam rentang(1, 3)
+        hedeh luar * 10 + dalam_angka
+    selesai untuk
+selesai untuk
+selesai jancuk"""
+        self.assertEqual(capture(source), "11\n12\n21\n22\n")
+
+    def test_dictionary_rejects_unhashable_key(self):
+        source = "jancuk\nlah data = {[1, 2]: \"nilai\"}\nselesai jancuk"
+        with self.assertRaisesRegex(RuntimeError, "kunci kamus harus dapat digunakan"):
+            Evaluator().run(source)
+
+    def test_range_requires_integer_arguments(self):
+        source = """jancuk
+untuk angka dalam rentang(1, 3.5)
+    hedeh angka
+selesai untuk
+selesai jancuk"""
+        with self.assertRaisesRegex(RuntimeError, "argumen rentang harus bilangan bulat"):
+            Evaluator().run(source)
+
+
+
+    def test_for_loop_iteration_limit(self):
+        source = """jancuk
+untuk angka dalam rentang(10001)
+selesai untuk
+selesai jancuk"""
+        with self.assertRaisesRegex(RuntimeError, "batas 10000 iterasi tercapai"):
+            Evaluator().run(source)
 
 if __name__ == "__main__":
     unittest.main()

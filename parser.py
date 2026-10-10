@@ -115,6 +115,16 @@ class Parser:
             self.need("selesai")
             self.need("mumet")
             return node("While", t.line, condition=condition, body=body)
+        if self.at("untuk"):
+            self.take()
+            name = self.name()
+            self.need("dalam")
+            iterable = self.expr()
+            self.skip_lines()
+            body = self.statements({("selesai", None)})
+            self.need("selesai")
+            self.need("untuk")
+            return node("For", t.line, name=name, iterable=iterable, body=body)
         if self.at("fungsi"):
             self.take()
             name = self.name()
@@ -198,6 +208,21 @@ class Parser:
                     items.append(self.expr())
             self.need("]")
             left = node("List", t.line, items=items)
+        elif t.value == "{":
+            items = []
+            if not self.at("}"):
+                while True:
+                    key = self.expr()
+                    self.need(":")
+                    value = self.expr()
+                    items.append((key, value))
+                    if not self.at(","):
+                        break
+                    self.take()
+                    if self.at("}"):
+                        break
+            self.need("}")
+            left = node("Dict", t.line, items=items)
         else:
             self.fail(f"ekspresi tidak valid: {t.value!r}")
 

@@ -11,6 +11,8 @@ KEYWORDS = frozenset({
     "njir",
     "kampret",
     "mumet",
+    "untuk",
+    "dalam",
     "tanya",
     "fungsi",
     "balek",
@@ -23,7 +25,7 @@ KEYWORDS = frozenset({
 
 MULTI_OPERATORS = ("==", "!=", "<=", ">=", "//")
 SINGLE_OPERATORS = frozenset("+-*/%=<>")
-PUNCTUATION = frozenset("()[],")
+PUNCTUATION = frozenset("()[],:{}")
 
 
 class LexerError(ValueError):
