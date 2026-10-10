@@ -148,10 +148,10 @@ class Evaluator:
             elif k == "IndexAssign":
                 obj = self.assign_index(n.collection, None, env, line, depth)
                 idx = self.expr(n.index, env, depth)
-                if not isinstance(idx, int) or isinstance(idx, bool):
-                    self.fail(line, "indeks harus berupa bilangan bulat")
                 value = self.expr(n.value, env, depth)
                 if isinstance(obj, list):
+                    if not isinstance(idx, int) or isinstance(idx, bool):
+                        self.fail(line, "indeks harus berupa bilangan bulat")
                     if idx < 0 or idx >= len(obj):
                         self.fail(line, "indeks daftar di luar batas")
                     obj[idx] = value
