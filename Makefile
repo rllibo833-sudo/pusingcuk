@@ -2,8 +2,14 @@ CC ?= cc
 CFLAGS ?= -std=c11 -O2 -Wall -Wextra
 LDLIBS ?= -lm
 NATIVE_BIN ?= $(CURDIR)/pusingcuk-native
+VERSION ?= 0.4.0-alpha.1
+PREFIX ?= /usr/local
+DESTDIR ?=
 
-.PHONY: native run-native test-native
+.PHONY: native run-native test-native version install package
+
+version:
+	@printf '%s\n' '$(VERSION)'
 
 native:
 	$(CC) $(CFLAGS) native/pusingcuk.c $(LDLIBS) -o "$(NATIVE_BIN)"
@@ -11,6 +17,16 @@ native:
 run-native: native
 	@test -n "$(FILE)" || (echo "Gunakan: make run-native FILE=program.pusingcuk" >&2; exit 2)
 	"$(NATIVE_BIN)" "$(FILE)"
+
+install: native
+	install -d "$(DESTDIR)$(PREFIX)/bin"
+	install -m 755 "$(NATIVE_BIN)" "$(DESTDIR)$(PREFIX)/bin/pusingcuk-native"
+
+package: test-native
+	@command -v git >/dev/null 2>&1 || (echo "git diperlukan untuk membuat source package" >&2; exit 2)
+	@mkdir -p dist
+	git archive --format=tar.gz --prefix="pusingcuk-$(VERSION)/" --output="dist/pusingcuk-$(VERSION)-source.tar.gz" HEAD
+	@printf 'Paket sumber dibuat: dist/pusingcuk-%s-source.tar.gz\n' '$(VERSION)'
 
 test-native: native
 	@set -eu; \
