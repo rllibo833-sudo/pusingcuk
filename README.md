@@ -18,6 +18,19 @@ Implementasi historis yang tidak menjadi entry point utama disimpan di `archive/
 
 Ikuti [Panduan Pusingcuk dari Nol](docs/PEMULA.md). Panduan itu mengutamakan jalur Termux native tanpa Python untuk menjalankan program.
 
+## Pusingcuk Studio — editor dan terminal HTML lokal
+
+Untuk mengembangkan program lewat browser di Android/Termux atau Linux, lihat [panduan Pusingcuk Studio](docs/WEB_WORKBENCH.md). Studio menyediakan editor HTML, tombol Jalankan, input standar, dan terminal keluaran yang menjalankan runtime native C melalui bridge lokal. Python hanya dipakai untuk bridge web; runtime bahasa yang dieksekusi tetap native C. Ini MVP lokal, bukan sandbox atau IDE penuh.
+
+Jalankan di Termux dari root repository:
+
+```sh
+pkg install python clang -y
+python tools/web_workbench.py
+```
+
+Lalu buka `http://127.0.0.1:8765` di browser pada perangkat yang sama.
+
 ## Jalankan interpreter modular (opsional)
 
 Jalur ini memerlukan Python:
@@ -115,7 +128,7 @@ Nilai yang didukung mencakup teks, angka, boolean, daftar, dan kamus. Operator m
 
 ## Pengujian
 
-Interpreter modular:
+Interpreter modular dan bridge Studio:
 
 ```sh
 python -m unittest discover -s tests -v
@@ -134,7 +147,7 @@ Jika perubahan menyentuh kedua jalur, jalankan keduanya. Tes CI Ubuntu tidak men
 - Interpreter modular masih menggunakan Python.
 - Runtime native hanya mendukung subset yang didokumentasikan dan diuji.
 - Sistem modul, tipe statis, dan pustaka backend/frontend lengkap belum tersedia.
-- Input interaktif `tanya` di Pusingcuk Studio belum diverifikasi.
+- Studio HTML memerlukan Python hanya untuk bridge lokal; CLI native tetap dapat dijalankan tanpa Python. Studio belum memiliki debugger, language server, atau isolasi OS.
 - Bahasa ini belum siap untuk menjalankan kode tak tepercaya.
 
 ## Kontribusi
