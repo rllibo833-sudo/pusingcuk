@@ -37,7 +37,6 @@ class EvaluatorTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "di luar batas"):
             run(program("lah a = [1]\nhedeh a[2]"))
 
-
     def test_nested_list_assignment(self):
         self.assertEqual(capture(program(
             "lah a = [[1, 2], [3, 4]]\na[1][0] = 77\nhedeh a[1][0]"
@@ -56,11 +55,11 @@ class EvaluatorTests(unittest.TestCase):
                 "hedeh ulang(0)"
             ))
 
-if __name__ == "__main__":
-    unittest.main()
-
-
     def test_boolean_output_format(self):
         self.assertEqual(capture(program(
-            "hedeh benar\\nhedeh salah"
-        )), "okelah\\ntidak\\n")
+            "hedeh benar\nhedeh salah"
+        )), "okelah\ntidak\n")
+
+
+if __name__ == "__main__":
+    unittest.main()
