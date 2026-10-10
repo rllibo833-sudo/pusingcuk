@@ -62,6 +62,15 @@ class EvaluatorTests(unittest.TestCase):
                 "hedeh ulang(0)"
             ))
 
+
+    def test_boolean_and_number_dictionary_keys_are_distinct(self):
+        self.assertEqual(capture(program(
+            'lah data = {1: "angka", benar: "boolean"}\n'
+            'hedeh data[1]\nhedeh data[benar]\n'
+            'data[1] = "angka baru"\ndata[benar] = "boolean baru"\n'
+            'hedeh panjang(data)\nhedeh benar == 1'
+        )), "angka\nboolean\n2\ntidak\n")
+
     def test_boolean_output_format(self):
         self.assertEqual(capture(program(
             "hedeh benar\nhedeh salah"

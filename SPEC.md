@@ -72,7 +72,7 @@ Boolean: benar, salah
 ### Daftar, kamus, teks, dan indeks
 
 Daftar ditulis menggunakan tanda kurung siku, misalnya `[10, 20, 30]`.
-Kamus ditulis dengan kurung kurawal dan pasangan kunci-nilai, misalnya `{"nama": "Budi", "umur": 20}`.
+Kamus ditulis dengan kurung kurawal dan pasangan kunci-nilai, misalnya `{"nama": "Budi", "umur": 20}`. Kunci teks, angka, dan boolean merupakan jenis kunci berbeda; khususnya, kunci `benar` dan kunci angka `1` tidak sama. Operator kesetaraan juga tidak menyamakan boolean dengan angka.
 Indeks daftar dan teks dimulai dari 0. Daftar dapat dibaca dan diubah melalui indeks. Nilai kamus dapat dibaca dan diubah melalui kunci.
 Fungsi `panjang(nilai)` menerima daftar, teks, kamus, atau rentang dan mengembalikan jumlah elemen, code point UTF-8, entri, atau nilai dalam rentang.
 Kunci kamus native dibatasi pada teks, angka, dan boolean. Assignment ke kunci baru menambahkan entri, sedangkan assignment ke kunci yang sudah ada memperbarui nilainya. Kamus kosong bernilai salah dan kamus berisi entri bernilai benar dalam kondisi; perulangan `untuk` menghasilkan kunci kamus. Kunci yang tidak didukung, kunci yang tidak ditemukan, dan indeks di luar batas menghasilkan kesalahan.

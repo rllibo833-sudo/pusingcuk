@@ -48,6 +48,9 @@ test-native: native
 	actual="$$($(NATIVE_BIN) tests/native/functions.pusingcuk)"; \
 	expected="$$(printf '5\n120\n3\n9')"; \
 	if [ "$$actual" != "$$expected" ]; then printf "fungsi actual=[%s] expected=[%s]\\n" "$$actual" "$$expected" >&2; exit 1; fi; \
+	actual="$$($(NATIVE_BIN) tests/native/dictionary_key_types.pusingcuk)"; \
+	expected="$$(printf 'angka\nboolean\n2\ntidak')"; \
+	test "$$actual" = "$$expected"; \
 	if $(NATIVE_BIN) tests/native/function_wrong_arity.pusingcuk >/dev/null 2>&1; then \
 		echo 'pemanggilan fungsi dengan jumlah argumen salah seharusnya gagal' >&2; exit 1; \
 	fi

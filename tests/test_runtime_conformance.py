@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SHARED_FIXTURES = (
     "tests/native/functions.pusingcuk",
+    "tests/native/dictionary_key_types.pusingcuk",
     "tests/native/for_range.pusingcuk",
     "tests/native/slang_aliases.pusingcuk",
     "examples/native/rekap_anggaran.pusingcuk",
