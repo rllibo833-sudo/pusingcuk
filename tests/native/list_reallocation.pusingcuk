@@ -1,0 +1,9 @@
+jancuk
+lah i = 0
+lah data = []
+mumet i < 1000
+    data = [i]
+    i = i + 1
+selesai mumet
+hedeh panjang(data)
+selesai jancuk
