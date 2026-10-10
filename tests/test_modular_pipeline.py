@@ -281,7 +281,7 @@ gitu njir
 gitu inthiseco"""
         self.assertEqual(
             capture(source),
-            "Pusingcuk native\\ntidak\\ncabang utama\\nadooh aktif\\n",
+            "Pusingcuk native\ntidak\ncabang utama\nadooh aktif\n",
         )
 
 if __name__ == "__main__":

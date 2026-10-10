@@ -37,5 +37,5 @@ jobs:
         shell: bash
         run: |
           actual="$(/tmp/pusingcuk-native tests/native/slang_aliases.pusingcuk)"
-          expected="$(printf 'Pusingcuk native\\ntidak\\ncabang utama\\nadooh aktif')"
+          expected="$(printf 'Pusingcuk native\ntidak\ncabang utama\nadooh aktif')"
           test "$actual" = "$expected"

@@ -78,7 +78,6 @@ Jika perintah pusingcuk belum tersedia:
 - fungsi: mendefinisikan fungsi
 - balek: mengembalikan nilai dari fungsi
 
-
 ### Kosakata Gen Z dan Gen Alpha
 
 Pusingcuk menerima kata slang sebagai alias yang tetap kompatibel dengan sintaks lama:
