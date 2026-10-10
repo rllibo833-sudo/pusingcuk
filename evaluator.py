@@ -189,10 +189,14 @@ class Evaluator:
                 iterable = self.expr(n.iterable, env, depth)
                 if not isinstance(iterable, (list, tuple, str, dict, range)):
                     self.fail(line, "untuk membutuhkan daftar, teks, kamus, atau rentang")
+                count = 0
                 for item in iterable:
                     self.step(line)
+                    if count >= 10000:
+                        self.fail(line, "batas 10000 iterasi tercapai")
                     env[n.name] = item
                     self.block(n.body, env, depth, in_function)
+                    count += 1
             elif k == "Function":
                 if n.name in ("panjang", "rentang"):
                     self.fail(line, f"nama fungsi '{n.name}' sudah digunakan")
