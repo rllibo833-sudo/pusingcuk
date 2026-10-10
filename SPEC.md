@@ -93,7 +93,7 @@ Perulangan modular untuk nama dalam koleksi mengunjungi setiap elemen daftar ata
 
 ## 10. Fungsi buatan pengguna
 
-Fungsi dideklarasikan dengan `fungsi nama(parameter)` dan diakhiri dengan `selesai fungsi`. Gunakan `balek ekspresi` untuk mengembalikan nilai. Jumlah argumen harus sesuai dengan jumlah parameter. Kedalaman pemanggilan fungsi dibatasi oleh interpreter.
+Fungsi dideklarasikan dengan `fungsi nama(parameter)` dan diakhiri dengan `selesai fungsi`. Gunakan `balek ekspresi` untuk mengembalikan nilai. Jumlah argumen harus sesuai dengan jumlah parameter. Fungsi tingkat atas dipindai sebelum program berjalan, sehingga pemanggilan sebelum definisi dan rekursi didukung. Parameter dan variabel lokal terisolasi dari variabel pemanggil; nilai koleksi yang diberikan sebagai argumen tetap merujuk pada objek koleksi yang sama. Kedalaman pemanggilan dibatasi hingga 100 pada runtime native dan interpreter modular membatasi kedalaman hingga 100.
 
 Contoh:
 
@@ -121,7 +121,7 @@ Fitur yang belum diuji tidak dianggap telah didukung.
 
 ## 14. Runtime native dan Termux
 
-Runtime C dapat dibangun dengan compiler C11 dan dijalankan sebagai executable tanpa Python untuk subset fitur yang tercantum dalam `docs/NATIVE_RUNTIME.md`. Di Termux, setelah memasang `clang` dan `make`, jalankan `bash scripts/install-termux.sh`, lalu gunakan `pusingcuk-native examples/native/rekap_anggaran.pusingcuk`. Fungsi buatan pengguna dan sistem modul belum tersedia di runtime native.
+Runtime C dapat dibangun dengan compiler C11 dan dijalankan sebagai executable tanpa Python untuk subset fitur yang tercantum dalam `docs/NATIVE_RUNTIME.md`. Di Termux, setelah memasang `clang` dan `make`, jalankan `bash scripts/install-termux.sh`, lalu gunakan `pusingcuk-native examples/native/rekap_anggaran.pusingcuk`. Fungsi buatan pengguna tersedia pada runtime native; sistem modul belum tersedia.
 
 ## 15. Alias kosakata slang
 

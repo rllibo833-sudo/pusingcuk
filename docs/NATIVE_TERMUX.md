@@ -64,6 +64,6 @@ python -m unittest discover -s tests -v
 
 ## 5. Cakupan dan batasan
 
-Runtime native mendukung subset yang didokumentasikan di [matriks runtime](NATIVE_RUNTIME.md). Fungsi buatan pengguna dan sistem modul belum tersedia pada runtime C, walaupun fungsi sudah didukung interpreter modular Python. Gunakan contoh native ini sebagai program yang kompatibel dengan executable mandiri.
+Runtime native mendukung subset yang didokumentasikan di [matriks runtime](NATIVE_RUNTIME.md), termasuk fungsi buatan pengguna, parameter, nilai balik `balek`, dan rekursi. Sistem modul belum tersedia. Jalankan `make test-native` setelah setiap perubahan untuk memeriksa kompatibilitas executable mandiri.
 
 Runtime ini bukan sandbox. Jangan menjalankan program yang tidak tepercaya dengan asumsi bahwa program tersebut terisolasi.

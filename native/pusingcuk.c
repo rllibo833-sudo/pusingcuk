@@ -9,7 +9,7 @@
 #define NV 256
 #define SZ 1024
 
-typedef enum { NUM, STR, BOOL, LIST, RANGE, DICT } Type;
+typedef enum { NUM, STR, BOOL, LIST, RANGE, DICT, NIL } Type;
 typedef struct Val Val;
 typedef struct List List;
 typedef struct Dict Dict;
@@ -27,6 +27,14 @@ typedef struct { char name[128]; Val v; } Var;
 static Var vars[NV];
 static int nvars, err, line_no;
 static const char *p;
+#define MAX_FUNCTIONS 128
+#define MAX_PARAMS 32
+typedef struct { char name[128]; char params[MAX_PARAMS][128]; int param_count; int first_line; int end_line; } Function;
+static Function functions[MAX_FUNCTIONS];
+static int function_count, call_depth, returning;
+static Val return_value;
+static int run_range(int first, int last);
+static Val call_user_function(const char *name, Val *args, int argc);
 
 static void fail(const char *msg) {
     if (!err) fprintf(stderr, "Kesalahan baris %d: %s\n", line_no, msg);
@@ -105,6 +113,7 @@ static int word(const char *s) {
 static int endline(void) { ws(); return !*p || *p=='\n' || *p=='\r' || *p=='#'; }
 static double range_length(Val v);
 static int truth(Val v) {
+    if (v.t==NIL) return 0;
     if (v.t==BOOL) return v.b;
     if (v.t==NUM) return v.n!=0;
     if (v.t==LIST) return v.list && v.list->len != 0;
@@ -114,6 +123,7 @@ static int truth(Val v) {
 }
 static int equal(Val a, Val b) {
     if (a.t!=b.t) return 0;
+    if (a.t==NIL) return 1;
     if (a.t==NUM) return a.n==b.n;
     if (a.t==BOOL) return a.b==b.b;
     if (a.t==RANGE) return a.range_start==b.range_start && a.range_end==b.range_end && a.range_step==b.range_step;
@@ -268,11 +278,11 @@ static Val primary(void) {
         if (!strcmp(name,"benar")) return boolean(1);
         if (!strcmp(name,"salah")) return boolean(0);
         if (take("(")) {
-            Val args[3]; int argc = 0;
+            Val args[MAX_PARAMS]; int argc = 0;
             if (!take(")")) {
                 for (;;) {
-                    if (argc >= 3) {
-                        fail("fungsi native menerima maksimal tiga argumen");
+                    if (argc >= MAX_PARAMS) {
+                        fail("fungsi native menerima maksimal 32 argumen");
                         return num(0);
                     }
                     args[argc++] = expr();
@@ -315,7 +325,7 @@ static Val primary(void) {
                 if (step == 0) { fail("langkah rentang() tidak boleh nol"); return num(0); }
                 return rangeval(start, end, step);
             }
-            fail("fungsi native belum didukung"); return num(0);
+            return call_user_function(name, args, argc);
         }
         Val value = num(0);
         int found = 0;
@@ -449,7 +459,8 @@ static int setvar(const char *name, Val v) {
     vars[nvars++].v=v; return 1;
 }
 static void printval(Val v) {
-    if(v.t==BOOL) puts(v.b?"okelah":"tidak");
+    if(v.t==NIL) puts("tidak ada");
+    else if(v.t==BOOL) puts(v.b?"okelah":"tidak");
     else if(v.t==STR) puts(v.s);
     else if(v.t==LIST) printf("[list: %zu]\n", v.list ? v.list->len : 0);
     else if(v.t==DICT) printf("[kamus: %zu]\n", v.dict ? v.dict->len : 0);
@@ -494,8 +505,76 @@ static int block_end(int start,const char *kind,int *middle) {
     }
     line_no=start+1; fail("blok tidak ditutup dengan benar"); return -1;
 }
+static int register_function(int header, int end) {
+    const char *saved_p = p;
+    int saved_line = line_no;
+    p = program_lines[header];
+    line_no = header + 1;
+    if (!word("fungsi")) { p = saved_p; line_no = saved_line; return 0; }
+    char name[128] = {0};
+    if (!identifier(name, sizeof name) || !take("(")) {
+        fail("deklarasi fungsi harus berbentuk fungsi nama(parameter)");
+        p = saved_p; line_no = saved_line; return 0;
+    }
+    if (!strcmp(name, "panjang") || !strcmp(name, "rentang")) {
+        fail("nama fungsi bawaan tidak boleh digunakan ulang");
+        p = saved_p; line_no = saved_line; return 0;
+    }
+    for (int i = 0; i < function_count; i++) {
+        if (!strcmp(functions[i].name, name)) {
+            fail("fungsi sudah dibuat"); p = saved_p; line_no = saved_line; return 0;
+        }
+    }
+    if (function_count >= MAX_FUNCTIONS) {
+        fail("jumlah fungsi native melampaui batas"); p = saved_p; line_no = saved_line; return 0;
+    }
+    Function fn = {0};
+    snprintf(fn.name, sizeof fn.name, "%s", name);
+    if (!take(")")) {
+        for (;;) {
+            if (fn.param_count >= MAX_PARAMS) {
+                fail("fungsi native maksimal memiliki 32 parameter");
+                p = saved_p; line_no = saved_line; return 0;
+            }
+            char param[128] = {0};
+            if (!identifier(param, sizeof param)) {
+                fail("nama parameter fungsi diharapkan");
+                p = saved_p; line_no = saved_line; return 0;
+            }
+            for (int j = 0; j < fn.param_count; j++) {
+                if (!strcmp(fn.params[j], param)) {
+                    fail("nama parameter fungsi tidak boleh duplikat");
+                    p = saved_p; line_no = saved_line; return 0;
+                }
+            }
+            snprintf(fn.params[fn.param_count++], sizeof fn.params[0], "%s", param);
+            if (take(")")) break;
+            if (!take(",")) {
+                fail("koma atau ')' diharapkan dalam parameter fungsi");
+                p = saved_p; line_no = saved_line; return 0;
+            }
+        }
+    }
+    if (!endline()) {
+        fail("karakter tambahan setelah deklarasi fungsi");
+        p = saved_p; line_no = saved_line; return 0;
+    }
+    fn.first_line = header + 1;
+    fn.end_line = end;
+    functions[function_count++] = fn;
+    p = saved_p; line_no = saved_line;
+    return 1;
+}
+
+static int function_registered_at(int header, int end) {
+    for (int i = 0; i < function_count; i++)
+        if (functions[i].first_line == header + 1 && functions[i].end_line == end)
+            return 1;
+    return 0;
+}
+
 static int run_range(int first,int last) {
-    for(int i=first;i<last && !err;i++) {
+    for(int i=first;i<last && !err && !returning;i++) {
         if(++steps>MAX_STEPS) {
             line_no=i+1; fail("batas 100000 langkah terlampaui"); break;
         }
@@ -527,7 +606,7 @@ static int run_range(int first,int last) {
             if (!err && iterable.t == LIST && iterable.list) {
                 size_t count = iterable.list->len;
                 if (count > MAX_ITER) { fail("list melebihi batas 10000 iterasi native"); }
-                for (size_t j=0; j<count && !err; j++) {
+                for (size_t j=0; j<count && !err && !returning; j++) {
                     if (++steps > MAX_STEPS) { fail("batas 100000 langkah terlampaui"); break; }
                     setvar(name, iterable.list->items[j]);
                     run_range(i+1,end);
@@ -535,7 +614,7 @@ static int run_range(int first,int last) {
             } else if (!err && iterable.t == STR) {
                 size_t offset=0;
                 int iter=0;
-                while (!err && iterable.s[offset]) {
+                while (!err && !returning && iterable.s[offset]) {
                     if (++iter > MAX_ITER) { fail("batas 10000 iterasi teks terlampaui"); break; }
                     if (++steps > MAX_STEPS) { fail("batas 100000 langkah terlampaui"); break; }
                     size_t next=utf8_next(iterable.s,offset);
@@ -548,7 +627,7 @@ static int run_range(int first,int last) {
             } else if (!err && iterable.t == DICT && iterable.dict) {
                 size_t count=iterable.dict->len;
                 if (count > MAX_ITER) fail("kamus melebihi batas 10000 iterasi native");
-                for (size_t j=0; j<count && !err; j++) {
+                for (size_t j=0; j<count && !err && !returning; j++) {
                     if (++steps > MAX_STEPS) { fail("batas 100000 langkah terlampaui"); break; }
                     setvar(name, iterable.dict->keys[j]);
                     run_range(i+1,end);
@@ -556,7 +635,7 @@ static int run_range(int first,int last) {
             } else if (!err && iterable.t == RANGE) {
                 int iter=0;
                 for (double x=iterable.range_start;
-                     !err && (iterable.range_step > 0 ? x < iterable.range_end : x > iterable.range_end);
+                     !err && !returning && (iterable.range_step > 0 ? x < iterable.range_end : x > iterable.range_end);
                      x += iterable.range_step) {
                     if (++iter > MAX_ITER) { fail("batas 10000 iterasi rentang() terlampaui"); break; }
                     if (++steps > MAX_STEPS) { fail("batas 100000 langkah terlampaui"); break; }
@@ -567,11 +646,21 @@ static int run_range(int first,int last) {
                 fail("perulangan native menerima list, teks, kamus, atau rentang()");
             }
             i=end;
+        } else if(word("fungsi")) {
+            int mid=-1, end=block_end(i,"fungsi",&mid);
+            if(end<0) break;
+            if(!function_registered_at(i,end) && !register_function(i,end)) break;
+            i=end;
+        } else if(word("balek")) {
+            if(call_depth <= 0) { fail("balek hanya boleh di dalam fungsi"); break; }
+            Val v=expr();
+            if(!endline()) fail("karakter tambahan setelah nilai balek");
+            if(!err) { return_value=v; returning=1; }
         } else if(word("mumet")) {
             int mid=-1, end=block_end(i,"mumet",&mid);
             if(end<0) break;
             int iter=0;
-            while(!err) {
+            while(!err && !returning) {
                 line_no=i+1; p=program_lines[i]; ws(); word("mumet");
                 Val c=expr();
                 if(!endline()) fail("karakter tambahan pada kondisi mumet");
@@ -656,6 +745,64 @@ static int run_range(int first,int last) {
     return !err;
 }
 
+static int register_top_level_functions(void) {
+    int depth = 0;
+    for (int i = 0; i < program_count && !err; i++) {
+        if (depth == 0 && line_word(i, "fungsi")) {
+            int middle = -1;
+            int end = block_end(i, "fungsi", &middle);
+            if (end < 0 || !register_function(i, end)) return 0;
+            i = end;
+            continue;
+        }
+        if (line_word(i, "njir") || line_word(i, "mumet") || line_word(i, "untuk")) {
+            depth++;
+        } else if (depth > 0 &&
+                   (line_close(i, "njir") || line_close(i, "mumet") || line_close(i, "untuk"))) {
+            depth--;
+        }
+    }
+    return !err;
+}
+
+static Val call_user_function(const char *name, Val *args, int argc) {
+    Function *fn = NULL;
+    for (int i = 0; i < function_count; i++) {
+        if (!strcmp(functions[i].name, name)) { fn = &functions[i]; break; }
+    }
+    if (!fn) { fail("fungsi native tidak dikenal"); return (Val){.t=NIL}; }
+    if (argc != fn->param_count) { fail("jumlah argumen fungsi tidak sesuai"); return (Val){.t=NIL}; }
+    if (call_depth >= 100) { fail("batas kedalaman pemanggilan fungsi tercapai"); return (Val){.t=NIL}; }
+
+    const char *saved_p = p;
+    int saved_line = line_no;
+    Var *saved_vars = malloc(sizeof vars);
+    if (!saved_vars) { fail("memori scope fungsi habis"); return (Val){.t=NIL}; }
+    memcpy(saved_vars, vars, sizeof vars);
+    int saved_nvars = nvars;
+    int saved_returning = returning;
+    Val saved_return_value = return_value;
+
+    nvars = 0;
+    returning = 0;
+    return_value = (Val){.t=NIL};
+    for (int i = 0; i < argc && !err; i++) setvar(fn->params[i], args[i]);
+    call_depth++;
+    if (!err) run_range(fn->first_line, fn->end_line);
+    call_depth--;
+
+    Val result = returning ? return_value : (Val){.t=NIL};
+    memcpy(vars, saved_vars, sizeof vars);
+    free(saved_vars);
+    nvars = saved_nvars;
+    returning = saved_returning;
+    return_value = saved_return_value;
+    p = saved_p;
+    line_no = saved_line;
+    return result;
+}
+
+
 int main(int argc,char **argv) {
     if(argc!=2) {
         fprintf(stderr,"Penggunaan: %s program.pusingcuk\n",argv[0]); return 2;
@@ -674,7 +821,7 @@ int main(int argc,char **argv) {
     }
     if(ferror(f)) { perror("Gagal membaca program"); fclose(f); return 2; }
     fclose(f);
-    run_range(0,program_count);
+    if (register_top_level_functions()) run_range(0,program_count);
     int result=err?1:0;
     for(int i=0;i<program_count;i++) free(program_lines[i]);
     for(size_t i=0;i<allocated_list_count;i++) {

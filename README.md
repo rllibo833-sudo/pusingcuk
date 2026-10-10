@@ -35,7 +35,7 @@ Runtime C mandiri dapat dikompilasi dan dijalankan tanpa interpreter Python untu
     make run-native FILE=tests/native/for_range.pusingcuk
     make test-native
 
-Compiler C11 diperlukan saat build; menjalankan executable hasil build tidak memerlukan Python. Runtime native yang diuji mendukung nilai dasar, list, teks, kamus, kondisi, perulangan, input standar `tanya`, `panjang`, dan `rentang`. Fungsi buatan pengguna dan sistem modul belum tersedia di native. Lihat [panduan native Termux](docs/NATIVE_TERMUX.md), [contoh native](examples/native/rekap_anggaran.pusingcuk), dan [matriks kemampuan runtime native](docs/NATIVE_RUNTIME.md). Untuk memasang executable di Termux, jalankan `bash scripts/install-termux.sh` setelah memasang `clang` dan `make`. Runtime ini **bukan sandbox** untuk kode tak tepercaya.
+Compiler C11 diperlukan saat build; menjalankan executable hasil build tidak memerlukan Python. Runtime native dirancang mendukung nilai dasar, list, teks, kamus, kondisi, perulangan, input standar `tanya`, `panjang`, `rentang`, serta fungsi buatan pengguna dengan parameter dan `balek`; status verifikasi terbaru ada di [matriks runtime](docs/NATIVE_RUNTIME.md). Deklarasi fungsi tingkat atas dipindai sebelum eksekusi, sehingga fungsi dapat dipanggil sebelum definisinya dan dapat melakukan rekursi. Sistem modul belum tersedia di native. Lihat [panduan native Termux](docs/NATIVE_TERMUX.md), [contoh native](examples/native/rekap_anggaran.pusingcuk), dan [matriks kemampuan runtime native](docs/NATIVE_RUNTIME.md). Untuk memasang executable di Termux, jalankan `bash scripts/install-termux.sh` setelah memasang `clang` dan `make`. Runtime ini **bukan sandbox** untuk kode tak tepercaya.
 
 ## Menjalankan program
 
@@ -173,7 +173,7 @@ Tes terminal juga memeriksa contoh `:contoh`, program buatan sendiri, dan alur i
 ## Batasan saat ini
 
 - Interpreter masih menggunakan Python untuk parsing ekspresi.
-- Fungsi buatan pengguna didukung dengan `fungsi` dan `balek`.
+- Fungsi buatan pengguna didukung dengan `fungsi` dan `balek` di interpreter modular maupun runtime native; runtime native membatasi kedalaman panggilan hingga 100.
 - Input interaktif `tanya` pada Studio belum terverifikasi; gunakan CLI untuk input interaktif.
 - Sistem modul belum tersedia.
 - Belum ada sistem tipe statis.

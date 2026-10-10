@@ -1,0 +1,27 @@
+inthiseco
+lah angka = 9
+jir tambah(2, 3)
+jir faktorial(5)
+jir cari_pertama()
+jir angka
+
+fungsi tambah(a, b)
+    balek a + b
+gitu fungsi
+
+fungsi faktorial(n)
+    njir n <= 1
+        balek 1
+    gitu njir
+    balek n * faktorial(n - 1)
+gitu fungsi
+
+fungsi cari_pertama()
+    untuk x dalam rentang(1, 5)
+        njir x >= 3
+            balek x
+        gitu njir
+    gitu untuk
+    balek 0
+gitu fungsi
+gitu inthiseco
