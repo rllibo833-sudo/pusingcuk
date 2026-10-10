@@ -71,6 +71,8 @@ Jika perintah pusingcuk belum tersedia:
 - selesai njir: mengakhiri kondisi
 - mumet: memulai perulangan while
 - selesai mumet: mengakhiri perulangan
+- untuk nama dalam koleksi: memulai perulangan koleksi
+- selesai untuk: mengakhiri perulangan koleksi
 - selesai jancuk: mengakhiri program
 - tanya: meminta masukan teks dari pengguna, misalnya `tanya nama = "Nama? "`
 - fungsi: mendefinisikan fungsi
@@ -78,7 +80,7 @@ Jika perintah pusingcuk belum tersedia:
 
 ## Nilai dan operator
 
-Nilai yang didukung mencakup string, angka, dan boolean.
+Nilai yang didukung mencakup teks, angka, boolean, daftar, dan kamus. Built-in `panjang` menghitung panjang teks, daftar, atau kamus; `rentang` membuat rentang bilangan bulat untuk perulangan.
 
 - benar dan salah: boolean
 - +, -, *, /, //, %: matematika
