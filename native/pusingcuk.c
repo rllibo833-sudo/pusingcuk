@@ -627,7 +627,7 @@ static int run_range(int first,int last) {
             } else if (!err && iterable.t == DICT && iterable.dict) {
                 size_t count=iterable.dict->len;
                 if (count > MAX_ITER) fail("kamus melebihi batas 10000 iterasi native");
-                for (size_t j=0; j<count && !err; j++) {
+                for (size_t j=0; j<count && !err && !returning; j++) {
                     if (++steps > MAX_STEPS) { fail("batas 100000 langkah terlampaui"); break; }
                     setvar(name, iterable.dict->keys[j]);
                     run_range(i+1,end);
