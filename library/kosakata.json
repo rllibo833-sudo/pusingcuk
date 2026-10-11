@@ -178,7 +178,7 @@
       "category": "program-structure",
       "meaning": "Alias Gen Z/Gen Alpha untuk memulai program.",
       "aliases": [],
-      "native_runtime": "tested",
+      "native_runtime": "pending-native-support",
       "c_backend": "supported"
     },
     {
@@ -186,7 +186,7 @@
       "category": "output",
       "meaning": "Alias slang untuk menampilkan nilai.",
       "aliases": [],
-      "native_runtime": "tested",
+      "native_runtime": "pending-native-support",
       "c_backend": "integer-and-boolean-subset"
     },
     {
@@ -194,7 +194,7 @@
       "category": "variables",
       "meaning": "Alias santai untuk mendeklarasikan variabel baru.",
       "aliases": [],
-      "native_runtime": "tested",
+      "native_runtime": "pending-native-support",
       "c_backend": "supported"
     },
     {
@@ -202,7 +202,7 @@
       "category": "boolean",
       "meaning": "Alias slang untuk nilai benar.",
       "aliases": [],
-      "native_runtime": "tested",
+      "native_runtime": "pending-native-support",
       "c_backend": "supported"
     },
     {
@@ -210,7 +210,7 @@
       "category": "boolean",
       "meaning": "Alias slang untuk nilai salah.",
       "aliases": [],
-      "native_runtime": "tested",
+      "native_runtime": "pending-native-support",
       "c_backend": "supported"
     },
     {
@@ -218,7 +218,7 @@
       "category": "control-flow",
       "meaning": "Alias slang untuk cabang alternatif kondisi.",
       "aliases": [],
-      "native_runtime": "tested",
+      "native_runtime": "pending-native-support",
       "c_backend": "supported"
     },
     {
@@ -226,7 +226,7 @@
       "category": "program-structure",
       "meaning": "Alias slang untuk penanda penutup blok; tetap diikuti nama blok.",
       "aliases": [],
-      "native_runtime": "tested",
+      "native_runtime": "pending-native-support",
       "c_backend": "supported"
     }
   ],
@@ -307,6 +307,6 @@
   "runtime_notes": {
     "native_runtime": "Runtime C mandiri mempunyai cakupan lebih luas pada fitur yang memiliki fixture native.",
     "c_backend": "Backend source C eksperimental mendukung integer/boolean, kondisi, loop mumet, dan fungsi pengguna dengan parameter/return integer. String, koleksi, input, loop untuk, dan deklarasi lah di dalam loop masih ditolak eksplisit.",
-    "aliases": "Alias dinormalisasi oleh lexer. Menambahkan alias baru memerlukan perubahan lexer dan tes, bukan hanya menambah entri glosarium."
+    "aliases": "Alias baru gas, spill, bestie, valid, zonk, skip, dan kelar saat ini diuji melalui lexer/interpreter Python dan front-end compiler C; dukungan lexer runtime C mandiri belum diklaim."
   }
 }
