@@ -2,62 +2,79 @@
 
 Pusingcuk menggunakan slang Indonesia sebagai bagian dari identitas bahasanya. Kata-kata ini bukan hiasan semata: setiap alias punya makna yang konsisten dan tes.
 
+## Alias resmi
+
 | Slang | Kata kanonis | Makna |
 |---|---|---|
-| `jir` | `hedeh` | Tampilkan nilai ke keluaran standar. |
-| `adooh` | `kampret` | Cabang alternatif dari kondisi `njir`. |
-| `gitu` | `selesai` | Penanda penutup blok; tetap diikuti nama blok, misalnya `gitu njir`. |
-| `inthiseco` | `jancuk` | Awal program. Program diakhiri dengan `gitu inthiseco`. |
-| `janggal` | `bukan` | Negasi logika; membalik nilai benar/salah. |
+| jir | hedeh | Tampilkan nilai ke keluaran standar. |
+| adooh | kampret | Cabang alternatif dari kondisi njir. |
+| gitu | selesai | Penanda penutup blok; tetap diikuti nama blok, misalnya gitu njir. |
+| inthiseco | jancuk | Awal program. Program diakhiri dengan gitu inthiseco. |
+| janggal | bukan | Negasi logika; membalik nilai benar/salah. |
+
+## Kosakata kondisi dan logika
+
+| Kata/operator | Makna | Contoh |
+|---|---|---|
+| njir | Memulai kondisi | njir skor >= 5 |
+| kampret | Cabang alternatif (opsional) | kampret |
+| selesai njir | Menutup kondisi | selesai njir |
+| benar | Nilai boolean benar; outputnya okelah | hedeh benar |
+| salah | Nilai boolean salah; outputnya tidak | hedeh salah |
+| dan | Logika AND dengan short-circuit | skor >= 5 dan benar |
+| atau | Logika OR dengan short-circuit | skor < 5 atau salah |
+| bukan | Negasi logika | bukan salah |
+| ==, != | Sama / tidak sama | skor == 5 |
+| <, <=, >, >= | Perbandingan urutan | skor >= 5 |
+
+Operator aritmetika yang terdokumentasi: +, -, *, /, //, dan %. Ketersediaan setiap operator bergantung pada runtime; lihat matriks runtime native dan backend C.
 
 ## Contoh
 
-```pusingcuk
-inthiseco
-lah angka = 7
-njir janggal (angka == 5)
-    jir "Angkanya bukan lima."
-adooh
-    jir "Angkanya lima."
-gitu njir
-gitu inthiseco
-```
+    inthiseco
+    lah skor = 7
+    njir skor >= 5 dan benar
+        jir skor
+    adooh
+        jir 0
+    gitu njir
+    jir benar == 1
+    jir janggal salah
+    gitu inthiseco
+
+Hasil yang diharapkan pada interpreter modular:
+
+    7
+    tidak
+    okelah
 
 ## Aturan desain
 
 - Kata slang adalah alias resmi, bukan pengganti wajib; kata kanonis lama tetap berlaku.
 - Ejaan alias peka huruf besar/kecil, sama seperti kata kunci lain.
 - Alias dinormalisasi pada tahap leksikal sehingga parser dan evaluator tetap punya satu makna kanonis.
-- Runtime native C hanya dijamin untuk subset yang memiliki tes native eksplisit. Ini bukan klaim kesetaraan penuh C dan Python.
-- Kata slang baru harus ditambahkan bersama spesifikasi, contoh, tes Python, dan tes native jika fitur itu termasuk subset native.
+- Runtime native C dan backend compiler memiliki subset yang berbeda. Hanya fitur dengan tes eksplisit yang boleh diberi status didukung.
+- Kata slang/alias baru harus ditambahkan bersama spesifikasi, contoh, tes Python, dan tes native/compiler yang relevan.
 
 ## Kosakata inti dan fungsi bawaan
 
 | Kata/fungsi | Arti | Status runtime native C |
 |---|---|---|
-| `lah` | Membuat variabel baru | Didukung |
-| `jir` / `hedeh` | Menampilkan nilai | Didukung |
-| `njir` / `adooh` | Kondisi dan cabang alternatif | Didukung |
-| `mumet` | Perulangan selama kondisi benar | Didukung |
-| `untuk ... dalam ...` | Mengunjungi elemen koleksi | List, teks UTF-8, kamus (menghasilkan kunci), dan `rentang()` didukung |
-| `panjang(nilai)` | Menghitung jumlah item/karakter/entri | List, teks, kamus, dan rentang didukung |
-| `rentang(...)` | Membuat rentang bilangan bulat dengan batas akhir eksklusif | Didukung; 1–3 argumen bulat |
-| `tanya` | Membaca masukan pengguna | Didukung melalui stdin; diuji lewat fixture native |
-| `fungsi` / `balek` | Mendefinisikan dan mengembalikan nilai fungsi | Didukung pada subset native teruji; lihat matriks runtime |
-| Kamus `{kunci: nilai}` | Menyimpan pasangan kunci-nilai | Didukung pada subset native teruji; kunci teks/angka/boolean, batas 256 entri |
+| jancuk / inthiseco | Memulai program | Teruji |
+| selesai / gitu | Menutup blok | Teruji |
+| lah | Membuat variabel baru | Teruji |
+| hedeh / jir | Menampilkan nilai | Teruji |
+| njir / kampret / adooh | Kondisi dan cabang alternatif | Teruji |
+| mumet | Perulangan selama kondisi benar | Teruji |
+| untuk ... dalam ... | Mengunjungi elemen koleksi | List, teks UTF-8, kamus (menghasilkan kunci), dan rentang() didukung |
+| panjang(nilai) | Menghitung jumlah item/karakter/entri | List, teks, kamus, dan rentang didukung |
+| rentang(...) | Membuat rentang bilangan bulat dengan batas akhir eksklusif | Didukung; 1–3 argumen bulat |
+| tanya | Membaca masukan pengguna | Didukung melalui stdin; diuji lewat fixture native |
+| fungsi / balek | Mendefinisikan dan mengembalikan nilai fungsi | Didukung pada subset native teruji |
+| Kamus {kunci: nilai} | Menyimpan pasangan kunci-nilai | Didukung pada subset native teruji; batas 256 entri |
 
-## Contoh runtime native
+## Backend compiler C eksperimental
 
-```pusingcuk
-inthiseco
-lah angka = [2, 4, 6]
-untuk nilai dalam angka
-    jir nilai
-gitu untuk
-untuk i dalam rentang(1, 5, 2)
-    jir i
-gitu untuk
-gitu inthiseco
-```
+Backend C kini memiliki subset teruji untuk integer, boolean, perbandingan, logika short-circuit, dan kondisi njir/kampret. Ini berbeda dari runtime C mandiri: backend C masih menolak teks, koleksi, input, loop, dan fungsi. Lihat panduan backend C sebelum mengandalkannya.
 
-Kamus ini membedakan **fitur bahasa modular** dari **fitur native yang sudah diuji**. Status native hanya boleh dinaikkan setelah ada fixture dan CI yang membuktikannya.
+Untuk glossary yang bisa dibaca mesin, lihat library/kosakata.json. Contoh yang siap dicoba ada di library/conditional_logic.pusingcuk.
