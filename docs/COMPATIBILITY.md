@@ -27,6 +27,12 @@ Pusingcuk harus mudah dimulai oleh pemula, tetap dapat dipakai untuk proyek seri
 | File, jaringan, database | Belum ada pustaka standar lintas runtime yang lengkap | Gunakan hanya API yang secara eksplisit tersedia pada runtime target |
 | Keamanan kode tak tepercaya | Tidak ada sandbox yang dijamin | Jangan menjalankan program tak tepercaya dengan hak akses penting |
 
+## Compiler dan interoperabilitas
+
+Pusingcuk dirancang agar dapat memiliki beberapa backend tanpa mengubah semantik bahasa. Lihat [arsitektur compiler dan interoperabilitas](COMPILER_INTEROP.md) untuk pipeline front-end → AST → analisis semantik → IR berversi → backend, serta batas rancangan ABI/FFI. Lihat [kontrak fixture konformansi](CONFORMANCE_FIXTURES.md) untuk format tes yang akan dipakai lintas runtime.
+
+IR stabil, compiler multi-target, backend WebAssembly/JavaScript, dan ABI/FFI saat ini **belum tersedia**. Backend baru hanya dapat diklaim kompatibel setelah lulus fixture yang sama untuk fitur yang dinyatakan didukung.
+
 ## Tingkat kompatibilitas fitur
 
 - **Inti teruji lintas runtime:** boleh disebut portabel hanya jika fixture yang sama lulus pada interpreter referensi dan runtime native.

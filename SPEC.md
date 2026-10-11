@@ -114,16 +114,22 @@ Baris yang setelah spasi awalnya dimulai dengan # dianggap komentar.
 
 Interpreter melaporkan kesalahan dengan nomor baris jika tersedia.
 
-## 13. Status spesifikasi
+## 13. Arah compiler dan portabilitas
+
+Semantik bahasa harus dipisahkan dari implementasi runtime agar program dapat diterjemahkan ke target lain. Rancangan pipeline compiler, IR berversi, capability, backend, dan ABI/FFI dijelaskan di [Arsitektur Compiler dan Interoperabilitas](docs/COMPILER_INTEROP.md). Kontrak manifest tes lintas runtime dijelaskan di [Kontrak Fixture Konformansi](docs/CONFORMANCE_FIXTURES.md).
+
+Dokumen tersebut adalah rancangan arsitektur. Saat ini belum ada kontrak IR compiler stabil, compiler multi-target, backend WebAssembly/JavaScript, atau ABI/FFI stabil. Jangan mengklaim fitur tersebut tersedia sebelum implementasi dan fixture konformansi membuktikannya.
+
+## 14. Status spesifikasi
 
 Dokumen ini mencatat perilaku implementasi saat ini.
 Fitur yang belum diuji tidak dianggap telah didukung.
 
-## 14. Runtime native dan Termux
+## 15. Runtime native dan Termux
 
 Runtime C dapat dibangun dengan compiler C11 dan dijalankan sebagai executable tanpa Python untuk subset fitur yang tercantum dalam `docs/NATIVE_RUNTIME.md`. Di Termux, setelah memasang `clang` dan `make`, jalankan `bash scripts/install-termux.sh`, lalu gunakan `pusingcuk-native examples/native/rekap_anggaran.pusingcuk`. Fungsi buatan pengguna tersedia pada runtime native; sistem modul belum tersedia.
 
-## 15. Alias kosakata slang
+## 16. Alias kosakata slang
 
 Lexer menerima alias berikut dan menormalkannya ke kata kunci kanonis sebelum parsing:
 
