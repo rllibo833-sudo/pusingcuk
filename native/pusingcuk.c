@@ -290,7 +290,7 @@ static Val primary(void) {
     if (isdigit((unsigned char)*p) || *p=='.') {
         char *e; double x=strtod(p,&e);
         if (e==p) { syntax_fail("angka tidak valid"); return num(0); }
-        p=e; if (!isfinite(x)) { fail("angka desimal tidak valid atau terlalu besar"); return num(0); } return num(x);
+        p=e; if (!isfinite(x)) { syntax_fail("angka desimal tidak valid atau terlalu besar"); return num(0); } return num(x);
     }
     if (isalpha((unsigned char)*p) || *p=='_') {
         char name[128]; size_t n=0;
