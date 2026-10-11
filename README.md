@@ -16,7 +16,7 @@ Implementasi historis yang tidak menjadi entry point utama disimpan di `archive/
 
 ## Mulai untuk pemula
 
-Ikuti [Panduan Pusingcuk dari Nol](docs/PEMULA.md). Panduan itu mengutamakan jalur Termux native tanpa Python untuk menjalankan program. Pengguna yang mengembangkan aplikasi dapat memeriksa [kontrak kompatibilitas](docs/COMPATIBILITY.md) untuk mengetahui fitur yang portabel, status runtime, dan platform yang belum terverifikasi.
+Ikuti [Panduan Pusingcuk dari Nol](docs/PEMULA.md), yang memakai langkah pendek, contoh langsung, dan tantangan kecil. Gaya penulisan dijelaskan di [Panduan Gaya Bahasa Gen Z dan Gen Alpha](docs/GAYA_BAHASA.md). Panduan pemula mengutamakan jalur Termux native tanpa Python untuk menjalankan program. Pengguna yang mengembangkan aplikasi dapat memeriksa [kontrak kompatibilitas](docs/COMPATIBILITY.md) untuk mengetahui fitur yang portabel, status runtime, dan platform yang belum terverifikasi.
 
 ## Pusingcuk Studio — editor dan terminal HTML lokal
 
