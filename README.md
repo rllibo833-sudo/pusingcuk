@@ -1,6 +1,6 @@
 # Pusingcuk
 
-Pusingcuk adalah bahasa pemrograman eksperimental dengan kosakata ramah bahasa Indonesia dan slang lokal. Tujuannya adalah mudah dipelajari, tetap dapat dikembangkan secara serius, dan perlahan bisa dijalankan native tanpa Python saat runtime.
+Pusingcuk adalah bahasa pemrograman eksperimental dengan kosakata ramah bahasa Indonesia dan slang lokal. Tujuannya adalah mudah dipelajari, tetap dapat dikembangkan secara serius, dan perlahan bisa dijalankan native tanpa Python saat runtime.\n\n🌐 **[Kunjungi situs komunitas PusingCuk](https://github.com/rllibo833-sudo/pusingcuk/tree/main/site)** — halaman pengenalan, contoh sintaks, jalur memulai, dan ajakan kontribusi. Setelah GitHub Pages diaktifkan, tautan publik situs akan tersedia dari deployment workflow.
 
 ## Keamanan
 
