@@ -18,6 +18,12 @@ Job `android-apk` di `.github/workflows/tests.yml` membangun APK pada pull reque
 
 Workflow mengompilasi `native/pusingcuk.c` untuk ABI `arm64-v8a` dan `armeabi-v7a`, menempatkan executable ke assets, lalu membangun APK dengan JDK 17, Android SDK/NDK, dan Gradle 8.9.
 
+## Cache dan file sementara
+
+Saat menjalankan program, Studio menulis salinan sumber sementara ke direktori cache privat aplikasi agar runtime native dapat membacanya sebagai file. File tersebut dihapus setelah eksekusi normal; saat aplikasi dibuka kembali, file sementara berawalan `program-` yang lebih lama dari 24 jam dibersihkan. Penghentian paksa masih dapat meninggalkan file sampai pembersihan berikutnya atau sampai Android mengosongkan cache.
+
+Cache aplikasi bukan penyimpanan permanen dan bukan mekanisme penghapusan aman. Jangan menyimpan kata sandi, token, kunci privat, atau data sensitif di kode sumber. Proyek yang disimpan secara eksplisit berada di penyimpanan privat aplikasi dan berbeda dari cache sementara.
+
 ## GitHub dan keamanan
 
 Versi awal hanya mengimpor file dari repositori **publik** dan membagikan kode lewat Android share sheet. Belum ada push/commit langsung ke GitHub, autentikasi akun, clone/pull multi-file, branch/commit UI, atau dukungan repo privat. Fitur tulis memerlukan desain OAuth/PKCE atau GitHub App yang aman; jangan menanam personal access token dalam APK atau kode sumber.
