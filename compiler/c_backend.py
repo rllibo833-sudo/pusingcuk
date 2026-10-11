@@ -136,8 +136,8 @@ def generate(document: dict) -> str:
                 out.append(f"{indent}{names[name]} = (int64_t)({value});")
             elif kind=="Print":
                 value,typ=expression(f.get("value"),names,types)
-                if typ=="bool": out.append(f'{indent}if (printf("%s\n", ({value}) ? "okelah" : "tidak") < 0) return EXIT_FAILURE;')
-                else: out.append(f'{indent}if (printf("%" PRId64 "\n", (int64_t)({value})) < 0) return EXIT_FAILURE;')
+                if typ=="bool": out.append(f'{indent}if (printf("%s\\n", ({value}) ? "okelah" : "tidak") < 0) return EXIT_FAILURE;')
+                else: out.append(f'{indent}if (printf("%" PRId64 "\\n", (int64_t)({value})) < 0) return EXIT_FAILURE;')
             elif kind=="If":
                 cond,_=expression(f.get("condition"),names,types); out.append(f"{indent}if (({cond}) != 0) {{")
                 yes=statements(f.get("then_body",[]),dict(names),dict(types),indent+"    ",in_function,in_loop); out.extend(yes or [indent+"    (void)0;"])
