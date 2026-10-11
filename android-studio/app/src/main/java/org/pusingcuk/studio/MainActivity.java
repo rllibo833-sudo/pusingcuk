@@ -211,7 +211,7 @@ public final class MainActivity extends Activity {
 
         synchronized String text() {
             String result = new String(buffer.toByteArray(), StandardCharsets.UTF_8);
-            return truncated ? result + "\\n[output dipotong: batas 256 KiB per stream]" : result;
+            return truncated ? result + "\n[output dipotong: batas 256 KiB per stream]" : result;
         }
     }
 
