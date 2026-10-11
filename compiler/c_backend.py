@@ -15,10 +15,10 @@ C_RUNTIME = r'''#include <inttypes.h>
 static unsigned int pc_call_depth = 0;
 static void pc_overflow(void) { fputs("Pusingcuk C backend: integer overflow\n", stderr); exit(EXIT_FAILURE); }
 static void pc_division_by_zero(void) { fputs("Pusingcuk C backend: division by zero\n", stderr); exit(EXIT_FAILURE); }
-static void pc_loop_limit(void) { fputs("Pusingcuk C backend: loop iteration limit reached\n", stderr); exit(EXIT_FAILURE); }
-static void pc_call_enter(void) { if (pc_call_depth >= 100) { fputs("Pusingcuk C backend: function call depth limit reached\n", stderr); exit(EXIT_FAILURE); } pc_call_depth++; }
-static void pc_call_leave(void) { if (pc_call_depth > 0) pc_call_depth--; }
-static void pc_missing_return(void) { fputs("Pusingcuk C backend: function ended without balek\n", stderr); exit(EXIT_FAILURE); }
+void pc_loop_limit(void) { fputs("Pusingcuk C backend: loop iteration limit reached\n", stderr); exit(EXIT_FAILURE); }
+void pc_call_enter(void) { if (pc_call_depth >= 100) { fputs("Pusingcuk C backend: function call depth limit reached\n", stderr); exit(EXIT_FAILURE); } pc_call_depth++; }
+void pc_call_leave(void) { if (pc_call_depth > 0) pc_call_depth--; }
+void pc_missing_return(void) { fputs("Pusingcuk C backend: function ended without balek\n", stderr); exit(EXIT_FAILURE); }
 int64_t pc_add(int64_t a, int64_t b) {
     if ((b > 0 && a > INT64_MAX - b) || (b < 0 && a < INT64_MIN - b)) pc_overflow();
     return a + b;
@@ -162,9 +162,9 @@ def generate(document: dict) -> str:
         f,line=st["fields"],st["line"]; params=f["params"]; sig=", ".join(f"int64_t pc_arg_{i}" for i in range(len(params))) or "void"
         prototypes.append(f"static int64_t pc_fn_{name}({sig});")
         names={p:f"pc_arg_{i}" for i,p in enumerate(params)}; types={p:"int" for p in params}
-        body_lines=statements(f["body"],names,types,"    ",True,False)
+        body_lines=[f"    (void)pc_arg_{i};" for i in range(len(params))] + statements(f["body"],names,types,"    ",True,False)
         definitions.append(f"static int64_t pc_fn_{name}({sig}) {{\n    pc_call_enter();\n"+("\n".join(body_lines) if body_lines else "    (void)0;")+"\n    pc_call_leave();\n    pc_missing_return();\n    return INT64_C(0);\n}")
-    main_lines=statements([s for s in body if s.get("kind")!="Function"],{}, {})
+    main_lines=[f"    (void)&pc_fn_{name};" for name in functions] + statements([s for s in body if s.get("kind")!="Function"],{}, {})
     return C_RUNTIME+"\n"+"\n".join(prototypes)+"\n"+"\n".join(definitions)+"\nint main(void) {\n"+("\n".join(main_lines) if main_lines else "    (void)0;")+"\n    return EXIT_SUCCESS;\n}\n"
 
 def main(argv=None) -> int:
