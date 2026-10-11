@@ -9,6 +9,13 @@ KEYWORD_ALIASES = {
     "gitu": "selesai",
     "inthiseco": "jancuk",
     "janggal": "bukan",
+    "gas": "jancuk",
+    "spill": "hedeh",
+    "bestie": "lah",
+    "valid": "benar",
+    "zonk": "salah",
+    "skip": "kampret",
+    "kelar": "selesai",
 }
 
 KEYWORDS = frozenset({

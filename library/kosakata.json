@@ -11,43 +11,302 @@
     "../docs/C_BACKEND.md"
   ],
   "keywords": [
-    {"word":"jancuk","category":"program-structure","meaning":"Memulai program.","aliases":["inthiseco"],"native_runtime":"tested","c_backend":"supported"},
-    {"word":"selesai","category":"program-structure","meaning":"Menutup blok; diikuti nama blok, misalnya selesai njir.","aliases":["gitu"],"native_runtime":"tested","c_backend":"supported"},
-    {"word":"lah","category":"variables","meaning":"Mendeklarasikan variabel baru.","aliases":[],"native_runtime":"tested","c_backend":"supported"},
-    {"word":"hedeh","category":"output","meaning":"Menampilkan nilai ke output standar.","aliases":["jir"],"native_runtime":"tested","c_backend":"integer-and-boolean-subset"},
-    {"word":"tanya","category":"input","meaning":"Menampilkan prompt dan membaca satu baris dari stdin.","aliases":[],"native_runtime":"tested","c_backend":"unsupported"},
-    {"word":"njir","category":"control-flow","meaning":"Memulai kondisi.","aliases":[],"native_runtime":"tested","c_backend":"supported"},
-    {"word":"kampret","category":"control-flow","meaning":"Menandai cabang alternatif pada kondisi.","aliases":["adooh"],"native_runtime":"tested","c_backend":"supported"},
-    {"word":"mumet","category":"control-flow","meaning":"Memulai perulangan selama kondisi benar.","aliases":[],"native_runtime":"tested","c_backend":"unsupported"},
-    {"word":"untuk","category":"control-flow","meaning":"Mengiterasi elemen dari koleksi atau rentang.","aliases":[],"native_runtime":"tested","c_backend":"unsupported"},
-    {"word":"dalam","category":"control-flow","meaning":"Menghubungkan nama iterasi dengan koleksi pada perulangan untuk.","aliases":[],"native_runtime":"tested","c_backend":"unsupported"},
-    {"word":"fungsi","category":"functions","meaning":"Mendefinisikan fungsi dengan parameter.","aliases":[],"native_runtime":"tested","c_backend":"unsupported"},
-    {"word":"balek","category":"functions","meaning":"Mengembalikan nilai dari fungsi.","aliases":[],"native_runtime":"tested","c_backend":"unsupported"},
-    {"word":"benar","category":"boolean","meaning":"Nilai boolean benar; output ditampilkan sebagai okelah.","aliases":[],"native_runtime":"tested","c_backend":"supported"},
-    {"word":"salah","category":"boolean","meaning":"Nilai boolean salah; output ditampilkan sebagai tidak.","aliases":[],"native_runtime":"tested","c_backend":"supported"},
-    {"word":"dan","category":"logic","meaning":"AND logika dengan evaluasi short-circuit.","aliases":[],"native_runtime":"tested","c_backend":"supported"},
-    {"word":"atau","category":"logic","meaning":"OR logika dengan evaluasi short-circuit.","aliases":[],"native_runtime":"tested","c_backend":"supported"},
-    {"word":"bukan","category":"logic","meaning":"Negasi logika.","aliases":["janggal"],"native_runtime":"tested","c_backend":"supported"},
-    {"word":"panjang","category":"builtin","meaning":"Menghitung panjang teks, list, kamus, atau rentang sesuai dukungan runtime.","aliases":[],"native_runtime":"tested","c_backend":"unsupported"},
-    {"word":"rentang","category":"builtin","meaning":"Menghasilkan rentang bilangan bulat dengan batas akhir eksklusif.","aliases":[],"native_runtime":"tested","c_backend":"unsupported"}
+    {
+      "word": "jancuk",
+      "category": "program-structure",
+      "meaning": "Memulai program.",
+      "aliases": [
+        "inthiseco"
+      ],
+      "native_runtime": "tested",
+      "c_backend": "supported"
+    },
+    {
+      "word": "selesai",
+      "category": "program-structure",
+      "meaning": "Menutup blok; diikuti nama blok, misalnya selesai njir.",
+      "aliases": [
+        "gitu"
+      ],
+      "native_runtime": "tested",
+      "c_backend": "supported"
+    },
+    {
+      "word": "lah",
+      "category": "variables",
+      "meaning": "Mendeklarasikan variabel baru.",
+      "aliases": [],
+      "native_runtime": "tested",
+      "c_backend": "supported"
+    },
+    {
+      "word": "hedeh",
+      "category": "output",
+      "meaning": "Menampilkan nilai ke output standar.",
+      "aliases": [
+        "jir"
+      ],
+      "native_runtime": "tested",
+      "c_backend": "integer-and-boolean-subset"
+    },
+    {
+      "word": "tanya",
+      "category": "input",
+      "meaning": "Menampilkan prompt dan membaca satu baris dari stdin.",
+      "aliases": [],
+      "native_runtime": "tested",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "njir",
+      "category": "control-flow",
+      "meaning": "Memulai kondisi.",
+      "aliases": [],
+      "native_runtime": "tested",
+      "c_backend": "supported"
+    },
+    {
+      "word": "kampret",
+      "category": "control-flow",
+      "meaning": "Menandai cabang alternatif pada kondisi.",
+      "aliases": [
+        "adooh"
+      ],
+      "native_runtime": "tested",
+      "c_backend": "supported"
+    },
+    {
+      "word": "mumet",
+      "category": "control-flow",
+      "meaning": "Memulai perulangan selama kondisi benar.",
+      "aliases": [],
+      "native_runtime": "tested",
+      "c_backend": "supported-integer-boolean-condition"
+    },
+    {
+      "word": "untuk",
+      "category": "control-flow",
+      "meaning": "Mengiterasi elemen dari koleksi atau rentang.",
+      "aliases": [],
+      "native_runtime": "tested",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "dalam",
+      "category": "control-flow",
+      "meaning": "Menghubungkan nama iterasi dengan koleksi pada perulangan untuk.",
+      "aliases": [],
+      "native_runtime": "tested",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "fungsi",
+      "category": "functions",
+      "meaning": "Mendefinisikan fungsi dengan parameter.",
+      "aliases": [],
+      "native_runtime": "tested",
+      "c_backend": "integer-parameters-and-return"
+    },
+    {
+      "word": "balek",
+      "category": "functions",
+      "meaning": "Mengembalikan nilai dari fungsi.",
+      "aliases": [],
+      "native_runtime": "tested",
+      "c_backend": "integer-return-only"
+    },
+    {
+      "word": "benar",
+      "category": "boolean",
+      "meaning": "Nilai boolean benar; output ditampilkan sebagai okelah.",
+      "aliases": [],
+      "native_runtime": "tested",
+      "c_backend": "supported"
+    },
+    {
+      "word": "salah",
+      "category": "boolean",
+      "meaning": "Nilai boolean salah; output ditampilkan sebagai tidak.",
+      "aliases": [],
+      "native_runtime": "tested",
+      "c_backend": "supported"
+    },
+    {
+      "word": "dan",
+      "category": "logic",
+      "meaning": "AND logika dengan evaluasi short-circuit.",
+      "aliases": [],
+      "native_runtime": "tested",
+      "c_backend": "supported"
+    },
+    {
+      "word": "atau",
+      "category": "logic",
+      "meaning": "OR logika dengan evaluasi short-circuit.",
+      "aliases": [],
+      "native_runtime": "tested",
+      "c_backend": "supported"
+    },
+    {
+      "word": "bukan",
+      "category": "logic",
+      "meaning": "Negasi logika.",
+      "aliases": [
+        "janggal"
+      ],
+      "native_runtime": "tested",
+      "c_backend": "supported"
+    },
+    {
+      "word": "panjang",
+      "category": "builtin",
+      "meaning": "Menghitung panjang teks, list, kamus, atau rentang sesuai dukungan runtime.",
+      "aliases": [],
+      "native_runtime": "tested",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "rentang",
+      "category": "builtin",
+      "meaning": "Menghasilkan rentang bilangan bulat dengan batas akhir eksklusif.",
+      "aliases": [],
+      "native_runtime": "tested",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "gas",
+      "category": "program-structure",
+      "meaning": "Alias Gen Z/Gen Alpha untuk memulai program.",
+      "aliases": [],
+      "native_runtime": "pending-native-support",
+      "c_backend": "supported"
+    },
+    {
+      "word": "spill",
+      "category": "output",
+      "meaning": "Alias slang untuk menampilkan nilai.",
+      "aliases": [],
+      "native_runtime": "pending-native-support",
+      "c_backend": "integer-and-boolean-subset"
+    },
+    {
+      "word": "bestie",
+      "category": "variables",
+      "meaning": "Alias santai untuk mendeklarasikan variabel baru.",
+      "aliases": [],
+      "native_runtime": "pending-native-support",
+      "c_backend": "supported"
+    },
+    {
+      "word": "valid",
+      "category": "boolean",
+      "meaning": "Alias slang untuk nilai benar.",
+      "aliases": [],
+      "native_runtime": "pending-native-support",
+      "c_backend": "supported"
+    },
+    {
+      "word": "zonk",
+      "category": "boolean",
+      "meaning": "Alias slang untuk nilai salah.",
+      "aliases": [],
+      "native_runtime": "pending-native-support",
+      "c_backend": "supported"
+    },
+    {
+      "word": "skip",
+      "category": "control-flow",
+      "meaning": "Alias slang untuk cabang alternatif kondisi.",
+      "aliases": [],
+      "native_runtime": "pending-native-support",
+      "c_backend": "supported"
+    },
+    {
+      "word": "kelar",
+      "category": "program-structure",
+      "meaning": "Alias slang untuk penanda penutup blok; tetap diikuti nama blok.",
+      "aliases": [],
+      "native_runtime": "pending-native-support",
+      "c_backend": "supported"
+    }
   ],
   "operators": [
-    {"symbol":"+","category":"arithmetic","meaning":"Penjumlahan.","c_backend":"supported"},
-    {"symbol":"-","category":"arithmetic","meaning":"Pengurangan atau unary minus.","c_backend":"supported"},
-    {"symbol":"*","category":"arithmetic","meaning":"Perkalian.","c_backend":"supported"},
-    {"symbol":"/","category":"arithmetic","meaning":"Pembagian.","c_backend":"unsupported"},
-    {"symbol":"//","category":"arithmetic","meaning":"Pembagian bulat dengan pembulatan ke bawah.","c_backend":"supported"},
-    {"symbol":"%","category":"arithmetic","meaning":"Modulo dengan semantik tanda divisor seperti Python.","c_backend":"supported"},
-    {"symbol":"==","category":"comparison","meaning":"Menguji kesamaan.","c_backend":"supported"},
-    {"symbol":"!=","category":"comparison","meaning":"Menguji ketidaksamaan.","c_backend":"supported"},
-    {"symbol":"<","category":"comparison","meaning":"Lebih kecil dari.","c_backend":"supported"},
-    {"symbol":"<=","category":"comparison","meaning":"Lebih kecil atau sama dengan.","c_backend":"supported"},
-    {"symbol":">","category":"comparison","meaning":"Lebih besar dari.","c_backend":"supported"},
-    {"symbol":">=","category":"comparison","meaning":"Lebih besar atau sama dengan.","c_backend":"supported"}
+    {
+      "symbol": "+",
+      "category": "arithmetic",
+      "meaning": "Penjumlahan.",
+      "c_backend": "supported"
+    },
+    {
+      "symbol": "-",
+      "category": "arithmetic",
+      "meaning": "Pengurangan atau unary minus.",
+      "c_backend": "supported"
+    },
+    {
+      "symbol": "*",
+      "category": "arithmetic",
+      "meaning": "Perkalian.",
+      "c_backend": "supported"
+    },
+    {
+      "symbol": "/",
+      "category": "arithmetic",
+      "meaning": "Pembagian.",
+      "c_backend": "unsupported"
+    },
+    {
+      "symbol": "//",
+      "category": "arithmetic",
+      "meaning": "Pembagian bulat dengan pembulatan ke bawah.",
+      "c_backend": "supported"
+    },
+    {
+      "symbol": "%",
+      "category": "arithmetic",
+      "meaning": "Modulo dengan semantik tanda divisor seperti Python.",
+      "c_backend": "supported"
+    },
+    {
+      "symbol": "==",
+      "category": "comparison",
+      "meaning": "Menguji kesamaan.",
+      "c_backend": "supported"
+    },
+    {
+      "symbol": "!=",
+      "category": "comparison",
+      "meaning": "Menguji ketidaksamaan.",
+      "c_backend": "supported"
+    },
+    {
+      "symbol": "<",
+      "category": "comparison",
+      "meaning": "Lebih kecil dari.",
+      "c_backend": "supported"
+    },
+    {
+      "symbol": "<=",
+      "category": "comparison",
+      "meaning": "Lebih kecil atau sama dengan.",
+      "c_backend": "supported"
+    },
+    {
+      "symbol": ">",
+      "category": "comparison",
+      "meaning": "Lebih besar dari.",
+      "c_backend": "supported"
+    },
+    {
+      "symbol": ">=",
+      "category": "comparison",
+      "meaning": "Lebih besar atau sama dengan.",
+      "c_backend": "supported"
+    }
   ],
   "runtime_notes": {
     "native_runtime": "Runtime C mandiri mempunyai cakupan lebih luas pada fitur yang memiliki fixture native.",
-    "c_backend": "Backend source C eksperimental hanya mendukung subset yang tercatat di docs/C_BACKEND.md; status unsupported berarti compiler menolak fitur itu secara eksplisit.",
-    "aliases": "Alias dinormalisasi oleh lexer. Menambahkan alias baru memerlukan perubahan lexer dan tes, bukan hanya menambah entri glosarium."
+    "c_backend": "Backend source C eksperimental mendukung integer/boolean, kondisi, loop mumet, dan fungsi pengguna dengan parameter/return integer. String, koleksi, input, loop untuk, dan deklarasi lah di dalam loop masih ditolak eksplisit.",
+    "aliases": "Alias baru gas, spill, bestie, valid, zonk, skip, dan kelar saat ini diuji melalui lexer/interpreter Python dan front-end compiler C; dukungan lexer runtime C mandiri belum diklaim."
   }
 }

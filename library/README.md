@@ -3,13 +3,15 @@
 Direktori ini berisi referensi kosakata yang mudah dipakai ulang dan contoh program Pusingcuk.
 
 - [kosakata.json](kosakata.json): glosarium mesin untuk kata kunci, alias, operator, arti, dan status dukungan runtime.
-- [conditional_logic.pusingcuk](conditional_logic.pusingcuk): contoh perbandingan, boolean, short-circuit, dan kondisi yang kompatibel dengan subset backend C saat ini.
+- [conditional_logic.pusingcuk](conditional_logic.pusingcuk): contoh perbandingan, boolean, short-circuit, dan kondisi yang kompatibel dengan subset backend C.
+- [loops_functions_genz.pusingcuk](loops_functions_genz.pusingcuk): contoh loop, fungsi rekursif, dan alias Gen Z/Gen Alpha. Jalankan lewat interpreter modular karena contoh ini mencetak teks yang belum didukung backend C.
 
 ## Jalankan contoh dengan interpreter Python
 
 Dari root repository:
 
     python pusingcuk_new.py library/conditional_logic.pusingcuk
+    python pusingcuk_new.py library/loops_functions_genz.pusingcuk
 
 ## Kompilasi contoh menjadi C11
 

@@ -14,7 +14,7 @@ Saat ini ada dua jalur eksekusi:
 - **Interpreter modular Python** sebagai jalur referensi pengembangan: `pusingcuk_new.py`, dengan lexer, parser, AST, dan evaluator.
 - **Runtime native C** untuk subset bahasa yang sudah memiliki fixture. Setelah dikompilasi, executable native berjalan tanpa Python.
 
-Kedua jalur belum sepenuhnya setara. Jangan menganggap fitur yang tersedia di interpreter modular otomatis tersedia di native. Daftar kemampuan dan batasnya ada di [matriks runtime native](docs/NATIVE_RUNTIME.md). Sasaran dan status lintas platform dijelaskan di [kontrak kompatibilitas](docs/COMPATIBILITY.md). Arah compiler multi-target dan FFI ada di [arsitektur compiler/interoperabilitas](docs/COMPILER_INTEROP.md); tes lintas runtime dijelaskan di [kontrak fixture konformansi](docs/CONFORMANCE_FIXTURES.md). Kontrak perilaku ada di [Kontrak Semantik](docs/SEMANTIC_CONTRACT.md). Front-end dapat mengekspor dan memvalidasi [IR v1](docs/IR_V1.md). Backend C eksperimental juga dapat menghasilkan source C11 untuk subset integer, boolean, perbandingan, logika short-circuit, dan kondisi; cakupan, batas, serta cara pakainya ada di [C backend](docs/C_BACKEND.md). Ini belum compiler multi-target penuh, belum backend WASM/JavaScript, dan belum menyediakan ABI/FFI. Sistem modul belum tersedia.
+Kedua jalur belum sepenuhnya setara. Jangan menganggap fitur yang tersedia di interpreter modular otomatis tersedia di native. Daftar kemampuan dan batasnya ada di [matriks runtime native](docs/NATIVE_RUNTIME.md). Sasaran dan status lintas platform dijelaskan di [kontrak kompatibilitas](docs/COMPATIBILITY.md). Arah compiler multi-target dan FFI ada di [arsitektur compiler/interoperabilitas](docs/COMPILER_INTEROP.md); tes lintas runtime dijelaskan di [kontrak fixture konformansi](docs/CONFORMANCE_FIXTURES.md). Kontrak perilaku ada di [Kontrak Semantik](docs/SEMANTIC_CONTRACT.md). Front-end dapat mengekspor dan memvalidasi [IR v1](docs/IR_V1.md). Backend C eksperimental juga dapat menghasilkan source C11 untuk subset integer, boolean, perbandingan, logika short-circuit, kondisi, loop `mumet`, serta fungsi dengan parameter dan nilai balik integer; cakupan dan batasnya ada di [C backend](docs/C_BACKEND.md). Ini belum compiler multi-target penuh, belum backend WASM/JavaScript, dan belum menyediakan ABI/FFI. Sistem modul belum tersedia.
 
 Implementasi historis yang tidak menjadi entry point utama disimpan di `archive/legacy/` untuk referensi saja. File arsip tidak termasuk jalur yang didukung dan tidak boleh dijadikan dasar klaim fitur.
 
@@ -121,12 +121,26 @@ selesai jancuk
 | `gitu` | `selesai` | Menutup blok |
 | `inthiseco` | `jancuk` | Memulai program |
 | `janggal` | `bukan` | Negasi logika |
+| `gas` | `jancuk` | Memulai program |
+| `spill` | `hedeh` | Menampilkan nilai |
+| `bestie` | `lah` | Mendeklarasikan variabel |
+| `valid` | `benar` | Nilai benar |
+| `zonk` | `salah` | Nilai salah |
+| `skip` | `kampret` | Cabang alternatif |
+| `kelar` | `selesai` | Menutup blok |
+| `gas` | `jancuk` | Memulai program |
+| `spill` | `hedeh` | Menampilkan nilai |
+| `bestie` | `lah` | Mendeklarasikan variabel |
+| `valid` | `benar` | Nilai benar |
+| `zonk` | `salah` | Nilai salah |
+| `skip` | `kampret` | Cabang alternatif |
+| `kelar` | `selesai` | Menutup blok |
 
 Alias tidak menghapus kata lama. Penjelasan ada di [Kosakata Slang Pusingcuk](docs/KOSAKATA_GENZ.md). Untuk daftar kosakata yang dapat dibaca mesin dan contoh program siap dicoba, buka [Pustaka Pusingcuk](library/README.md).
 
 ## Koleksi dan operator
 
-Nilai yang didukung mencakup teks, angka, boolean, daftar, dan kamus. Operator matematika: `+`, `-`, `*`, `/`, `//`, `%`. Perbandingan: `==`, `!=`, `<`, `<=`, `>`, `>=`. Logika: `dan`, `atau`, `bukan`. Backend compiler C eksperimental kini juga mendukung subset integer/boolean, perbandingan, logika short-circuit, serta kondisi `njir/kampret`; fitur di luar subset tersebut tetap ditolak. Lihat [matriks kemampuan backend C](docs/C_BACKEND.md).
+Nilai yang didukung mencakup teks, angka, boolean, daftar, dan kamus. Operator matematika: `+`, `-`, `*`, `/`, `//`, `%`. Perbandingan: `==`, `!=`, `<`, `<=`, `>`, `>=`. Logika: `dan`, `atau`, `bukan`. Backend compiler C eksperimental kini juga mendukung subset integer/boolean, perbandingan, logika short-circuit, kondisi, loop `mumet`, serta fungsi integer; fitur di luar subset tersebut tetap ditolak. Lihat [matriks kemampuan backend C](docs/C_BACKEND.md).
 
 - Daftar menggunakan tanda siku, misalnya `[10, 20, 30]`.
 - Kamus menggunakan pasangan kunci-nilai, misalnya `{"nama": "Budi", "umur": 20}`.
