@@ -43,7 +43,7 @@ Pusingcuk source (.pusingcuk)
   -> conformance tests + artifact/runtime checks
 ```
 
-Pipeline ini adalah arah desain, bukan daftar backend yang sudah tersedia. Saat ini runtime C native menjalankan subset langsung dan interpreter modular Python menjadi jalur referensi. Compiler multi-target, optimizer, WebAssembly, serta JavaScript/TypeScript backend belum dinyatakan tersedia.
+Pipeline ini adalah arah desain, bukan daftar backend yang sudah tersedia. Saat ini runtime C native menjalankan subset langsung dan interpreter modular Python menjadi jalur referensi. Front-end dapat menghasilkan IR v1 yang mempertahankan AST dan memvalidasinya. Backend C eksperimental melakukan code generation untuk subset integer terbatas, dengan penolakan eksplisit atas fitur di luar subset. Compiler multi-target penuh, optimizer umum, WebAssembly, JavaScript/TypeScript, dan ABI/FFI belum tersedia.
 
 ## Batas antara bahasa inti dan platform
 

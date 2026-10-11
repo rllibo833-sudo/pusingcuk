@@ -10,7 +10,7 @@ Saat ini ada dua jalur eksekusi:
 - **Interpreter modular Python** sebagai jalur referensi pengembangan: `pusingcuk_new.py`, dengan lexer, parser, AST, dan evaluator.
 - **Runtime native C** untuk subset bahasa yang sudah memiliki fixture. Setelah dikompilasi, executable native berjalan tanpa Python.
 
-Kedua jalur belum sepenuhnya setara. Jangan menganggap fitur yang tersedia di interpreter modular otomatis tersedia di native. Daftar kemampuan dan batasnya ada di [matriks runtime native](docs/NATIVE_RUNTIME.md). Sasaran dan status lintas platform dijelaskan di [kontrak kompatibilitas](docs/COMPATIBILITY.md). Arah compiler multi-target, IR, dan FFI ada di [arsitektur compiler/interoperabilitas](docs/COMPILER_INTEROP.md); format tes lintas runtime dijelaskan di [kontrak fixture konformansi](docs/CONFORMANCE_FIXTURES.md). Keduanya merupakan rancangan, bukan klaim bahwa backend compiler atau FFI sudah tersedia. Sistem modul belum tersedia.
+Kedua jalur belum sepenuhnya setara. Jangan menganggap fitur yang tersedia di interpreter modular otomatis tersedia di native. Daftar kemampuan dan batasnya ada di [matriks runtime native](docs/NATIVE_RUNTIME.md). Sasaran dan status lintas platform dijelaskan di [kontrak kompatibilitas](docs/COMPATIBILITY.md). Arah compiler multi-target dan FFI ada di [arsitektur compiler/interoperabilitas](docs/COMPILER_INTEROP.md); tes lintas runtime dijelaskan di [kontrak fixture konformansi](docs/CONFORMANCE_FIXTURES.md). Kontrak perilaku ada di [Kontrak Semantik](docs/SEMANTIC_CONTRACT.md). Front-end dapat mengekspor dan memvalidasi [IR v1](docs/IR_V1.md). Backend C eksperimental juga dapat menghasilkan source C11 untuk subset integer yang dibatasi; cakupannya dan cara pakainya ada di [C backend](docs/C_BACKEND.md). Ini belum compiler multi-target penuh, belum backend WASM/JavaScript, dan belum menyediakan ABI/FFI. Sistem modul belum tersedia.
 
 Implementasi historis yang tidak menjadi entry point utama disimpan di `archive/legacy/` untuk referensi saja. File arsip tidak termasuk jalur yang didukung dan tidak boleh dijadikan dasar klaim fitur.
 
@@ -146,7 +146,7 @@ Tes konformansi lintas runtime membandingkan output dan exit code dari interpret
 python tools/conformance.py
 ```
 
-Harness ini memvalidasi metadata fixture dan path sumber, memberi timeout untuk tiap program, serta melaporkan `PASS`, `FAIL`, dan `UNSUPPORTED` secara terpisah. Cakupan awal masih kecil dan akan ditambah seiring semantik bahasa distabilkan. Jika perubahan menyentuh kedua jalur, jalankan keduanya. Tes CI Ubuntu tidak menggantikan pengujian fisik Termux.
+Harness ini memvalidasi metadata fixture dan path sumber, memberi timeout untuk tiap program, serta melaporkan `PASS`, `FAIL`, dan `UNSUPPORTED` secara terpisah. Untuk menghasilkan source C dari subset integer eksperimental: `python -m compiler.c_backend program.pusingcuk -o program.c`, lalu kompilasi source hasil dengan compiler C11. Fitur di luar subset ditolak, bukan diam-diam diterjemahkan dengan semantik berbeda. Tes CI Ubuntu tidak menggantikan pengujian fisik Termux.
 
 ## Batasan saat ini
 
