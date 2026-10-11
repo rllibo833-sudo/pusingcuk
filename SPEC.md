@@ -140,3 +140,8 @@ Lexer menerima alias berikut dan menormalkannya ke kata kunci kanonis sebelum pa
 - `janggal` → `bukan`
 
 Alias tidak mengubah makna sintaks dan tidak menghapus kata kunci lama. Runtime C mandiri diuji terhadap subset alias ini; fitur lain pada runtime C belum dinyatakan setara dengan interpreter modular.
+
+
+## 17. Bytecode IR PVM v1 (draft)
+
+PusingCuk kini memiliki eksperimen assembler bytecode biner PVM dan backend transpiler JavaScript/Python. Spesifikasi framing, 19 opcode, operand, dan batas kompatibilitas berada di [docs/PVM_SPEC.md](docs/PVM_SPEC.md). Format ini masih draft: parser sumber C bersifat line-oriented, bukan parser ekspresi penuh, dan kesetaraan seluruh fitur belum dijamin. Jangan menganggap PVM v1 sebagai ABI stabil sebelum seluruh fixture konformansi lulus di CI.
