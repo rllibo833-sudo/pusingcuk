@@ -91,5 +91,5 @@ test-native: native test-cli
 		echo 'penggabungan string melebihi batas seharusnya gagal' >&2; exit 1; \
 	fi
 	@$(NATIVE_BIN) tests/native/string_concat_limit.pusingcuk > $(CURDIR)/pusingcuk-string-limit.out
-	@test "$(wc -c < $(CURDIR)/pusingcuk-string-limit.out)" -eq 1024
+	@wc -c < $(CURDIR)/pusingcuk-string-limit.out | grep -qx '1024'
 	@rm -f $(CURDIR)/pusingcuk-string-limit.out
