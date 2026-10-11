@@ -79,3 +79,11 @@ test-native: native test-cli
 	if $(NATIVE_BIN) tests/native/function_wrong_arity.pusingcuk >/dev/null 2>&1; then \
 		echo 'pemanggilan fungsi dengan jumlah argumen salah seharusnya gagal' >&2; exit 1; \
 	fi
+	if $(NATIVE_BIN) tests/native/numeric_overflow.pusingcuk >/dev/null 2>&1; then \
+		echo 'operasi angka overflow seharusnya gagal' >&2; exit 1; \
+	fi; \
+	if $(NATIVE_BIN) tests/native/numeric_non_finite_literal.pusingcuk >/dev/null 2>&1; then \
+		echo 'literal angka non-finite seharusnya gagal' >&2; exit 1; \
+	fi; \
+	$(NATIVE_BIN) tests/native/numeric_large_finite.pusingcuk > $(CURDIR)/pusingcuk-numeric-large.out; \
+	grep -qx '1e+308' $(CURDIR)/pusingcuk-numeric-large.out

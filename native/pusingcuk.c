@@ -1,6 +1,7 @@
 
 #include <ctype.h>
 #include <math.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -41,6 +42,10 @@ static void fail(const char *msg) {
     err = 1;
 }
 static Val num(double x) { Val v={0}; v.t=NUM; v.n=x; return v; }
+static Val checked_num(double x, const char *message) {
+    if (!isfinite(x)) { fail(message); return num(0); }
+    return num(x);
+}
 static List *new_list(void) {
     if (allocated_list_count >= MAX_LIST_ALLOCATIONS) {
         fail("batas alokasi list native terlampaui"); return NULL;
@@ -266,7 +271,7 @@ static Val primary(void) {
     if (isdigit((unsigned char)*p) || *p=='.') {
         char *e; double x=strtod(p,&e);
         if (e==p) { fail("angka tidak valid"); return num(0); }
-        p=e; return num(x);
+        p=e; if (!isfinite(x)) { fail("angka desimal tidak valid atau terlalu besar"); return num(0); } return num(x);
     }
     if (isalpha((unsigned char)*p) || *p=='_') {
         char name[128]; size_t n=0;
@@ -368,22 +373,22 @@ static Val mul(void) {
         if (take("*")) {
             Val b=unary();
             if (a.t!=NUM || b.t!=NUM) { fail("'*' membutuhkan angka"); return num(0); }
-            a=num(a.n*b.n);
+            a=checked_num(a.n*b.n,"hasil angka desimal terlalu besar atau tidak valid");
         } else if (take("//")) {
             Val b=unary();
             if (a.t!=NUM || b.t!=NUM) { fail("'//' membutuhkan angka"); return num(0); }
             if (b.n==0) { fail("pembagian dengan nol"); return num(0); }
-            a=num(floor(a.n/b.n));
+            a=checked_num(floor(a.n/b.n),"hasil angka desimal terlalu besar atau tidak valid");
         } else if (take("%")) {
             Val b=unary();
             if (a.t!=NUM || b.t!=NUM) { fail("'%' membutuhkan angka"); return num(0); }
             if (b.n==0) { fail("modulo dengan nol"); return num(0); }
-            a=num(a.n-floor(a.n/b.n)*b.n);
+            a=checked_num(a.n-floor(a.n/b.n)*b.n,"hasil angka desimal terlalu besar atau tidak valid");
         } else if (take("/")) {
             Val b=unary();
             if (a.t!=NUM || b.t!=NUM) { fail("'/' membutuhkan angka"); return num(0); }
             if (b.n==0) { fail("pembagian dengan nol"); return num(0); }
-            a=num(a.n/b.n);
+            a=checked_num(a.n/b.n,"hasil angka desimal terlalu besar atau tidak valid");
         } else break;
     }
     return a;
@@ -397,12 +402,12 @@ static Val add(void) {
                 char tmp[SZ];
                 if (strlen(a.s)+strlen(b.s)>=sizeof tmp) { fail("hasil string terlalu panjang"); return string(""); }
                 snprintf(tmp,sizeof tmp,"%s%s",a.s,b.s); a=string(tmp);
-            } else if (a.t==NUM && b.t==NUM) a=num(a.n+b.n);
+            } else if (a.t==NUM && b.t==NUM) a=checked_num(a.n+b.n,"hasil angka desimal terlalu besar atau tidak valid");
             else { fail("'+' membutuhkan dua angka atau dua string"); return num(0); }
         } else if (take("-")) {
             Val b=mul();
             if (a.t!=NUM || b.t!=NUM) { fail("'-' membutuhkan angka"); return num(0); }
-            a=num(a.n-b.n);
+            a=checked_num(a.n-b.n,"hasil angka desimal terlalu besar atau tidak valid");
         } else break;
     }
     return a;
@@ -465,7 +470,7 @@ static void printval(Val v) {
     else if(v.t==LIST) printf("[list: %zu]\n", v.list ? v.list->len : 0);
     else if(v.t==DICT) printf("[kamus: %zu]\n", v.dict ? v.dict->len : 0);
     else if(v.t==RANGE) printf("[rentang: %.0f]\n", range_length(v));
-    else if(isfinite(v.n) && v.n==(long long)v.n) printf("%lld\n",(long long)v.n);
+    else if(isfinite(v.n) && v.n >= -9223372036854775808.0 && v.n < 9223372036854775808.0 && v.n==trunc(v.n)) printf("%lld\n",(long long)v.n);
     else printf("%.10g\n",v.n);
 }
 
