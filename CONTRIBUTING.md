@@ -9,6 +9,7 @@ Terima kasih sudah membantu mengembangkan Pusingcuk. Prioritas proyek adalah bah
 3. Jangan commit hasil build, cache, file backup, token, kata sandi, atau data pengguna.
 4. Perubahan perilaku bahasa harus memperbarui spesifikasi, tes, dan dokumentasi yang relevan.
 5. Jangan mengklaim dukungan native berdasarkan hasil interpreter Python saja.
+6. Klaim kompatibilitas lintas runtime atau platform harus merujuk pada [kontrak kompatibilitas](docs/COMPATIBILITY.md) dan didukung tes yang relevan.
 6. Jangan merge PR tanpa tinjauan pemilik proyek.
 
 ## Nama branch
@@ -57,6 +58,7 @@ Jika perubahan menyentuh kedua runtime, jalankan keduanya. CI wajib lulus pada c
 - [ ] Ada tes untuk jalur sukses dan kasus error yang relevan.
 - [ ] Dokumentasi dan `SPEC.md` selaras dengan perilaku implementasi.
 - [ ] Runtime native dan modular tidak diklaim setara tanpa fixture konformansi.
+- [ ] Klaim platform/kompatibilitas sesuai matriks yang benar-benar diuji di [kontrak kompatibilitas](docs/COMPATIBILITY.md).
 - [ ] Tidak ada token, data pribadi, cache, binary, atau backup yang ikut masuk.
 - [ ] Pesan error cukup jelas dan tidak membocorkan rahasia.
 - [ ] Perintah tes, hasilnya, dan batas yang belum diuji ditulis jujur di deskripsi PR.
