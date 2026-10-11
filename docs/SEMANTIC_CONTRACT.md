@@ -30,6 +30,8 @@ Status: baseline engineering untuk perilaku yang harus dipatuhi front-end, inter
 ## Koleksi
 
 - Indeks list dimulai dari nol.
+- Kesetaraan list membandingkan panjang dan elemen secara rekursif; list dengan isi sama dibandingkan setara, termasuk list bersarang. Runtime native membatasi kedalaman perbandingan rekursif untuk melindungi stack.
+- Kesetaraan kamus masih berbasis identitas objek; perubahan ke kesetaraan struktural memerlukan keputusan kontrak terpisah.
 - Mutasi indeks mempertahankan identitas koleksi yang dirujuk variabel.
 - Kunci dictionary teks, angka, dan boolean memiliki identitas tipe; boolean tidak boleh bertabrakan dengan angka yang nilainya sama.
 - Urutan iterasi dictionary harus dinyatakan eksplisit sebelum dijadikan jaminan portabel.

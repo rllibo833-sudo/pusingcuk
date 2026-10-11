@@ -27,6 +27,8 @@ static size_t allocated_dict_count;
 typedef struct { char name[128]; Val v; } Var;
 static Var vars[NV];
 static int nvars, err, line_no;
+/* Parse skipped logical operands without performing runtime effects. */
+static int suppress_eval;
 static const char *p;
 #define MAX_FUNCTIONS 128
 #define MAX_PARAMS 32
@@ -38,6 +40,11 @@ static int run_range(int first, int last);
 static Val call_user_function(const char *name, Val *args, int argc);
 
 static void fail(const char *msg) {
+    if (suppress_eval) return;
+    if (!err) fprintf(stderr, "Kesalahan baris %d: %s\n", line_no, msg);
+    err = 1;
+}
+static void syntax_fail(const char *msg) {
     if (!err) fprintf(stderr, "Kesalahan baris %d: %s\n", line_no, msg);
     err = 1;
 }
@@ -126,15 +133,27 @@ static int truth(Val v) {
     if (v.t==RANGE) return range_length(v) != 0;
     return v.s[0]!=0;
 }
-static int equal(Val a, Val b) {
+static int equal_depth(Val a, Val b, unsigned depth) {
     if (a.t!=b.t) return 0;
     if (a.t==NIL) return 1;
     if (a.t==NUM) return a.n==b.n;
     if (a.t==BOOL) return a.b==b.b;
     if (a.t==RANGE) return a.range_start==b.range_start && a.range_end==b.range_end && a.range_step==b.range_step;
-    if (a.t==LIST) return a.list==b.list;
+    if (a.t==LIST) {
+        if (a.list==b.list) return 1;
+        if (!a.list || !b.list || a.list->len!=b.list->len) return 0;
+        /* Bound recursive comparison so cyclic or deeply nested lists cannot exhaust the C stack. */
+        if (depth>=64) return 0;
+        for (size_t i=0; i<a.list->len; i++)
+            if (!equal_depth(a.list->items[i],b.list->items[i],depth+1)) return 0;
+        return 1;
+    }
+    /* Dictionary equality remains identity-based until its language contract is specified. */
     if (a.t==DICT) return a.dict==b.dict;
     return !strcmp(a.s,b.s);
+}
+static int equal(Val a, Val b) {
+    return equal_depth(a,b,0);
 }
 static int valid_dict_key(Val key) {
     if (key.t==STR || key.t==NUM || key.t==BOOL) return 1;
@@ -221,11 +240,11 @@ static Val primary(void) {
         if (!take("}")) {
             for (;;) {
                 Val key = expr();
-                if (!take(":")) { fail("tanda ':' diharapkan setelah kunci kamus"); return dictval(d); }
+                if (!take(":")) { syntax_fail("tanda ':' diharapkan setelah kunci kamus"); return dictval(d); }
                 Val value = expr();
                 if (err || !dict_set(d,key,value)) return dictval(d);
                 if (take("}")) break;
-                if (!take(",")) { fail("koma atau '}' diharapkan dalam kamus"); return dictval(d); }
+                if (!take(",")) { syntax_fail("koma atau '}' diharapkan dalam kamus"); return dictval(d); }
                 if (take("}")) break;
             }
         }
@@ -240,7 +259,7 @@ static Val primary(void) {
                 if (err || !append_list(l, item)) return listval(l);
                 if (take("]")) break;
                 if (!take(",")) {
-                    fail("koma atau ']' diharapkan"); return listval(l);
+                    syntax_fail("koma atau ']' diharapkan"); return listval(l);
                 }
             }
         }
@@ -250,7 +269,7 @@ static Val primary(void) {
     ws();
     if (take("(")) {
         Val v=expr();
-        if (!take(")")) fail("kurung tutup ')' diharapkan");
+        if (!take(")")) syntax_fail("kurung tutup ')' diharapkan");
         return v;
     }
     if (*p=='"') {
@@ -258,20 +277,20 @@ static Val primary(void) {
         while (*p && *p!='"' && *p!='\n' && *p!='\r') {
             char c=*p++;
             if (c=='\\') {
-                if (!*p) { fail("escape string tidak lengkap"); break; }
+                if (!*p) { syntax_fail("escape string tidak lengkap"); break; }
                 c=*p++;
                 if (c=='n') c='\n'; else if (c=='t') c='\t';
-                else if (c!='"' && c!='\\') { fail("escape string tidak dikenal"); }
+                else if (c!='"' && c!='\\') { syntax_fail("escape string tidak dikenal"); }
             }
             if (n+1<SZ) buf[n++]=c; else fail("string terlalu panjang");
         }
-        if (*p!='"') fail("string belum ditutup"); else p++;
+        if (*p!='"') syntax_fail("string belum ditutup"); else p++;
         buf[n]=0; return string(buf);
     }
     if (isdigit((unsigned char)*p) || *p=='.') {
         char *e; double x=strtod(p,&e);
-        if (e==p) { fail("angka tidak valid"); return num(0); }
-        p=e; if (!isfinite(x)) { fail("angka desimal tidak valid atau terlalu besar"); return num(0); } return num(x);
+        if (e==p) { syntax_fail("angka tidak valid"); return num(0); }
+        p=e; if (!isfinite(x)) { syntax_fail("angka desimal tidak valid atau terlalu besar"); return num(0); } return num(x);
     }
     if (isalpha((unsigned char)*p) || *p=='_') {
         char name[128]; size_t n=0;
@@ -287,18 +306,19 @@ static Val primary(void) {
             if (!take(")")) {
                 for (;;) {
                     if (argc >= MAX_PARAMS) {
-                        fail("fungsi native menerima maksimal 32 argumen");
+                        syntax_fail("fungsi native menerima maksimal 32 argumen");
                         return num(0);
                     }
                     args[argc++] = expr();
                     if (err) return num(0);
                     if (take(")")) break;
                     if (!take(",")) {
-                        fail("koma atau ')' diharapkan dalam argumen fungsi");
+                        syntax_fail("koma atau ')' diharapkan dalam argumen fungsi");
                         return num(0);
                     }
                 }
             }
+            if (suppress_eval) return num(0);
             if (!strcmp(name,"panjang")) {
                 if (argc != 1) { fail("panjang() membutuhkan satu argumen"); return num(0); }
                 if (args[0].t == LIST && args[0].list)
@@ -332,6 +352,13 @@ static Val primary(void) {
             }
             return call_user_function(name, args, argc);
         }
+        if (suppress_eval) {
+            if (take("[")) {
+                (void)expr();
+                if (!take("]")) syntax_fail("kurung siku tutup ']' diharapkan");
+            }
+            return num(0);
+        }
         Val value = num(0);
         int found = 0;
         for (int i=0;i<nvars;i++)
@@ -341,7 +368,7 @@ static Val primary(void) {
         if (!found) { fail("variabel belum dibuat"); return num(0); }
         if (take("[")) {
             Val idx=expr();
-            if (!take("]")) fail("kurung siku tutup ']' diharapkan");
+            if (!take("]")) syntax_fail("kurung siku tutup ']' diharapkan");
             if (value.t == STR) {
                 size_t start=0, end=0;
                 if (!string_index(value,idx,&start,&end)) return string("");
@@ -356,7 +383,7 @@ static Val primary(void) {
         }
         return value;
     }
-    fail("ekspresi tidak valid"); return num(0);
+    syntax_fail("ekspresi tidak valid"); return num(0);
 }
 static Val unary(void) {
     if (word("bukan")) return boolean(!truth(unary()));
@@ -444,12 +471,24 @@ static Val compare(void) {
 }
 static Val and_expr(void) {
     Val a=compare();
-    while (word("dan")) { Val b=compare(); a=boolean(truth(a)&&truth(b)); }
+    while (word("dan")) {
+        int previous = suppress_eval;
+        suppress_eval = previous || !truth(a);
+        Val b=compare();
+        suppress_eval = previous;
+        a=boolean(truth(a)&&truth(b));
+    }
     return a;
 }
 static Val expr(void) {
     Val a=and_expr();
-    while (word("atau")) { Val b=and_expr(); a=boolean(truth(a)||truth(b)); }
+    while (word("atau")) {
+        int previous = suppress_eval;
+        suppress_eval = previous || truth(a);
+        Val b=and_expr();
+        suppress_eval = previous;
+        a=boolean(truth(a)||truth(b));
+    }
     return a;
 }
 static int identifier(char *out, size_t cap) {
