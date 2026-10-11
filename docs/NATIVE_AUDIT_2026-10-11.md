@@ -69,3 +69,12 @@ The target is **easy to start, serious enough to grow**:
 ## Exit criteria for replacing CORE components
 
 Do not replace or delete CORE because the native executable builds. Require a capability matrix, required cross-runtime fixtures, an integration contract, security review for used capabilities, reproducible builds, tests in CORE, backup/rollback proof, and explicit Founder approval.
+
+
+## Additional confirmed parity risk — collection equality
+
+The native C equality helper compares LIST and DICT values by pointer identity, while the reference evaluator delegates to language/container equality. Structurally equal collections may therefore produce different results across runtimes.
+
+Tracking issue: https://github.com/rllibo833-sudo/pusingcuk/issues/46
+
+Acceptance gate: run a reproducer against the reference CLI, decide/document nested collection semantics, add shared success/failure fixtures, and require native/reference parity in CI.
