@@ -1,0 +1,25 @@
+gas
+bestie angka = 5
+bestie hasil = 1
+
+fungsi faktorial(n)
+    njir n <= 1
+        balek 1
+    selesai njir
+    balek n * faktorial(n - 1)
+selesai fungsi
+
+mumet angka > 1
+    hasil = hasil * angka
+    angka = angka - 1
+selesai mumet
+
+spill hasil
+spill faktorial(5)
+
+njir valid dan hasil == 120
+    spill "slay: hasil cocok"
+skip
+    spill "zonk: hasil beda"
+kelar njir
+kelar gas
