@@ -2,6 +2,10 @@
 
 Pusingcuk adalah bahasa pemrograman eksperimental dengan kosakata ramah bahasa Indonesia dan slang lokal. Tujuannya adalah mudah dipelajari, tetap dapat dikembangkan secara serius, dan perlahan bisa dijalankan native tanpa Python saat runtime.
 
+## Keamanan
+
+Lihat [kebijakan keamanan](SECURITY.md) untuk batas keamanan runtime dan cara melaporkan kerentanan secara privat. Pusingcuk masih eksperimental; runtime native bukan sandbox untuk kode tak tepercaya.
+
 ## Status proyek
 
 Versi: 0.4-dev.

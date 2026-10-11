@@ -55,9 +55,23 @@ public final class MainActivity extends Activity {
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+        cleanupStaleRunFiles();
         getWindow().setStatusBarColor(Color.rgb(10,15,28)); getWindow().setNavigationBarColor(Color.rgb(10,15,28));
         File dir = new File(getFilesDir(), "projects"); if (!dir.exists()) dir.mkdirs();
         projectFile = new File(dir, "program.pusingcuk"); buildUi(); installRuntime(); loadProject();
+    }
+
+    // Cache files are app-private, but a force-stop can leave source files behind.
+    // Remove only old files created by this runner; never clear the whole cache.
+    private void cleanupStaleRunFiles() {
+        File work = new File(getCacheDir(), "run");
+        File[] files = work.listFiles((dir, name) ->
+                name.startsWith("program-") && name.endsWith(".pusingcuk"));
+        if (files == null) return;
+        long cutoff = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(24);
+        for (File file : files) {
+            if (file.isFile() && file.lastModified() < cutoff) file.delete();
+        }
     }
 
     private void buildUi() {

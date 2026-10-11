@@ -29,3 +29,13 @@ belajar_tanya.pusingcuk
 /native_test
 /native/pusingcuk
 /native/pusingcuk.c.bak-*
+
+# Android / Gradle local and generated files
+.gradle/
+**/build/
+local.properties
+*.apk
+*.aab
+*.jks
+*.keystore
+/android-studio/app/src/main/assets/bin/
