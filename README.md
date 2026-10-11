@@ -18,6 +18,10 @@ Implementasi historis yang tidak menjadi entry point utama disimpan di `archive/
 
 Ikuti [Panduan Pusingcuk dari Nol](docs/PEMULA.md), yang memakai langkah pendek, contoh langsung, dan tantangan kecil. Gaya penulisan dijelaskan di [Panduan Gaya Bahasa Gen Z dan Gen Alpha](docs/GAYA_BAHASA.md). Panduan pemula mengutamakan jalur Termux native tanpa Python untuk menjalankan program. Pengguna yang mengembangkan aplikasi dapat memeriksa [kontrak kompatibilitas](docs/COMPATIBILITY.md) untuk mengetahui fitur yang portabel, status runtime, dan platform yang belum terverifikasi.
 
+## Pusingcuk Studio — aplikasi Android dan workbench web
+
+Aplikasi Android mandiri awal untuk editor, runtime native C, proyek lokal, impor satu file dari repositori GitHub publik, dan berbagi kode didokumentasikan di [Pusingcuk Studio Android](docs/ANDROID_STUDIO.md). APK debug dibangun oleh GitHub Actions. Versi ini belum dapat menulis commit langsung ke GitHub; autentikasi aman masih menjadi pekerjaan lanjutan.
+
 ## Pusingcuk Studio — editor dan terminal HTML lokal
 
 Untuk mengembangkan program lewat browser di Android/Termux atau Linux, lihat [panduan Pusingcuk Studio](docs/WEB_WORKBENCH.md). Studio menyediakan editor HTML, tombol Jalankan, input standar, dan terminal keluaran yang menjalankan runtime native C melalui bridge lokal. Python hanya dipakai untuk bridge web; runtime bahasa yang dieksekusi tetap native C. Ini MVP lokal, bukan sandbox atau IDE penuh.
