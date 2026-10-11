@@ -77,9 +77,10 @@ const pcMod = (a, b) => {
 const pcGet = (collection, key) => {
   if (Array.isArray(collection) || typeof collection === "string") {
     if (!Number.isInteger(key)) throw new Error("indeks harus integer");
-    const i = key < 0 ? collection.length + key : key;
-    if (i < 0 || i >= collection.length) throw new Error("indeks di luar batas");
-    return collection[i];
+    const sequence = typeof collection === "string" ? Array.from(collection) : collection;
+    const i = key < 0 ? sequence.length + key : key;
+    if (i < 0 || i >= sequence.length) throw new Error("indeks di luar batas");
+    return sequence[i];
   }
   if (collection instanceof Map) {
     if (!collection.has(key)) throw new Error("kunci kamus tidak ditemukan");
@@ -98,7 +99,8 @@ const pcSet = (collection, key, value) => {
   throw new Error("nilai tidak dapat diubah melalui indeks");
 };
 const pcLength = (v) => {
-  if (typeof v === "string" || Array.isArray(v)) return v.length;
+  if (typeof v === "string") return Array.from(v).length;
+  if (Array.isArray(v)) return v.length;
   if (v instanceof Map) return v.size;
   throw new Error("panjang() membutuhkan teks, daftar, atau kamus");
 };
@@ -141,6 +143,8 @@ def _js_literal(value, line):
         return "null"
     if isinstance(value, bool):
         return "true" if value else "false"
+    if isinstance(value, int) and not isinstance(value, bool) and abs(value) > 9007199254740991:
+        raise JSBackendError(f"baris {line}: integer di luar rentang aman JavaScript")
     if isinstance(value, (int, float)):
         if isinstance(value, float) and not (value == value and abs(value) != float("inf")):
             raise JSBackendError(f"baris {line}: literal angka non-finite tidak didukung")
