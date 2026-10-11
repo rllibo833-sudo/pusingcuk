@@ -20,11 +20,11 @@ C_RUNTIME = r'''#include <inttypes.h>
 #include <limits.h>
 
 static void pc_overflow(void) {
-    fputs("Pusingcuk C backend: integer overflow\\n", stderr);
+    fputs("Pusingcuk C backend: integer overflow\n", stderr);
     exit(EXIT_FAILURE);
 }
 static void pc_division_by_zero(void) {
-    fputs("Pusingcuk C backend: division by zero\\n", stderr);
+    fputs("Pusingcuk C backend: division by zero\n", stderr);
     exit(EXIT_FAILURE);
 }
 int64_t pc_add(int64_t a, int64_t b) {
@@ -146,7 +146,7 @@ def generate(document: dict) -> str:
             lines.append(f"    {names[name]} = {value};")
         elif kind == "Print":
             value = expression(fields.get("value"))
-            lines.append(f'    if (printf("%" PRId64 "\\n", (int64_t)({value})) < 0) return EXIT_FAILURE;')
+            lines.append(f'    if (printf("%" PRId64 "\n", (int64_t)({value})) < 0) return EXIT_FAILURE;')
         else:
             raise CBackendError(f"baris {line}: pernyataan {kind!r} belum didukung backend C")
 
