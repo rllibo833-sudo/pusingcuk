@@ -181,3 +181,7 @@ Harness ini memvalidasi metadata fixture dan path sumber, memberi timeout untuk 
 ## Kontribusi
 
 Baca [CONTRIBUTING.md](CONTRIBUTING.md) sebelum membuka PR. Gunakan branch terfokus, sertakan tes dan dokumentasi, jangan commit cache/binary/rahasia, dan tunggu review sebelum merge.
+
+## Situs komunitas
+
+Kunjungi [situs perkenalan PusingCuk](https://rllibo833-sudo.github.io/pusingcuk/) atau lihat [sumber situs](site/README.md). Status fitur dan contoh compiler dijelaskan secara eksplisit di sana.
