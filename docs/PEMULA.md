@@ -1,10 +1,12 @@
 # Pusingcuk dari Nol
 
-Panduan ini mengutamakan runtime native agar kamu dapat mulai memakai Pusingcuk di Termux tanpa Python sebagai dependensi saat menjalankan program. Pusingcuk masih dalam pengembangan; runtime native hanya mendukung subset yang tercantum di [matriks kemampuan](NATIVE_RUNTIME.md).
+Yuk mulai dari program kecil, lalu naik pelan-pelan ke fungsi dan proyek mini. Panduan ini mengutamakan executable native supaya kamu bisa menjalankan program tanpa Python setelah Pusingcuk dibangun. Runtime native masih berkembang dan hanya mendukung fitur yang tercantum di [matriks kemampuan](NATIVE_RUNTIME.md).
 
-## 1. Siapkan Termux
+Gaya dokumentasi mengikuti [Panduan Gaya Bahasa](GAYA_BAHASA.md): santai, jelas, dan tidak mengorbankan ketepatan teknis.
 
-Gunakan Termux dari sumber yang terpelihara, lalu jalankan di shell Termux:
+## 1. Siapkan alat di Android / Termux
+
+Gunakan Termux dari sumber yang terpelihara. Jalankan perintah berikut di shell Termux:
 
 ```sh
 pkg update
@@ -24,31 +26,31 @@ Bangun dan pasang executable native:
 bash scripts/install-termux.sh
 ```
 
-Skrip memasang executable ke `$PREFIX/bin/pusingcuk-native`. Compiler diperlukan saat membangun ulang, tetapi tidak diperlukan untuk setiap kali menjalankan program.
+Selesai build, executable dipasang sebagai `pusingcuk-native`. Compiler dibutuhkan saat membangun ulang, bukan setiap kali menjalankan program.
 
-## 2. Jalankan program contoh pertama
+## 2. Jalankan contoh pertama
 
 ```sh
 pusingcuk-native examples/native/rekap_anggaran.pusingcuk
 ```
 
-Contoh menghitung anggaran menggunakan kamus, perulangan, kondisi, dan fungsi buatan pengguna. Nilai keluaran yang diharapkan antara lain total pengeluaran `1200000`, sisa anggaran `1300000`, dan status anggaran aman.
+Program contoh menghitung anggaran menggunakan kamus, perulangan, kondisi, dan fungsi. Beberapa hasil yang diharapkan adalah total pengeluaran `1200000`, sisa anggaran `1300000`, dan status anggaran aman.
 
-Untuk memastikan build dan fixture native lulus:
+Kalau ingin memastikan build dan fixture native lulus, jalankan:
 
 ```sh
 make test-native
 ```
 
-## 3. Buat program sendiri
+## 3. Buat program halo
 
-Buat berkas baru dengan editor teks:
+Buat file baru:
 
 ```sh
 nano halo.pusingcuk
 ```
 
-Masukkan kode berikut:
+Isi dengan kode ini:
 
 ```pusingcuk
 jancuk
@@ -57,32 +59,49 @@ hedeh "Halo, " + nama
 selesai jancuk
 ```
 
-Simpan berkas di nano dengan **Ctrl+O**, tekan **Enter**, lalu keluar dengan **Ctrl+X**. Jalankan:
+Simpan di nano dengan **Ctrl+O**, tekan **Enter**, lalu keluar dengan **Ctrl+X**. Jalankan:
 
 ```sh
 pusingcuk-native halo.pusingcuk
 ```
 
-Keluaran yang diharapkan:
+Hasilnya:
 
 ```text
 Halo, Pusingcuk
 ```
 
-Contoh fungsi:
+**Bedah singkat:**
+- `jancuk` menandai awal program.
+- `lah nama = ...` membuat variabel bernama `nama`.
+- `hedeh` menampilkan nilai.
+- `selesai jancuk` menandai akhir program.
+
+## 4. Buat fungsi pertamamu
+
+Fungsi adalah blok kode yang bisa dipanggil kembali. Contoh berikut menjumlahkan dua angka:
 
 ```pusingcuk
 jancuk
 fungsi tambah(a, b)
     balek a + b
 selesai fungsi
+
 hedeh tambah(20, 22)
 selesai jancuk
 ```
 
-Simpan sebagai `fungsi.pusingcuk`, lalu jalankan `pusingcuk-native fungsi.pusingcuk`. Keluaran yang diharapkan adalah `42`.
+Simpan sebagai `fungsi.pusingcuk`, lalu jalankan:
 
-## 4. Belajar input, kondisi, dan perulangan
+```sh
+pusingcuk-native fungsi.pusingcuk
+```
+
+Hasil yang diharapkan adalah `42`.
+
+**Mini-challenge:** ganti `20` dan `22` dengan dua angka lain. Sebelum menjalankan program, coba tebak hasilnya.
+
+## 5. Minta input dan pilih respons
 
 ```pusingcuk
 jancuk
@@ -95,19 +114,37 @@ selesai njir
 selesai jancuk
 ```
 
-Simpan dan jalankan seperti contoh sebelumnya. Runtime native membaca satu baris dari input standar. Cobalah mengubah kondisi dan amati perbedaannya.
+Program membaca satu baris teks. Jika input kosong, program menampilkan pesan bahwa nama belum diisi. Jika tidak kosong, program menyapa nama tersebut.
 
-## 5. Jika terjadi kesalahan
+**Mini-challenge:** ubah kalimat sapaan. Jalankan lagi dan lihat apakah output berubah sesuai editmu.
 
-- Baca seluruh pesan `Kesalahan baris ...`; nomor baris membantu menemukan kode bermasalah.
-- Pastikan berkas benar-benar disimpan dan nama/path berkas tepat.
-- Periksa apakah fitur yang digunakan tercantum sebagai teruji di `docs/NATIVE_RUNTIME.md`.
-- Jangan menganggap runtime native sebagai sandbox; jangan jalankan kode tak tepercaya.
-- Saat meminta bantuan, kirim pesan error dan contoh kode minimal yang memunculkannya. Hapus rahasia/token dari log sebelum membagikannya.
+## 6. Coba perulangan
 
-## 6. Perbarui Pusingcuk
+```pusingcuk
+jancuk
+lah i = 1
+mumet i <= 3
+    hedeh i
+    i = i + 1
+selesai mumet
+selesai jancuk
+```
 
-Dari shell Termux (bukan di dalam program Pusingcuk):
+Program menampilkan angka 1, 2, dan 3. Variabel `i` bertambah satu pada setiap putaran. Kondisi `i <= 3` membuat perulangan berhenti setelah angka 3.
+
+## 7. Kalau program gagal jalan
+
+- Baca pesan `Kesalahan baris ...`; nomor baris membantu menemukan masalah.
+- Pastikan file sudah disimpan dan path-nya benar.
+- Periksa apakah fitur yang digunakan termasuk fitur native teruji di [matriks runtime](NATIVE_RUNTIME.md).
+- Jika diminta memasukkan teks, ketik input di terminal lalu tekan Enter.
+- Saat meminta bantuan, kirim pesan error dan contoh kode terkecil yang masih memunculkan masalah. Hapus token, kata sandi, dan data pribadi dari log.
+
+Runtime native bukan sandbox. Jangan menjalankan program yang tidak dipercaya dengan hak akses penting.
+
+## 8. Perbarui Pusingcuk
+
+Di shell Termux, dari direktori repositori:
 
 ```sh
 cd ~/pusingcuk
@@ -115,13 +152,14 @@ git pull --ff-only
 bash scripts/install-termux.sh
 ```
 
-Jika kamu sudah mengubah kode sumber sendiri, commit atau simpan perubahanmu sebelum menarik pembaruan. Opsi `--ff-only` mencegah Git membuat merge commit otomatis ketika riwayat lokal dan remote berbeda.
+Jika kamu mengubah kode sumber sendiri, simpan atau commit perubahanmu sebelum menarik pembaruan. Opsi `--ff-only` mencegah Git membuat merge commit otomatis saat riwayat lokal dan remote berbeda.
 
-## 7. Apakah Python diperlukan?
+## 9. Apakah Python diperlukan?
 
 - **Menjalankan executable native:** tidak membutuhkan Python.
 - **Membangun executable:** membutuhkan `clang` dan `make`.
 - **Menjalankan interpreter modular dan unit test Python:** membutuhkan Python.
-- **Sistem modul, paket standar lengkap, serta dukungan backend/frontend penuh:** belum tersedia hanya dengan runtime native saat ini.
+- **Menjalankan Pusingcuk Studio saat ini:** bridge web lokal membutuhkan Python; program yang dieksekusi tetap melalui runtime native C.
+- **Sistem modul, pustaka standar lengkap, dan tooling tingkat lanjut:** belum tersedia sepenuhnya di runtime native.
 
-Pusingcuk dirancang agar bisa dipelajari pemula dan dikembangkan secara profesional, tetapi jangan menganggap kemampuan Python/JavaScript sudah tersedia sebelum ada implementasi dan tes konformansi.
+Langkah berikutnya setelah nyaman dengan contoh dasar adalah mempelajari [kosakata slang](KOSAKATA_GENZ.md), [kemampuan runtime native](NATIVE_RUNTIME.md), dan [kontrak kompatibilitas](COMPATIBILITY.md). Jangan menganggap fitur dari Python atau JavaScript otomatis tersedia di Pusingcuk.
