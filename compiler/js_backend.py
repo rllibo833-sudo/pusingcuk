@@ -118,6 +118,20 @@ const pcRange = (...args) => {
   }
   return result;
 };
+const pcNumeric = (name, value) => {
+  if (typeof value !== "number" || !Number.isFinite(value))
+    throw new Error(name + "() membutuhkan angka finite");
+  return value;
+};
+const pcAbs = (value) => Math.abs(pcNumeric("mutlak", value));
+const pcMin = (a, b) => Math.min(pcNumeric("minimum", a), pcNumeric("minimum", b));
+const pcMax = (a, b) => Math.max(pcNumeric("maksimum", a), pcNumeric("maksimum", b));
+const pcRound = (value) => {
+  const n = pcNumeric("bulatkan", value), lower = Math.floor(n), fraction = n - lower;
+  if (fraction < 0.5) return lower;
+  if (fraction > 0.5) return lower + 1;
+  return lower % 2 === 0 ? lower : lower + 1;
+};
 const pcInputLines = (typeof process !== "undefined" && typeof require === "function")
   ? require("fs").readFileSync(0, "utf8").split(/\r?\n/)
   : [];
