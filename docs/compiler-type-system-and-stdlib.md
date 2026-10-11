@@ -17,9 +17,14 @@ elements use `any`.
 
 ## Standard library registry
 
-The first registry provides metadata and callable implementations for
+The registry provides metadata and callable implementations for
 `panjang`, `teks`, `bilangan`, `desimal`, `logika`, `mutlak`,
-`minimum`, `maksimum`, and `bulatkan`. It intentionally excludes file,
+`minimum`, `maksimum`, and `bulatkan`. The compiler JavaScript and Python
+backends and the bytecode VM now execute the numeric subset `mutlak`,
+`minimum`, `maksimum`, and `bulatkan`. These functions validate numeric inputs,
+reject booleans, and use ties-to-even rounding for `bulatkan` across targets.
+The conversion functions remain registry-only until their conversion semantics
+are aligned across every runtime. The registry intentionally excludes file,
 network, shell, and process access. Numeric casts reject booleans explicitly.
 
 ## Required next integration steps
@@ -44,3 +49,30 @@ network, shell, and process access. Numeric casts reject booleans explicitly.
 - `native/`: C runtime/backend implementation.
 - `android-studio/`: Android app and build integration.
 - `archive/`: historical experiments, never imported by production code.
+
+
+## Cross-target numeric builtins
+
+The following program is supported by the JS, Python, and VM targets:
+
+```pusingcuk
+jancuk
+hedeh mutlak(-8)
+hedeh minimum(4, 9)
+hedeh maksimum(4, 9)
+hedeh bulatkan(2.5)
+hedeh bulatkan(3.5)
+selesai jancuk
+```
+
+Expected output:
+
+```text
+8
+4
+9
+2
+4
+```
+
+These names are reserved for builtins; user-defined functions cannot shadow them.

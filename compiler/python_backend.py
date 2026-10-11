@@ -19,7 +19,7 @@ def generate(document):
     for s in root["fields"]["body"]:
         if s["kind"] == "Function":
             f = s["fields"]
-            if f["name"] in functions or f["name"] in ("panjang", "rentang"):
+            if f["name"] in functions or f["name"] in ("panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan"):
                 raise PythonBackendError(f"nama fungsi bentrok: {f['name']}")
             functions[f["name"]] = s
 
@@ -39,6 +39,11 @@ def generate(document):
             values = ", ".join(expr(x, env) for x in args)
             if name == "panjang" and len(args) == 1: return f"len({values})"
             if name == "rentang" and 1 <= len(args) <= 3: return f"pc_range({values})"
+            numeric_builtins = {"mutlak": (1, "pc_abs"), "minimum": (2, "pc_min"), "maksimum": (2, "pc_max"), "bulatkan": (1, "pc_round")}
+            if name in numeric_builtins:
+                arity, helper = numeric_builtins[name]
+                if len(args) != arity: raise PythonBackendError(f"baris {line}: {name} membutuhkan {arity} argumen")
+                return f"{helper}({values})"
             if name not in functions: raise PythonBackendError(f"baris {line}: fungsi tidak dikenal: {name}")
             if len(args) != len(functions[name]["fields"]["params"]): raise PythonBackendError(f"baris {line}: jumlah argumen salah untuk {name}")
             return f"pc_fn_{name}({values})"
@@ -133,6 +138,20 @@ class PcDict:
         else: self.entries[i] = (self.entries[i][0], value)
     def __iter__(self): return (key for key, _ in self.entries)
     def __len__(self): return len(self.entries)
+def pc_numeric(name, value):
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+        raise TypeError(name + " membutuhkan angka finite")
+    return value
+def pc_abs(value): return abs(pc_numeric("mutlak", value))
+def pc_min(a, b): return min(pc_numeric("minimum", a), pc_numeric("minimum", b))
+def pc_max(a, b): return max(pc_numeric("maksimum", a), pc_numeric("maksimum", b))
+def pc_round(value):
+    value = pc_numeric("bulatkan", value)
+    lower = math.floor(value)
+    fraction = value - lower
+    if fraction < 0.5: return lower
+    if fraction > 0.5: return lower + 1
+    return lower if lower % 2 == 0 else lower + 1
 def pc_range(*args):
     if not 1 <= len(args) <= 3 or any(not isinstance(x, int) or isinstance(x, bool) for x in args): raise TypeError("rentang membutuhkan 1-3 integer")
     if len(args) == 3 and args[2] == 0: raise ValueError("langkah rentang tidak boleh nol")

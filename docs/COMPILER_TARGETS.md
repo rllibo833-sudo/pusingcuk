@@ -41,3 +41,13 @@ Backend menolak konstruksi yang belum dikenali alih-alih diam-diam menerjemahkan
 `PusingCuk → parser/IR → backend`
 
 IR dirancang sebagai titik integrasi untuk backend baru, language server, formatter, editor, alat AI, dan pipeline build. Target berikutnya adalah memperluas interoperabilitas modul dan package, browser APIs, WebAssembly, server/API, database adapters, serta blockchain SDK. Semua itu memerlukan backend atau pustaka integrasi khusus; tidak otomatis tersedia hanya karena target JS/Python/HTML ada.
+
+
+## Builtin lintas target
+
+Target JavaScript, Python, dan VM mendukung builtin numerik `mutlak(angka)`,
+`minimum(a, b)`, `maksimum(a, b)`, dan `bulatkan(angka)`. Input harus berupa
+angka finite; boolean ditolak. Pembulatan `.5` menggunakan aturan ties-to-even
+agar hasil konsisten antartarget. Builtin konversi lain yang tercatat di
+[model tipe dan pustaka standar](compiler-type-system-and-stdlib.md) belum
+diaktifkan di semua backend.

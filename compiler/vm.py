@@ -171,6 +171,19 @@ class VirtualMachine:
                     try: result = range(*args)
                     except ValueError: self.fail(line, "langkah rentang tidak boleh nol")
                     if len(result) > 10000: self.fail(line, "rentang melewati batas 10000 item")
+                elif name in ("mutlak", "minimum", "maksimum", "bulatkan"):
+                    arity = 1 if name in ("mutlak", "bulatkan") else 2
+                    if len(args) != arity: self.fail(line, f"{name} membutuhkan {arity} argumen")
+                    if any(isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) for value in args):
+                        self.fail(line, f"{name} membutuhkan angka finite")
+                    if name == "mutlak": result = abs(args[0])
+                    elif name == "minimum": result = min(args)
+                    elif name == "maksimum": result = max(args)
+                    else:
+                        value = args[0]
+                        lower = math.floor(value)
+                        fraction = value - lower
+                        result = lower if fraction < 0.5 else lower + 1 if fraction > 0.5 else (lower if lower % 2 == 0 else lower + 1)
                 else:
                     fn = self.functions.get(name)
                     if fn is None: self.fail(line, f"fungsi '{name}' tidak dikenal")

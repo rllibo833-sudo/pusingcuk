@@ -42,6 +42,18 @@ class PortableVMTests(unittest.TestCase):
             'untuk n dalam rentang(1, 4)\n    hedeh n\nselesai untuk\nselesai jancuk'
         ), "7\nangka\nboolean\n1\n2\n3\n")
 
+    def test_numeric_standard_library(self):
+        self.assertEqual(self.run_source(
+            "jancuk\\nhedeh mutlak(-8)\\nhedeh minimum(4, 9)\\n"
+            "hedeh maksimum(4, 9)\\nhedeh bulatkan(2.5)\\n"
+            "hedeh bulatkan(3.5)\\nselesai jancuk"
+        ), "8\\n4\\n9\\n2\\n4\\n")
+
+    def test_numeric_standard_library_rejects_boolean(self):
+        program = compile_source("jancuk\\nhedeh mutlak(benar)\\nselesai jancuk")
+        with self.assertRaisesRegex(VMError, "angka finite"):
+            VirtualMachine(program, output_stream=io.StringIO()).run()
+
     def test_input(self):
         self.assertEqual(self.run_source(
             'jancuk\ntanya nama = "Nama? "\nhedeh nama\nselesai jancuk',

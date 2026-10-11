@@ -138,7 +138,7 @@ class Compiler:
         for stmt in body:
             if stmt["kind"] != "Function": continue
             name = stmt["fields"]["name"]
-            if name in functions or name in ("panjang", "rentang"):
+            if name in functions or name in ("panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan"):
                 raise BytecodeError(f"fungsi duplikat atau nama bawaan: {name}")
             functions[name] = self.compile_function(stmt)
         self.statements([s for s in body if s["kind"] != "Function"])
