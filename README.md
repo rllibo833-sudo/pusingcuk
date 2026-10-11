@@ -144,6 +144,8 @@ Tes konformansi lintas runtime membandingkan output dan exit code dari interpret
 
 ```sh
 python tools/conformance.py
+# atau jalankan seluruh suite lokal
+make test-all
 ```
 
 Harness ini memvalidasi metadata fixture dan path sumber, memberi timeout untuk tiap program, serta melaporkan `PASS`, `FAIL`, dan `UNSUPPORTED` secara terpisah. Cakupan awal masih kecil dan akan ditambah seiring semantik bahasa distabilkan. Jika perubahan menyentuh kedua jalur, jalankan keduanya. Tes CI Ubuntu tidak menggantikan pengujian fisik Termux.
@@ -159,3 +161,6 @@ Harness ini memvalidasi metadata fixture dan path sumber, memberi timeout untuk 
 ## Kontribusi
 
 Baca [CONTRIBUTING.md](CONTRIBUTING.md) sebelum membuka PR. Gunakan branch terfokus, sertakan tes dan dokumentasi, jangan commit cache/binary/rahasia, dan tunggu review sebelum merge.
+
+
+Kontrak semantik yang diuji: [docs/SEMANTIC_CONTRACT.md](docs/SEMANTIC_CONTRACT.md).
