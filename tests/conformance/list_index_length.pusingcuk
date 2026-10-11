@@ -1,0 +1,7 @@
+jancuk
+lah angka = [10, 20, 30]
+hedeh panjang(angka)
+hedeh angka[1]
+angka[1] = 42
+hedeh angka[1]
+selesai jancuk
