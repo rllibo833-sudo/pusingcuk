@@ -11,18 +11,20 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 | Alias slang: `jir`, `adooh`, `gitu`, `inthiseco`, `janggal` | Teruji |
 | Variabel, angka, teks, boolean, operator dasar | Teruji |
 | List, baca/ubah indeks list | Teruji |
+| Batas list 256 item dan penolakan item ke-257 | Fixture native mengharapkan error |
 | Indeks teks berdasarkan code point UTF-8 | Teruji untuk teks UTF-8 valid |
 | Kondisi `njir` / `adooh` dan loop `mumet` | Teruji |
 | `untuk` pada list, teks, kamus (menghasilkan kunci), dan `rentang()` | Teruji |
 | Built-in `panjang()` dan `rentang()` | Teruji pada argumen yang didukung |
 | `tanya nama = "Prompt"` dari stdin | Teruji melalui pipe dan CLI |
 | Literal kamus, kunci teks/angka/boolean, baca/ubah/tambah kunci | Teruji |
+| Batas kamus 256 entri dan penolakan entri ke-257 | Fixture native mengharapkan error |
 | `panjang(kamus)`, truthiness kamus kosong/terisi, iterasi kunci | Teruji |
 | Error untuk kunci yang tidak didukung dan kunci yang tidak ditemukan | Teruji |
 | Fungsi buatan pengguna (`fungsi`, parameter, `balek`, rekursi) | Teruji oleh CI GCC/Clang di Ubuntu; perangkat Termux nyata belum diverifikasi |
 | Sistem modul | Belum tersedia di native |
 
-Fixture kamus sukses berada di `tests/native/dictionaries.pusingcuk`; kasus kunci tidak valid dan kunci hilang masing-masing ada di `tests/native/dictionary_invalid_key.pusingcuk` dan `tests/native/dictionary_missing_key.pusingcuk`. Fixture fungsi dan rekursi ada di `tests/native/functions.pusingcuk`; jumlah argumen yang salah diuji di `tests/native/function_wrong_arity.pusingcuk`. Semuanya dijalankan oleh `make test-native`.
+Fixture kapasitas koleksi ada di `tests/native/list_overflow.pusingcuk` dan `tests/native/dictionary_overflow.pusingcuk`; keduanya memastikan penambahan melewati 256 item/entri ditolak. Fixture kamus sukses berada di `tests/native/dictionaries.pusingcuk`; kasus kunci tidak valid dan kunci hilang masing-masing ada di `tests/native/dictionary_invalid_key.pusingcuk` dan `tests/native/dictionary_missing_key.pusingcuk`. Fixture fungsi dan rekursi ada di `tests/native/functions.pusingcuk`; jumlah argumen yang salah diuji di `tests/native/function_wrong_arity.pusingcuk`. Semuanya dijalankan oleh `make test-native`.
 
 ## Contoh aplikasi native
 
