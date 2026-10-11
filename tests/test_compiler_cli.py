@@ -31,7 +31,7 @@ class MultiTargetCompilerTests(unittest.TestCase):
         self.assertIn("</html>", result)
 
     def test_numeric_standard_library_is_lowered_in_js_and_python(self):
-        source = "jancuk\\nhedeh mutlak(-8)\\nhedeh minimum(4, 9)\\nhedeh maksimum(4, 9)\\nhedeh bulatkan(2.5)\\nselesai jancuk"
+        source = "jancuk\nhedeh mutlak(-8)\nhedeh minimum(4, 9)\nhedeh maksimum(4, 9)\nhedeh bulatkan(2.5)\nselesai jancuk"
         js = compile_source(source, "builtins.pusingcuk", "js")
         self.assertIn("pcAbs(-(", js)
         self.assertIn("pcMin(4, 9)", js)
