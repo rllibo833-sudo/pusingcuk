@@ -154,7 +154,8 @@ def generate(document: dict) -> str:
                 if f.get("value") is None: raise CBackendError(f"baris {line}: balek pada backend C subset membutuhkan nilai integer")
                 value,typ=expression(f["value"],names,types)
                 if typ!="int": raise CBackendError(f"baris {line}: balek pada backend C subset hanya mendukung integer")
-                out.extend([f"{indent}pc_call_leave();",f"{indent}return (int64_t)({value});"])
+                ret_id=next_id; next_id+=1
+                out.extend([f"{indent}int64_t pc_ret_{ret_id} = (int64_t)({value});",f"{indent}pc_call_leave();",f"{indent}return pc_ret_{ret_id};"])
             else: raise CBackendError(f"baris {line}: pernyataan {kind!r} belum didukung backend C")
         return out
     prototypes=[]; definitions=[]
