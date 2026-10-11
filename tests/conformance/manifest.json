@@ -185,6 +185,44 @@
         "reference": "required",
         "native": "required"
       }
+    },
+    {
+      "id": "operators.arithmetic-precedence",
+      "source": "arithmetic_precedence.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "arithmetic",
+        "operator-precedence",
+        "parentheses"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "14\n20\n8\n12\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "text.utf8-output",
+      "source": "unicode_output.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "strings",
+        "unicode",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "Pusingcuk: selamat pagi 🌾\nBahasa Indonesia\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
     }
   ]
 }
