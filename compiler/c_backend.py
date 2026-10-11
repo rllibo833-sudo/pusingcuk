@@ -20,7 +20,11 @@ C_RUNTIME = r'''#include <inttypes.h>
 #include <limits.h>
 
 static void pc_overflow(void) {
-    fputs("Pusingcuk C backend: integer overflow\n", stderr);
+    fputs("Pusingcuk C backend: integer overflow\\n", stderr);
+    exit(EXIT_FAILURE);
+}
+static void pc_division_by_zero(void) {
+    fputs("Pusingcuk C backend: division by zero\\n", stderr);
     exit(EXIT_FAILURE);
 }
 int64_t pc_add(int64_t a, int64_t b) {
@@ -42,6 +46,24 @@ int64_t pc_mul(int64_t a, int64_t b) {
             (b < 0 && a < INT64_MAX / b)) pc_overflow();
     }
     return a * b;
+}
+/* Match Python floor-division semantics rather than C's truncation toward zero. */
+int64_t pc_floor_div(int64_t a, int64_t b) {
+    if (b == 0) pc_division_by_zero();
+    if (a == INT64_MIN && b == -1) pc_overflow();
+    int64_t quotient = a / b;
+    int64_t remainder = a % b;
+    if (remainder != 0 && ((remainder < 0) != (b < 0))) quotient--;
+    return quotient;
+}
+/* Match Python modulo semantics; the result has the divisor's sign. */
+int64_t pc_mod(int64_t a, int64_t b) {
+    if (b == 0) pc_division_by_zero();
+    /* C makes INT64_MIN % -1 undefined, while the mathematical result is zero. */
+    if (a == INT64_MIN && b == -1) return 0;
+    int64_t remainder = a % b;
+    if (remainder != 0 && ((remainder < 0) != (b < 0))) remainder += b;
+    return remainder;
 }
 '''
 
@@ -86,7 +108,13 @@ def generate(document: dict) -> str:
             return f"pc_sub(INT64_C(0), {expression(fields.get('value'))})"
         if kind == "Binary":
             op = fields.get("op")
-            helper = {"+": "pc_add", "-": "pc_sub", "*": "pc_mul"}.get(op)
+            helper = {
+                "+": "pc_add",
+                "-": "pc_sub",
+                "*": "pc_mul",
+                "//": "pc_floor_div",
+                "%": "pc_mod",
+            }.get(op)
             if not helper:
                 raise CBackendError(f"baris {line}: operator {op!r} belum didukung backend C")
             left = expression(fields.get("left"))
