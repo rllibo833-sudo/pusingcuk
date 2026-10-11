@@ -19,7 +19,7 @@ class JSBackendError(ValueError):
 
 
 SUPPORTED = {
-    "Program", "Declare", "Assign", "Print", "If", "While", "For",
+    "Program", "Declare", "Assign", "Input", "Print", "If", "While", "For",
     "Function", "Return", "Literal", "Variable", "Unary", "Binary",
     "List", "Dict", "Index", "IndexAssign", "Call",
 }
@@ -78,7 +78,7 @@ const pcGet = (collection, key) => {
   if (Array.isArray(collection) || typeof collection === "string") {
     if (!Number.isInteger(key)) throw new Error("indeks harus integer");
     const sequence = typeof collection === "string" ? Array.from(collection) : collection;
-    const i = key < 0 ? sequence.length + key : key;
+    const i = key;
     if (i < 0 || i >= sequence.length) throw new Error("indeks di luar batas");
     return sequence[i];
   }
@@ -91,7 +91,7 @@ const pcGet = (collection, key) => {
 const pcSet = (collection, key, value) => {
   if (Array.isArray(collection)) {
     if (!Number.isInteger(key)) throw new Error("indeks harus integer");
-    const i = key < 0 ? collection.length + key : key;
+    const i = key;
     if (i < 0 || i >= collection.length) throw new Error("indeks di luar batas");
     collection[i] = value; return value;
   }
@@ -117,6 +117,18 @@ const pcRange = (...args) => {
     result.push(n);
   }
   return result;
+};
+const pcInputLines = (typeof process !== "undefined" && typeof require === "function")
+  ? require("fs").readFileSync(0, "utf8").split(/\r?\n/)
+  : [];
+let pcInputIndex = 0;
+const pcInput = (prompt) => {
+  if (typeof process !== "undefined" && typeof process.stdout !== "undefined") {
+    process.stdout.write(pcString(prompt));
+    if (pcInputIndex >= pcInputLines.length) return "";
+    return pcInputLines[pcInputIndex++];
+  }
+  return typeof window !== "undefined" ? (window.prompt(pcString(prompt)) ?? "") : "";
 };
 const pcIter = (v) => {
   if (Array.isArray(v)) return v;
@@ -254,6 +266,15 @@ def generate(document: dict) -> str:
                 value = expr(f.get("value"), names)
                 names[name] = js_name
                 output.append(f"{indent}let {js_name} = {value};")
+            elif kind == "Input":
+                name = f.get("name")
+                if not isinstance(name, str) or not IDENTIFIER.fullmatch(name):
+                    raise JSBackendError(f"baris {line}: nama variabel input tidak valid")
+                if name in names:
+                    raise JSBackendError(f"baris {line}: variabel {name!r} sudah dideklarasikan")
+                prompt = expr(f.get("prompt"), names)
+                names[name] = f"pc_v_{name}"
+                output.append(f"{indent}let {names[name]} = pcInput({prompt});")
             elif kind == "Assign":
                 name = f.get("name")
                 if name not in names:

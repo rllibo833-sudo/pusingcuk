@@ -13,13 +13,13 @@ NODE = shutil.which("node")
 
 @unittest.skipUnless(NODE, "Node.js tidak tersedia")
 class JavaScriptBackendTests(unittest.TestCase):
-    def run_source(self, source):
+    def run_source(self, source, input_text=""):
         generated = generate(from_source(source, "fixture.pusingcuk"))
         with tempfile.TemporaryDirectory(prefix="pusingcuk-js-") as temp:
             path = Path(temp) / "program.js"
             path.write_text(generated, encoding="utf-8")
             return subprocess.run(
-                [NODE, str(path)], text=True, capture_output=True,
+                [NODE, str(path)], input=input_text, text=True, capture_output=True,
                 timeout=5, check=False,
             )
 
@@ -100,9 +100,13 @@ class JavaScriptBackendTests(unittest.TestCase):
         with self.assertRaisesRegex(JSBackendError, "tidak dikenal"):
             generate(from_source("jancuk\nhedeh fungsi_ajaib(1)\nselesai jancuk"))
 
-    def test_rejects_input_until_backend_has_explicit_runtime_support(self):
-        with self.assertRaisesRegex(JSBackendError, "Input"):
-            generate(from_source('jancuk\ntanya nama = "Nama? "\nselesai jancuk'))
+    def test_input_compiles_and_runs_on_node(self):
+        result = self.run_source(
+            'jancuk\ntanya nama = "Nama? "\nhedeh nama\nselesai jancuk',
+            input_text="Budi\n",
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "Nama? Budi\n")
 
 
 if __name__ == "__main__":
