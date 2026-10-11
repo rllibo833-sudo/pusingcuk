@@ -71,10 +71,10 @@ The target is **easy to start, serious enough to grow**:
 Do not replace or delete CORE because the native executable builds. Require a capability matrix, required cross-runtime fixtures, an integration contract, security review for used capabilities, reproducible builds, tests in CORE, backup/rollback proof, and explicit Founder approval.
 
 
-## Additional confirmed parity risk — collection equality
+## Additional confirmed parity risk — list equality
 
-The native C equality helper compares LIST and DICT values by pointer identity, while the reference evaluator delegates to language/container equality. Structurally equal collections may therefore produce different results across runtimes.
+The native C equality helper compares LIST values by pointer identity, while the reference evaluator delegates list equality to Python's structural list equality. Separately created but structurally equal lists may therefore compare differently. The reference's custom CompatDict currently uses identity equality, so dictionary equality must be documented separately rather than assumed structural.
 
 Tracking issue: https://github.com/rllibo833-sudo/pusingcuk/issues/46
 
-Acceptance gate: run a reproducer against the reference CLI, decide/document nested collection semantics, add shared success/failure fixtures, and require native/reference parity in CI.
+Acceptance gate: run a reproducer against both runtimes, define nested-list semantics and boolean/number distinctions, document dictionary identity behavior separately, add shared success/failure fixtures, and require native/reference parity in CI.
