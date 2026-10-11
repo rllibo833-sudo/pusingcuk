@@ -32,13 +32,13 @@ def generate(document):
             if f["name"] not in env: raise PythonBackendError(f"baris {line}: variabel belum dideklarasikan: {f['name']}")
             return env[f["name"]]
         if k == "List": return "[" + ", ".join(expr(x, env) for x in f["items"]) + "]"
-        if k == "Dict": return "{" + ", ".join(expr(p[0], env) + ": " + expr(p[1], env) for p in f["items"]) + "}"
+        if k == "Dict": return "PcDict([" + ", ".join("(" + expr(p[0], env) + ", " + expr(p[1], env) + ")" for p in f["items"]) + "])"
         if k == "Index": return f"pc_get({expr(f['collection'], env)}, {expr(f['index'], env)})"
         if k == "Call":
             name, args = f["name"], f["args"]
             values = ", ".join(expr(x, env) for x in args)
             if name == "panjang" and len(args) == 1: return f"len({values})"
-            if name == "rentang" and 1 <= len(args) <= 3: return f"list(range({values}))"
+            if name == "rentang" and 1 <= len(args) <= 3: return f"pc_range({values})"
             if name not in functions: raise PythonBackendError(f"baris {line}: fungsi tidak dikenal: {name}")
             if len(args) != len(functions[name]["fields"]["params"]): raise PythonBackendError(f"baris {line}: jumlah argumen salah untuk {name}")
             return f"pc_fn_{name}({values})"
@@ -109,6 +109,36 @@ def generate(document):
         return out
 
     runtime = '''import math
+class PcDict:
+    def __init__(self, pairs=()):
+        self.entries = []
+        for key, value in pairs: self[key] = value
+    @staticmethod
+    def same(a, b):
+        if isinstance(a, bool) or isinstance(b, bool): return type(a) is type(b) and a == b
+        if isinstance(a, (int, float)) and isinstance(b, (int, float)): return a == b
+        return type(a) is type(b) and a == b
+    def index(self, key):
+        if not isinstance(key, (str, int, float, bool)): raise TypeError("kunci kamus harus teks, angka, atau boolean")
+        for i, (old, _) in enumerate(self.entries):
+            if self.same(old, key): return i
+        return -1
+    def __getitem__(self, key):
+        i = self.index(key)
+        if i < 0: raise KeyError("kunci kamus tidak ditemukan")
+        return self.entries[i][1]
+    def __setitem__(self, key, value):
+        i = self.index(key)
+        if i < 0: self.entries.append((key, value))
+        else: self.entries[i] = (self.entries[i][0], value)
+    def __iter__(self): return (key for key, _ in self.entries)
+    def __len__(self): return len(self.entries)
+def pc_range(*args):
+    if not 1 <= len(args) <= 3 or any(not isinstance(x, int) or isinstance(x, bool) for x in args): raise TypeError("rentang membutuhkan 1-3 integer")
+    if len(args) == 3 and args[2] == 0: raise ValueError("langkah rentang tidak boleh nol")
+    result = range(*args)
+    if len(result) > 10000: raise ValueError("rentang melewati batas 10000 item")
+    return result
 def pc_out(v):
     if v is True: v = "okelah"
     elif v is False: v = "tidak"
@@ -134,9 +164,11 @@ def pc_get(a, i):
     if isinstance(a, (str, list)):
         if not isinstance(i, int) or isinstance(i, bool) or i < 0 or i >= len(a): raise IndexError("indeks di luar batas")
         return a[i]
-    return a[i]
+    if isinstance(a, PcDict): return a[i]
+    if isinstance(a, dict): return a[i]
+    raise TypeError("nilai tidak dapat diindeks")
 def pc_set(a, i, v):
-    if not isinstance(a, (list, dict)): raise TypeError("nilai tidak dapat diindeks")
+    if not isinstance(a, (list, dict, PcDict)): raise TypeError("nilai tidak dapat diindeks")
     if isinstance(a, list) and (not isinstance(i, int) or isinstance(i, bool) or i < 0 or i >= len(a)): raise IndexError("indeks di luar batas")
     a[i] = v
 '''
