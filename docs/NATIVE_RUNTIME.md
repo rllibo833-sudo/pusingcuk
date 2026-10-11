@@ -10,13 +10,15 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 |---|---|
 | Alias slang: `jir`, `adooh`, `gitu`, `inthiseco`, `janggal` | Teruji |
 | Variabel, angka, teks, boolean, operator dasar | Teruji |
-| List, baca/ubah indeks list | Teruji |\n| Batas list 256 item dan penolakan item ke-257 | Fixture native mengharapkan error |
+| List, baca/ubah indeks list | Teruji |
+| Batas list 256 item dan penolakan item ke-257 | Fixture native mengharapkan error |
 | Indeks teks berdasarkan code point UTF-8 | Teruji untuk teks UTF-8 valid |
 | Kondisi `njir` / `adooh` dan loop `mumet` | Teruji |
 | `untuk` pada list, teks, kamus (menghasilkan kunci), dan `rentang()` | Teruji |
 | Built-in `panjang()` dan `rentang()` | Teruji pada argumen yang didukung |
 | `tanya nama = "Prompt"` dari stdin | Teruji melalui pipe dan CLI |
-| Literal kamus, kunci teks/angka/boolean, baca/ubah/tambah kunci | Teruji |\n| Batas kamus 256 entri dan penolakan entri ke-257 | Fixture native mengharapkan error |
+| Literal kamus, kunci teks/angka/boolean, baca/ubah/tambah kunci | Teruji |
+| Batas kamus 256 entri dan penolakan entri ke-257 | Fixture native mengharapkan error |
 | `panjang(kamus)`, truthiness kamus kosong/terisi, iterasi kunci | Teruji |
 | Error untuk kunci yang tidak didukung dan kunci yang tidak ditemukan | Teruji |
 | Fungsi buatan pengguna (`fungsi`, parameter, `balek`, rekursi) | Teruji oleh CI GCC/Clang di Ubuntu; perangkat Termux nyata belum diverifikasi |
