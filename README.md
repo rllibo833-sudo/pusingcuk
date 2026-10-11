@@ -10,13 +10,13 @@ Saat ini ada dua jalur eksekusi:
 - **Interpreter modular Python** sebagai jalur referensi pengembangan: `pusingcuk_new.py`, dengan lexer, parser, AST, dan evaluator.
 - **Runtime native C** untuk subset bahasa yang sudah memiliki fixture. Setelah dikompilasi, executable native berjalan tanpa Python.
 
-Kedua jalur belum sepenuhnya setara. Jangan menganggap fitur yang tersedia di interpreter modular otomatis tersedia di native. Daftar kemampuan dan batasnya ada di [matriks runtime native](docs/NATIVE_RUNTIME.md). Sistem modul belum tersedia.
+Kedua jalur belum sepenuhnya setara. Jangan menganggap fitur yang tersedia di interpreter modular otomatis tersedia di native. Daftar kemampuan dan batasnya ada di [matriks runtime native](docs/NATIVE_RUNTIME.md). Sasaran dan status lintas platform dijelaskan di [kontrak kompatibilitas](docs/COMPATIBILITY.md). Sistem modul belum tersedia.
 
 Implementasi historis yang tidak menjadi entry point utama disimpan di `archive/legacy/` untuk referensi saja. File arsip tidak termasuk jalur yang didukung dan tidak boleh dijadikan dasar klaim fitur.
 
 ## Mulai untuk pemula
 
-Ikuti [Panduan Pusingcuk dari Nol](docs/PEMULA.md). Panduan itu mengutamakan jalur Termux native tanpa Python untuk menjalankan program.
+Ikuti [Panduan Pusingcuk dari Nol](docs/PEMULA.md). Panduan itu mengutamakan jalur Termux native tanpa Python untuk menjalankan program. Pengguna yang mengembangkan aplikasi dapat memeriksa [kontrak kompatibilitas](docs/COMPATIBILITY.md) untuk mengetahui fitur yang portabel, status runtime, dan platform yang belum terverifikasi.
 
 ## Pusingcuk Studio — editor dan terminal HTML lokal
 
