@@ -23,7 +23,7 @@ jobs:
         python-version: ["3.11", "3.12"]
     steps:
       - name: Ambil kode
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Siapkan Python
         uses: actions/setup-python@v7
         with:
@@ -42,7 +42,7 @@ jobs:
       CC: ${{ matrix.compiler }}
     steps:
       - name: Ambil kode
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Verifikasi compiler
         run: ${{ matrix.compiler }} --version
       - name: Kompilasi dan uji runtime native
@@ -55,7 +55,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Ambil kode
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Siapkan Java
         uses: actions/setup-java@v4
         with:
