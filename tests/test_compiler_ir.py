@@ -3,7 +3,7 @@ import copy
 import json
 import unittest
 
-from compiler_ir import IRValidationError, lower_to_ir, validate_ir
+from compiler_ir import IRValidationError, _encode, lower_to_ir, validate_ir
 
 
 SOURCE = """jancuk
@@ -64,9 +64,11 @@ class CompilerIRTests(unittest.TestCase):
         with self.assertRaisesRegex(IRValidationError, "field dokumen"):
             validate_ir(document)
 
-    def test_rejects_non_finite_literal_during_serialization(self):
+    def test_rejects_non_finite_value_during_encoding(self):
+        # The parser rejects 1e999 as invalid source before IR lowering.
+        # Exercise the IR encoder's non-finite guard directly instead.
         with self.assertRaisesRegex(IRValidationError, "non-finite"):
-            lower_to_ir("jancuk\nhedeh 1e999\nselesai jancuk\n")
+            _encode(float("inf"), [0], "example.pusingcuk", [], 0)
 
 
 if __name__ == "__main__":
