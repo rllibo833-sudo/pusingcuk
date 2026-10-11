@@ -244,6 +244,8 @@ def generate(document: dict) -> str:
                     raise JSBackendError(f"baris {line}: nama variabel tidak valid")
                 if name in names:
                     raise JSBackendError(f"baris {line}: variabel {name!r} sudah dideklarasikan")
+                if in_loop:
+                    raise JSBackendError(f"baris {line}: deklarasi lah di dalam loop belum didukung; deklarasikan sebelum loop")
                 js_name = f"pc_v_{name}"
                 value = expr(f.get("value"), names)
                 names[name] = js_name
@@ -278,7 +280,7 @@ def generate(document: dict) -> str:
                 js_name = f"pc_v_{name}"
                 loop_names = dict(names)
                 loop_names[name] = js_name
-                output.append(f"{indent}{{ let pc_loop_count = 0; for (const {js_name} of pcIter({iterable})) {{")
+                output.append(f"{indent}{{ let pc_loop_count = 0; for (let {js_name} of pcIter({iterable})) {{")
                 output.append(f"{indent}  if (++pc_loop_count > 10000) throw new Error('batas iterasi loop terlampaui');")
                 output.extend(statements(f.get("body", []), loop_names, indent + "  ", in_function, True) or [indent + "  ;"])
                 output.append(f"{indent}}} }}")
