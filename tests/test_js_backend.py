@@ -85,6 +85,17 @@ class JavaScriptBackendTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "7\nBudi\n1\n2\n3\n")
 
+    def test_unicode_string_index_and_length_use_code_points(self):
+        result = self.run_source(
+            'jancuk\nlah teks = "A🌾Z"\nhedeh teks[1]\nhedeh panjang(teks)\nselesai jancuk'
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "🌾\\n3\\n")
+
+    def test_rejects_integer_outside_javascript_safe_range(self):
+        with self.assertRaisesRegex(JSBackendError, "rentang aman JavaScript"):
+            generate(from_source("jancuk\\nhedeh 9007199254740992\\nselesai jancuk"))
+
     def test_rejects_unknown_function_during_compilation(self):
         with self.assertRaisesRegex(JSBackendError, "tidak dikenal"):
             generate(from_source("jancuk\nhedeh fungsi_ajaib(1)\nselesai jancuk"))
