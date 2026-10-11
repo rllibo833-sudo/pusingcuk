@@ -85,5 +85,5 @@ test-native: native test-cli
 	if $(NATIVE_BIN) tests/native/numeric_non_finite_literal.pusingcuk >/dev/null 2>&1; then \
 		echo 'literal angka non-finite seharusnya gagal' >&2; exit 1; \
 	fi; \
-	actual="$($(NATIVE_BIN) tests/native/numeric_large_finite.pusingcuk)"; \
-	test "$actual" = '1e+308'
+	$(NATIVE_BIN) tests/native/numeric_large_finite.pusingcuk > $(CURDIR)/pusingcuk-numeric-large.out; \
+	grep -qx '1e+308' $(CURDIR)/pusingcuk-numeric-large.out
