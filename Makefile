@@ -6,7 +6,7 @@ VERSION ?= 0.4.0-alpha.1
 PREFIX ?= /usr/local
 DESTDIR ?=
 
-.PHONY: native run-native test-native test-cli version install package
+.PHONY: native run-native test-native test-cli test-conformance test-all version install package
 
 version:
 	@printf '%s\n' '$(VERSION)'
@@ -99,3 +99,10 @@ test-native: native test-cli
 	@$(NATIVE_BIN) tests/native/string_concat_limit.pusingcuk > $(CURDIR)/pusingcuk-string-limit.out
 	@wc -c < $(CURDIR)/pusingcuk-string-limit.out | grep -qx '1024'
 	@rm -f $(CURDIR)/pusingcuk-string-limit.out
+
+# Full local verification: reference tests, native tests, then cross-runtime fixtures.
+test-conformance:
+	python3 tools/conformance.py
+
+test-all: test-native test-conformance
+	python3 -m unittest discover -s tests -v
