@@ -148,6 +148,43 @@
         "reference": "required",
         "native": "required"
       }
+    },
+    {
+      "id": "logic.short-circuit",
+      "source": "short_circuit.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "boolean",
+        "logical-operators",
+        "short-circuit"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "tidak\nokelah\ntidak\nokelah\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "logic.skipped-operand-still-parses",
+      "source": "short_circuit_malformed.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "logical-operators",
+        "syntax-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "error"
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
     }
   ]
 }
