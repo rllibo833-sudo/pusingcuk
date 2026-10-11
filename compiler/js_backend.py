@@ -78,7 +78,7 @@ const pcGet = (collection, key) => {
   if (Array.isArray(collection) || typeof collection === "string") {
     if (!Number.isInteger(key)) throw new Error("indeks harus integer");
     const sequence = typeof collection === "string" ? Array.from(collection) : collection;
-    const i = key < 0 ? sequence.length + key : key;
+    const i = key;
     if (i < 0 || i >= sequence.length) throw new Error("indeks di luar batas");
     return sequence[i];
   }
@@ -91,7 +91,7 @@ const pcGet = (collection, key) => {
 const pcSet = (collection, key, value) => {
   if (Array.isArray(collection)) {
     if (!Number.isInteger(key)) throw new Error("indeks harus integer");
-    const i = key < 0 ? collection.length + key : key;
+    const i = key;
     if (i < 0 || i >= collection.length) throw new Error("indeks di luar batas");
     collection[i] = value; return value;
   }
