@@ -136,8 +136,8 @@ def generate(document: dict) -> str:
                 out.append(f"{indent}{names[name]} = (int64_t)({value});")
             elif kind=="Print":
                 value,typ=expression(f.get("value"),names,types)
-                if typ=="bool": out.append(f'{indent}if (printf("%s\\n", ({value}) ? "okelah" : "tidak") < 0) return EXIT_FAILURE;')
-                else: out.append(f'{indent}if (printf("%" PRId64 "\\n", (int64_t)({value})) < 0) return EXIT_FAILURE;')
+                if typ=="bool": out.append(f'{indent}if (printf("%s\n", ({value}) ? "okelah" : "tidak") < 0) return EXIT_FAILURE;')
+                else: out.append(f'{indent}if (printf("%" PRId64 "\n", (int64_t)({value})) < 0) return EXIT_FAILURE;')
             elif kind=="If":
                 cond,_=expression(f.get("condition"),names,types); out.append(f"{indent}if (({cond}) != 0) {{")
                 yes=statements(f.get("then_body",[]),dict(names),dict(types),indent+"    ",in_function,in_loop); out.extend(yes or [indent+"    (void)0;"])
@@ -163,9 +163,9 @@ def generate(document: dict) -> str:
         prototypes.append(f"static int64_t pc_fn_{name}({sig});")
         names={p:f"pc_arg_{i}" for i,p in enumerate(params)}; types={p:"int" for p in params}
         body_lines=statements(f["body"],names,types,"    ",True,False)
-        definitions.append(f"static int64_t pc_fn_{name}({sig}) {{\\n    pc_call_enter();\\n"+("\\n".join(body_lines) if body_lines else "    (void)0;")+"\\n    pc_call_leave();\\n    pc_missing_return();\\n    return INT64_C(0);\\n}")
+        definitions.append(f"static int64_t pc_fn_{name}({sig}) {{\n    pc_call_enter();\n"+("\n".join(body_lines) if body_lines else "    (void)0;")+"\n    pc_call_leave();\n    pc_missing_return();\n    return INT64_C(0);\n}")
     main_lines=statements([s for s in body if s.get("kind")!="Function"],{}, {})
-    return C_RUNTIME+"\\n"+"\\n".join(prototypes)+"\\n"+"\\n".join(definitions)+"\\nint main(void) {\\n"+("\\n".join(main_lines) if main_lines else "    (void)0;")+"\\n    return EXIT_SUCCESS;\\n}\\n"
+    return C_RUNTIME+"\n"+"\n".join(prototypes)+"\n"+"\n".join(definitions)+"\nint main(void) {\n"+("\n".join(main_lines) if main_lines else "    (void)0;")+"\n    return EXIT_SUCCESS;\n}\n"
 
 def main(argv=None) -> int:
     parser=argparse.ArgumentParser(description="Kompilasi subset Pusingcuk menjadi source C11.")
