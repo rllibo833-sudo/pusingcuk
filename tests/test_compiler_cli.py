@@ -39,7 +39,7 @@ class MultiTargetCompilerTests(unittest.TestCase):
         self.assertIn("pcRound(2.5)", js)
         py = compile_source(source, "builtins.pusingcuk", "python")
         compile(py, "builtins.py", "exec")
-        self.assertIn("pc_abs(-(", py)
+        self.assertIn("pc_abs((-(8)))", py)
         self.assertIn("pc_min(4, 9)", py)
         self.assertIn("pc_max(4, 9)", py)
         self.assertIn("pc_round(2.5)", py)
