@@ -33,6 +33,7 @@ static const char *p;
 typedef struct { char name[128]; char params[MAX_PARAMS][128]; int param_count; int first_line; int end_line; } Function;
 static Function functions[MAX_FUNCTIONS];
 static int function_count, call_depth, returning;
+static int parse_only;
 static Val return_value;
 static int run_range(int first, int last);
 static Val call_user_function(const char *name, Val *args, int argc);
@@ -229,7 +230,7 @@ static Val primary(void) {
                 if (take("}")) break;
             }
         }
-        return dictval(d);
+        return parse_only ? num(0) : dictval(d);
     }
     if (take("[")) {
         List *l = new_list();
@@ -244,7 +245,7 @@ static Val primary(void) {
                 }
             }
         }
-        return listval(l);
+        return parse_only ? num(0) : listval(l);
     }
 
     ws();
@@ -266,12 +267,12 @@ static Val primary(void) {
             if (n+1<SZ) buf[n++]=c; else fail("string terlalu panjang");
         }
         if (*p!='"') fail("string belum ditutup"); else p++;
-        buf[n]=0; return string(buf);
+        buf[n]=0; return parse_only ? num(0) : string(buf);
     }
     if (isdigit((unsigned char)*p) || *p=='.') {
         char *e; double x=strtod(p,&e);
         if (e==p) { fail("angka tidak valid"); return num(0); }
-        p=e; if (!isfinite(x)) { fail("angka desimal tidak valid atau terlalu besar"); return num(0); } return num(x);
+        p=e; if (!isfinite(x)) { fail("angka desimal tidak valid atau terlalu besar"); return num(0); } return parse_only ? num(0) : num(x);
     }
     if (isalpha((unsigned char)*p) || *p=='_') {
         char name[128]; size_t n=0;
@@ -280,8 +281,8 @@ static Val primary(void) {
             p++;
         }
         name[n]=0;
-        if (!strcmp(name,"benar")) return boolean(1);
-        if (!strcmp(name,"salah")) return boolean(0);
+        if (!strcmp(name,"benar")) return parse_only ? num(0) : boolean(1);
+        if (!strcmp(name,"salah")) return parse_only ? num(0) : boolean(0);
         if (take("(")) {
             Val args[MAX_PARAMS]; int argc = 0;
             if (!take(")")) {
@@ -299,6 +300,7 @@ static Val primary(void) {
                     }
                 }
             }
+            if (parse_only) return num(0);
             if (!strcmp(name,"panjang")) {
                 if (argc != 1) { fail("panjang() membutuhkan satu argumen"); return num(0); }
                 if (args[0].t == LIST && args[0].list)
@@ -338,6 +340,13 @@ static Val primary(void) {
             if (!strcmp(vars[i].name,name)) {
                 value=vars[i].v; found=1; break;
             }
+        if (parse_only) {
+            while (take("[")) {
+                (void)expr();
+                if (!take("]")) fail("kurung siku tutup ']' diharapkan");
+            }
+            return num(0);
+        }
         if (!found) { fail("variabel belum dibuat"); return num(0); }
         if (take("[")) {
             Val idx=expr();
@@ -444,12 +453,26 @@ static Val compare(void) {
 }
 static Val and_expr(void) {
     Val a=compare();
-    while (word("dan")) { Val b=compare(); a=boolean(truth(a)&&truth(b)); }
+    while (word("dan")) {
+        int previous_parse_only = parse_only;
+        int skip_right = !previous_parse_only && !truth(a);
+        if (skip_right) parse_only = 1;
+        Val b=compare();
+        parse_only = previous_parse_only;
+        a = skip_right ? boolean(0) : boolean(truth(a) && truth(b));
+    }
     return a;
 }
 static Val expr(void) {
     Val a=and_expr();
-    while (word("atau")) { Val b=and_expr(); a=boolean(truth(a)||truth(b)); }
+    while (word("atau")) {
+        int previous_parse_only = parse_only;
+        int skip_right = !previous_parse_only && truth(a);
+        if (skip_right) parse_only = 1;
+        Val b=and_expr();
+        parse_only = previous_parse_only;
+        a = skip_right ? boolean(1) : boolean(truth(a) || truth(b));
+    }
     return a;
 }
 static int identifier(char *out, size_t cap) {
