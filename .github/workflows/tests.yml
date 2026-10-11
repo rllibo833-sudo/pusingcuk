@@ -47,3 +47,5 @@ jobs:
         run: ${{ matrix.compiler }} --version
       - name: Kompilasi dan uji runtime native
         run: make test-native
+      - name: Uji konformansi lintas runtime
+        run: python tools/conformance.py

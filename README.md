@@ -140,7 +140,13 @@ Runtime native:
 make test-native
 ```
 
-Jika perubahan menyentuh kedua jalur, jalankan keduanya. Tes CI Ubuntu tidak menggantikan pengujian fisik Termux.
+Tes konformansi lintas runtime membandingkan output dan exit code dari interpreter referensi dengan runtime native berdasarkan manifest:
+
+```sh
+python tools/conformance.py
+```
+
+Harness ini memvalidasi metadata fixture dan path sumber, memberi timeout untuk tiap program, serta melaporkan `PASS`, `FAIL`, dan `UNSUPPORTED` secara terpisah. Cakupan awal masih kecil dan akan ditambah seiring semantik bahasa distabilkan. Jika perubahan menyentuh kedua jalur, jalankan keduanya. Tes CI Ubuntu tidak menggantikan pengujian fisik Termux.
 
 ## Batasan saat ini
 
