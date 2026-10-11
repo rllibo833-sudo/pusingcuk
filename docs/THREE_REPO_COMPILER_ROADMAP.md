@@ -20,8 +20,9 @@ Do not migrate production logic or advertise full compiler support until tests d
 
 ## Confirmed readiness findings
 
-- Native short-circuit behavior for `dan` and `atau` is a priority parity gate. The intended behavior is `salah dan variabel_yang_belum_ada` → false and `benar atau variabel_yang_belum_ada` → true without evaluating the missing variable. Genuine syntax errors must still be reported.
-- Native list equality has been identified as a possible parity gap: the C runtime compares list identity while the Python reference uses structural list equality. Define nested-list behavior and boolean/number distinctions with tests before changing the contract.
+- Native short-circuit behavior for `dan` and `atau` is now covered by shared fixtures: skipped operands must not trigger missing-variable or division-by-zero errors, while genuine syntax errors must still be reported.
+- Native list equality now compares list contents recursively, including nested lists. Recursive comparison is bounded to protect the C stack; deeply nested/cyclic collection semantics remain a resource-limit edge that should be tested explicitly.
+- Dictionary equality remains identity-based by design for now; do not assume it should become structural without a separate language design decision.
 - Dictionary equality must be handled separately; do not assume it should become structural without a language design decision.
 - The current conformance manifest is a useful but limited sample, not proof of full semantic parity. Test coverage must grow across precedence, scope, functions/returns, input limits, Unicode, numeric/range edges, malformed syntax, diagnostics and exit codes.
 - CI on GCC/Clang does not replace a real Termux/Android device check. Building an Android APK does not prove all runtime paths have been exercised on-device.
@@ -47,8 +48,8 @@ The Python implementation remains the reference oracle during the transition. Th
 
 ### Phase 0 — Stabilize semantics
 
-1. Fix native short-circuit behavior for `dan` and `atau`.
-2. Define list equality and nested-list semantics against the reference implementation.
+1. Keep native short-circuit behavior for `dan` and `atau` aligned with the reference runtime, including malformed syntax in skipped operands.
+2. Keep list equality and nested-list semantics aligned with the reference; explicitly test the native recursion/resource boundary.
 3. Expand shared fixtures for precedence, scope, functions/returns, input limits, Unicode, numeric/range edges, malformed syntax, diagnostics and exit codes.
 4. Run conformance on GCC and Clang; test on real Termux/Android when device behavior matters.
 
