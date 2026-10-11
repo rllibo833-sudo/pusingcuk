@@ -97,6 +97,10 @@ class CBackendTests(unittest.TestCase):
         result = self.compile_and_run(source)
         self.assertEqual(result.stdout, "okelah\nokelah\ntidak\nokelah\nokelah\ntidak\nokelah\n")
 
+    def test_mixed_type_equality_still_evaluates_both_operands(self):
+        # Type-sensitive equality must not optimize away a failing right operand.
+        self.assert_matches_reference("jancuk\\nhedeh benar == (1 // 0)\\nselesai jancuk")
+
     def test_if_else_and_nested_boolean_condition_match_reference(self):
         source = (
             "jancuk\n"
