@@ -95,7 +95,7 @@ jobs:
           AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
           "$AAPT" dump badging "$APK" | grep -q "package: name='org.pusingcuk.studio'"
       - name: Unggah APK debug
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pusingcuk-studio-debug-apk
           path: android-studio/app/build/outputs/apk/debug/app-debug.apk
