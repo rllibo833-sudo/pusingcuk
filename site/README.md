@@ -18,6 +18,7 @@ Workflow `.github/workflows/pages.yml` memublikasikan folder `site/` melalui Git
 
 ## Catatan
 
-- Halaman ini adalah situs pengenalan proyek; bukan compiler yang berjalan di browser.
-- Contoh `examples/halo.pusingcuk` adalah kode sumber PusingCuk yang ditampilkan di halaman.
+- Halaman utama adalah HTML/CSS statis; compiler belum memiliki backend templating untuk membangun halaman desain bebas langsung dari source PusingCuk.
+- Workflow publikasi benar-benar mengompilasi `examples/halo.pusingcuk` ke target HTML mandiri sebagai `demo.html`. Link hasil kompilasi ada di halaman utama.
+- Situs perkenalan dan contoh hasil compile adalah dua hal terpisah; jangan mengklaim bahwa seluruh landing page telah ditulis dalam bahasa PusingCuk.
 - Status fitur ditulis konservatif dan mengarah ke dokumentasi utama untuk detail teknis.
