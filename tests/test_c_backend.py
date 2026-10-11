@@ -156,5 +156,53 @@ class CBackendTests(unittest.TestCase):
             generate(from_source("jancuk\nhedeh angka\nselesai jancuk"))
 
 
+    def test_while_loop_matches_reference(self):
+        source = (
+            "jancuk\nlah i = 1\nlah total = 0\n"
+            "mumet i <= 5\n"
+            "    total = total + i\n"
+            "    i = i + 1\n"
+            "selesai mumet\nhedeh total\nselesai jancuk"
+        )
+        self.assert_matches_reference(source)
+        self.assertEqual(self.compile_and_run(source).stdout, "15\n")
+
+    def test_integer_functions_and_forward_calls_match_reference(self):
+        source = (
+            "jancuk\n"
+            "hedeh tambah(20, 22)\n"
+            "fungsi tambah(a, b)\n"
+            "    balek a + b\n"
+            "selesai fungsi\n"
+            "selesai jancuk"
+        )
+        self.assert_matches_reference(source)
+        self.assertEqual(self.compile_and_run(source).stdout, "42\n")
+
+    def test_recursive_integer_function_matches_reference(self):
+        source = (
+            "jancuk\n"
+            "fungsi faktorial(n)\n"
+            "    njir n <= 1\n"
+            "        balek 1\n"
+            "    selesai njir\n"
+            "    balek n * faktorial(n - 1)\n"
+            "selesai fungsi\n"
+            "hedeh faktorial(6)\n"
+            "selesai jancuk"
+        )
+        self.assert_matches_reference(source)
+        self.assertEqual(self.compile_and_run(source).stdout, "720\n")
+
+    def test_loop_rejects_local_declarations_explicitly(self):
+        source = "jancuk\nmumet salah\n    lah x = 1\nselesai mumet\nselesai jancuk"
+        with self.assertRaisesRegex(CBackendError, "deklarasi lah di dalam loop"):
+            generate(from_source(source))
+
+    def test_function_requires_integer_arguments_and_return(self):
+        with self.assertRaisesRegex(CBackendError, "parameter fungsi C subset harus integer"):
+            generate(from_source("jancuk\nfungsi identitas(x)\n    balek x\nselesai fungsi\nhedeh identitas(benar)\nselesai jancuk"))
+
+
 if __name__ == "__main__":
     unittest.main()
