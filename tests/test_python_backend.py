@@ -44,6 +44,24 @@ class PythonBackendTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "7\n3\n")
 
+    def test_dictionary_boolean_and_number_keys_stay_distinct(self):
+        result = self.run_source(
+            'jancuk\nlah d = {1: "angka", benar: "boolean"}\n'
+            'hedeh d[1]\nhedeh d[benar]\nselesai jancuk'
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "angka\nboolean\n")
+
+    def test_input_is_supported(self):
+        output = generate(from_source('jancuk\ntanya nama = "Nama? "\nhedeh nama\nselesai jancuk'))
+        with tempfile.TemporaryDirectory(prefix="pusingcuk-py-") as temp:
+            path = Path(temp) / "program.py"
+            path.write_text(output, encoding="utf-8")
+            result = subprocess.run([sys.executable, str(path)], input="Budi\n",
+                                    text=True, capture_output=True, timeout=5)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "Nama? Budi\n")
+
     def test_unknown_function_is_compile_error(self):
         with self.assertRaisesRegex(PythonBackendError, "tidak dikenal"):
             generate(from_source("jancuk\nhedeh ajaib(1)\nselesai jancuk"))
