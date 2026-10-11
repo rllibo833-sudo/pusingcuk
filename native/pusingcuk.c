@@ -40,7 +40,12 @@ static int run_range(int first, int last);
 static Val call_user_function(const char *name, Val *args, int argc);
 
 static void fail(const char *msg) {
-    if (!err) fprintf(stderr, "Kesalahan baris %d: %s\n", line_no, msg);
+    if (suppress_eval) return;
+    if (!err) fprintf(stderr, "Kesalahan baris %d: %s\\n", line_no, msg);
+    err = 1;
+}
+static void syntax_fail(const char *msg) {
+    if (!err) fprintf(stderr, "Kesalahan baris %d: %s\\n", line_no, msg);
     err = 1;
 }
 static Val num(double x) { Val v={0}; v.t=NUM; v.n=x; return v; }
