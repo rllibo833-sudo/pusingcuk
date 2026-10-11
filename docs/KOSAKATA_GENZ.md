@@ -90,6 +90,6 @@ Contoh runnable tersedia di `library/loops_functions_genz.pusingcuk`. Untuk menc
 
 ## Backend compiler C eksperimental
 
-Backend C kini memiliki subset teruji untuk integer, boolean, perbandingan, logika short-circuit, dan kondisi njir/kampret. Ini berbeda dari runtime C mandiri: backend C masih menolak teks, koleksi, input, loop, dan fungsi. Lihat panduan backend C sebelum mengandalkannya.
+Backend C kini memiliki subset teruji untuk integer, boolean, perbandingan, logika short-circuit, kondisi njir/kampret, loop mumet, serta fungsi tingkat atas dengan parameter dan nilai balik integer. Loop dibatasi 10.000 iterasi dan kedalaman panggilan fungsi 100. Backend C tetap menolak teks, koleksi, input, loop untuk, serta deklarasi lah di dalam loop. Lihat panduan backend C sebelum mengandalkannya.
 
-Untuk glossary yang bisa dibaca mesin, lihat library/kosakata.json. Contoh yang siap dicoba ada di library/conditional_logic.pusingcuk.
+Contoh yang memakai loop, fungsi rekursif, dan alias Gen Z/Gen Alpha ada di library/loops_functions_genz.pusingcuk. Jalankan melalui interpreter modular: `python pusingcuk_new.py library/loops_functions_genz.pusingcuk`. Untuk glossary yang bisa dibaca mesin, lihat library/kosakata.json.
