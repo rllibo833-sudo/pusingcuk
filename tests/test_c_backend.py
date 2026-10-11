@@ -99,7 +99,7 @@ class CBackendTests(unittest.TestCase):
 
     def test_mixed_type_equality_still_evaluates_both_operands(self):
         # Type-sensitive equality must not optimize away a failing right operand.
-        self.assert_matches_reference("jancuk\\nhedeh benar == (1 // 0)\\nselesai jancuk")
+        self.assert_matches_reference("jancuk\nhedeh benar == (1 // 0)\nselesai jancuk")
 
     def test_if_else_and_nested_boolean_condition_match_reference(self):
         source = (
