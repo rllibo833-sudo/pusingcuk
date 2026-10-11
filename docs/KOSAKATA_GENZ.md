@@ -11,6 +11,13 @@ Pusingcuk menggunakan slang Indonesia sebagai bagian dari identitas bahasanya. K
 | gitu | selesai | Penanda penutup blok; tetap diikuti nama blok, misalnya gitu njir. |
 | inthiseco | jancuk | Awal program. Program diakhiri dengan gitu inthiseco. |
 | janggal | bukan | Negasi logika; membalik nilai benar/salah. |
+| gas | jancuk | Memulai program. |
+| spill | hedeh | Menampilkan nilai. |
+| bestie | lah | Mendeklarasikan variabel. |
+| valid | benar | Nilai boolean benar. |
+| zonk | salah | Nilai boolean salah. |
+| skip | kampret | Cabang alternatif kondisi. |
+| kelar | selesai | Menutup blok; tetap diikuti nama blok. |
 
 ## Kosakata kondisi dan logika
 
@@ -47,6 +54,14 @@ Hasil yang diharapkan pada interpreter modular:
     7
     tidak
     okelah
+
+## Loop dan fungsi pada backend C
+
+Backend C kini memiliki dukungan teruji untuk loop `mumet` dan fungsi tingkat atas dengan parameter serta nilai balik integer. Fungsi dapat dipanggil sebelum definisinya dan mendukung rekursi dengan batas kedalaman 100; setiap loop dibatasi 10.000 iterasi. Backend menolak `lah` di dalam loop, parameter/nilai balik boolean, `untuk`, teks, koleksi, dan input. Lihat [panduan backend C](C_BACKEND.md).
+
+## Contoh kosakata Gen Z/Gen Alpha
+
+Contoh runnable tersedia di `library/loops_functions_genz.pusingcuk`. Untuk mencoba seluruh contoh termasuk teks, gunakan `python pusingcuk_new.py library/loops_functions_genz.pusingcuk`. Daftar kanonis dan status runtime tetap tercatat di `library/kosakata.json`.
 
 ## Aturan desain
 
