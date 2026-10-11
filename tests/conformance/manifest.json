@@ -160,7 +160,7 @@
       ],
       "expected": {
         "exit_code": 0,
-        "stdout": "tidak\nokelah\ntidak\nokelah\n",
+        "stdout": "tidak\nokelah\ntidak\nokelah\ntidak\nokelah\n",
         "stderr_class": null
       },
       "runtimes": {
