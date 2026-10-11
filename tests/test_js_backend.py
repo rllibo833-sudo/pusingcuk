@@ -106,7 +106,7 @@ class JavaScriptBackendTests(unittest.TestCase):
             input_text="Budi\n",
         )
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout, "Nama? Budi\\n")
+        self.assertEqual(result.stdout, "Nama? Budi\n")
 
 
 if __name__ == "__main__":
