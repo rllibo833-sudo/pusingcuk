@@ -10,7 +10,7 @@ Saat ini ada dua jalur eksekusi:
 - **Interpreter modular Python** sebagai jalur referensi pengembangan: `pusingcuk_new.py`, dengan lexer, parser, AST, dan evaluator.
 - **Runtime native C** untuk subset bahasa yang sudah memiliki fixture. Setelah dikompilasi, executable native berjalan tanpa Python.
 
-Kedua jalur belum sepenuhnya setara. Jangan menganggap fitur yang tersedia di interpreter modular otomatis tersedia di native. Daftar kemampuan dan batasnya ada di [matriks runtime native](docs/NATIVE_RUNTIME.md). Sasaran dan status lintas platform dijelaskan di [kontrak kompatibilitas](docs/COMPATIBILITY.md). Sistem modul belum tersedia.
+Kedua jalur belum sepenuhnya setara. Jangan menganggap fitur yang tersedia di interpreter modular otomatis tersedia di native. Daftar kemampuan dan batasnya ada di [matriks runtime native](docs/NATIVE_RUNTIME.md). Sasaran dan status lintas platform dijelaskan di [kontrak kompatibilitas](docs/COMPATIBILITY.md). Arah compiler multi-target, IR, dan FFI ada di [arsitektur compiler/interoperabilitas](docs/COMPILER_INTEROP.md); format tes lintas runtime dijelaskan di [kontrak fixture konformansi](docs/CONFORMANCE_FIXTURES.md). Keduanya merupakan rancangan, bukan klaim bahwa backend compiler atau FFI sudah tersedia. Sistem modul belum tersedia.
 
 Implementasi historis yang tidak menjadi entry point utama disimpan di `archive/legacy/` untuk referensi saja. File arsip tidak termasuk jalur yang didukung dan tidak boleh dijadikan dasar klaim fitur.
 
