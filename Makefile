@@ -87,3 +87,9 @@ test-native: native test-cli
 	fi; \
 	$(NATIVE_BIN) tests/native/numeric_large_finite.pusingcuk > $(CURDIR)/pusingcuk-numeric-large.out; \
 	grep -qx '1e+308' $(CURDIR)/pusingcuk-numeric-large.out
+	@if $(NATIVE_BIN) tests/native/string_concat_overflow.pusingcuk >/dev/null 2>&1; then \
+		echo 'penggabungan string melebihi batas seharusnya gagal' >&2; exit 1; \
+	fi
+	@$(NATIVE_BIN) tests/native/string_concat_limit.pusingcuk > $(CURDIR)/pusingcuk-string-limit.out
+	@test "$(wc -c < $(CURDIR)/pusingcuk-string-limit.out)" -eq 1024
+	@rm -f $(CURDIR)/pusingcuk-string-limit.out
