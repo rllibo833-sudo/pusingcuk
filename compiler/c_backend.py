@@ -145,7 +145,9 @@ def generate(document: dict) -> str:
 
             if op in {"==", "!="}:
                 if left_type != right_type:
-                    return ("INT64_C(0)" if op == "==" else "INT64_C(1)", "bool")
+                    # Equality is type-sensitive, but both operands must still be evaluated.
+                    result = "INT64_C(0)" if op == "==" else "INT64_C(1)"
+                    return f"(((void)({left})), ((void)({right})), {result})", "bool"
                 operator = "==" if op == "==" else "!="
                 return f"(({left}) {operator} ({right}))", "bool"
 
