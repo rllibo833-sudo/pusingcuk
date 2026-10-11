@@ -194,7 +194,7 @@ def generate(document: dict) -> str:
             name, params = fields.get("name"), fields.get("params")
             if not isinstance(name, str) or not IDENTIFIER.fullmatch(name):
                 raise JSBackendError(f"baris {line}: nama fungsi tidak valid")
-            if name in {"panjang", "rentang"} or name in functions:
+            if name in {"panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan"} or name in functions:
                 raise JSBackendError(f"baris {line}: nama fungsi {name!r} sudah digunakan")
             if not isinstance(params, list) or any(
                 not isinstance(p, str) or not IDENTIFIER.fullmatch(p) for p in params
@@ -231,6 +231,11 @@ def generate(document: dict) -> str:
             if name == "rentang":
                 if not 1 <= len(args) <= 3: raise JSBackendError(f"baris {line}: rentang() membutuhkan 1-3 argumen")
                 return f"pcRange({rendered})"
+            numeric_builtins = {"mutlak": (1, "pcAbs"), "minimum": (2, "pcMin"), "maksimum": (2, "pcMax"), "bulatkan": (1, "pcRound")}
+            if name in numeric_builtins:
+                arity, helper = numeric_builtins[name]
+                if len(args) != arity: raise JSBackendError(f"baris {line}: {name}() membutuhkan {arity} argumen")
+                return f"{helper}({rendered})"
             if name not in functions:
                 raise JSBackendError(f"baris {line}: fungsi {name!r} tidak dikenal atau belum didukung")
             expected = len(functions[name]["fields"]["params"])
