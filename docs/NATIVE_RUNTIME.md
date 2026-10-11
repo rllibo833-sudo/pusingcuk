@@ -10,6 +10,7 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 |---|---|
 | Alias slang: `jir`, `adooh`, `gitu`, `inthiseco`, `janggal` | Teruji |
 | Variabel, angka, teks, boolean, operator dasar | Teruji |
+| Evaluasi short-circuit operator `dan` / `atau` | Teruji melalui suite konformansi lintas runtime |
 | List, baca/ubah indeks list | Teruji |
 | Batas list 256 item dan penolakan item ke-257 | Fixture native mengharapkan error |
 | Indeks teks berdasarkan code point UTF-8 | Teruji untuk teks UTF-8 valid |
