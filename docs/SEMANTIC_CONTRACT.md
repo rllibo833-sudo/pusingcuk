@@ -10,7 +10,7 @@ Status: kontrak kerja yang dibuktikan sebagian oleh interpreter referensi dan ru
 | Output | `hedeh` menghasilkan satu nilai per baris | Aritmetika, list, fungsi, alias |
 | Boolean | `benar` dan `salah` adalah boolean, bukan angka | Identitas kunci kamus dan short-circuit |
 | Kesetaraan | Boolean tidak setara dengan angka yang tampak serupa | Fixture identitas kunci kamus; suite native tambahan |
-| Evaluasi logika | Interpreter referensi melakukan short-circuit; runtime native belum dinyatakan setara | Fixture short-circuit wajib pada reference, `UNSUPPORTED` pada native |
+| Evaluasi logika | `dan` dan `atau` melakukan short-circuit pada interpreter referensi dan runtime native | Fixture short-circuit lintas runtime |
 | Fungsi | Parameter diteruskan, `balek` mengembalikan nilai | Fixture fungsi penjumlahan |
 | Daftar | Indeks dimulai dari nol; assignment indeks memperbarui elemen | Fixture list/index/mutasi |
 | Kamus | Boolean dan angka adalah jenis kunci berbeda; `panjang` menghitung entri | Fixture identitas kunci |
@@ -29,7 +29,6 @@ Status: kontrak kerja yang dibuktikan sebagian oleh interpreter referensi dan ru
 ## Batas yang diketahui
 
 - Harness saat ini membandingkan stdout byte-for-byte, exit code, dan kelas error umum. Ia belum menetapkan katalog kode error publik yang stabil.
-- Fixture awal bukan bukti parity lengkap; runtime native saat ini belum lulus uji short-circuit terhadap variabel tak dikenal di cabang yang semestinya tidak dievaluasi. Statusnya dicatat `UNSUPPORTED`, bukan disamarkan sebagai lulus. Perbaikan semantik native adalah prioritas berikutnya.
-- Tes harus bertambah untuk scope, rekursi, overflow, input, koleksi kompleks, error lokasi, dan tiap backend baru.
+- Fixture awal bukan bukti parity lengkap. Tes harus bertambah untuk scope, rekursi, overflow, input, koleksi kompleks, error lokasi, dan tiap backend baru.
 - `native` berarti runtime C langsung yang diuji pada CI Linux GCC/Clang. Ini tidak otomatis membuktikan kompatibilitas Windows, macOS, atau perangkat Android/Termux.
 - Compiler IR, backend C hasil generasi, WebAssembly, JavaScript, serta ABI/FFI tetap pekerjaan terpisah sampai ada implementasi dan fixture yang menjalankannya.
