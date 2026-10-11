@@ -18,6 +18,15 @@ Pusingcuk currently has a Python reference pipeline, a native C runtime for a do
 
 Do not migrate production logic or advertise full compiler support until tests demonstrate the required behavior.
 
+## Confirmed readiness findings
+
+- Native short-circuit behavior for `dan` and `atau` is a priority parity gate. The intended behavior is `salah dan variabel_yang_belum_ada` → false and `benar atau variabel_yang_belum_ada` → true without evaluating the missing variable. Genuine syntax errors must still be reported.
+- Native list equality has been identified as a possible parity gap: the C runtime compares list identity while the Python reference uses structural list equality. Define nested-list behavior and boolean/number distinctions with tests before changing the contract.
+- Dictionary equality must be handled separately; do not assume it should become structural without a language design decision.
+- The current conformance manifest is a useful but limited sample, not proof of full semantic parity. Test coverage must grow across precedence, scope, functions/returns, input limits, Unicode, numeric/range edges, malformed syntax, diagnostics and exit codes.
+- CI on GCC/Clang does not replace a real Termux/Android device check. Building an Android APK does not prove all runtime paths have been exercised on-device.
+- Native execution is not a sandbox; filesystem, network, database, process and secret access require explicit capability boundaries.
+
 ## Target architecture
 
 `Pusingcuk source → lexer/parser → typed or validated semantic model → versioned IR → backend capability check → target code/artifact → target-specific tests`
