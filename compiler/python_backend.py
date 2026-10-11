@@ -176,10 +176,10 @@ def pc_set(a, i, v):
     for name, s in functions.items():
         f = s["fields"]; env = {p: "pc_v_" + p for p in f["params"]}
         out.append("def pc_fn_" + name + "(" + ", ".join(env[p] for p in f["params"]) + "):")
-        out.extend(emit(f["body"], env) or ["    pass"])
+        out.extend(emit(f["body"], env, inside_function=True) or ["    pass"])
         out.append("")
     out.append("# Program utama")
-    out.extend(emit([s for s in root["fields"]["body"] if s["kind"] != "Function"], {}) or ["pass"])
+    out.extend(emit([s for s in root["fields"]["body"] if s["kind"] != "Function"], {}, indent="") or ["pass"])
     return "\n".join(out) + "\n"
 
 
