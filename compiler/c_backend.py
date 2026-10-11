@@ -146,7 +146,7 @@ def generate(document: dict) -> str:
             lines.append(f"    {names[name]} = {value};")
         elif kind == "Print":
             value = expression(fields.get("value"))
-            lines.append(f'    if (printf("%" PRId64 "\n", (int64_t)({value})) < 0) return EXIT_FAILURE;')
+            lines.append(f'    if (printf("%" PRId64 "\\n", (int64_t)({value})) < 0) return EXIT_FAILURE;')
         else:
             raise CBackendError(f"baris {line}: pernyataan {kind!r} belum didukung backend C")
 
