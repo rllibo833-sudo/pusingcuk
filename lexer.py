@@ -107,6 +107,23 @@ class Lexer:
             while self._peek().isdigit():
                 self._advance()
 
+        if self._peek() in ("e", "E"):
+            kind = "FLOAT"
+            self._advance()
+
+            if self._peek() in ("+", "-"):
+                self._advance()
+
+            if not self._peek().isdigit():
+                self._error(
+                    line,
+                    max(1, self.column - 1),
+                    "eksponen angka tidak valid",
+                )
+
+            while self._peek().isdigit():
+                self._advance()
+
         text = self.source[start:self.position]
 
         if kind == "INTEGER":
