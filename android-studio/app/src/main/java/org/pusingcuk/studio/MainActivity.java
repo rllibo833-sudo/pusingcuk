@@ -122,7 +122,7 @@ public final class MainActivity extends Activity {
         if(utf8Length(input)>MAX_STDIN_BYTES){toastError("Input maksimum 16 KiB.");return;}
         runButton.setEnabled(false); status.setText("Program sedang berjalan…"); output.setText("");
         worker.execute(()->{
-            File program=null; Process proc=null; ByteArrayOutputStream stdout=new ByteArrayOutputStream(), stderr=new ByteArrayOutputStream();
+            File program=null; Process proc=null; BoundedOutputStream stdout=new BoundedOutputStream(), stderr=new BoundedOutputStream();
             try {
                 File work=new File(getCacheDir(),"run"); if(!work.exists()&&!work.mkdirs())throw new IllegalStateException("Folder sementara gagal dibuat.");
                 program=File.createTempFile("program-",".pusingcuk",work);
@@ -136,7 +136,7 @@ public final class MainActivity extends Activity {
                 if(!finished){proc.destroyForcibly();proc.waitFor(500,TimeUnit.MILLISECONDS);}
                 outReader.join(500);errReader.join(500);
                 final boolean timeout=!finished; final int exit=finished?proc.exitValue():-1;
-                final String outText=stdout.toString("UTF-8"),errText=stderr.toString("UTF-8");
+                final String outText=stdout.text(),errText=stderr.text();
                 runOnUiThread(()->{
                     String text=outText;if(!errText.isEmpty())text+=(text.isEmpty()?"":"\n")+"[stderr]\n"+errText;
                     if(timeout){text+=(text.isEmpty()?"":"\n")+"Eksekusi dihentikan setelah 3 detik.";status.setText("Timeout");}
@@ -192,8 +192,31 @@ public final class MainActivity extends Activity {
         startActivity(Intent.createChooser(intent,"Bagikan kode Pusingcuk"));
     }
     private static int utf8Length(String s){return s.getBytes(StandardCharsets.UTF_8).length;}
-    private static void copy(InputStream in,ByteArrayOutputStream out){
-        try(InputStream input=in){byte[] b=new byte[4096];int n;while((n=input.read(b))!=-1)synchronized(out){out.write(b,0,n);}}catch(Exception ignored){}
+    private static final class BoundedOutputStream extends OutputStream {
+        private static final int MAX_CAPTURE_BYTES = 256 * 1024;
+        private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        private boolean truncated;
+
+        @Override public synchronized void write(int value) {
+            if (buffer.size() < MAX_CAPTURE_BYTES) buffer.write(value);
+            else truncated = true;
+        }
+
+        @Override public synchronized void write(byte[] bytes, int offset, int length) {
+            if (length <= 0) return;
+            int remaining = MAX_CAPTURE_BYTES - buffer.size();
+            if (remaining > 0) buffer.write(bytes, offset, Math.min(remaining, length));
+            if (length > remaining) truncated = true;
+        }
+
+        synchronized String text() {
+            String result = new String(buffer.toByteArray(), StandardCharsets.UTF_8);
+            return truncated ? result + "\n[output dipotong: batas 256 KiB per stream]" : result;
+        }
+    }
+
+    private static void copy(InputStream in,BoundedOutputStream out){
+        try(InputStream input=in){byte[] b=new byte[4096];int n;while((n=input.read(b))!=-1)out.write(b,0,n);}catch(Exception ignored){}
     }
     private void toastError(String m){Toast.makeText(this,m,Toast.LENGTH_LONG).show();}
     @Override protected void onDestroy(){worker.shutdownNow();super.onDestroy();}

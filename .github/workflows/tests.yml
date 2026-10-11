@@ -63,6 +63,8 @@ jobs:
           java-version: "17"
       - name: Siapkan Android SDK dan NDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
       - name: Pasang Android SDK/NDK yang dibutuhkan
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;27.2.12479018"
       - name: Siapkan Gradle

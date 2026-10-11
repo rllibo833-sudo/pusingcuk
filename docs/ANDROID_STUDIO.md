@@ -6,7 +6,7 @@ Pusingcuk Studio adalah aplikasi Android awal untuk menulis dan menjalankan prog
 
 - Editor kode `.pusingcuk` dengan area input standar dan terminal keluaran.
 - Menjalankan program lewat runtime native C yang dibundel di APK.
-- Batas sumber 64 KiB, input 16 KiB, dan waktu eksekusi 3 detik.
+- Batas sumber 64 KiB, input 16 KiB, waktu eksekusi 3 detik, dan penangkapan output maksimum 256 KiB untuk masing-masing stdout/stderr.
 - Simpan dan buka satu proyek lokal di penyimpanan privat aplikasi.
 - Impor satu berkas dari repositori GitHub publik melalui GitHub Contents API.
 - Bagikan/ekspor kode melalui menu berbagi Android.
@@ -14,7 +14,7 @@ Pusingcuk Studio adalah aplikasi Android awal untuk menulis dan menjalankan prog
 
 ## Build
 
-Workflow `.github/workflows/android-studio.yml` membangun APK untuk PR yang menyentuh aplikasi/runtime dan untuk push ke `main`. Artefak `pusingcuk-studio-debug-apk` tersedia pada halaman run GitHub Actions yang berhasil.
+Job `android-apk` di `.github/workflows/tests.yml` membangun APK pada pull request dan workflow yang dijalankan sesuai pemicu di file tersebut. Artefak `pusingcuk-studio-debug-apk` tersedia pada halaman run GitHub Actions yang berhasil.
 
 Workflow mengompilasi `native/pusingcuk.c` untuk ABI `arm64-v8a` dan `armeabi-v7a`, menempatkan executable ke assets, lalu membangun APK dengan JDK 17, Android SDK/NDK, dan Gradle 8.9.
 
