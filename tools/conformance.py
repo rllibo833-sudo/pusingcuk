@@ -76,7 +76,7 @@ def load_manifest():
         for runtime, state in runtimes.items():
             if runtime not in {"reference", "native"}:
                 raise ManifestError(f"{fixture_id}: runtime tidak dikenal: {runtime}")
-            if state not in ALLOWED_RUNTIME_STATES:
+            if not isinstance(state, str) or state not in ALLOWED_RUNTIME_STATES:
                 raise ManifestError(f"{fixture_id}: status runtime tidak valid: {runtime}")
         validated.append((item, source_path))
     return validated
