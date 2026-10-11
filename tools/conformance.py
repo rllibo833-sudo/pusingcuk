@@ -22,9 +22,11 @@ class ManifestError(ValueError):
     pass
 
 
-def load_manifest():
+def load_manifest(manifest_path=MANIFEST):
+    manifest_path = Path(manifest_path)
+    fixtures_root = manifest_path.parent.resolve()
     try:
-        data = json.loads(MANIFEST.read_text(encoding="utf-8"))
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise ManifestError(f"manifest tidak dapat dibaca: {exc}") from exc
     if not isinstance(data, dict) or data.get("schema_version") != 1:
@@ -45,9 +47,9 @@ def load_manifest():
         source = item.get("source")
         if not isinstance(source, str) or not source or Path(source).is_absolute():
             raise ManifestError(f"{fixture_id}: source harus path relatif")
-        source_path = (FIXTURES / source).resolve()
+        source_path = (fixtures_root / source).resolve()
         try:
-            source_path.relative_to(FIXTURES.resolve())
+            source_path.relative_to(fixtures_root)
         except ValueError as exc:
             raise ManifestError(f"{fixture_id}: path source keluar dari direktori fixture") from exc
         if not source_path.is_file() or source_path.suffix != ".pusingcuk":
