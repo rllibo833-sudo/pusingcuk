@@ -116,7 +116,7 @@ Interpreter melaporkan kesalahan dengan nomor baris jika tersedia.
 
 ## 13. Arah compiler dan portabilitas
 
-Semantik bahasa harus dipisahkan dari implementasi runtime agar program dapat diterjemahkan ke target lain. Rancangan pipeline compiler, IR berversi, capability, backend, dan ABI/FFI dijelaskan di [Arsitektur Compiler dan Interoperabilitas](docs/COMPILER_INTEROP.md). Kontrak manifest tes lintas runtime dijelaskan di [Kontrak Fixture Konformansi](docs/CONFORMANCE_FIXTURES.md).
+Semantik bahasa harus dipisahkan dari implementasi runtime agar program dapat diterjemahkan ke target lain. Baseline perilaku ada di [Kontrak Semantik](docs/SEMANTIC_CONTRACT.md). Front-end dapat mengekspor IR v1 yang mempertahankan AST; format dan validatornya ada di [IR v1](docs/IR_V1.md). Backend C eksperimental mendukung subset integer yang tercatat di [C backend](docs/C_BACKEND.md). Arsitektur target lain dan ABI/FFI dijelaskan di [Arsitektur Compiler dan Interoperabilitas](docs/COMPILER_INTEROP.md), sedangkan tes lintas runtime ada di [Kontrak Fixture Konformansi](docs/CONFORMANCE_FIXTURES.md).
 
 Dokumen tersebut adalah rancangan arsitektur. Saat ini belum ada kontrak IR compiler stabil, compiler multi-target, backend WebAssembly/JavaScript, atau ABI/FFI stabil. Jangan mengklaim fitur tersebut tersedia sebelum implementasi dan fixture konformansi membuktikannya.
 

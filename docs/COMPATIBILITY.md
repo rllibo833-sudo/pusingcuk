@@ -31,7 +31,7 @@ Pusingcuk harus mudah dimulai oleh pemula, tetap dapat dipakai untuk proyek seri
 
 Pusingcuk dirancang agar dapat memiliki beberapa backend tanpa mengubah semantik bahasa. Lihat [arsitektur compiler dan interoperabilitas](COMPILER_INTEROP.md) untuk pipeline front-end → AST → analisis semantik → IR berversi → backend, serta batas rancangan ABI/FFI. Lihat [kontrak fixture konformansi](CONFORMANCE_FIXTURES.md) untuk format tes yang akan dipakai lintas runtime.
 
-IR stabil, compiler multi-target, backend WebAssembly/JavaScript, dan ABI/FFI saat ini **belum tersedia**. Backend baru hanya dapat diklaim kompatibel setelah lulus fixture yang sama untuk fitur yang dinyatakan didukung.
+IR v1 tersedia sebagai format AST-preserving; backend C eksperimental hanya mendukung subset integer yang terdokumentasi. Compiler multi-target penuh, backend WebAssembly/JavaScript, dan ABI/FFI **belum tersedia**. Backend baru hanya dapat diklaim kompatibel setelah lulus fixture yang sama untuk fitur yang dinyatakan didukung.
 
 ## Tingkat kompatibilitas fitur
 

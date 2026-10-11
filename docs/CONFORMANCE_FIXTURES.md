@@ -1,6 +1,6 @@
 # Kontrak Fixture Konformansi Pusingcuk
 
-Status: harness awal tersedia melalui `python tools/conformance.py`; cakupan fixture masih kecil dan akan diperluas bertahap.
+Status: harness otomatis tersedia melalui python tools/conformance.py. Manifest aktif dan fixture konformansi dijalankan oleh CI; setiap backend wajib menggunakan hasil yang sama untuk fitur yang menyatakan required.
 
 ## Tujuan
 

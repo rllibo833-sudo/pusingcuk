@@ -16,6 +16,46 @@
       "requires": ["syntax-diagnostics"],
       "expected": {"exit_code": 1, "stdout": "", "stderr_class": "error"},
       "runtimes": {"reference": "required", "native": "required"}
+    },
+    {
+      "id": "functions.return-value",
+      "source": "functions.pusingcuk",
+      "profile": "core",
+      "requires": ["functions", "return", "calls"],
+      "expected": {"exit_code": 0, "stdout": "9\n", "stderr_class": null},
+      "runtimes": {"reference": "required", "native": "required"}
+    },
+    {
+      "id": "collections.list-index-mutation",
+      "source": "list_index.pusingcuk",
+      "profile": "core",
+      "requires": ["lists", "indexing", "mutation"],
+      "expected": {"exit_code": 0, "stdout": "99\n2\n", "stderr_class": null},
+      "runtimes": {"reference": "required", "native": "required"}
+    },
+    {
+      "id": "collections.boolean-numeric-dictionary-keys",
+      "source": "dictionary_keys.pusingcuk",
+      "profile": "core",
+      "requires": ["dictionaries", "key-identity", "equality"],
+      "expected": {"exit_code": 0, "stdout": "angka\nboolean\n2\ntidak\n", "stderr_class": null},
+      "runtimes": {"reference": "required", "native": "required"}
+    },
+    {
+      "id": "control.range-loop",
+      "source": "range_loop.pusingcuk",
+      "profile": "core",
+      "requires": ["loops", "range"],
+      "expected": {"exit_code": 0, "stdout": "1\n3\n", "stderr_class": null},
+      "runtimes": {"reference": "required", "native": "required"}
+    },
+    {
+      "id": "syntax.alias-keywords",
+      "source": "alias_keywords.pusingcuk",
+      "profile": "core",
+      "requires": ["keyword-aliases", "arithmetic"],
+      "expected": {"exit_code": 0, "stdout": "42\n", "stderr_class": null},
+      "runtimes": {"reference": "required", "native": "required"}
     }
   ]
 }
