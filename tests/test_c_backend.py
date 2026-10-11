@@ -81,6 +81,60 @@ class CBackendTests(unittest.TestCase):
         self.assertEqual(result.stdout, "")
         self.assertIn("division by zero", result.stderr)
 
+    def test_comparisons_booleans_and_short_circuit_match_reference(self):
+        source = (
+            "jancuk\n"
+            "hedeh 2 < 3\n"
+            "hedeh 3 == 3\n"
+            "hedeh benar == 1\n"
+            "hedeh bukan salah\n"
+            "hedeh (2 < 3) dan (5 >= 5)\n"
+            "hedeh salah dan (1 // 0 == 0)\n"
+            "hedeh benar atau (1 // 0 == 0)\n"
+            "selesai jancuk"
+        )
+        self.assert_matches_reference(source)
+        result = self.compile_and_run(source)
+        self.assertEqual(result.stdout, "okelah\nokelah\ntidak\nokelah\nokelah\ntidak\nokelah\n")
+
+    def test_if_else_and_nested_boolean_condition_match_reference(self):
+        source = (
+            "jancuk\n"
+            "lah skor = 7\n"
+            "njir skor >= 5 dan benar\n"
+            "    hedeh 42\n"
+            "kampret\n"
+            "    hedeh 0\n"
+            "selesai njir\n"
+            "njir skor < 5 atau salah\n"
+            "    hedeh 0\n"
+            "kampret\n"
+            "    hedeh benar\n"
+            "selesai njir\n"
+            "selesai jancuk"
+        )
+        self.assert_matches_reference(source)
+        result = self.compile_and_run(source)
+        self.assertEqual(result.stdout, "42\nokelah\n")
+
+    def test_condition_short_circuits_division_by_zero(self):
+        source = (
+            "jancuk\n"
+            "njir salah dan (1 // 0 == 0)\n"
+            "    hedeh 0\n"
+            "kampret\n"
+            "    hedeh 9\n"
+            "selesai njir\n"
+            "selesai jancuk"
+        )
+        self.assert_matches_reference(source)
+        self.assertEqual(self.compile_and_run(source).stdout, "9\n")
+
+    def test_rejects_variable_type_changes(self):
+        source = "jancuk\nlah nilai = 1\nnilai = benar\nselesai jancuk"
+        with self.assertRaisesRegex(CBackendError, "perubahan tipe"):
+            generate(from_source(source))
+
     def test_detects_runtime_integer_overflow(self):
         result = self.compile_and_run(
             "jancuk\nlah angka = 9223372036854775807\n"
