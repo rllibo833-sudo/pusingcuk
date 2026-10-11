@@ -49,3 +49,53 @@ jobs:
         run: make test-native
       - name: Uji konformansi lintas runtime
         run: python tools/conformance.py
+
+  android-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Ambil kode
+        uses: actions/checkout@v4
+      - name: Siapkan Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Siapkan Android SDK dan NDK
+        uses: android-actions/setup-android@v3
+      - name: Pasang Android SDK/NDK yang dibutuhkan
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;27.2.12479018"
+      - name: Siapkan Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+      - name: Bangun runtime native Android ARM
+        shell: bash
+        run: |
+          set -euo pipefail
+          NDK_BIN="$ANDROID_HOME/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          test -x "$NDK_BIN/aarch64-linux-android24-clang"
+          mkdir -p android-studio/app/src/main/assets/bin/arm64-v8a
+          "$NDK_BIN/aarch64-linux-android24-clang" -std=c11 -O2 -Wall -Wextra native/pusingcuk.c -lm -o android-studio/app/src/main/assets/bin/arm64-v8a/pusingcuk-native
+          chmod 755 android-studio/app/src/main/assets/bin/arm64-v8a/pusingcuk-native
+          mkdir -p android-studio/app/src/main/assets/bin/armeabi-v7a
+          "$NDK_BIN/armv7a-linux-androideabi24-clang" -std=c11 -O2 -Wall -Wextra native/pusingcuk.c -lm -o android-studio/app/src/main/assets/bin/armeabi-v7a/pusingcuk-native
+          chmod 755 android-studio/app/src/main/assets/bin/armeabi-v7a/pusingcuk-native
+          file android-studio/app/src/main/assets/bin/*/pusingcuk-native
+      - name: Bangun APK debug
+        working-directory: android-studio
+        run: gradle --no-daemon assembleDebug
+      - name: Periksa APK
+        run: |
+          set -euo pipefail
+          APK=android-studio/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='org.pusingcuk.studio'"
+      - name: Unggah APK debug
+        uses: actions/upload-artifact@v4
+        with:
+          name: pusingcuk-studio-debug-apk
+          path: android-studio/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
