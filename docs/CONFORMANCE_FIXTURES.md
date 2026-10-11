@@ -1,6 +1,6 @@
 # Kontrak Fixture Konformansi Pusingcuk
 
-Status: rancangan untuk suite konformansi lintas runtime. Dokumen ini belum berarti harness otomatis sudah tersedia.
+Status: harness awal tersedia melalui `python tools/conformance.py`; cakupan fixture masih kecil dan akan diperluas bertahap.
 
 ## Tujuan
 
@@ -30,7 +30,7 @@ Fixture sumber disimpan sebagai `.pusingcuk`. Metadata sebaiknya dipisahkan ke m
 }
 ```
 
-Contoh di atas menunjukkan format yang diusulkan, bukan manifest yang sudah dibaca oleh CI. Implementasi harness harus memvalidasi schema dan path fixture, bukan mempercayai field manifest tanpa pemeriksaan.
+Manifest aktif berada di `tests/conformance/manifest.json`. Harness memvalidasi versi schema, ID unik, field yang diizinkan, exit code, kelas error, status runtime, dan path fixture; ia tidak menjalankan perintah dari metadata.
 
 ## Aturan metadata
 
@@ -75,12 +75,12 @@ Jika error message memang menjadi kontrak publik, uji pesan yang distabilkan. Se
 
 ## Gerbang sebelum implementasi dianggap siap
 
-1. Manifest schema terdokumentasi dan divalidasi.
-2. Harness menampilkan pass/fail/unsupported terpisah.
-3. Setidaknya satu fixture sukses dan satu fixture gagal diuji pada setiap runtime wajib.
-4. CI menjalankan suite dengan versi runtime dan toolchain yang dicatat.
-5. Menambah backend tidak mengubah expected output secara diam-diam.
-6. README dan matriks runtime menyatakan dengan tepat apa yang benar-benar diuji.
+1. [x] Manifest schema terdokumentasi dan divalidasi.
+2. [x] Harness menampilkan PASS/FAIL/UNSUPPORTED terpisah.
+3. [x] Satu fixture sukses dan satu fixture gagal dijalankan pada runtime wajib saat ini (reference dan native).
+4. [x] CI menjalankan suite di job native GCC dan Clang.
+5. [ ] Tambahkan cakupan fixture dan jalankan untuk setiap backend baru sebelum backend dianggap konforman.
+6. [ ] Perluas kelas diagnostik error setelah kontrak error publik distabilkan.
 
 ## Hubungan dengan dokumen lain
 
