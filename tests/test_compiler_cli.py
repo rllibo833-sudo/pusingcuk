@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from compiler import compile_source
+from compiler.__main__ import compile_source
 
 
 SOURCE = "jancuk\nhedeh 42\nselesai jancuk"
