@@ -204,5 +204,16 @@ class CBackendTests(unittest.TestCase):
             generate(from_source("jancuk\nfungsi identitas(x)\n    balek x\nselesai fungsi\nhedeh identitas(benar)\nselesai jancuk"))
 
 
+    def test_genz_aliases_work_across_loop_condition_and_function(self):
+        source = (
+            "gas\nbestie angka = 3\n"
+            "fungsi kuadrat(n)\n    balek n * n\nselesai fungsi\n"
+            "mumet angka > 0\n    spill kuadrat(angka)\n    angka = angka - 1\nselesai mumet\n"
+            "njir valid\n    spill zonk\nskip\n    spill valid\nkelar njir\nkelar gas"
+        )
+        self.assert_matches_reference(source)
+        self.assertEqual(self.compile_and_run(source).stdout, "9\n4\n1\ntidak\n")
+
+
 if __name__ == "__main__":
     unittest.main()
