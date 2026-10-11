@@ -102,3 +102,17 @@ jobs:
           path: android-studio/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
+
+
+  pvm-backends:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Ambil kode
+        uses: actions/checkout@v7
+      - name: Siapkan Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - name: Verifikasi assembler dan kesetaraan backend PVM
+        run: bash tests/test_all.sh
