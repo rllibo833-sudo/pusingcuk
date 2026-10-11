@@ -45,6 +45,7 @@ Binary default ditempatkan di root repositori sebagai `pusingcuk-native` (sesuai
 - Runtime native C belum setara penuh dengan pipeline modular Python. Fungsi native dibatasi 128 deklarasi tingkat atas, 32 parameter/argumen per fungsi, dan kedalaman panggilan 100; sistem modul belum tersedia.
 - Indeks teks native menerima indeks bilangan bulat nonnegatif; indeks negatif belum didukung.
 - Teks native disimpan dalam buffer tetap berukuran 1024 byte. Operasi yang membangun teks harus diperiksa terhadap batas ini; dukungan indeks/iterasi code point UTF-8 tidak berarti runtime telah memvalidasi semua urutan UTF-8 atau menyediakan normalisasi Unicode.
+- Penggabungan teks native menerima hasil hingga 1023 byte payload (ditambah terminator NUL); hasil yang melampaui kapasitas ditolak, dan batas tepat diuji melalui fixture native.
 - Literal angka desimal non-finite dan hasil operasi aritmetika yang menjadi `NaN`/tak hingga ditolak dengan error. Output angka integral hanya dikonversi ke integer jika berada dalam rentang `long long`; angka finite di luar rentang tersebut tetap dicetak sebagai desimal.
 - Batas loop dan langkah eksekusi membantu mengendalikan beban, tetapi **bukan sandbox**. Jangan jalankan program tak tepercaya dengan asumsi terisolasi.
 - Setiap fitur native baru wajib memiliki fixture yang dijalankan oleh `make test-native`, termasuk kasus error bila relevan. Dokumentasi tidak boleh mengklaim dukungan hanya karena interpreter Python mendukung fitur tersebut.

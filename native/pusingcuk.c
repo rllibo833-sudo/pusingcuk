@@ -400,8 +400,13 @@ static Val add(void) {
             Val b=mul();
             if (a.t==STR && b.t==STR) {
                 char tmp[SZ];
-                if (strlen(a.s)+strlen(b.s)>=sizeof tmp) { fail("hasil string terlalu panjang"); return string(""); }
-                snprintf(tmp,sizeof tmp,"%s%s",a.s,b.s); a=string(tmp);
+                size_t a_len = strlen(a.s), b_len = strlen(b.s);
+                if (a_len + b_len >= sizeof tmp) {
+                    fail("hasil string terlalu panjang"); return string("");
+                }
+                memcpy(tmp, a.s, a_len);
+                memcpy(tmp + a_len, b.s, b_len + 1);
+                a = string(tmp);
             } else if (a.t==NUM && b.t==NUM) a=checked_num(a.n+b.n,"hasil angka desimal terlalu besar atau tidak valid");
             else { fail("'+' membutuhkan dua angka atau dua string"); return num(0); }
         } else if (take("-")) {
