@@ -126,15 +126,27 @@ static int truth(Val v) {
     if (v.t==RANGE) return range_length(v) != 0;
     return v.s[0]!=0;
 }
-static int equal(Val a, Val b) {
+static int equal_depth(Val a, Val b, unsigned depth) {
     if (a.t!=b.t) return 0;
     if (a.t==NIL) return 1;
     if (a.t==NUM) return a.n==b.n;
     if (a.t==BOOL) return a.b==b.b;
     if (a.t==RANGE) return a.range_start==b.range_start && a.range_end==b.range_end && a.range_step==b.range_step;
-    if (a.t==LIST) return a.list==b.list;
+    if (a.t==LIST) {
+        if (a.list==b.list) return 1;
+        if (!a.list || !b.list || a.list->len!=b.list->len) return 0;
+        /* Bound recursive comparison so cyclic or deeply nested lists cannot exhaust the C stack. */
+        if (depth>=64) return 0;
+        for (size_t i=0; i<a.list->len; i++)
+            if (!equal_depth(a.list->items[i],b.list->items[i],depth+1)) return 0;
+        return 1;
+    }
+    /* Dictionary equality remains identity-based until its language contract is specified. */
     if (a.t==DICT) return a.dict==b.dict;
     return !strcmp(a.s,b.s);
+}
+static int equal(Val a, Val b) {
+    return equal_depth(a,b,0);
 }
 static int valid_dict_key(Val key) {
     if (key.t==STR || key.t==NUM || key.t==BOOL) return 1;
