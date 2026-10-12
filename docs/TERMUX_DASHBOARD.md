@@ -8,12 +8,11 @@ Dari root repo:
 
 ```sh
 pkg update
-pkg install git gh nano clang make python nodejs -y
-gh auth login
+pkg install git nano clang make python nodejs -y
 chmod +x tools/termux_dashboard.sh
 ```
 
-Pilih login GitHub via HTTPS ketika diminta. Pastikan `gh auth status` berhasil.
+GitHub CLI (`gh`) tidak diperlukan untuk menu branch, Actions, dan Pull Requests. Menu Actions dan PR membuka halaman GitHub di browser. Melihat branch lokal/remote memakai Git; pembaruan referensi remote memakai `git fetch origin --prune`, yang untuk repo publik biasanya tidak membutuhkan login.
 
 ## Menjalankan dashboard
 
@@ -51,11 +50,13 @@ PUSINGCUK_NO_DASHBOARD=1 bash
 
 Menu sinkronisasi akan meminta konfirmasi, lalu melakukan commit (jika ada perubahan), `git pull --rebase`, dan `git push` pada branch aktif. Ini mengotomatisasi langkah Git, tetapi bukan sinkronisasi langsung tanpa Git: perubahan lokal baru terlihat di GitHub setelah berhasil dikirim melalui jaringan.
 
-Jangan menaruh token, kata sandi, kunci privat, atau data rahasia di repo. Jika terjadi konflik rebase, dashboard menghentikan proses sebelum push agar perubahan tidak tertimpa. Periksa `git status` dan selesaikan konflik secara manual.
+Jangan menaruh token, kata sandi, kunci privat, atau data rahasia di repo. Menu sinkronisasi saat ini menggunakan `git add -A`, jadi periksa `git status --short` dan pastikan tidak ada file rahasia sebelum menggunakannya. Jika terjadi konflik rebase, dashboard menghentikan proses sebelum push agar perubahan tidak tertimpa.
 
 ## Batasan
 
 - Dashboard membutuhkan repo lokal yang sudah di-clone.
-- Menu Actions dan PR memerlukan GitHub CLI (`gh`) yang sudah login.
+- Menu 2 menampilkan branch yang tersimpan secara lokal, mencoba memperbaruinya dengan Git, lalu membuka daftar branch lengkap di browser.
+- Menu 3 membuka GitHub Actions di browser, tanpa memerlukan `gh auth login`.
+- Menu 4 membuka Pull Requests di browser, tanpa memerlukan `gh auth login`.
 - Tes tertentu memerlukan toolchain yang sesuai (Clang, Node.js, Python, Make).
-- Dashboard tidak menampilkan seluruh UI web GitHub; ia menyediakan ringkasan terminal dan shortcut.
+- Dashboard tidak menampilkan seluruh UI web GitHub di dalam terminal; shortcut membuka browser Android.

@@ -42,9 +42,15 @@ show_status() {
 }
 
 show_branches() {
-  printf '\nBRANCH LOKAL + REMOTE YANG TERSIMPAN DI TERMUX\n'
-  git branch -avv
-  printf '\nMembuka daftar semua branch GitHub di browser...\n'
+  printf '\nMemperbarui referensi branch dari GitHub (tanpa gh)...\n'
+  if git fetch origin --prune; then
+    printf '\nBRANCH LOKAL + REMOTE YANG TERSIMPAN DI TERMUX\n'
+    git branch -avv
+  else
+    printf '\nFetch gagal; menampilkan branch lokal/remote yang tersimpan.\n'
+    git branch -avv
+  fi
+  printf '\nMembuka daftar branch lengkap di GitHub...\n'
   open_page "$REPO_URL/branches"
   pause
 }
@@ -141,9 +147,9 @@ while true; do
   if [ -z "$(git status --porcelain)" ]; then printf 'bersih\n'; else printf 'ada perubahan lokal\n'; fi
   printf '\n'
   printf '  1. Ringkasan status repo\n'
-  printf '  2. Lihat branch lokal dan remote\n'
-  printf '  3. Lihat GitHub Actions terbaru\n'
-  printf '  4. Lihat Pull Requests terbuka\n'
+  printf '  2. Lihat branch + buka daftar branch GitHub\n'
+  printf '  3. Buka GitHub Actions (browser, tanpa gh)\n'
+  printf '  4. Buka Pull Requests (browser, tanpa gh)\n'
   printf '  5. Jalankan tes proyek\n'
   printf '  6. Buat/edit program Pusingcuk\n'
   printf '  7. Sinkronkan branch aktif ke GitHub\n'
@@ -160,8 +166,8 @@ while true; do
     5) run_tests ;;
     6) edit_program ;;
     7) sync_repo ;;
-    8) if command -v termux-open-url >/dev/null 2>&1; then termux-open-url "$REPO_URL"; else printf '%s\n' "$REPO_URL"; pause; fi ;;
-    9) exec "${SHELL:-/data/data/com.termux/files/usr/bin/bash}" -i ;;
+    8) open_page "$REPO_URL"; pause ;;
+    9) PUSINGCUK_NO_DASHBOARD=1 exec "${SHELL:-/data/data/com.termux/files/usr/bin/bash}" -i ;;
     0) printf 'Dashboard ditutup.\n'; exit 0 ;;
     *) printf 'Pilihan tidak dikenal.\n'; sleep 1 ;;
   esac
