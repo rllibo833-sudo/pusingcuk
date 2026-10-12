@@ -82,5 +82,24 @@ class EvaluatorTests(unittest.TestCase):
             self.assertEqual(capture(source), "Halo, Budi\n")
 
 
+    def test_plus_rejects_text_and_number_with_clear_error(self):
+        with self.assertRaisesRegex(RuntimeError, r"operator '\+' membutuhkan dua angka, dua teks"):
+            run(program('hedeh "umur " + 17'))
+
+    def test_plus_rejects_number_and_text_with_clear_error(self):
+        with self.assertRaisesRegex(RuntimeError, r"operator '\+' membutuhkan dua angka, dua teks"):
+            run(program('hedeh 17 + " tahun"'))
+
+    def test_plus_allows_two_texts_and_two_numbers(self):
+        self.assertEqual(capture(program(
+            'hedeh "halo " + "dunia"\\nhedeh 17 + 3'
+        )), "halo dunia\\n20\\n")
+
+    def test_plus_allows_two_lists(self):
+        self.assertEqual(capture(program(
+            "hedeh [1, 2] + [3]"
+        )), "[1, 2, 3]\\n")
+
+
 if __name__ == "__main__":
     unittest.main()
