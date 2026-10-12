@@ -92,13 +92,13 @@ class EvaluatorTests(unittest.TestCase):
 
     def test_plus_allows_two_texts_and_two_numbers(self):
         self.assertEqual(capture(program(
-            'hedeh "halo " + "dunia"\\nhedeh 17 + 3'
-        )), "halo dunia\\n20\\n")
+            'hedeh "halo " + "dunia"\nhedeh 17 + 3'
+        )), "halo dunia\n20\n")
 
     def test_plus_allows_two_lists(self):
         self.assertEqual(capture(program(
             "hedeh [1, 2] + [3]"
-        )), "[1, 2, 3]\\n")
+        )), "[1, 2, 3]\n")
 
 
 if __name__ == "__main__":
