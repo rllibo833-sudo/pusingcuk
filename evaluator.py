@@ -7,6 +7,7 @@ from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.error import HTTPError
 from urllib.parse import urlsplit
 import ipaddress
+import socket
 import json
 from datetime import datetime, date
 from ast_nodes import Node
@@ -118,9 +119,19 @@ _BLOCKED_NETWORKS = tuple(
     for network in (
         "0.0.0.0/32", "10.0.0.0/8", "127.0.0.0/8",
         "169.254.0.0/16", "172.16.0.0/12", "192.168.0.0/16",
-        "::1/128", "fe80::/10",
+        "::1/128", "fc00::/7", "fe80::/10",
     )
 )
+
+
+def _is_blocked_address(address):
+    """Reject non-public destinations, including IPv4-mapped IPv6 addresses."""
+    if getattr(address, "ipv4_mapped", None) is not None:
+        address = address.ipv4_mapped
+    return not address.is_global or any(
+        address.version == network.version and address in network
+        for network in _BLOCKED_NETWORKS
+    )
 
 
 def _is_blocked_hostname(hostname):
@@ -130,10 +141,17 @@ def _is_blocked_hostname(hostname):
     try:
         address = ipaddress.ip_address(host)
     except ValueError:
-        return False
-    if getattr(address, "ipv4_mapped", None) is not None:
-        address = address.ipv4_mapped
-    return any(address in network for network in _BLOCKED_NETWORKS)
+        # Resolve before handing the URL to urllib. Fail closed when DNS cannot
+        # be resolved, and inspect both IPv4 and IPv6 answers.
+        try:
+            ipv4 = socket.gethostbyname(host)
+            addresses = [ipaddress.ip_address(ipv4)]
+            for result in socket.getaddrinfo(host, None, type=socket.SOCK_STREAM):
+                addresses.append(ipaddress.ip_address(result[4][0].split("%", 1)[0]))
+        except (OSError, ValueError):
+            return True
+        return any(_is_blocked_address(address) for address in addresses)
+    return _is_blocked_address(address)
 
 
 def _valid_http_url(url):
