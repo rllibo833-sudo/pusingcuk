@@ -53,3 +53,8 @@ Perubahan semantik wajib mencakup pembaruan SPEC.md dan dokumen ini, fixture pos
 ## Batas compiler saat ini
 
 IR v1 merupakan AST-preserving interchange format yang berversi, deterministik, dapat divalidasi, dan membawa source map serta daftar fitur. Ini belum bytecode, belum SSA, belum mengoptimalkan program, dan belum menghasilkan C/WASM/JavaScript. Backend dibangun setelah kontrak semantik dan fixture mencakup fitur yang diterjemahkan.
+
+
+## Shared builtin metadata
+
+`library/builtin_contract.json` is the canonical metadata source for builtin names, arity, importer allow-lists, backend helper mappings, and target support. Do not copy builtin-name tables into new importer/backend/test code. Runtime implementations remain target-specific, and every `supported` declaration must have executable tests.

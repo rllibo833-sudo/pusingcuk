@@ -165,3 +165,8 @@ Pusingcuk is intended to be developed by people and communities beyond its found
 ## License
 
 Pusingcuk is distributed under the MIT License. See [LICENSE](LICENSE).
+
+
+## Builtin contract and offline-first roadmap
+
+Builtin names, arity, Python import mappings, backend helper mappings, and compatibility status are defined in [`library/builtin_contract.json`](library/builtin_contract.json). This helps keep the reference registry, importer, compiler backends, and tests consistent. See [`library/README.md`](library/README.md) for how to extend it.

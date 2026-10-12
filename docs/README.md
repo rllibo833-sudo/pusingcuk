@@ -60,3 +60,6 @@ The machine-readable vocabulary registry and selected examples live in [the libr
 ## How to report a documentation problem
 
 When reporting a mismatch, include the document path, the relevant heading, the runtime or backend involved, the exact command used, and a minimal reproducible example where possible. Do not include passwords, tokens, private data, or details of an unpatched security issue in a public report; follow [SECURITY.md](../SECURITY.md) for security concerns.
+
+
+- [Shared builtin contract](../library/README.md#builtin-contract-one-metadata-source)

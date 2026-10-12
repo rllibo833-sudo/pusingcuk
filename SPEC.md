@@ -154,3 +154,8 @@ Alias tidak mengubah makna sintaks dan tidak menghapus kata kunci lama. Runtime 
 Eksperimen PVM memiliki assembler dan backend JavaScript/Python. Spesifikasi framing, 19 opcode, operand, dan batas kompatibilitas berada di [docs/PVM_SPEC.md](docs/PVM_SPEC.md). Format ini masih draft: parser sumber C bersifat line-oriented, bukan parser ekspresi penuh, dan kesetaraan seluruh fitur belum dijamin. Jangan menganggap PVM v1 sebagai ABI stabil sebelum fixture konformansi lulus di CI.
 
 **Peringatan keamanan:** backend JavaScript PVM memakai parser ekspresi terbatas dan menolak URL jaringan eksternal; backend Python memakai evaluator AST terbatas. Payload lokal `data:text/plain,` tetap didukung oleh opcode PVM terkait, tetapi operasi file PVM belum dibatasi oleh sandbox sistem operasi. Ini bukan sandbox. Jangan menjalankan bytecode atau program Pusingcuk yang tidak dipercaya.
+
+
+## Shared builtin metadata
+
+Canonical builtin names, accepted argument counts, Python standard-library allow-lists, backend helper mappings, and per-target support states are recorded in `library/builtin_contract.json`. This is machine-readable implementation metadata connected to the semantic contract; it does not replace the language specification or imply support in targets marked `unsupported` or `not-claimed`. Platform services such as databases, servers, browser APIs, Web3, and blockchain integrations remain explicit adapters/capabilities, not implicit offline core behavior.

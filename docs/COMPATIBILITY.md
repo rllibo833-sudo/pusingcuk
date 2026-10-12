@@ -87,3 +87,14 @@ The experimental Python importer uses explicit allow-lists, not arbitrary host i
 | `statistics.median` | `median` | JS, Python, HTML | One non-empty list of finite numbers; not full `statistics` semantics |
 
 VM and native C support for the new statistics helpers is not claimed. Unsupported imports such as `statistics.variance`, wildcard imports, and other modules are rejected instead of being silently passed through. HTML uses the JavaScript backend, so its helper implementation and tests share that runtime. See [Python importer limits](IMPORT_PYTHON.md) and [standard-library registry](compiler-type-system-and-stdlib.md).
+
+
+## Shared builtin contract
+
+The machine-readable source of builtin metadata is [`library/builtin_contract.json`](../library/builtin_contract.json). It defines canonical names, parameters and accepted arity, Python import allow-lists, target helper mappings, and explicit support states. The Python reference registry and JS/Python backend dispatch are derived from it; runtime implementation code remains target-specific.
+
+- `supported`: implemented and covered by tests for that target.
+- `unsupported`: explicitly not implemented by that target.
+- `not-claimed`: not verified; do not promise compatibility.
+
+The contract is not a package manager and does not imply network access. Database, server, browser, Web3, and blockchain APIs should be separate capability-scoped adapters with local/mock modes for offline development and explicit target support.

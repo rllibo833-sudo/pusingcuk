@@ -155,3 +155,10 @@ Backend belum boleh disebut siap hanya karena bisa mengompilasi contoh "Halo dun
 | Modul dan package manager | Belum tersedia penuh |
 
 Jangan mengklaim target eksperimental sebagai stabil atau mengklaim ABI/FFI sampai implementasi, tes, dan dokumentasi target benar-benar ada.
+
+
+## Shared builtin contract and capability boundaries
+
+The canonical builtin metadata lives in [`library/builtin_contract.json`](../library/builtin_contract.json). The reference registry, Python importer allow-list, JS/Python backend dispatch, and contract consistency tests consume that file instead of maintaining independent name/arity tables. This is metadata centralization, not a claim that backend runtime code is shared or semantically identical: every `supported` target still needs executable tests.
+
+Database, server/API, browser DOM, network, Web3, and blockchain APIs are future capabilities, not core builtins. Each adapter should declare its required capabilities, have a local/mock mode for offline development, and fail clearly when a target or permission is unavailable. Credentials and network/file access must never be silently enabled by importing a module.

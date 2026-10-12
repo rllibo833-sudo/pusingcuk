@@ -52,3 +52,15 @@ The glossary is a practical index, not a replacement for `SPEC.md`, the semantic
 ## Explicit Python statistics subset
 
 The Python importer maps only `statistics.mean` to `rata_rata` and `statistics.median` to `median`. Both accept a non-empty list of finite numbers; this is a deliberately small Pusingcuk API, not full Python `statistics` compatibility. Other statistics functions, wildcard imports, VM, and native C support are not claimed.
+
+
+## Builtin contract: one metadata source
+
+`builtin_contract.json` owns canonical names, parameters/arity, descriptions, Python import mappings, backend helper names, and support states. `builtin_contract.py` validates and exposes it. The reference registry and backend dispatch tables are derived from this metadata; implementation code remains target-specific. `tools/conformance.py` loads the same contract before running fixtures.
+
+Use only these support labels:
+- `supported`: implementation and tests exist for that target.
+- `unsupported`: the target is known not to implement this builtin.
+- `not-claimed`: support has not been verified; do not promise compatibility.
+
+Database, server, browser, Web3, and blockchain imports must not be added as names alone. They need explicit adapters, capability permissions, offline-friendly development modes, and target-specific tests.

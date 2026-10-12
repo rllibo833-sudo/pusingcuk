@@ -39,6 +39,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -66,6 +69,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -93,6 +99,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -120,6 +129,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -147,6 +159,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -179,6 +194,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -209,6 +227,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -240,6 +261,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -271,6 +295,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -301,6 +328,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -331,6 +361,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -361,6 +394,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -391,6 +427,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -422,6 +461,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -452,6 +494,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -482,6 +527,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -512,6 +560,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     },
@@ -542,6 +593,9 @@
         },
         "native_c": {
           "status": "not-claimed"
+        },
+        "reference": {
+          "status": "supported"
         }
       }
     }

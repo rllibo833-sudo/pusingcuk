@@ -67,3 +67,10 @@ diaktifkan di semua backend.
 ## Statistics builtins and compatibility
 
 The importer supports `statistics.mean` and `statistics.median`, mapped to `rata_rata(daftar)` and `median(daftar)`. These are implemented and tested on JavaScript, Python, and HTML (which embeds the JS runtime). Inputs must be a non-empty list of finite numbers; booleans are rejected. The VM and native C runtime do not claim support. The presence of these builtins does not mean the full Python `statistics` module is compatible.
+
+
+## Kontrak builtin bersama
+
+Metadata nama builtin, jumlah argumen, pemetaan importer Python, helper backend, dan status kompatibilitas bersumber dari [`library/builtin_contract.json`](../library/builtin_contract.json). Registry referensi, importer, backend JS/Python, dan pemeriksaan konformansi membaca kontrak yang sama. Implementasi runtime tetap terpisah karena operasi Python, JavaScript, VM, dan native C tidak identik secara otomatis.
+
+Status `supported` hanya boleh dipakai jika implementasi dan tes target tersedia. `unsupported` berarti target diketahui belum memiliki implementasi; `not-claimed` berarti kompatibilitas belum diverifikasi. HTML berbagi runtime JavaScript, bukan runtime browser terpisah. Database, server, Web3, blockchain, dan API browser bukan bagian dari builtin core.
