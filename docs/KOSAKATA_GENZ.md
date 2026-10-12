@@ -63,6 +63,12 @@ Backend C kini memiliki dukungan teruji untuk loop `mumet` dan fungsi tingkat at
 
 Contoh runnable tersedia di `library/loops_functions_genz.pusingcuk`. Untuk mencoba seluruh contoh termasuk teks, gunakan `python pusingcuk_new.py library/loops_functions_genz.pusingcuk`. Daftar kanonis dan status runtime tetap tercatat di `library/kosakata.json`.
 
+## Konteks lokal dan lintas budaya
+
+Pusingcuk memakai slang Indonesia sebagai salah satu identitasnya, bukan sebagai ukuran universal bahasa anak muda. Istilah yang akrab di satu kota atau komunitas bisa terdengar kasar, membingungkan, atau memiliki makna lain di wilayah dan bahasa berbeda. Silakan memberi kritik budaya dengan hormat.
+
+Istilah Gen Z dan Gen Alpha mencakup banyak generasi, wilayah, dan komunitas; tidak ada satu daftar slang yang mewakili semuanya. Kosakata daerah tambahan atau profil alias yang dapat dipilih masih merupakan gagasan masa depan, bukan fitur yang tersedia sekarang. Alias yang diterima runtime saat ini tetap harus mengikuti implementasi dan tes.
+
 ## Aturan desain
 
 - Kata slang adalah alias resmi, bukan pengganti wajib; kata kanonis lama tetap berlaku.
