@@ -120,16 +120,23 @@ Semantik bahasa harus dipisahkan dari implementasi runtime agar program dapat di
 
 Status implementasi saat ini: front-end dapat mengekspor IR v1, dan CLI `python -m compiler` memiliki target eksperimental `js`, `python`, `html`, `json`, dan `vm`. Backend source C eksperimental tersedia secara terpisah. Target-target tersebut hanya mendukung subset yang berbeda; keberadaan target bukan jaminan kesetaraan semantik atau ABI yang stabil. WebAssembly dan ABI/FFI stabil belum tersedia. Rujuk `docs/COMPILER_TARGETS.md`, `docs/IR_V1.md`, `docs/JS_BACKEND.md`, `docs/BYTECODE_VM.md`, dan `docs/COMPATIBILITY.md` sebelum mengandalkan target tertentu.
 
-## 14. Status spesifikasi
+## 14. Status spesifikasi dan pembekuan sintaks
 
-Dokumen ini mencatat perilaku implementasi saat ini.
-Fitur yang belum diuji tidak dianggap telah didukung.
+Mulai versi 0.4-dev, sintaks dan kosakata yang tercantum dalam dokumen ini dibekukan untuk masa maintenance. Kata kunci inti, alias slang, operator, dan bentuk blok yang sudah tercatat tetap dipertahankan. Kata kunci atau alias baru, perubahan ejaan, maupun perubahan makna sintaks hanya boleh ditambahkan dengan izin eksplisit Founder Pusingcuk.
+
+Interpreter Python modular (`pusingcuk_new.py`, melalui `lexer.py`, `parser.py`, dan `evaluator.py`) adalah implementasi referensi. Perilakunya harus mengikuti dokumen ini; jika ditemukan perbedaan, perbaiki implementasi referensi atau ubah spesifikasi hanya setelah mendapat izin Founder.
+
+Runtime C, backend JavaScript, backend Python hasil kompilasi, dan PVM adalah implementasi pengikut eksperimental. Mereka boleh mendukung subset yang lebih kecil dan tidak menjadi acuan untuk mengubah makna bahasa. Jangan mengklaim kesetaraan penuh hanya karena sebuah target tersedia.
+
+Dokumen ini mencatat perilaku resmi yang dituju. Jika dukungan implementasi belum lengkap, tandai sebagai batas implementasi; jangan diam-diam mengubah makna sintaks.
 
 ## 15. Runtime native dan Termux
 
 Runtime C dapat dibangun dengan compiler C11 dan dijalankan sebagai executable tanpa Python untuk subset fitur yang tercantum dalam `docs/NATIVE_RUNTIME.md`. Di Termux, setelah memasang `clang` dan `make`, jalankan `bash scripts/install-termux.sh`, lalu gunakan `pusingcuk-native examples/native/rekap_anggaran.pusingcuk`. Fungsi buatan pengguna tersedia pada runtime native; sistem modul belum tersedia.
 
-## 16. Alias kosakata slang
+## 16. Alias kosakata slang Gen Z dan Gen Alpha
+
+Kosakata slang adalah lapisan gaya bahasa Pusingcuk, bukan bahasa inti terpisah. Daftar alias berikut dibekukan bersama sintaks; jangan menambah alias atau kata kunci baru tanpa izin eksplisit Founder.
 
 Lexer menerima alias berikut dan menormalkannya ke kata kunci kanonis sebelum parsing:
 
