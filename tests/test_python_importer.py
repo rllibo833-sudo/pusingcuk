@@ -43,10 +43,10 @@ class PythonImporterTests(unittest.TestCase):
 
     def test_numeric_builtins_map_to_supported_stdlib(self):
         result = translate(
-            "print(abs(-8))\\n"
-            "print(round(2.5))\\n"
-            "print(min(4, 9))\\n"
-            "print(max(4, 9))\\n"
+            "print(abs(-8))\n"
+            "print(round(2.5))\n"
+            "print(min(4, 9))\n"
+            "print(max(4, 9))\n"
         )
         self.assertIn("hedeh mutlak((-8))", result)
         self.assertIn("hedeh bulatkan(2.5)", result)
@@ -56,19 +56,19 @@ class PythonImporterTests(unittest.TestCase):
 
     def test_numeric_builtin_arity_is_checked(self):
         with self.assertRaises(ImportErrorPython):
-            translate("print(min(1))\\n")
+            translate("print(min(1))\n")
         with self.assertRaises(ImportErrorPython):
-            translate("print(round(1, 2))\\n")
+            translate("print(round(1, 2))\n")
 
     def test_elif_structure(self):
         result = translate(
-            "score = 8\\n"
-            "if score > 8:\\n"
-            "    print('tinggi')\\n"
-            "elif score == 8:\\n"
-            "    print('pas')\\n"
-            "else:\\n"
-            "    print('rendah')\\n"
+            "score = 8\n"
+            "if score > 8:\n"
+            "    print('tinggi')\n"
+            "elif score == 8:\n"
+            "    print('pas')\n"
+            "else:\n"
+            "    print('rendah')\n"
         )
         self.assertIn("kampret", result)
         parse(result)
