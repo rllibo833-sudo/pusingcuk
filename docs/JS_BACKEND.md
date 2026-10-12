@@ -29,7 +29,7 @@ Alur awal:
 
 \`PusingCuk source → parser/IR v1 → backend target → artifact\`
 
-Backend ini adalah target JavaScript pertama. IR v1 juga bisa disimpan sebagai JSON untuk pertukaran alat, tetapi JSON IR bukan bytecode atau program yang dapat langsung dieksekusi. Backend Python, WebAssembly, HTML/browser bundling, dan integrasi blockchain adalah target lanjutan terpisah yang perlu kontrak fitur dan tes kompatibilitas masing-masing.
+Backend ini adalah target JavaScript pertama. IR v1 juga bisa disimpan sebagai JSON untuk pertukaran alat, tetapi JSON IR bukan bytecode atau program yang dapat langsung dieksekusi. Backend Python, HTML mandiri, dan VM JSON tersedia sebagai target eksperimental terpisah dengan cakupan berbeda. WebAssembly, bundling frontend yang lengkap, dan integrasi blockchain adalah target lanjutan yang memerlukan kontrak fitur dan tes kompatibilitas masing-masing.
 
 ## Tes
 
