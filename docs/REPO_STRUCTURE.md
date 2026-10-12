@@ -26,7 +26,7 @@ Dokumen ini menjelaskan fungsi direktori dan file utama agar kontributor baru da
 | `terminal.py` | Terminal interaktif untuk belajar dan menjalankan program. |
 | `compiler_ir.py` | Representasi intermediate yang digunakan pipeline compiler tertentu. |
 | `compiler/` | CLI compiler, IR, sistem tipe, bytecode/VM, dan backend C, JavaScript, serta Python. |
-| `src/backends/` | Backend PVM terpisah, termasuk JavaScript dan Python. Periksa `docs/PVM_SPEC.md`; backend JS saat ini memiliki risiko keamanan dan bukan sandbox. |
+| `src/backends/` | Backend PVM terpisah, termasuk JavaScript dan Python. Periksa `docs/PVM_SPEC.md`; ekspresi memakai parser terbatas dan opcode jaringan ditolak, tetapi opcode file masih dapat mengakses file yang tersedia bagi proses. |
 | `src/c-core/` | Implementasi runtime/inti native C. |
 | `native/` | Build dan kode runtime native C. |
 | `Makefile` | Target build, test, dan perintah pengembangan. |
@@ -79,7 +79,7 @@ Tujuan jangka panjang Pusingcuk adalah menjadi bahasa yang mudah dipelajari namu
 | Database | Belum ada dasar untuk mengklaim konektor database standar yang lengkap hanya dari struktur repo. Perlu driver, kontrak koneksi, pengelolaan kredensial, migrasi, dan tes. |
 | WebAssembly (WASM) | Belum ada backend WASM yang dinyatakan tersedia dalam dokumentasi target saat ini. |
 | Blockchain | Belum ada dukungan blockchain produksi yang terverifikasi hanya dari keberadaan nama/file lokal. Perlu API/SDK, penandatanganan transaksi aman, pengujian jaringan, dan audit. |
-| Sandbox keamanan | Belum tersedia sebagai jaminan umum. Jangan menjalankan kode atau bytecode tak tepercaya; lihat `SECURITY.md` dan `docs/PVM_SPEC.md`. |
+| Sandbox keamanan | Belum tersedia sebagai jaminan umum. Backend PVM menolak opcode jaringan dan memakai parser ekspresi terbatas, tetapi operasi file belum dikurung oleh sandbox OS. Jangan menjalankan bytecode tak tepercaya; lihat `SECURITY.md` dan `docs/PVM_SPEC.md`. |
 
 Untuk setiap integrasi baru, dokumentasikan statusnya sebagai **direncanakan**, **prototipe**, **eksperimental**, atau **stabil**, beserta platform, contoh kerja, tes, dan batas keamanan. Hindari mengiklankan target masa depan sebagai fitur selesai.
 
