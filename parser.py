@@ -96,7 +96,7 @@ class Parser:
         if self.at("coba"):
             self.take()
             self.skip_lines()
-            body = self.statements({("ketangkep", None), ("akhirnya", None), ("gitu", None)})
+            body = self.statements({("ketangkep", None), ("akhirnya", None), ("selesai", None)})
             handler_name = None
             handler = []
             final = []
@@ -104,12 +104,12 @@ class Parser:
                 self.take()
                 handler_name = self.name()
                 self.skip_lines()
-                handler = self.statements({("akhirnya", None), ("gitu", None)})
+                handler = self.statements({("akhirnya", None), ("selesai", None)})
             if self.at("akhirnya"):
                 self.take()
                 self.skip_lines()
-                final = self.statements({("gitu", None)})
-            self.need("gitu")
+                final = self.statements({("selesai", None)})
+            self.need("selesai")
             self.need("coba")
             return node("Try", t.line, body=body, handler_name=handler_name, handler=handler, final=final)
         if self.at("akhirnya") or self.at("ketangkep"):
