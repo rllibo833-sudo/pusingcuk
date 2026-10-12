@@ -141,7 +141,7 @@ Kalau memakai runtime native Termux, ikuti dulu langkah instalasi di `docs/PEMUL
 
 **Belum boleh dianggap selesai:** sistem modul/paket lintas-runtime, API server produksi, konektor database lengkap, backend WASM, binding frontend browser penuh, ABI/FFI stabil, blockchain produksi, atau sandbox keamanan umum.
 
-Itu semua boleh menjadi tujuan komunitas, tapi jangan ditulis seolah sudah siap dipakai. Cara yang sehat: tentukan aturan dulu, buat contoh kecil, buat tes positif dan negatif, dokumentasikan target yang didukung, baru klaim fiturnya.
+Untuk pemakaian yang benar-benar offline, pindahkan folder repo ke HP lewat kabel USB atau file lokal dan pastikan Python sudah terpasang. Build runtime native membutuhkan compiler C dan Make yang sudah tersedia; mengunduh repo atau paket untuk pertama kali memang membutuhkan koneksi saat persiapan. Setelah semua terpasang, interpreter dan runtime tidak perlu internet untuk menjalankan program. Workbench browser hanya memakai alamat lokal `127.0.0.1`, bukan layanan internet.\n\nItu semua boleh menjadi tujuan komunitas, tapi jangan ditulis seolah sudah siap dipakai. Cara yang sehat: tentukan aturan dulu, buat contoh kecil, buat tes positif dan negatif, dokumentasikan target yang didukung, baru klaim fiturnya.
 
 ## 8. Aturan pengembangan Pusingcuk
 
