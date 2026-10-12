@@ -245,7 +245,7 @@ def compile_pvm(records):
             else:
                 emit("print(len(" + val(arg) + "))")
         elif opcode == 18:
-            match = re.match(r"^([A-Za-z_]\\w*)\\s*=\\s*(.+)$", arg)
+            match = re.match(r"^([A-Za-z_]\w*)\s*=\s*(.+)$", arg)
             if match:
                 emit("v[" + repr(match.group(1)) + "] = __offline_data(" + val(match.group(2)) + ")")
             else:
