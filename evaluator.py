@@ -128,10 +128,24 @@ def _read_http_response(response):
     return data.decode(charset, errors="replace")
 
 
+MAX_MODULE_FILE_BYTES = 1 * 1024 * 1024
+MAX_MODULE_DEPTH = 20
+_REPO_ROOT = Path(__file__).resolve().parent
+
+
 class Evaluator:
-    def __init__(self):
+    def __init__(self, source_path=None, project_root=None, module_cache=None,
+                 module_loading_stack=None, module_depth=0, is_main=True):
         self.functions = {}
         self.budget = 0
+        self.source_path = Path(source_path).resolve() if source_path is not None else None
+        self.project_root = Path(project_root or _REPO_ROOT).resolve()
+        self._module_cache = module_cache if module_cache is not None else {}
+        self._module_loading_stack = (
+            module_loading_stack if module_loading_stack is not None else set()
+        )
+        self._module_depth = module_depth
+        self._is_main = is_main
 
     def fail(self, line, message):
         raise RuntimeError(f"Baris {line}: {message}")
@@ -220,19 +234,53 @@ class Evaluator:
                 if n.name == "angkut":
                     if len(args) != 1 or not isinstance(args[0], str):
                         self.fail(line, "angkut membutuhkan satu path berkas teks")
-                    path = Path(args[0])
+                    raw_path = Path(args[0])
+                    # Main-program imports start at the repository root. Imports made
+                    # inside a module are relative to that module's own source file.
+                    if raw_path.is_absolute() or ".." in raw_path.parts:
+                        return False
+                    if raw_path.suffix != ".pusingcuk":
+                        return False
+                    if self._module_depth >= MAX_MODULE_DEPTH:
+                        return False
+                    base_dir = self.project_root if self._is_main or self.source_path is None else self.source_path.parent
+                    path = (base_dir / raw_path).resolve()
                     try:
+                        path.relative_to(self.project_root)
+                    except ValueError:
+                        return False
+                    if path in self._module_loading_stack:
+                        # A cycle is a failed import, not unbounded recursive evaluation.
+                        return False
+                    if path in self._module_cache:
+                        return self._module_cache[path]
+                    try:
+                        if not path.is_file() or path.stat().st_size > MAX_MODULE_FILE_BYTES:
+                            return False
                         source = path.read_text(encoding="utf-8")
-                    except OSError as exc:
-                        self.fail(line, f"modul tidak bisa dibaca: {path} ({exc})")
-                    module_evaluator = Evaluator()
-                    module_env = module_evaluator.run_module(source)
-                    exports = PusingDict()
-                    for key, value in module_env.items():
-                        exports[key] = value
-                    for key in module_evaluator.functions:
-                        exports[key] = ExportedFunction(module_evaluator, key, module_env)
-                    return exports
+                    except (OSError, UnicodeError):
+                        return False
+
+                    self._module_loading_stack.add(path)
+                    try:
+                        module_evaluator = Evaluator(
+                            source_path=path,
+                            project_root=self.project_root,
+                            module_cache=self._module_cache,
+                            module_loading_stack=self._module_loading_stack,
+                            module_depth=self._module_depth + 1,
+                            is_main=False,
+                        )
+                        module_env = module_evaluator.run_module(source)
+                        exports = PusingDict()
+                        for key, value in module_env.items():
+                            exports[key] = value
+                        for key in module_evaluator.functions:
+                            exports[key] = ExportedFunction(module_evaluator, key, module_env)
+                        self._module_cache[path] = exports
+                        return exports
+                    finally:
+                        self._module_loading_stack.discard(path)
                 if "." in n.name:
                     module_name, function_name = n.name.split(".", 1)
                     module = env.get(module_name)
@@ -525,12 +573,12 @@ class Evaluator:
         return None
 
 
-def run(source):
-    return Evaluator().run(source)
+def run(source, source_path=None, project_root=None):
+    return Evaluator(source_path=source_path, project_root=project_root).run(source)
 
 
-def capture(source):
+def capture(source, source_path=None, project_root=None):
     output = StringIO()
     with redirect_stdout(output):
-        run(source)
+        run(source, source_path=source_path, project_root=project_root)
     return output.getvalue()

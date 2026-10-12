@@ -918,7 +918,7 @@
       "parameters": [
         "path"
       ],
-      "description": "Load a Pusingcuk module.",
+      "description": "Load a relative .pusingcuk module from the repository root in the main program, or relative to the importing module file when nested. Rejects absolute paths, '..' traversal, paths outside the project root, files over 1 MiB, and imports deeper than 20 levels; caches successful exports and safely rejects cycles.",
       "status": "supported",
       "backends": {
         "python": "supported",

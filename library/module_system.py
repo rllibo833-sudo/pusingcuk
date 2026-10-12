@@ -180,6 +180,8 @@ def expand_file(source_path: str | Path, *, max_modules: int = MAX_MODULES,
                     relative = Path(raw_name)
                     if relative.is_absolute() or ".." in relative.parts:
                         raise ModuleImportError(f"{path.name}: jalur impor tidak aman")
+                    # Compiler-only static expansion follows the interpreter rule:
+                    # resolve each import from the file that declares it, not CWD.
                     target = (path.parent / relative).resolve()
                     child_modules, module_exports = load(target, depth + 1)
                     for child_path, child_code in child_modules:
@@ -237,6 +239,8 @@ def expand_file(source_path: str | Path, *, max_modules: int = MAX_MODULES,
             relative = Path(raw_name)
             if relative.is_absolute() or ".." in relative.parts:
                 raise ModuleImportError("jalur impor tidak aman")
+            # The entry file is the caller for top-level compiler imports; nested
+            # imports above are resolved from their own declaring module file.
             target = (entry.parent / relative).resolve()
             modules, module_exports = load(target, 1)
             for module_path, module_code in modules:

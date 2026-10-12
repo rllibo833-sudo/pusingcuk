@@ -20,7 +20,7 @@ def main():
         return 2
 
     try:
-        run(path.read_text(encoding="utf-8"))
+        run(path.read_text(encoding="utf-8"), source_path=path)
     except (SyntaxError, RuntimeError, ValueError, TypeError, IndexError) as exc:
         print(f"Kesalahan: {exc}", file=sys.stderr)
         return 1
