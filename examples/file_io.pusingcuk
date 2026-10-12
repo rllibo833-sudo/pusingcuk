@@ -1,0 +1,10 @@
+inthiseco
+  spill "=== Warung Catatan ==="
+  lah nama = kepo "nama lu: "
+  lah pesan = kepo "pesan: "
+  lah gabung = nama + " : " + pesan
+  simpen "warung.txt", gabung
+  spill "disimpen!"
+  lah isi = bongkar "warung.txt"
+  spill isi
+gitu inthiseco
