@@ -1,10 +1,11 @@
-# Pusingcuk Standard Examples
+# Pusingcuk Examples and Vocabulary Registry
 
-This directory contains reusable keyword references and example Pusingcuk programs.
+This directory contains runnable examples and a machine-readable vocabulary registry. It is not yet a package manager or a general-purpose importable standard library.
 
-- [`kosakata.json`](kosakata.json): machine-readable glossary of keywords, aliases, operators, meanings, and runtime support status.
-- [`conditional_logic.pusingcuk`](conditional_logic.pusingcuk): examples of comparisons, booleans, short-circuit logic, and conditionals supported by the C backend subset.
-- [`loops_functions_genz.pusingcuk`](loops_functions_genz.pusingcuk): examples of loops, recursive functions, and slang aliases. Run this example with the modular interpreter because it prints text not yet supported by the C backend.
+- [`kosakata.json`](kosakata.json): keyword and alias glossary, meanings, and support-status metadata.
+- [`conditional_logic.pusingcuk`](conditional_logic.pusingcuk): comparisons, booleans, short-circuit logic, and conditionals.
+- [`loops_functions_genz.pusingcuk`](loops_functions_genz.pusingcuk): loops, recursive functions, and newer slang aliases. Run it with the modular interpreter because its text output is not supported by the experimental C source backend subset.
+- [`stdlib.py`](stdlib.py): an internal, dependency-free builtin registry foundation; it is not automatically available in every runtime.
 
 ## Run examples with the Python interpreter
 
@@ -15,7 +16,7 @@ python pusingcuk_new.py library/conditional_logic.pusingcuk
 python pusingcuk_new.py library/loops_functions_genz.pusingcuk
 ```
 
-## Compile an example to C11
+## Compile the conditional example to C11
 
 With Python and a C11 compiler installed:
 
@@ -27,10 +28,22 @@ cc -std=c11 -Wall -Wextra -Werror /tmp/conditional_logic.c -o /tmp/conditional_l
 
 The compiled executable does not require Python at runtime. Python is only used by the compiler front end.
 
+## How to update the vocabulary
+
+When adding or changing a keyword or alias, update all relevant layers together:
+
+1. The lexer/parser or runtime implementation that actually recognizes the word.
+2. The language specification and slang guide.
+3. `kosakata.json`, including the alias's canonical target and honest support-status fields.
+4. Runnable examples and regression tests for the runtimes that claim support.
+
+The JSON registry is a contributor-facing reference, not proof that a feature works. The automated tests should compare its alias mapping with the implementation so the two cannot silently drift.
+
 ## Understanding support status
 
-- `native_runtime: tested` means the feature has tests for the standalone C runtime; check the runtime matrix for detailed limits.
-- `c_backend: supported` means the feature is included in the tested source-to-C subset.
+- `native_runtime: tested` means a native-runtime fixture exercises the feature; it does not imply every compiler target supports it.
+- `native_runtime: pending-native-support` means the standalone native runtime does not yet claim support for that alias/feature.
+- `c_backend: supported` or a more specific subset label describes the experimental source-to-C backend only.
 - `c_backend: unsupported` means the feature must not be used in C-backend examples; the compiler should reject it explicitly.
 
-The glossary is a practical index, not a replacement for the language specification. If information differs, refer to `SPEC.md` and the semantic documentation.
+The glossary is a practical index, not a replacement for `SPEC.md`, the semantic contract, or the runtime compatibility matrix. If information differs, report the mismatch and use tests plus the relevant implementation to establish the actual behavior.
