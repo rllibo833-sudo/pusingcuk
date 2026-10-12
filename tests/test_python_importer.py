@@ -1,8 +1,10 @@
 """Tests for the experimental Python-to-Pusingcuk source importer."""
+import subprocess
 import unittest
 
 from compiler.import_python import ImportErrorPython, translate
 from compiler.ir import from_source
+from compiler.__main__ import compile_source
 from compiler.js_backend import generate as generate_js
 from parser import parse
 
@@ -86,9 +88,59 @@ class PythonImporterTests(unittest.TestCase):
         self.assertIn('tanya name = "Nama? "', result)
         parse(result)
 
-    def test_rejects_import_instead_of_silently_ignoring(self):
+    def test_math_module_maps_to_cross_target_builtins(self):
+        source = (
+            "import math as m\n"
+            "from math import sqrt as akar_lokal, pi\n"
+            "print(m.sqrt(81))\n"
+            "print(akar_lokal(25))\n"
+            "print(m.floor(2.9))\n"
+            "print(m.ceil(2.1))\n"
+            "print(m.pow(2, 3))\n"
+            "print(m.sin(0))\n"
+            "print(m.cos(0))\n"
+            "print(m.fabs(-4))\n"
+            "print(pi)\n"
+        )
+        translated = translate(source)
+        self.assertIn("akar(", translated)
+        self.assertIn("bawah(", translated)
+        self.assertIn("atas(", translated)
+        self.assertIn("pangkat(", translated)
+        self.assertIn("sinus(", translated)
+        self.assertIn("kosinus(", translated)
+        parse(translated)
+
+        generated_js = generate_js(from_source(translated))
+        result = subprocess.run(
+            ["node", "-e", generated_js], capture_output=True, text=True, check=True
+        )
+        expected = "9\n5\n2\n3\n8\n0\n1\n4\n3.141592653589793\n"
+        self.assertEqual(result.stdout, expected)
+
+        generated_html = compile_source(translated, "math_import.cuk", "html")
+        self.assertIn("<script>", generated_html)
+        self.assertIn("const pcSqrt", generated_html)
+        self.assertIn("const pcPow", generated_html)
+        script = generated_html.split("<script>\n", 1)[1].split("\n</script>", 1)[0]
+        harness = (
+            "global.__pc = {textContent: ''};\n"
+            "global.document = {getElementById: () => global.__pc};\n"
+            + script
+            + "\nprocess.stdout.write(global.__pc.textContent);\n"
+        )
+        html_result = subprocess.run(
+            ["node", "-e", harness], capture_output=True, text=True, check=True
+        )
+        self.assertEqual(html_result.stdout, expected)
+
+    def test_math_import_is_allow_list_only(self):
         with self.assertRaises(ImportErrorPython):
             translate("import os\n")
+        with self.assertRaises(ImportErrorPython):
+            translate("import math\nprint(math.log(10))\n")
+        with self.assertRaises(ImportErrorPython):
+            translate("from math import *\n")
 
     def test_rejects_chained_comparison(self):
         with self.assertRaises(ImportErrorPython):
