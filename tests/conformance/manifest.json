@@ -57,6 +57,24 @@
       }
     },
     {
+      "id": "functions.wrong-arity",
+      "source": "function_wrong_arity.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "functions",
+        "arity-check"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "error"
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
       "id": "collections.list-index-mutation",
       "source": "list_index.pusingcuk",
       "profile": "core",
