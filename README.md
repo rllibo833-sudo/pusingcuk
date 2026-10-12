@@ -10,6 +10,17 @@ Lihat [kebijakan keamanan](SECURITY.md) untuk batas keamanan runtime dan cara me
 
 Versi: 0.4-dev.
 
+**Pusingcuk masih eksperimental.** Fitur interpreter modular, runtime native, compiler C, compiler multi-target, dan PVM memiliki cakupan yang berbeda; gunakan matriks dan spesifikasi untuk memeriksa dukungan sebelum mengandalkan fitur.
+
+### Navigasi komunitas
+
+- **Baru mulai:** [Panduan dari Nol](docs/PEMULA.md) · [Contoh pustaka](library/README.md)
+- **Belajar sintaks:** [Spesifikasi bahasa](SPEC.md) · [Kosakata slang](docs/KOSAKATA_GENZ.md) · [Glosarium mesin](library/kosakata.json)
+- **Memilih runtime:** [Matriks native](docs/NATIVE_RUNTIME.md) · [Kompatibilitas](docs/COMPATIBILITY.md) · [Target compiler](docs/COMPILER_TARGETS.md)
+- **Membantu proyek:** [Panduan kontribusi](CONTRIBUTING.md) · [Kebijakan keamanan](SECURITY.md) · [Riwayat perubahan](https://github.com/rllibo833-sudo/pusingcuk/commits/main)
+
+**Peringatan keamanan:** runtime native, Studio, dan backend PVM belum merupakan sandbox. Backend JavaScript PVM memakai evaluasi ekspresi `Function()` dan memiliki operasi file/jaringan. Jangan jalankan kode atau bytecode dari sumber yang tidak dipercaya.
+
 Saat ini ada dua jalur eksekusi:
 - **Interpreter modular Python** sebagai jalur referensi pengembangan: `pusingcuk_new.py`, dengan lexer, parser, AST, dan evaluator.
 - **Runtime native C** untuk subset bahasa yang sudah memiliki fixture. Setelah dikompilasi, executable native berjalan tanpa Python.
@@ -121,13 +132,6 @@ selesai jancuk
 | `gitu` | `selesai` | Menutup blok |
 | `inthiseco` | `jancuk` | Memulai program |
 | `janggal` | `bukan` | Negasi logika |
-| `gas` | `jancuk` | Memulai program |
-| `spill` | `hedeh` | Menampilkan nilai |
-| `bestie` | `lah` | Mendeklarasikan variabel |
-| `valid` | `benar` | Nilai benar |
-| `zonk` | `salah` | Nilai salah |
-| `skip` | `kampret` | Cabang alternatif |
-| `kelar` | `selesai` | Menutup blok |
 | `gas` | `jancuk` | Memulai program |
 | `spill` | `hedeh` | Menampilkan nilai |
 | `bestie` | `lah` | Mendeklarasikan variabel |
