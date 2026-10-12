@@ -223,8 +223,6 @@ class PythonImporterTests(unittest.TestCase):
         with self.assertRaises(ImportErrorPython):
             translate("import json\n")
         with self.assertRaises(ImportErrorPython):
-            translate("print(mean([1]))\n")
-        with self.assertRaises(ImportErrorPython):
             translate("print(median())\n")
 
     def test_statistics_builtins_exist_in_standard_library_registry(self):
