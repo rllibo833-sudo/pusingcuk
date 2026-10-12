@@ -107,6 +107,8 @@ class Importer:
                     _fail(node, "input() hanya didukung sebagai nilai assignment sederhana")
                 if name == "len":
                     name = "panjang"
+                elif name == "range":
+                    name = "rentang"
                 return f"{name}(" + ", ".join(self.expr(v) for v in node.args) + ")"
             _fail(node, "pemanggilan melalui atribut/objek belum didukung")
         _fail(node, f"ekspresi Python {type(node).__name__} belum didukung")
