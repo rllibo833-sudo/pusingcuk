@@ -220,7 +220,7 @@ class Parser:
                     left = node("Attribute", t.line, object=node("Variable", t.line, name=t.value), name=member)
             elif self.at("("):
                 left = self.call(t.value, t.line)
-            elif t.value in ("baca", "angkut"):
+            elif t.value in ("baca", "angkut", "kepo_internet"):
                 left = node("Call", t.line, name=t.value, args=[self.expr(6)])
             else:
                 left = node("Variable", t.line, name=t.value)

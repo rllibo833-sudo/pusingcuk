@@ -1,0 +1,19 @@
+inthiseco
+  lah util = angkut "examples/utils.pusingcuk"
+  lah pesan = {"pesan": util.sapa("bestie"), "sumber": "Pusingcuk Level 5"}
+  lah payload = jadi_teks(pesan)
+  spill warna("=== Viral Bot ===", "pink")
+  spill payload
+  coba
+    lah balasan = kirim_api("https://httpbin.org/post", pesan)
+    njir balasan == salah
+      spill warna("API lagi zonk", "merah")
+    kampret
+      spill balasan
+    selesai njir
+  ketangkep eror
+    spill warna("POST gagal: ", "merah") + eror
+  akhirnya
+    spill "bot kelar"
+  gitu coba
+gitu inthiseco

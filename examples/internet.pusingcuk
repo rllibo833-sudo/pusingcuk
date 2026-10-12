@@ -1,0 +1,11 @@
+inthiseco
+  spill warna("=== Kepo Internet ===", "sian")
+  coba
+    lah data = kepo_internet "https://api.github.com/zen"
+    spill data
+    lah cuaca = kepo_internet "https://wttr.in/Banjarbaru?format=3"
+    spill warna(cuaca, "kuning")
+  ketangkep eror
+    spill warna("gagal kepo internet: ", "merah") + eror
+  gitu coba
+gitu inthiseco

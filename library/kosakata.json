@@ -364,6 +364,53 @@
       "aliases": [],
       "native_runtime": "reference-python",
       "c_backend": "unsupported"
+    },
+    {
+      "word": "kepo_internet",
+      "category": "internet",
+      "meaning": "HTTP GET dan mengembalikan isi respons teks; mengembalikan salah jika gagal.",
+      "aliases": [
+        "gas_api",
+        "stalking"
+      ],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "kirim_api",
+      "category": "internet",
+      "meaning": "Mengirim HTTP POST dengan data teks atau objek JSON; mengembalikan isi respons atau salah jika gagal.",
+      "aliases": [
+        "kirim_gosip"
+      ],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "jadi_json",
+      "category": "json",
+      "meaning": "Mengurai teks JSON menjadi nilai Pusingcuk; mengembalikan salah jika JSON tidak valid.",
+      "aliases": [
+        "parse_json"
+      ],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "jadi_teks",
+      "category": "json",
+      "meaning": "Mengubah nilai Pusingcuk menjadi teks JSON.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "warna",
+      "category": "terminal",
+      "meaning": "Mewarnai teks dengan kode ANSI: merah, hijau, kuning, biru, pink, sian.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
     }
   ],
   "operators": [
@@ -446,6 +493,7 @@
     "aliases": "Alias baru gas, spill, bestie, valid, zonk, skip, dan kelar saat ini diuji melalui lexer/interpreter Python dan front-end compiler C; dukungan lexer runtime C mandiri belum diklaim.",
     "file_io": "tulis/baca (aliases simpen/bongkar) and expression input tanya (alias kepo) are supported by the Python reference interpreter only. Native C and C backend file I/O are unsupported for now.",
     "json_io": "tulis_json/baca_json (aliases simpen_json/bongkar_json) use Python's json module and are supported by the Python reference interpreter only. Native C and C backend JSON I/O are unsupported for now.",
-    "level4": "Modules, try/catch/finally, jam/waktu and tanggal are supported by the Python reference interpreter only."
+    "level4": "Modules, try/catch/finally, jam/waktu and tanggal are supported by the Python reference interpreter only.",
+    "level5": "HTTP GET/POST, parsing dan serialisasi JSON, serta warna ANSI tersedia di interpreter referensi Python saja. Permintaan jaringan memakai timeout 10 detik dan mengembalikan salah saat gagal."
   }
 }

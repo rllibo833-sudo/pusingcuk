@@ -3,6 +3,7 @@ from contextlib import redirect_stdout
 from collections.abc import MutableMapping
 from io import StringIO
 from pathlib import Path
+from urllib.request import Request, urlopen
 import json
 from datetime import datetime, date
 from ast_nodes import Node
@@ -261,6 +262,57 @@ class Evaluator:
                         return _language_json(data)
                     except (OSError, json.JSONDecodeError):
                         return False
+                if n.name == "kepo_internet":
+                    if len(args) != 1 or not isinstance(args[0], str):
+                        self.fail(line, "kepo_internet membutuhkan satu URL teks")
+                    try:
+                        request = Request(args[0], headers={"User-Agent": "Pusingcuk/0.5 (Internet Native)"}, method="GET")
+                        with urlopen(request, timeout=10) as response:
+                            charset = response.headers.get_content_charset() or "utf-8"
+                            return response.read().decode(charset, errors="replace")
+                    except Exception:
+                        return False
+                if n.name == "kirim_api":
+                    if len(args) != 2 or not isinstance(args[0], str):
+                        self.fail(line, "kirim_api membutuhkan URL dan data")
+                    try:
+                        payload = args[1]
+                        if isinstance(payload, (dict, PusingDict)):
+                            body = json.dumps(_json_ready(payload), ensure_ascii=False).encode("utf-8")
+                            content_type = "application/json; charset=utf-8"
+                        elif isinstance(payload, str):
+                            body = payload.encode("utf-8")
+                            content_type = "text/plain; charset=utf-8"
+                        else:
+                            body = str(payload).encode("utf-8")
+                            content_type = "text/plain; charset=utf-8"
+                        request = Request(args[0], data=body, headers={"User-Agent": "Pusingcuk/0.5 (Internet Native)", "Content-Type": content_type}, method="POST")
+                        with urlopen(request, timeout=10) as response:
+                            charset = response.headers.get_content_charset() or "utf-8"
+                            return response.read().decode(charset, errors="replace")
+                    except Exception:
+                        return False
+                if n.name == "jadi_json":
+                    if len(args) != 1 or not isinstance(args[0], str):
+                        self.fail(line, "jadi_json membutuhkan satu teks JSON")
+                    try:
+                        return _language_json(json.loads(args[0]))
+                    except (json.JSONDecodeError, ValueError):
+                        return False
+                if n.name == "jadi_teks":
+                    if len(args) != 1:
+                        self.fail(line, "jadi_teks membutuhkan satu objek")
+                    try:
+                        return json.dumps(_json_ready(args[0]), ensure_ascii=False)
+                    except (TypeError, ValueError):
+                        return False
+                if n.name == "warna":
+                    if len(args) != 2:
+                        self.fail(line, "warna membutuhkan teks dan nama warna")
+                    colors = {"merah": "31", "hijau": "32", "kuning": "33", "biru": "34", "pink": "35", "sian": "36"}
+                    if not isinstance(args[1], str) or args[1] not in colors:
+                        self.fail(line, "warna tidak dikenal; pilih merah, hijau, kuning, biru, pink, atau sian")
+                    return "\\033[" + colors[args[1]] + "m" + str(args[0]) + "\\033[0m"
                 if n.name == "panjang":
                     if len(args) != 1:
                         self.fail(line, "fungsi 'panjang' membutuhkan 1 argumen")

@@ -22,6 +22,10 @@ KEYWORD_ALIASES = {
     "bongkar_json": "baca_json",
     "impor": "angkut",
     "waktu": "jam",
+    "gas_api": "kepo_internet",
+    "stalking": "kepo_internet",
+    "kirim_gosip": "kirim_api",
+    "parse_json": "jadi_json",
     "kepo": "tanya",
 }
 
