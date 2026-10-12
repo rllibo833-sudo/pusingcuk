@@ -39,3 +39,14 @@ local.properties
 *.jks
 *.keystore
 /android-studio/app/src/main/assets/bin/
+# Local credentials and environment files (keep only documented examples)
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets.json
+credentials.json
