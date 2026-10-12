@@ -108,6 +108,9 @@ def __parse_expression(source):
         raise ValueError("expression node is not allowed: " + type(node).__name__)
 
     return visit(root)
+
+def main():
+    global __opened
 """
 
 def read_pvm(filename):
