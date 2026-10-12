@@ -3,13 +3,25 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 CC=clang
-TMP="/tmp/pusingcuk-pvm-test-$$"
+if [[ -n "${TMPDIR:-}" ]]; then
+  TMP_BASE="$TMPDIR"
+elif [[ -n "${PREFIX:-}" && -d "$PREFIX/tmp" ]]; then
+  TMP_BASE="$PREFIX/tmp"
+else
+  TMP_BASE=/tmp
+fi
+TMP="$TMP_BASE/pusingcuk-pvm-test-$$"
+FIXTURE="tests/pusingcuk-pvm-test.txt"
 mkdir -p "$TMP"
-trap 'rm -rf "$TMP"' EXIT
+cleanup() {
+  rm -rf "$TMP"
+  rm -f "$FIXTURE"
+}
+trap cleanup EXIT
 "$CC" -std=c11 -O2 -Wall -Wextra -Werror src/c-core/main.c -o "$TMP/pvmc"
 command -v node >/dev/null || { echo "Node.js dibutuhkan untuk uji JS" >&2; exit 2; }
 python3 --version >/dev/null
-printf 'fixture file I/O\n' > /tmp/pusingcuk-pvm-test.txt
+printf 'fixture file I/O\n' > "$FIXTURE"
 for src in tests/0[1-6]_*.cuk; do
   name="$(basename "$src" .cuk)"
   "$TMP/pvmc" "$src" "$TMP/$name.pvm"
