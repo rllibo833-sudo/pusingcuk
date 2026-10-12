@@ -5,6 +5,8 @@ Dokumen ini menjelaskan fungsi direktori dan file utama agar kontributor baru da
 ## Mulai dari sini
 
 - `README.md`: gambaran proyek, status fitur, dan jalur menjalankan program.
+- `docs/README.md`: indeks dokumentasi lengkap yang dikelompokkan berdasarkan topik.
+- `docs/INDEPENDENT_REVIEW.md`: panduan reviewer independen, perintah tes, dan area audit prioritas.
 - `docs/VISION.md`: visi umum, prinsip inklusi, gaya bahasa lintas budaya, dan jalur kontribusi.
 - `docs/PEMULA.md`: tutorial langkah demi langkah untuk pemula.
 - `SPEC.md`: sintaks dan perilaku bahasa yang dimaksudkan.
