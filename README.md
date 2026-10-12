@@ -123,7 +123,7 @@ The core language interpreter is designed to run locally and does not require a 
 
 Do not add `os.system`, Python `eval` or `exec`, `requests`, OpenAI SDK dependencies, API-key requirements, or automatic outbound network calls to the core runtime. Keep external integrations out of the default execution path and add offline tests for new features.
 
-**Security note:** the PVM JavaScript and Python backends now use restricted expression parsing and reject the network opcode. PVM file operations are still not confined by an operating-system sandbox, so do not run bytecode from untrusted sources. Check [SECURITY.md](SECURITY.md) for current limitations.
+**Security note:** the PVM JavaScript and Python backends now use restricted expression parsing. External network URLs are rejected; only local `data:text/plain,` payloads are supported. PVM file operations are still not confined by an operating-system sandbox, so do not run bytecode from untrusted sources. Check [SECURITY.md](SECURITY.md) for current limitations.
 
 ## Repository guide
 
