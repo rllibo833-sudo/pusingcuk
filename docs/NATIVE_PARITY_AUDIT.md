@@ -1,6 +1,7 @@
 # Audit Kesenjangan Runtime Native Pusingcuk
 
 **Status:** Dokumen audit historis; jangan gunakan bagian temuan lama di bawah sebagai gambaran implementasi terkini.  
+**Scope:** Audit runtime Pusingcuk bersifat umum. Referensi ke integrasi aplikasi eksternal di bawah adalah contoh opsional, bukan arah wajib proyek.  
 **Audit sumber awal:** dibuat sebelum dukungan kamus dan fungsi native selesai.  
 **Status terkini:** runtime C telah memiliki fixture untuk list, kamus, fungsi pengguna, rekursi terbatas, input, rentang, dan alias slang. Rujuk [Runtime Native](NATIVE_RUNTIME.md) dan [Roadmap Native, Keamanan, dan Ekosistem](NATIVE_SECURE_ECOSYSTEM_ROADMAP.md) sebagai sumber status yang lebih baru.
 
@@ -24,7 +25,7 @@ Dokumen ini menyimpan konteks historis keputusan desain agar riwayat proyek tida
 3. Tentukan arsitektur modul dan paket sebelum menambah banyak pustaka.
 4. Bangun kemampuan backend (HTTP, database berparameter, autentikasi/otorisasi, secrets) sebagai adapter eksplisit dengan izin minimum.
 5. Bangun kemampuan frontend secara bertahap: HTML/template aman atau target web, lalu tentukan batas JavaScript/WebAssembly yang realistis.
-6. Sinkronkan status runtime terlebih dahulu pada CORE; catat keputusan permanen di Founder-OS hanya setelah keputusan disahkan; PUBLIC hanya memuat kemampuan yang telah terbukti.
+6. Sinkronkan status runtime pada dokumentasi teknis utama. Jika Pusingcuk dipakai oleh aplikasi atau repo lain, catat keputusan pada dokumentasi proyek tujuan dan pastikan aplikasi publik hanya mengekspos kemampuan yang sudah dibuktikan.
 
 ## Gerbang penerimaan
 
@@ -32,6 +33,6 @@ Dokumen ini menyimpan konteks historis keputusan desain agar riwayat proyek tida
 - Perubahan hanya menyentuh berkas yang memang terkait; tidak memasukkan binary, cache, keluaran tes, patch lokal, atau rahasia.
 - CI hijau pada commit yang tepat.
 - README, SPEC, dan matriks runtime tidak melebih-lebihkan kemampuan.
-- Perubahan lintas repositori mengikuti kontrak MEMORY / CORE / PUBLIC dan menyertakan referensi commit/evidence.
+- Perubahan lintas repositori mengikuti kontrak integrasi yang disepakati oleh maintainer masing-masing repo dan menyertakan referensi commit/bukti.
 
 Audit ini berbasis sumber GitHub. Pengujian CI tidak membuktikan perilaku pada perangkat Termux fisik; hal tersebut tetap perlu diverifikasi di perangkat.
