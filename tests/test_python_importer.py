@@ -24,6 +24,18 @@ class PythonImporterTests(unittest.TestCase):
         self.assertIn("kampret", result)
         parse(result)
 
+    def test_variable_declared_in_both_branches(self):
+        result = translate(
+            "flag = True\\n"
+            "if flag:\\n"
+            "    value = 1\\n"
+            "else:\\n"
+            "    value = 2\\n"
+            "print(value)\\n"
+        )
+        self.assertEqual(result.count("lah value ="), 2)
+        parse(result)
+
     def test_for_range_and_list(self):
         result = translate("numbers = [1, 2, 3]\nfor number in range(1, 4):\n    print(number)\n")
         self.assertIn("untuk number dalam rentang(1, 4)", result)
