@@ -3,8 +3,10 @@ from contextlib import redirect_stdout
 from collections.abc import MutableMapping
 from io import StringIO
 from pathlib import Path
-from urllib.request import Request, urlopen
+from urllib.request import Request, build_opener, HTTPRedirectHandler
+from urllib.error import HTTPError
 from urllib.parse import urlsplit
+import ipaddress
 import json
 from datetime import datetime, date
 from ast_nodes import Node
@@ -110,13 +112,66 @@ MAX_HTTP_RESPONSE_BYTES = 2 * 1024 * 1024
 MAX_HTTP_REQUEST_BYTES = 1 * 1024 * 1024
 
 
+# Reject local/private redirect destinations before urllib follows them.
+_BLOCKED_NETWORKS = tuple(
+    ipaddress.ip_network(network)
+    for network in (
+        "0.0.0.0/32", "10.0.0.0/8", "127.0.0.0/8",
+        "169.254.0.0/16", "172.16.0.0/12", "192.168.0.0/16",
+        "::1/128", "fe80::/10",
+    )
+)
+
+
+def _is_blocked_hostname(hostname):
+    host = hostname.lower().rstrip(".")
+    if host == "localhost" or host.endswith(".localhost"):
+        return True
+    try:
+        address = ipaddress.ip_address(host)
+    except ValueError:
+        return False
+    if getattr(address, "ipv4_mapped", None) is not None:
+        address = address.ipv4_mapped
+    return any(address in network for network in _BLOCKED_NETWORKS)
+
+
 def _valid_http_url(url):
-    """Accept explicit HTTP(S) URLs only; never pass other schemes to urllib."""
+    """Accept HTTP(S) URLs only when their host is not a local/private address."""
     try:
         parsed = urlsplit(url)
-        return parsed.scheme.lower() in ("http", "https") and bool(parsed.hostname)
+        return (
+            parsed.scheme.lower() in ("http", "https")
+            and bool(parsed.hostname)
+            and not _is_blocked_hostname(parsed.hostname)
+        )
     except (TypeError, ValueError):
         return False
+
+
+class _SafeRedirectHandler(HTTPRedirectHandler):
+    """Reject private redirect targets and stop after three redirects."""
+    max_redirections = 3
+    max_repeats = 3
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        if not _valid_http_url(newurl):
+            raise HTTPError(newurl, code, "redirect target blocked", headers, fp)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def urlopen(request, timeout=10):
+    """Open HTTP requests with a private-address-aware redirect handler."""
+    return build_opener(_SafeRedirectHandler()).open(request, timeout=timeout)
+
+
+def _response_url_is_safe(response, original_url):
+    """Check the final URL as a second guard after the redirect chain."""
+    try:
+        final_url = response.geturl()
+    except AttributeError:
+        final_url = original_url
+    return _valid_http_url(final_url)
 
 
 def _read_http_response(response):
@@ -342,6 +397,8 @@ class Evaluator:
                     try:
                         request = Request(args[0], headers={"User-Agent": "Pusingcuk/0.5 (Internet Native)"}, method="GET")
                         with urlopen(request, timeout=10) as response:
+                            if not _response_url_is_safe(response, request.full_url):
+                                return False
                             return _read_http_response(response)
                     except Exception:
                         return False

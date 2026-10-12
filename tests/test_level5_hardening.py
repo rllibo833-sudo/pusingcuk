@@ -9,8 +9,9 @@ def program(body):
 
 
 class FakeResponse:
-    def __init__(self, body):
+    def __init__(self, body, final_url="https://example.com"):
         self.body = body
+        self.final_url = final_url
         self.headers = Mock()
         self.headers.get_content_charset.return_value = "utf-8"
         self.read_sizes = []
@@ -20,6 +21,9 @@ class FakeResponse:
 
     def __exit__(self, *_args):
         return False
+
+    def geturl(self):
+        return self.final_url
 
     def read(self, size=-1):
         self.read_sizes.append(size)
@@ -38,6 +42,13 @@ class Level5HardeningTests(unittest.TestCase):
             with self.subTest(url=url), patch("evaluator.urlopen") as open_url:
                 self.assertEqual(capture(program(f'hedeh kirim_api("{url}", "data")')), "tidak\n")
                 open_url.assert_not_called()
+
+    def test_redirect_to_localhost_blocked(self):
+        response = FakeResponse(b"secret", final_url="http://127.0.0.1/admin")
+        with patch("evaluator.urlopen", return_value=response) as open_url:
+            output = capture(program('hedeh kepo_internet("https://example.com/redirect")'))
+        self.assertEqual(output, "tidak\n")
+        open_url.assert_called_once()
 
     def test_get_reads_only_response_limit_plus_one(self):
         response = FakeResponse(b"x" * (MAX_HTTP_RESPONSE_BYTES + 1))
