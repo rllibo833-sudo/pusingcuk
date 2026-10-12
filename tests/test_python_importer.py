@@ -178,6 +178,43 @@ class PythonImporterTests(unittest.TestCase):
         )
         self.assertEqual(python_result.stdout, expected)
 
+    def test_statistics_runtime_rejects_invalid_samples_on_js_html_and_python(self):
+        from compiler.python_backend import generate as generate_python
+        cases = (
+            "hedeh rata_rata([])",
+            "hedeh median([1, benar])",
+            'hedeh median([1, "x"])',
+        )
+        for statement in cases:
+            source = "jancuk\\n" + statement + "\\nselesai jancuk"
+            generated_js = generate_js(from_source(source))
+            js_result = subprocess.run(
+                ["node", "-e", generated_js], capture_output=True, text=True
+            )
+            self.assertNotEqual(js_result.returncode, 0, statement)
+            self.assertEqual(js_result.stdout, "", statement)
+
+            generated_python = generate_python(from_source(source))
+            py_result = subprocess.run(
+                ["python", "-c", generated_python], capture_output=True, text=True
+            )
+            self.assertNotEqual(py_result.returncode, 0, statement)
+            self.assertEqual(py_result.stdout, "", statement)
+
+            generated_html = compile_source(source, "invalid_statistics.cuk", "html")
+            script = generated_html.split("<script>\\n", 1)[1].split("\\n</script>", 1)[0]
+            harness = (
+                "global.__pc = {textContent: ''};\\n"
+                "global.document = {getElementById: () => global.__pc};\\n"
+                + script
+                + "\\nprocess.stdout.write(global.__pc.textContent);\\n"
+            )
+            html_result = subprocess.run(
+                ["node", "-e", harness], capture_output=True, text=True
+            )
+            self.assertNotEqual(html_result.returncode, 0, statement)
+            self.assertEqual(html_result.stdout, "", statement)
+
     def test_statistics_module_is_explicitly_allow_listed(self):
         with self.assertRaisesRegex(ImportErrorPython, "statistics.variance"):
             translate("import statistics\\nprint(statistics.variance([1, 2, 3]))\\n")

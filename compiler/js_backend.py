@@ -146,7 +146,12 @@ const pcCos = (value) => pcMathResult("kosinus", Math.cos(pcNumeric("kosinus", v
 const pcStatValues = (name, value) => {
   if (!Array.isArray(value) || value.length === 0)
     throw new Error(name + "() membutuhkan daftar angka yang tidak kosong");
-  return value.map(v => pcNumeric(name, v));
+  return value.map(v => {
+    const number = pcNumeric(name, v);
+    if (Number.isInteger(number) && !Number.isSafeInteger(number))
+      throw new Error(name + "() menolak integer di luar rentang aman lintas target");
+    return number;
+  });
 };
 const pcStatResult = (name, value) => {
   if (!Number.isFinite(value)) throw new Error(name + "() menghasilkan angka non-finite");

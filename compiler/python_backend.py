@@ -174,7 +174,10 @@ def pc_cos(value): return pc_math_result("kosinus", math.cos(pc_numeric("kosinus
 def pc_stat_values(name, value):
     if not isinstance(value, list) or not value:
         raise TypeError(name + "() membutuhkan daftar angka yang tidak kosong")
-    return [pc_numeric(name, item) for item in value]
+    values = [pc_numeric(name, item) for item in value]
+    if any(isinstance(item, int) and abs(item) > 9007199254740991 for item in values):
+        raise ValueError(name + "() menolak integer di luar rentang aman lintas target")
+    return values
 def pc_stat_result(name, value):
     if not math.isfinite(value): raise ValueError(name + "() menghasilkan angka non-finite")
     if value.is_integer() and abs(value) <= 9007199254740991: return int(value)
