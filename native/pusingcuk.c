@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// TODO: file I/O not yet in C, use Python reference.
+// TODO file I/O not yet in C, use Python ref.
 
 #define NV 256
 #define SZ 1024
