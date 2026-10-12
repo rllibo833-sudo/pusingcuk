@@ -163,15 +163,22 @@ class Importer:
             self.scopes[-1].add(name)
             return
         if isinstance(node, ast.If):
+            before = set(self.scopes[-1])
             self.emit("njir " + self.expr(node.test))
             self.indent += 1
+            self.scopes[-1] = set(before)
             self.block(node.body)
+            then_names = set(self.scopes[-1])
             self.indent -= 1
+            else_names = set(before)
             if node.orelse:
                 self.emit("kampret")
                 self.indent += 1
+                self.scopes[-1] = set(before)
                 self.block(node.orelse)
+                else_names = set(self.scopes[-1])
                 self.indent -= 1
+            self.scopes[-1] = before | then_names | else_names
             self.emit("selesai njir")
             return
         if isinstance(node, ast.While):
