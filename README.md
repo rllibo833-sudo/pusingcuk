@@ -131,7 +131,9 @@ Do not add `os.system`, Python `eval` or `exec`, `requests`, OpenAI SDK dependen
 
 **Security note:** the PVM JavaScript and Python backends use restricted expression parsing. External network URLs are rejected; only local `data:text/plain,` payloads are supported. PVM file operations are still not confined by an operating-system sandbox, so do not run bytecode from untrusted sources. Check [SECURITY.md](SECURITY.md) for current limitations.
 
-## Repository guide
+## Documentation and repository guide
+
+The full, categorized documentation catalog is in [docs/README.md](docs/README.md). Independent technical reviewers can start with [docs/INDEPENDENT_REVIEW.md](docs/INDEPENDENT_REVIEW.md).
 
 - [Project vision and community principles](docs/VISION.md)
 - [Repository structure and feature status](docs/REPO_STRUCTURE.md)
@@ -149,9 +151,11 @@ Do not add `os.system`, Python `eval` or `exec`, `requests`, OpenAI SDK dependen
 - [Security policy](SECURITY.md)
 - [Community code of conduct](CODE_OF_CONDUCT.md)
 
-## Contributing
+## Contributing and project contact
 
 Pusingcuk is open to contributions from beginners and experienced developers. You do not need to be a programmer to contribute: documentation, translations, examples, reproducible bug reports, and thoughtful design feedback are useful too. Read [CONTRIBUTING.md](CONTRIBUTING.md), describe the problem clearly, include a small reproducible example where possible, and add tests for behavior changes. Contributions should preserve offline operation and document Android support honestly.
+
+For ordinary project contact and review feedback, email **pusingcukdevprog@gmail.com**. Please do not send passwords, access tokens, private user data, or unpatched vulnerability details by ordinary email; follow [SECURITY.md](SECURITY.md) for security reports.
 
 ## Community extensibility
 
