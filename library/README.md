@@ -5,7 +5,7 @@ This directory contains runnable examples and a machine-readable vocabulary regi
 - [`kosakata.json`](kosakata.json): keyword and alias glossary, meanings, and support-status metadata.
 - [`conditional_logic.pusingcuk`](conditional_logic.pusingcuk): comparisons, booleans, short-circuit logic, and conditionals.
 - [`loops_functions_genz.pusingcuk`](loops_functions_genz.pusingcuk): loops, recursive functions, and newer slang aliases. Run it with the modular interpreter because its text output is not supported by the experimental C source backend subset.
-- [`stdlib.py`](stdlib.py): an internal, dependency-free builtin registry foundation; it is not automatically available in every runtime.
+- [`stdlib.py`](stdlib.py): an internal builtin registry for conversions, shared numeric helpers, and math helpers (`akar`, `bawah`, `atas`, `pangkat`, `sinus`, `kosinus`). Registry presence alone does not imply every runtime supports a builtin: the six math helpers currently work in the JS/Python compiler backends, and HTML uses the JS backend; VM/native C support is not yet claimed.
 
 ## Run examples with the Python interpreter
 
