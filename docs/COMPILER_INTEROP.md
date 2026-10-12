@@ -43,7 +43,7 @@ Pusingcuk source (.pusingcuk)
   -> conformance tests + artifact/runtime checks
 ```
 
-Pipeline ini adalah arah desain, bukan daftar backend yang sudah tersedia. Saat ini runtime C native menjalankan subset langsung dan interpreter modular Python menjadi jalur referensi. Front-end dapat menghasilkan IR v1 yang mempertahankan AST dan memvalidasinya. Backend C eksperimental melakukan code generation untuk subset integer terbatas, dengan penolakan eksplisit atas fitur di luar subset. Compiler multi-target penuh, optimizer umum, WebAssembly, JavaScript/TypeScript, dan ABI/FFI belum tersedia.
+Pipeline ini adalah arah desain, bukan daftar backend yang sudah stabil. Saat ini interpreter modular Python menjadi jalur referensi dan runtime C native menjalankan subset teruji. Front-end menghasilkan IR v1 yang mempertahankan AST dan dapat divalidasi. CLI compiler memiliki target eksperimental JavaScript, Python, HTML, JSON IR, dan VM JSON dengan cakupan berbeda; backend C terpisah hanya mendukung subset integer terbatas. Optimizer umum, WebAssembly, ABI/FFI stabil, dan sistem modul/paket lintas-runtime belum tersedia.
 
 ## Batas antara bahasa inti dan platform
 
@@ -147,11 +147,11 @@ Backend belum boleh disebut siap hanya karena bisa mengompilasi contoh "Halo dun
 | Spesifikasi sintaks dan semantik awal | Ada, perlu diperluas dan diuji konsistensinya |
 | Interpreter modular Python | Jalur referensi |
 | Runtime native C | Subset teruji; belum setara penuh |
-| AST/IR compiler stabil | Belum tersedia sebagai kontrak compiler |
-| Backend C source generation | Belum tersedia sebagai compiler multi-target |
+| IR v1 | Tersedia sebagai format AST-preserving yang tervalidasi; belum menjadi ABI stabil |
+| Backend C source generation | Eksperimental; hanya subset integer terdokumentasi |
 | WebAssembly backend | Belum tersedia |
-| JavaScript/TypeScript backend | Belum tersedia |
+| JavaScript backend | Ada sebagai target eksperimental; bukan backend produksi yang sepenuhnya kompatibel |
 | ABI/FFI stabil | Belum tersedia |
 | Modul dan package manager | Belum tersedia penuh |
 
-Jangan mengklaim dukungan compiler atau FFI di README sampai implementasi, tes, dan dokumentasi target benar-benar ada.
+Jangan mengklaim target eksperimental sebagai stabil atau mengklaim ABI/FFI sampai implementasi, tes, dan dokumentasi target benar-benar ada.
