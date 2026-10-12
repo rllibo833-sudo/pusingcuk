@@ -11,7 +11,7 @@ Dokumen ini menjelaskan fungsi direktori dan file utama agar kontributor baru da
 - `docs/COMPILER_TARGETS.md`: target compiler dan cara menggunakannya.
 - `CONTRIBUTING.md`: cara berkontribusi.
 - `SECURITY.md`: pelaporan kerentanan dan batas keamanan.
-- `docs/ROADMAP` belum menjadi satu sumber status tunggal; periksa dokumen target terkait sebelum menganggap suatu fitur selesai.
+- Status fitur harus diverifikasi pada dokumen target terkait; jangan menganggap roadmap atau nama folder sebagai bukti fitur sudah selesai.
 
 ## Implementasi inti bahasa
 
