@@ -19,7 +19,7 @@ def generate(document):
     for s in root["fields"]["body"]:
         if s["kind"] == "Function":
             f = s["fields"]
-            if f["name"] in functions or f["name"] in ("panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan"):
+            if f["name"] in functions or f["name"] in ("panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat", "sinus", "kosinus"):
                 raise PythonBackendError(f"nama fungsi bentrok: {f['name']}")
             functions[f["name"]] = s
 
@@ -39,7 +39,13 @@ def generate(document):
             values = ", ".join(expr(x, env) for x in args)
             if name == "panjang" and len(args) == 1: return f"len({values})"
             if name == "rentang" and 1 <= len(args) <= 3: return f"pc_range({values})"
-            numeric_builtins = {"mutlak": (1, "pc_abs"), "minimum": (2, "pc_min"), "maksimum": (2, "pc_max"), "bulatkan": (1, "pc_round")}
+            numeric_builtins = {
+                "mutlak": (1, "pc_abs"), "minimum": (2, "pc_min"),
+                "maksimum": (2, "pc_max"), "bulatkan": (1, "pc_round"),
+                "akar": (1, "pc_sqrt"), "bawah": (1, "pc_floor"),
+                "atas": (1, "pc_ceil"), "pangkat": (2, "pc_pow"),
+                "sinus": (1, "pc_sin"), "kosinus": (1, "pc_cos"),
+            }
             if name in numeric_builtins:
                 arity, helper = numeric_builtins[name]
                 if len(args) != arity: raise PythonBackendError(f"baris {line}: {name} membutuhkan {arity} argumen")
@@ -152,6 +158,18 @@ def pc_round(value):
     if fraction < 0.5: return lower
     if fraction > 0.5: return lower + 1
     return lower if lower % 2 == 0 else lower + 1
+def pc_math_result(name, value):
+    if not math.isfinite(value): raise ValueError(name + " menghasilkan angka di luar domain atau non-finite")
+    return value
+def pc_sqrt(value):
+    value = pc_numeric("akar", value)
+    if value < 0: raise ValueError("akar() membutuhkan angka non-negatif")
+    return pc_math_result("akar", math.sqrt(value))
+def pc_floor(value): return math.floor(pc_numeric("bawah", value))
+def pc_ceil(value): return math.ceil(pc_numeric("atas", value))
+def pc_pow(a, b): return pc_math_result("pangkat", math.pow(pc_numeric("pangkat", a), pc_numeric("pangkat", b)))
+def pc_sin(value): return pc_math_result("sinus", math.sin(pc_numeric("sinus", value)))
+def pc_cos(value): return pc_math_result("kosinus", math.cos(pc_numeric("kosinus", value)))
 def pc_range(*args):
     if not 1 <= len(args) <= 3 or any(not isinstance(x, int) or isinstance(x, bool) for x in args): raise TypeError("rentang membutuhkan 1-3 integer")
     if len(args) == 3 and args[2] == 0: raise ValueError("langkah rentang tidak boleh nol")
