@@ -157,8 +157,8 @@ class Evaluator:
                 if n.name == "panjang":
                     if len(args) != 1:
                         self.fail(line, "fungsi 'panjang' membutuhkan 1 argumen")
-                    if not isinstance(args[0], (list, str, PusingDict)):
-                        self.fail(line, "panjang menerima daftar, teks, atau kamus")
+                    if not isinstance(args[0], (list, str, PusingDict, range)):
+                        self.fail(line, "panjang menerima daftar, teks, kamus, atau rentang")
                     return len(args[0])
                 if n.name == "rentang":
                     if not 1 <= len(args) <= 3:
