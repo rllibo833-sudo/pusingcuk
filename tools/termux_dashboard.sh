@@ -21,6 +21,15 @@ cd "$ROOT" || exit 1
 pause() { printf '\nTekan Enter untuk kembali...'; read -r _; }
 line() { printf '%s\n' '------------------------------------------------------------'; }
 
+open_page() {
+  url="$1"
+  if command -v termux-open-url >/dev/null 2>&1; then
+    termux-open-url "$url"
+  else
+    printf '\nBuka URL ini di browser: %s\n' "$url"
+  fi
+}
+
 show_status() {
   line
   printf 'REPO: %s\n' "$ROOT"
@@ -33,29 +42,22 @@ show_status() {
 }
 
 show_branches() {
-  git fetch --all --prune
-  printf '\nBRANCH LOKAL + REMOTE\n'
+  printf '\nBRANCH LOKAL + REMOTE YANG TERSIMPAN DI TERMUX\n'
   git branch -avv
+  printf '\nMembuka daftar semua branch GitHub di browser...\n'
+  open_page "$REPO_URL/branches"
   pause
 }
 
 show_actions() {
-  if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
-    gh run list --repo rllibo833-sudo/pusingcuk --limit 10
-  else
-    printf 'GitHub CLI belum siap. Pasang dengan: pkg install gh\n'
-    printf 'Lalu login: gh auth login\n'
-    printf 'Alternatif: %s/actions\n' "$REPO_URL"
-  fi
+  printf '\nMembuka GitHub Actions di browser (tanpa gh auth)...\n'
+  open_page "$REPO_URL/actions"
   pause
 }
 
 show_prs() {
-  if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
-    gh pr list --repo rllibo833-sudo/pusingcuk --state open
-  else
-    printf 'Buka daftar PR: %s/pulls\n' "$REPO_URL"
-  fi
+  printf '\nMembuka Pull Requests di browser (tanpa gh auth)...\n'
+  open_page "$REPO_URL/pulls"
   pause
 }
 
