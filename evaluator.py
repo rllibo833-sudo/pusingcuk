@@ -144,6 +144,13 @@ class Evaluator:
                 }
                 if n.op not in ops:
                     self.fail(line, "operator tidak dikenal")
+                if n.op == "+":
+                    numeric = (isinstance(a, (int, float)) and not isinstance(a, bool)
+                               and isinstance(b, (int, float)) and not isinstance(b, bool))
+                    same_text = isinstance(a, str) and isinstance(b, str)
+                    same_list = isinstance(a, list) and isinstance(b, list)
+                    if not (numeric or same_text or same_list):
+                        self.fail(line, "operator '+' membutuhkan dua angka, dua teks, atau dua daftar; ubah angka menjadi teks secara eksplisit jika ingin menggabungkan teks")
                 return ops[n.op]()
             if k == "Call":
                 args = [self.expr(x, env, depth) for x in n.args]
