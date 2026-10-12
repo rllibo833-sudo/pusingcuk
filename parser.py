@@ -1,4 +1,6 @@
 """Parser Pusingcuk: token lexer -> AST."""
+import re
+
 from lexer import lex, LexerError
 from ast_nodes import node
 
@@ -7,8 +9,30 @@ class ParserError(ValueError):
     pass
 
 
+def format_diagnostic(source, filename, line, column, message):
+    """Format a compact Indonesian Gen Z diagnostic with a source pointer."""
+    lines = source.splitlines()
+    line = max(1, int(line or 1))
+    column = max(1, int(column or 1))
+    snippet = lines[line - 1] if line <= len(lines) else ""
+    pointer = "   " + " " * min(column - 1, len(snippet)) + "^"
+    return (
+        f"[{filename}:{line}:{column}] Waduh, error cuk! {message}\n"
+        f" > {snippet}\n{pointer}"
+    )
+
+
+def _lexer_location(message):
+    match = re.search(r"Baris (\d+), kolom (\d+):\s*(.*)", message)
+    if match:
+        return int(match.group(1)), int(match.group(2)), match.group(3)
+    return 1, 1, message
+
+
 class Parser:
-    def __init__(self, source_or_tokens):
+    def __init__(self, source_or_tokens, filename="<string>"):
+        self.source = source_or_tokens if isinstance(source_or_tokens, str) else ""
+        self.filename = str(filename)
         self.tokens = (
             lex(source_or_tokens)
             if isinstance(source_or_tokens, str)
@@ -33,9 +57,13 @@ class Parser:
         return t
 
     def fail(self, message):
-        raise ParserError(
-            f"Baris {self.tok.line}, kolom {self.tok.column}: {message}"
-        )
+        if message.startswith("token tidak sesuai"):
+            message = "sintaks lu typo cuk, tokennya gak cocok (" + message + ")"
+        elif message.startswith("harus ada baris baru"):
+            message = "kasih baris baru dulu cuk biar parser gak mumet"
+        raise ParserError(format_diagnostic(
+            self.source, self.filename, self.tok.line, self.tok.column, message
+        ))
 
     def need(self, value=None, kind=None):
         if not self.at(value, kind):
@@ -265,7 +293,10 @@ class Parser:
             self.need("}")
             left = node("Dict", t.line, items=items)
         else:
-            self.fail(f"ekspresi tidak valid: {t.value!r}")
+            message = f"ekspresi tidak valid: {t.value!r}; sintaks lu typo cuk"
+            raise ParserError(format_diagnostic(
+                self.source, self.filename, t.line, t.column, message
+            ))
 
         while True:
             if self.at("["):
@@ -297,8 +328,12 @@ class Parser:
         return node("Call", line, name=name, args=args)
 
 
-def parse(source):
+def parse(source, filename="<string>"):
     try:
-        return Parser(source).parse()
+        return Parser(source, filename=filename).parse()
     except LexerError as exc:
-        raise ParserError(str(exc)) from exc
+        line, column, message = _lexer_location(str(exc))
+        raise ParserError(format_diagnostic(
+            source, filename, line, column,
+            "karakter sumber lu gak valid cuk: " + message
+        )) from exc
