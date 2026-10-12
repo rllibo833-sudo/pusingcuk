@@ -179,7 +179,8 @@
       "meaning": "Alias Gen Z/Gen Alpha untuk memulai program.",
       "aliases": [],
       "native_runtime": "pending-native-support",
-      "c_backend": "supported"
+      "c_backend": "supported",
+      "alias_of": "jancuk"
     },
     {
       "word": "spill",
@@ -187,7 +188,8 @@
       "meaning": "Alias slang untuk menampilkan nilai.",
       "aliases": [],
       "native_runtime": "pending-native-support",
-      "c_backend": "integer-and-boolean-subset"
+      "c_backend": "integer-and-boolean-subset",
+      "alias_of": "hedeh"
     },
     {
       "word": "bestie",
@@ -195,7 +197,8 @@
       "meaning": "Alias santai untuk mendeklarasikan variabel baru.",
       "aliases": [],
       "native_runtime": "pending-native-support",
-      "c_backend": "supported"
+      "c_backend": "supported",
+      "alias_of": "lah"
     },
     {
       "word": "valid",
@@ -203,7 +206,8 @@
       "meaning": "Alias slang untuk nilai benar.",
       "aliases": [],
       "native_runtime": "pending-native-support",
-      "c_backend": "supported"
+      "c_backend": "supported",
+      "alias_of": "benar"
     },
     {
       "word": "zonk",
@@ -211,7 +215,8 @@
       "meaning": "Alias slang untuk nilai salah.",
       "aliases": [],
       "native_runtime": "pending-native-support",
-      "c_backend": "supported"
+      "c_backend": "supported",
+      "alias_of": "salah"
     },
     {
       "word": "skip",
@@ -219,7 +224,8 @@
       "meaning": "Alias slang untuk cabang alternatif kondisi.",
       "aliases": [],
       "native_runtime": "pending-native-support",
-      "c_backend": "supported"
+      "c_backend": "supported",
+      "alias_of": "kampret"
     },
     {
       "word": "kelar",
@@ -227,7 +233,8 @@
       "meaning": "Alias slang untuk penanda penutup blok; tetap diikuti nama blok.",
       "aliases": [],
       "native_runtime": "pending-native-support",
-      "c_backend": "supported"
+      "c_backend": "supported",
+      "alias_of": "selesai"
     }
   ],
   "operators": [
