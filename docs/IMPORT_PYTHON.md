@@ -36,18 +36,21 @@ selesai jancuk
 - `if/else`, `while`, dan `for nama in koleksi`.
 - `range()` menjadi `rentang()` (1–3 argumen), `len()` menjadi `panjang()`.
 - Builtin numerik: `abs(x)` → `mutlak(x)`, `round(x)` → `bulatkan(x)`, `min(a, b)` → `minimum(a, b)`, dan `max(a, b)` → `maksimum(a, b)`.
+- Modul standar `math` dengan daftar izin eksplisit: `sqrt`, `floor`, `ceil`, `fabs`, `pow`, `sin`, `cos`, serta konstanta `pi` dan `e`. Bentuk `import math as m`, `from math import sqrt`, dan alias nama yang diimpor didukung.
 - Fungsi dengan parameter posisi biasa tanpa nilai default, `return`, daftar, kamus, dan indeks.
 - Boolean, perbandingan sederhana, `if/elif/else`, serta operator `and/or/not`.
 
 ## Hubungan dengan pustaka standar Pusingcuk
 
-Pemetaan hanya memakai fungsi yang sudah didukung backend JS/Python/VM dan didokumentasikan: `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, dan `bulatkan`. Untuk menjaga arti tetap dekat dengan Python, `min` dan `max` dibatasi menjadi tepat dua argumen dan dimaksudkan untuk angka. `round` hanya menerima satu argumen; pembulatan Pusingcuk mengikuti aturan ties-to-even.
+Pemetaan builtin umum memakai `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, dan `bulatkan`. Integrasi `math` menambahkan builtin lintas backend JS/Python `akar`, `bawah`, `atas`, `pangkat`, `sinus`, dan `kosinus`; target HTML memakai backend JavaScript yang sama. Untuk menjaga arti tetap dekat dengan Python, `min` dan `max` dibatasi menjadi tepat dua argumen dan dimaksudkan untuk angka. `round` hanya menerima satu argumen; pembulatan Pusingcuk mengikuti aturan ties-to-even.
 
-Walaupun registri pustaka juga mencatat `teks`, `bilangan`, `desimal`, dan `logika`, dokumentasi proyek menyatakan konversi itu belum diaktifkan secara konsisten di semua backend. Karena itu importer **belum** memetakannya. Import seperti `import os`, `import requests`, atau modul pihak ketiga tetap ditolak; nama modul tidak otomatis membuat API tersebut tersedia di Pusingcuk.
+Konversi `teks`, `bilangan`, `desimal`, dan `logika` belum dipetakan karena implementasinya belum konsisten di seluruh backend. Modul lain seperti `os`, `sys`, `json`, `requests`, dan modul pihak ketiga tetap ditolak sampai tersedia adapter nyata. Import seperti `import os`, `import requests`, atau modul pihak ketiga tetap ditolak; nama modul tidak otomatis membuat API tersebut tersedia di Pusingcuk.
 
 ## Batasan penting
 
 Ini **belum menerjemahkan semua Python**. Import modul (selain pemetaan builtin eksplisit di atas), kelas, exception handling, comprehension, slicing, decorator, parameter default, argumen bernama, chained comparison, format string f-string, dan banyak fitur lain ditolak dengan pesan yang menjelaskan batasnya. `import os` atau `import requests` tidak otomatis menjadi kemampuan Pusingcuk; modul dan dependensinya memerlukan integrasi terpisah. Beberapa perbedaan perilaku Python dan Pusingcuk mungkin tetap ada, sehingga hasil harus diuji dengan program asli.
+
+Integrasi `math` sengaja dibatasi pada daftar fungsi/konstanta di atas; API seperti `math.log`, `math.exp`, `math.tan`, `math.isnan`, dan wildcard import tetap ditolak. Tes konformansi menjalankan contoh yang sama pada JavaScript dan HTML yang dihasilkan. Hasil lintas target tetap perlu diuji untuk domain/error numerik di program nyata.
 
 Importer tidak mengeksekusi kode Python sumber. Namun, hasil Pusingcuk tetap harus diperlakukan sebagai kode biasa dan jangan menjalankan sumber yang tidak dipercaya dengan hak akses penting.
 
