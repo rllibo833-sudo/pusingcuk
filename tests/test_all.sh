@@ -11,11 +11,10 @@ else
   TMP_BASE=/tmp
 fi
 TMP="$TMP_BASE/pusingcuk-pvm-test-$$"
-FIXTURE="tests/pusingcuk-pvm-test.txt"
+FIXTURE="$TMP/pusingcuk-pvm-test.txt"
 mkdir -p "$TMP"
 cleanup() {
   rm -rf "$TMP"
-  rm -f "$FIXTURE"
 }
 trap cleanup EXIT
 "$CC" -std=c11 -O2 -Wall -Wextra -Werror src/c-core/main.c -o "$TMP/pvmc"
@@ -24,6 +23,10 @@ python3 --version >/dev/null
 printf 'fixture file I/O\n' > "$FIXTURE"
 for src in tests/0[1-6]_*.cuk; do
   name="$(basename "$src" .cuk)"
+  if [[ "$src" == "tests/05_file_io.cuk" ]]; then
+    src="$TMP/05_file_io.cuk"
+    sed "s|tests/pusingcuk-pvm-test.txt|$FIXTURE|g" tests/05_file_io.cuk > "$src"
+  fi
   "$TMP/pvmc" "$src" "$TMP/$name.pvm"
   node src/backends/js/compiler.js "$TMP/$name.pvm" "$TMP/$name.js"
   python3 src/backends/python/compiler.py "$TMP/$name.pvm" "$TMP/$name.py"
