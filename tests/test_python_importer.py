@@ -7,6 +7,7 @@ from compiler.ir import from_source
 from compiler.__main__ import compile_source
 from compiler.js_backend import generate as generate_js
 from parser import parse
+from library.stdlib import BUILTINS, call_builtin
 
 
 class PythonImporterTests(unittest.TestCase):
@@ -133,6 +134,18 @@ class PythonImporterTests(unittest.TestCase):
             ["node", "-e", harness], capture_output=True, text=True, check=True
         )
         self.assertEqual(html_result.stdout, expected)
+
+    def test_math_builtins_exist_in_standard_library_registry(self):
+        for name in ("akar", "bawah", "atas", "pangkat", "sinus", "kosinus"):
+            self.assertIn(name, BUILTINS)
+        self.assertEqual(call_builtin("akar", 81), 9)
+        self.assertEqual(call_builtin("bawah", 2.9), 2)
+        self.assertEqual(call_builtin("atas", 2.1), 3)
+        self.assertEqual(call_builtin("pangkat", 2, 3), 8)
+        self.assertEqual(call_builtin("sinus", 0), 0)
+        self.assertEqual(call_builtin("kosinus", 0), 1)
+        with self.assertRaises(TypeError):
+            call_builtin("akar", True)
 
     def test_math_import_is_allow_list_only(self):
         with self.assertRaises(ImportErrorPython):
