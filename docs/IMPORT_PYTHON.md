@@ -57,3 +57,10 @@ Importer tidak mengeksekusi kode Python sumber. Namun, hasil Pusingcuk tetap har
 ## Status
 
 Tahap pertama ini menyediakan jalur eksperimen yang dapat diuji dan dikembangkan. Jangan menyebutnya kompatibel penuh dengan Python. Perluasan berikutnya harus menambah fitur sedikit demi sedikit disertai tes semantik, khususnya untuk scope variabel, nilai kebenaran, koleksi, dan perilaku error.
+
+
+## Subset modul standar `statistics`
+
+Importer secara eksplisit memetakan `statistics.mean` → `rata_rata` dan `statistics.median` → `median`. Bentuk `import statistics as stats`, `from statistics import mean`, dan alias impor didukung. Kedua fungsi menerima tepat satu daftar Pusingcuk nonkosong berisi angka finite; boolean dan nilai nonnumerik ditolak. Implementasinya diuji untuk target JavaScript, HTML (runtime JavaScript yang sama), dan Python.
+
+Ini bukan kompatibilitas penuh modul Python `statistics`: `variance`, `stdev`, `pvariance`, `quantiles`, wildcard import, dan API lain ditolak secara eksplisit. VM dan runtime native C belum mendukung builtin ini.

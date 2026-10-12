@@ -143,6 +143,30 @@ const pcCeil = (value) => Math.ceil(pcNumeric("atas", value));
 const pcPow = (a, b) => pcMathResult("pangkat", Math.pow(pcNumeric("pangkat", a), pcNumeric("pangkat", b)));
 const pcSin = (value) => pcMathResult("sinus", Math.sin(pcNumeric("sinus", value)));
 const pcCos = (value) => pcMathResult("kosinus", Math.cos(pcNumeric("kosinus", value)));
+const pcStatValues = (name, value) => {
+  if (!Array.isArray(value) || value.length === 0)
+    throw new Error(name + "() membutuhkan daftar angka yang tidak kosong");
+  return value.map(v => pcNumeric(name, v));
+};
+const pcStatResult = (name, value) => {
+  if (!Number.isFinite(value)) throw new Error(name + "() menghasilkan angka non-finite");
+  return value;
+};
+const pcMean = (value) => {
+  const values = pcStatValues("rata_rata", value);
+  let total = 0;
+  for (const number of values) {
+    total += number;
+    if (!Number.isFinite(total)) throw new Error("rata_rata() menghasilkan angka non-finite");
+  }
+  return pcStatResult("rata_rata", total / values.length);
+};
+const pcMedian = (value) => {
+  const values = pcStatValues("median", value).sort((a, b) => a - b);
+  const middle = Math.floor(values.length / 2);
+  if (values.length % 2) return values[middle];
+  return pcStatResult("median", values[middle - 1] / 2 + values[middle] / 2);
+};
 const pcInputLines = (typeof process !== "undefined" && typeof require === "function")
   ? require("fs").readFileSync(0, "utf8").split(/\r?\n/)
   : [];
@@ -205,7 +229,7 @@ def generate(document: dict) -> str:
             name, params = fields.get("name"), fields.get("params")
             if not isinstance(name, str) or not IDENTIFIER.fullmatch(name):
                 raise JSBackendError(f"baris {line}: nama fungsi tidak valid")
-            if name in {"panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat", "sinus", "kosinus"} or name in functions:
+            if name in {"panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat", "sinus", "kosinus", "rata_rata", "median"} or name in functions:
                 raise JSBackendError(f"baris {line}: nama fungsi {name!r} sudah digunakan")
             if not isinstance(params, list) or any(
                 not isinstance(p, str) or not IDENTIFIER.fullmatch(p) for p in params
@@ -248,6 +272,7 @@ def generate(document: dict) -> str:
                 "akar": (1, "pcSqrt"), "bawah": (1, "pcFloor"),
                 "atas": (1, "pcCeil"), "pangkat": (2, "pcPow"),
                 "sinus": (1, "pcSin"), "kosinus": (1, "pcCos"),
+                "rata_rata": (1, "pcMean"), "median": (1, "pcMedian"),
             }
             if name in numeric_builtins:
                 arity, helper = numeric_builtins[name]

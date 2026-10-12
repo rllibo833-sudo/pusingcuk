@@ -5,7 +5,7 @@ This directory contains runnable examples and a machine-readable vocabulary regi
 - [`kosakata.json`](kosakata.json): keyword and alias glossary, meanings, and support-status metadata.
 - [`conditional_logic.pusingcuk`](conditional_logic.pusingcuk): comparisons, booleans, short-circuit logic, and conditionals.
 - [`loops_functions_genz.pusingcuk`](loops_functions_genz.pusingcuk): loops, recursive functions, and newer slang aliases. Run it with the modular interpreter because its text output is not supported by the experimental C source backend subset.
-- [`stdlib.py`](stdlib.py): an internal builtin registry for conversions, shared numeric helpers, and math helpers (`akar`, `bawah`, `atas`, `pangkat`, `sinus`, `kosinus`). Registry presence alone does not imply every runtime supports a builtin: the six math helpers currently work in the JS/Python compiler backends, and HTML uses the JS backend; VM/native C support is not yet claimed.
+- [`stdlib.py`](stdlib.py): an internal builtin registry for conversions, shared numeric helpers, and math helpers (`akar`, `bawah`, `atas`, `pangkat`, `sinus`, `kosinus`), and statistics helpers (`rata_rata`, `median`). Registry presence alone does not imply every runtime supports a builtin: the six math helpers currently work in the JS/Python compiler backends, and HTML uses the JS backend; VM/native C support is not yet claimed.
 
 ## Run examples with the Python interpreter
 
@@ -47,3 +47,8 @@ The JSON registry is a contributor-facing reference, not proof that a feature wo
 - `c_backend: unsupported` means the feature must not be used in C-backend examples; the compiler should reject it explicitly.
 
 The glossary is a practical index, not a replacement for `SPEC.md`, the semantic contract, or the runtime compatibility matrix. If information differs, report the mismatch and use tests plus the relevant implementation to establish the actual behavior.
+
+
+## Explicit Python statistics subset
+
+The Python importer maps only `statistics.mean` to `rata_rata` and `statistics.median` to `median`. Both accept a non-empty list of finite numbers; this is a deliberately small Pusingcuk API, not full Python `statistics` compatibility. Other statistics functions, wildcard imports, VM, and native C support are not claimed.

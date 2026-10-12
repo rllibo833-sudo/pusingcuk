@@ -19,7 +19,7 @@ def generate(document):
     for s in root["fields"]["body"]:
         if s["kind"] == "Function":
             f = s["fields"]
-            if f["name"] in functions or f["name"] in ("panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat", "sinus", "kosinus"):
+            if f["name"] in functions or f["name"] in ("panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat", "sinus", "kosinus", "rata_rata", "median"):
                 raise PythonBackendError(f"nama fungsi bentrok: {f['name']}")
             functions[f["name"]] = s
 
@@ -45,6 +45,7 @@ def generate(document):
                 "akar": (1, "pc_sqrt"), "bawah": (1, "pc_floor"),
                 "atas": (1, "pc_ceil"), "pangkat": (2, "pc_pow"),
                 "sinus": (1, "pc_sin"), "kosinus": (1, "pc_cos"),
+                "rata_rata": (1, "pc_mean"), "median": (1, "pc_median"),
             }
             if name in numeric_builtins:
                 arity, helper = numeric_builtins[name]
@@ -170,6 +171,26 @@ def pc_ceil(value): return math.ceil(pc_numeric("atas", value))
 def pc_pow(a, b): return pc_math_result("pangkat", math.pow(pc_numeric("pangkat", a), pc_numeric("pangkat", b)))
 def pc_sin(value): return pc_math_result("sinus", math.sin(pc_numeric("sinus", value)))
 def pc_cos(value): return pc_math_result("kosinus", math.cos(pc_numeric("kosinus", value)))
+def pc_stat_values(name, value):
+    if not isinstance(value, list) or not value:
+        raise TypeError(name + "() membutuhkan daftar angka yang tidak kosong")
+    return [pc_numeric(name, item) for item in value]
+def pc_stat_result(name, value):
+    if not math.isfinite(value): raise ValueError(name + "() menghasilkan angka non-finite")
+    if value.is_integer() and abs(value) <= 9007199254740991: return int(value)
+    return value
+def pc_mean(value):
+    values = pc_stat_values("rata_rata", value)
+    try: return pc_stat_result("rata_rata", sum(values) / len(values))
+    except OverflowError as exc: raise ValueError("rata_rata() menghasilkan angka non-finite") from exc
+def pc_median(value):
+    values = sorted(pc_stat_values("median", value))
+    middle = len(values) // 2
+    if len(values) % 2:
+        result = values[middle]
+        if isinstance(result, int) and abs(result) <= 9007199254740991: return result
+        return pc_stat_result("median", float(result))
+    return pc_stat_result("median", values[middle - 1] / 2 + values[middle] / 2)
 def pc_range(*args):
     if not 1 <= len(args) <= 3 or any(not isinstance(x, int) or isinstance(x, bool) for x in args): raise TypeError("rentang membutuhkan 1-3 integer")
     if len(args) == 3 and args[2] == 0: raise ValueError("langkah rentang tidak boleh nol")

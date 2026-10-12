@@ -154,3 +154,8 @@ Alias tidak mengubah makna sintaks dan tidak menghapus kata kunci lama. Runtime 
 Eksperimen PVM memiliki assembler dan backend JavaScript/Python. Spesifikasi framing, 19 opcode, operand, dan batas kompatibilitas berada di [docs/PVM_SPEC.md](docs/PVM_SPEC.md). Format ini masih draft: parser sumber C bersifat line-oriented, bukan parser ekspresi penuh, dan kesetaraan seluruh fitur belum dijamin. Jangan menganggap PVM v1 sebagai ABI stabil sebelum fixture konformansi lulus di CI.
 
 **Peringatan keamanan:** backend JavaScript PVM memakai parser ekspresi terbatas dan menolak URL jaringan eksternal; backend Python memakai evaluator AST terbatas. Payload lokal `data:text/plain,` tetap didukung oleh opcode PVM terkait, tetapi operasi file PVM belum dibatasi oleh sandbox sistem operasi. Ini bukan sandbox. Jangan menjalankan bytecode atau program Pusingcuk yang tidak dipercaya.
+
+
+## Experimental statistics builtins
+
+Compiler targets JavaScript, Python, and HTML expose `rata_rata(daftar)` and `median(daftar)`, introduced by the allow-listed Python importer mappings `statistics.mean` and `statistics.median`. Each accepts one non-empty list of finite numbers and rejects booleans. These builtins are an experimental target-specific subset, not a promise of full Python `statistics` compatibility; VM and native C support are not available.

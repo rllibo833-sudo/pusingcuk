@@ -62,3 +62,8 @@ angka finite; boolean ditolak. Pembulatan `.5` menggunakan aturan ties-to-even
 agar hasil konsisten antartarget. Builtin konversi lain yang tercatat di
 [model tipe dan pustaka standar](compiler-type-system-and-stdlib.md) belum
 diaktifkan di semua backend.
+
+
+## Statistics builtins and compatibility
+
+The importer supports `statistics.mean` and `statistics.median`, mapped to `rata_rata(daftar)` and `median(daftar)`. These are implemented and tested on JavaScript, Python, and HTML (which embeds the JS runtime). Inputs must be a non-empty list of finite numbers; booleans are rejected. The VM and native C runtime do not claim support. The presence of these builtins does not mean the full Python `statistics` module is compatible.

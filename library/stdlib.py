@@ -91,6 +91,38 @@ def _cos(value: Any) -> float:
     return _math_result("kosinus", math.cos(_numeric("kosinus", value)))
 
 
+def _stat_values(name: str, value: Any) -> list[int | float]:
+    if not isinstance(value, list) or not value:
+        raise TypeError(name + "() membutuhkan daftar angka yang tidak kosong")
+    return [_numeric(name, item) for item in value]
+
+
+def _stat_result(name: str, value: float) -> int | float:
+    value = _math_result(name, value)
+    if value.is_integer() and abs(value) <= 9007199254740991:
+        return int(value)
+    return value
+
+
+def _mean(value: Any) -> int | float:
+    values = _stat_values("rata_rata", value)
+    try:
+        return _stat_result("rata_rata", sum(values) / len(values))
+    except OverflowError as exc:
+        raise ValueError("rata_rata() menghasilkan angka di luar rentang finite") from exc
+
+
+def _median(value: Any) -> int | float:
+    values = sorted(_stat_values("median", value))
+    middle = len(values) // 2
+    if len(values) % 2:
+        result = values[middle]
+        if isinstance(result, int) and abs(result) <= 9007199254740991:
+            return result
+        return _stat_result("median", float(result))
+    return _stat_result("median", values[middle - 1] / 2 + values[middle] / 2)
+
+
 BUILTINS: dict[str, Builtin] = {
     "panjang": Builtin("panjang", ("nilai",), "Jumlah item pada teks, daftar, atau peta.", len),
     "teks": Builtin("teks", ("nilai",), "Konversi nilai menjadi teks.", str),
@@ -107,6 +139,8 @@ BUILTINS: dict[str, Builtin] = {
     "pangkat": Builtin("pangkat", ("basis", "eksponen"), "Pangkat numerik dengan hasil finite.", _pow),
     "sinus": Builtin("sinus", ("radian",), "Sinus sudut dalam radian.", _sin),
     "kosinus": Builtin("kosinus", ("radian",), "Kosinus sudut dalam radian.", _cos),
+    "rata_rata": Builtin("rata_rata", ("daftar",), "Rata-rata aritmetika daftar angka finite yang tidak kosong.", _mean),
+    "median": Builtin("median", ("daftar",), "Median daftar angka finite yang tidak kosong.", _median),
 }
 
 

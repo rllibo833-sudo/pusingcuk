@@ -74,3 +74,16 @@ Tes lintas runtime harus membandingkan hasil yang terlihat pengguna, bukan detai
 - **Kontributor/runtime engineer:** baca [panduan kontribusi](../CONTRIBUTING.md), tambahkan tes konformansi dan kasus error, lalu verifikasi kedua jalur runtime yang tersentuh.
 
 Kompatibilitas yang baik berarti program gagal dengan jelas saat fitur tidak tersedia, bukan diam-diam berperilaku berbeda.
+
+
+## Python standard-library import subset
+
+The experimental Python importer uses explicit allow-lists, not arbitrary host imports. The currently tested mappings are:
+
+| Python API | Pusingcuk builtin | Targets with implementation | Important limits |
+|---|---|---|---|
+| `math.sqrt/floor/ceil/fabs/pow/sin/cos`, `math.pi/e` | `akar/bawah/atas/mutlak/pangkat/sinus/kosinus` and numeric constants | JS, Python, HTML | Only listed names; numeric-domain behavior is validated per helper |
+| `statistics.mean` | `rata_rata` | JS, Python, HTML | One non-empty list of finite numbers; not full `statistics` semantics |
+| `statistics.median` | `median` | JS, Python, HTML | One non-empty list of finite numbers; not full `statistics` semantics |
+
+VM and native C support for the new statistics helpers is not claimed. Unsupported imports such as `statistics.variance`, wildcard imports, and other modules are rejected instead of being silently passed through. HTML uses the JavaScript backend, so its helper implementation and tests share that runtime. See [Python importer limits](IMPORT_PYTHON.md) and [standard-library registry](compiler-type-system-and-stdlib.md).
