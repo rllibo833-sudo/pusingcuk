@@ -1,14 +1,16 @@
 # Pusingcuk: Native Runtime, Secure Standard Library, and Ecosystem Migration
 
-**Status:** Architecture proposal; implementation not yet complete  
-**Target:** Pusingcuk becomes the primary application language for Founder-OS, kawasan-masjid-core, and kawasan-masjid-public  
+**Status:** Optional architecture proposal; implementation not yet complete  
+**Scope:** A specific downstream integration case study, not the overall Pusingcuk mission or a claim of current capability.  
 **Baseline:** The main pipeline is Python-based; a C native runtime prototype exists.
 
-## 1. Product definition
+> **Scope note:** Pusingcuk's overall direction is defined in [VISION.md](VISION.md): an open language project for learners, engineers, educators, and communities across regions and programming languages. The Founder-OS / CORE / PUBLIC names below describe one proposed application ecosystem only. They are not required targets for Pusingcuk, do not define its public identity, and must not be presented as implemented integrations.
 
-Pusingcuk is intended to become a beginner-friendly, production-oriented language for the Kawasan 1000 Hektar digital ecosystem: applications, APIs, data workflows, integrations, operational automation and bounded AI-agent tasks.
+## 1. Case-study objective
 
-The long-term goal is that Python is not required to run or deploy Pusingcuk applications. Python may remain an optional migration/test tool during development, but must not be a hidden runtime dependency in the final toolchain.
+Within this optional case study, the proposal explores whether Pusingcuk could eventually serve applications, APIs, data workflows, integrations, operational automation, and bounded AI-agent tasks for the named ecosystem. This is one possible downstream use, not the general project mission, not a requirement for contributors, and not a claim that these capabilities exist today.
+
+For workloads in this case study, the long-term proposal is to avoid requiring Python to run or deploy applications. Python may remain an optional migration/test tool during development, but this is a future goal rather than a current guarantee.
 
 This is a migration program, not a one-step rewrite. The existing Python implementation and tests remain the behavioral reference until native parity is demonstrated.
 
