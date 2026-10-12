@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# LEGACY - active is compiler/ folder
 """Experimental, versioned JSON AST-IR export for Pusingcuk."""
 from __future__ import annotations
 

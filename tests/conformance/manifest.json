@@ -30,7 +30,11 @@
       "expected": {
         "exit_code": 1,
         "stdout": "",
-        "stderr_class": "error"
+        "stderr_class": "error",
+        "exit_code_by_runtime": {
+          "reference": 2,
+          "native": 1
+        }
       },
       "runtimes": {
         "reference": "required",
@@ -197,7 +201,11 @@
       "expected": {
         "exit_code": 1,
         "stdout": "",
-        "stderr_class": "error"
+        "stderr_class": "error",
+        "exit_code_by_runtime": {
+          "reference": 2,
+          "native": 1
+        }
       },
       "runtimes": {
         "reference": "required",

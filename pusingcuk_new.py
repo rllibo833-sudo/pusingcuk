@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 from evaluator import run
+from parser import ParserError
 
 
 def main():
@@ -17,12 +18,24 @@ def main():
 
     if not path.is_file():
         print(f"Kesalahan: berkas tidak ditemukan: {path}", file=sys.stderr)
-        return 2
+        return 3
 
     try:
-        run(path.read_text(encoding="utf-8"), source_path=path)
-    except (SyntaxError, RuntimeError, ValueError, TypeError, IndexError) as exc:
-        print(f"Kesalahan: {exc}", file=sys.stderr)
+        source = path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        print(f"Kesalahan: berkas tidak ditemukan: {path}", file=sys.stderr)
+        return 3
+    except (OSError, UnicodeError) as exc:
+        print(f"Kesalahan membaca berkas: {exc}", file=sys.stderr)
+        return 1
+
+    try:
+        run(source, source_path=path)
+    except ParserError as exc:
+        print(f"Kesalahan sintaks: {exc}", file=sys.stderr)
+        return 2
+    except (RuntimeError, ValueError, TypeError, IndexError, OSError) as exc:
+        print(f"Kesalahan runtime: {exc}", file=sys.stderr)
         return 1
     return 0
 

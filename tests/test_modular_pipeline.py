@@ -203,7 +203,7 @@ selesai jancuk"""
                 capture_output=True,
                 check=False,
             )
-        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.returncode, 3)
         self.assertIn("berkas tidak ditemukan", result.stderr)
         self.assertEqual(result.stdout, "")
 

@@ -5,8 +5,9 @@ from lexer import lex, LexerError
 from ast_nodes import node
 
 
-class ParserError(ValueError):
-    pass
+class ParserError(SyntaxError):
+    """Raised when source text cannot be parsed as valid Pusingcuk syntax."""
+
 
 
 def format_diagnostic(source, filename, line, column, message):

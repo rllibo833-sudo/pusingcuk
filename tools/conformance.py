@@ -17,7 +17,7 @@ from library.builtin_contract import BUILTIN_CONTRACT  # validates metadata befo
 FIXTURES = ROOT / "tests" / "conformance"
 MANIFEST = FIXTURES / "manifest.json"
 ALLOWED_RUNTIME_STATES = {"required", "optional", "unsupported"}
-ALLOWED_EXPECTED_KEYS = {"exit_code", "stdout", "stderr_class", "stdin"}
+ALLOWED_EXPECTED_KEYS = {"exit_code", "exit_code_by_runtime", "stdout", "stderr_class", "stdin"}
 ALLOWED_FIXTURE_KEYS = {"id", "source", "profile", "requires", "expected", "runtimes"}
 
 
@@ -61,6 +61,14 @@ def load_manifest():
             raise ManifestError(f"{fixture_id}: expected tidak valid")
         if not isinstance(expected.get("exit_code"), int) or isinstance(expected.get("exit_code"), bool):
             raise ManifestError(f"{fixture_id}: expected.exit_code harus integer")
+        exit_code_by_runtime = expected.get("exit_code_by_runtime", {})
+        if not isinstance(exit_code_by_runtime, dict):
+            raise ManifestError(f"{fixture_id}: exit_code_by_runtime harus berupa objek")
+        for runtime_name, runtime_code in exit_code_by_runtime.items():
+            if runtime_name not in {"reference", "native"}:
+                raise ManifestError(f"{fixture_id}: runtime exit code tidak dikenal: {runtime_name}")
+            if not isinstance(runtime_code, int) or isinstance(runtime_code, bool):
+                raise ManifestError(f"{fixture_id}: exit code untuk {runtime_name} harus integer")
         if not isinstance(expected.get("stdout"), str):
             raise ManifestError(f"{fixture_id}: expected.stdout harus teks")
         stderr_class = expected.get("stderr_class")
@@ -176,8 +184,11 @@ def main():
                     continue
 
                 actual_class = classify_stderr(result.returncode, result.stderr)
+                expected_exit_code = expected.get("exit_code_by_runtime", {}).get(
+                    runtime, expected["exit_code"]
+                )
                 matches = (
-                    result.returncode == expected["exit_code"]
+                    result.returncode == expected_exit_code
                     and result.stdout == expected["stdout"]
                     and actual_class == expected.get("stderr_class")
                 )
@@ -187,7 +198,7 @@ def main():
                 else:
                     states["FAIL"] += 1
                     print(f"FAIL {label}")
-                    print(f"  exit: expected={expected['exit_code']} actual={result.returncode}")
+                    print(f"  exit: expected={expected_exit_code} actual={result.returncode}")
                     print(f"  stdout expected={expected['stdout']!r} actual={result.stdout!r}")
                     print(f"  stderr_class expected={expected.get('stderr_class')!r} actual={actual_class!r}")
                     if result.stderr:

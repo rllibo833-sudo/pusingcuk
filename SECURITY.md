@@ -10,6 +10,8 @@ Include the affected version or commit, platform, minimal reproduction steps, ex
 
 ## Security scope and limitations
 
+**PVM and native runtime are NOT a sandbox — do not run untrusted code.** Both execute with the permissions available to the current process; file operations may reach accessible files.
+
 Pusingcuk is experimental. The native runtime, Pusingcuk Studio, and PVM backends are **not security sandboxes**. Do not use them to run untrusted code on a device that contains sensitive data or accounts.
 
 The PVM JavaScript backend now parses expressions with a restricted grammar instead of dynamically compiling expressions, and the PVM backend accepts only local `data:text/plain,` payloads while rejecting external network URLs. The PVM Python backend now uses a restricted AST evaluator and rejects external URLs passed to the network opcode. Neither backend requires an API key or makes an outbound network request as part of normal expression evaluation. The optional web workbench serves the local device through loopback only; its local HTTP connection is not an external internet service. Initial source/package downloads are setup actions, not runtime behavior.

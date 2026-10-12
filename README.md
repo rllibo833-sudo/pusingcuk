@@ -155,6 +155,17 @@ Jangan tambahkan `os.system`, Python `eval` atau `exec`, dependensi OpenAI SDK, 
 
 **Security note:** backend JavaScript dan Python PVM memakai parsing ekspresi terbatas. URL jaringan eksternal ditolak; hanya payload lokal `data:text/plain,` yang didukung. Operasi file PVM belum dikurung oleh sandbox tingkat OS, jadi jangan jalankan bytecode dari sumber yang gak dipercaya. Baca [SECURITY.md](SECURITY.md) untuk batasan terbaru.
 
+## Arsitektur
+
+Jalur aktif yang jadi acuan pengembangan:
+
+- `evaluator.py` — interpreter Python modular; gunakan `pusingcuk_new.py` sebagai CLI.
+- `compiler/` — jalur compiler utama.
+- `native/pusingcuk.c` — runtime interpreter native C.
+- `src/c-core/main.c` — **bukan duplikat** runtime native; ini assembler PVM v1 yang terpisah, jadi belum ditandai deprecated.
+
+`interpreter.py` dan `compiler_ir.py` adalah jalur legacy/eksperimental; jangan jadikan keduanya sumber utama fitur baru.
+
 ## Dokumentasi dan peta repository
 
 Katalog dokumentasi lengkap ada di [docs/README.md](docs/README.md). Reviewer teknis independen bisa mulai dari [docs/INDEPENDENT_REVIEW.md](docs/INDEPENDENT_REVIEW.md).
