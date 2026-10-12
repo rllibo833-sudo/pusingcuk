@@ -119,7 +119,7 @@ The Python interpreter is the reference development path. The native C runtime a
 
 ## Offline-first policy
 
-The core language interpreter is designed to run locally and does not require a network connection, API key, hosted service, or third-party Python package. Tests should be runnable from local files. Any optional tool that serves a local browser page must bind to loopback only; it must not silently contact external services.
+The core language interpreter, native runtime, compiler, and tests are designed to run locally without outbound network access, API keys, hosted services, or third-party Python packages. The first-time commands `git clone` and `pkg install` shown above download source/tools and therefore require a connection during setup. For a strictly offline setup, transfer the repository and ensure Python (and, if building native code, a C compiler and Make) are already installed. After setup, running Pusingcuk does not need internet. Tests should use local files only. The optional browser workbench binds to loopback (`127.0.0.1`) for this device only and must not contact external services.
 
 Do not add `os.system`, Python `eval` or `exec`, `requests`, OpenAI SDK dependencies, API-key requirements, or automatic outbound network calls to the core runtime. Keep external integrations out of the default execution path and add offline tests for new features.
 
