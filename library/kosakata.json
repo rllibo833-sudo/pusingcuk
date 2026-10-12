@@ -278,6 +278,40 @@
       "native_runtime": "reference-python",
       "c_backend": "unsupported",
       "alias_of": "tanya"
+    },
+    {
+      "word": "tulis_json",
+      "category": "file-io",
+      "meaning": "Menyimpan objek JSON ke berkas UTF-8 dan mengembalikan benar jika berhasil.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "baca_json",
+      "category": "file-io",
+      "meaning": "Membaca JSON dari berkas dan mengubah objek JSON menjadi kamus Pusingcuk.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "simpen_json",
+      "category": "file-io",
+      "meaning": "Alias slang untuk menyimpan objek JSON.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported",
+      "alias_of": "tulis_json"
+    },
+    {
+      "word": "bongkar_json",
+      "category": "file-io",
+      "meaning": "Alias slang untuk membaca objek JSON.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported",
+      "alias_of": "baca_json"
     }
   ],
   "operators": [
@@ -358,6 +392,7 @@
     "native_runtime": "Runtime C mandiri mempunyai cakupan lebih luas pada fitur yang memiliki fixture native.",
     "c_backend": "Backend source C eksperimental mendukung integer/boolean, kondisi, loop mumet, dan fungsi pengguna dengan parameter/return integer. String, koleksi, input, loop untuk, dan deklarasi lah di dalam loop masih ditolak eksplisit.",
     "aliases": "Alias baru gas, spill, bestie, valid, zonk, skip, dan kelar saat ini diuji melalui lexer/interpreter Python dan front-end compiler C; dukungan lexer runtime C mandiri belum diklaim.",
-    "file_io": "tulis/baca (aliases simpen/bongkar) and expression input tanya (alias kepo) are supported by the Python reference interpreter only. Native C and C backend file I/O are unsupported for now."
+    "file_io": "tulis/baca (aliases simpen/bongkar) and expression input tanya (alias kepo) are supported by the Python reference interpreter only. Native C and C backend file I/O are unsupported for now.",
+    "json_io": "tulis_json/baca_json (aliases simpen_json/bongkar_json) use Python's json module and are supported by the Python reference interpreter only. Native C and C backend JSON I/O are unsupported for now."
   }
 }

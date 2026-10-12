@@ -38,6 +38,15 @@ jobs:
           grep -Fq 'Budi : Beli kopi' <<< "$output"
           rm -f warung.txt
 
+      - name: Uji contoh JSON I/O Level 3.5
+        run: |
+          set -euo pipefail
+          output="$(python pusingcuk_new.py examples/database.pusingcuk)"
+          printf '%s\n' "$output"
+          grep -Fq 'Budi' <<< "$output"
+          grep -Fq '15000' <<< "$output"
+          rm -f database.json
+
   native-runtime:
     runs-on: ubuntu-latest
     timeout-minutes: 10

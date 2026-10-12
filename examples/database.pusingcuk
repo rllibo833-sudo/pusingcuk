@@ -1,0 +1,9 @@
+inthiseco
+  lah data = {"nama": "Budi", "saldo": 15000, "aktif": benar, "tag": ["kopi", "warung"]}
+  simpen_json("database.json", data)
+  lah hasil = bongkar_json("database.json")
+  spill hasil["nama"]
+  spill hasil["saldo"]
+  spill hasil["aktif"]
+  spill hasil["tag"][0]
+gitu inthiseco

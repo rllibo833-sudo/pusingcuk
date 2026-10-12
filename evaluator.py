@@ -3,6 +3,7 @@ from contextlib import redirect_stdout
 from collections.abc import MutableMapping
 from io import StringIO
 from pathlib import Path
+import json
 from ast_nodes import Node
 from parser import parse
 
@@ -66,6 +67,28 @@ def language_equal(left, right):
             return False
     return left == right
 
+
+def _json_ready(value):
+    """Convert Pusingcuk collections into values accepted by json."""
+    if isinstance(value, PusingDict):
+        return {key: _json_ready(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_json_ready(item) for item in value]
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    raise TypeError("nilai tidak didukung oleh JSON")
+
+
+def _language_json(value):
+    """Convert decoded JSON objects into Pusingcuk dictionaries recursively."""
+    if isinstance(value, dict):
+        result = PusingDict()
+        for key, item in value.items():
+            result[key] = _language_json(item)
+        return result
+    if isinstance(value, list):
+        return [_language_json(item) for item in value]
+    return value
 
 class ReturnSignal(Exception):
     def __init__(self, value):
@@ -175,6 +198,26 @@ class Evaluator:
                     except FileNotFoundError:
                         return False
                     except OSError:
+                        return False
+                if n.name == "tulis_json":
+                    if len(args) != 2 or not isinstance(args[0], str):
+                        self.fail(line, "tulis_json membutuhkan path teks dan satu objek")
+                    try:
+                        data = _json_ready(args[1])
+                        Path(args[0]).write_text(
+                            json.dumps(data, ensure_ascii=False, indent=2),
+                            encoding="utf-8",
+                        )
+                        return True
+                    except (OSError, TypeError, ValueError):
+                        return False
+                if n.name == "baca_json":
+                    if len(args) != 1 or not isinstance(args[0], str):
+                        self.fail(line, "baca_json membutuhkan satu path berupa teks")
+                    try:
+                        data = json.loads(Path(args[0]).read_text(encoding="utf-8"))
+                        return _language_json(data)
+                    except (OSError, json.JSONDecodeError):
                         return False
                 if n.name == "panjang":
                     if len(args) != 1:

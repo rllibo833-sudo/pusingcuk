@@ -18,6 +18,8 @@ KEYWORD_ALIASES = {
     "kelar": "selesai",
     "simpen": "tulis",
     "bongkar": "baca",
+    "simpen_json": "tulis_json",
+    "bongkar_json": "baca_json",
     "kepo": "tanya",
 }
 
