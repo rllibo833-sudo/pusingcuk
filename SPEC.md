@@ -118,7 +118,7 @@ Interpreter melaporkan kesalahan dengan nomor baris jika tersedia.
 
 Semantik bahasa harus dipisahkan dari implementasi runtime agar program dapat diterjemahkan ke target lain. Baseline perilaku ada di [Kontrak Semantik](docs/SEMANTIC_CONTRACT.md). Front-end dapat mengekspor IR v1 yang mempertahankan AST; format dan validatornya ada di [IR v1](docs/IR_V1.md). Backend C eksperimental mendukung subset integer yang tercatat di [C backend](docs/C_BACKEND.md). Arsitektur target lain dan ABI/FFI dijelaskan di [Arsitektur Compiler dan Interoperabilitas](docs/COMPILER_INTEROP.md), sedangkan tes lintas runtime ada di [Kontrak Fixture Konformansi](docs/CONFORMANCE_FIXTURES.md).
 
-Dokumen tersebut adalah rancangan arsitektur. Saat ini belum ada kontrak IR compiler stabil, compiler multi-target, backend WebAssembly/JavaScript, atau ABI/FFI stabil. Jangan mengklaim fitur tersebut tersedia sebelum implementasi dan fixture konformansi membuktikannya.
+Status implementasi saat ini: front-end dapat mengekspor IR v1, dan CLI `python -m compiler` memiliki target eksperimental `js`, `python`, `html`, `json`, dan `vm`. Backend source C eksperimental tersedia secara terpisah. Target-target tersebut hanya mendukung subset yang berbeda; keberadaan target bukan jaminan kesetaraan semantik atau ABI yang stabil. WebAssembly dan ABI/FFI stabil belum tersedia. Rujuk `docs/COMPILER_TARGETS.md`, `docs/IR_V1.md`, `docs/JS_BACKEND.md`, `docs/BYTECODE_VM.md`, dan `docs/COMPATIBILITY.md` sebelum mengandalkan target tertentu.
 
 ## 14. Status spesifikasi
 
@@ -138,10 +138,19 @@ Lexer menerima alias berikut dan menormalkannya ke kata kunci kanonis sebelum pa
 - `gitu` → `selesai`
 - `inthiseco` → `jancuk`
 - `janggal` → `bukan`
+- `gas` → `jancuk`
+- `spill` → `hedeh`
+- `bestie` → `lah`
+- `valid` → `benar`
+- `zonk` → `salah`
+- `skip` → `kampret`
+- `kelar` → `selesai`
 
 Alias tidak mengubah makna sintaks dan tidak menghapus kata kunci lama. Runtime C mandiri diuji terhadap subset alias ini; fitur lain pada runtime C belum dinyatakan setara dengan interpreter modular.
 
 
-## 17. Bytecode IR PVM v1 (draft)
+## 17. Bytecode PVM v1 (draft) dan batas keamanan
 
-PusingCuk kini memiliki eksperimen assembler bytecode biner PVM dan backend transpiler JavaScript/Python. Spesifikasi framing, 19 opcode, operand, dan batas kompatibilitas berada di [docs/PVM_SPEC.md](docs/PVM_SPEC.md). Format ini masih draft: parser sumber C bersifat line-oriented, bukan parser ekspresi penuh, dan kesetaraan seluruh fitur belum dijamin. Jangan menganggap PVM v1 sebagai ABI stabil sebelum seluruh fixture konformansi lulus di CI.
+Eksperimen PVM memiliki assembler dan backend JavaScript/Python. Spesifikasi framing, 19 opcode, operand, dan batas kompatibilitas berada di [docs/PVM_SPEC.md](docs/PVM_SPEC.md). Format ini masih draft: parser sumber C bersifat line-oriented, bukan parser ekspresi penuh, dan kesetaraan seluruh fitur belum dijamin. Jangan menganggap PVM v1 sebagai ABI stabil sebelum fixture konformansi lulus di CI.
+
+**Peringatan keamanan:** backend JavaScript PVM saat ini mengevaluasi ekspresi melalui `Function()` dan `with`, serta menyediakan operasi file dan jaringan. Ini bukan sandbox. Jangan menjalankan bytecode atau program Pusingcuk yang tidak dipercaya, dan jangan menganggap `Function`, `eval`, atau mekanisme VM bahasa host sebagai batas isolasi keamanan.
