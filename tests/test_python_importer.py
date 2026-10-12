@@ -185,6 +185,7 @@ class PythonImporterTests(unittest.TestCase):
             "hedeh rata_rata([])",
             "hedeh median([1, benar])",
             'hedeh median([1, "x"])',
+            "hedeh median([9007199254740992.0])",
         )
         for statement in cases:
             source = "jancuk\n" + statement + "\nselesai jancuk"

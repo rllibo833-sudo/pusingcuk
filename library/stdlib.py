@@ -95,7 +95,11 @@ def _stat_values(name: str, value: Any) -> list[int | float]:
     if not isinstance(value, list) or not value:
         raise TypeError(name + "() membutuhkan daftar angka yang tidak kosong")
     values = [_numeric(name, item) for item in value]
-    if any(isinstance(item, int) and abs(item) > 9007199254740991 for item in values):
+    if any(
+        (isinstance(item, int) and abs(item) > 9007199254740991)
+        or (isinstance(item, float) and item.is_integer() and abs(item) > 9007199254740991)
+        for item in values
+    ):
         raise ValueError(name + "() menolak integer di luar rentang aman lintas target")
     return values
 
