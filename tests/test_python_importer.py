@@ -2,6 +2,8 @@
 import unittest
 
 from compiler.import_python import ImportErrorPython, translate
+from compiler.ir import from_source
+from compiler.js_backend import generate as generate_js
 from parser import parse
 
 
@@ -40,6 +42,7 @@ class PythonImporterTests(unittest.TestCase):
         result = translate("numbers = [1, 2, 3]\nfor number in range(1, 4):\n    print(number)\n")
         self.assertIn("untuk number dalam rentang(1, 4)", result)
         parse(result)
+        self.assertIn("pcRange", generate_js(from_source(result)))
 
     def test_numeric_builtins_map_to_supported_stdlib(self):
         result = translate(
@@ -53,6 +56,11 @@ class PythonImporterTests(unittest.TestCase):
         self.assertIn("hedeh minimum(4, 9)", result)
         self.assertIn("hedeh maksimum(4, 9)", result)
         parse(result)
+        generated = generate_js(from_source(result))
+        self.assertIn("pcAbs", generated)
+        self.assertIn("pcRound", generated)
+        self.assertIn("pcMin", generated)
+        self.assertIn("pcMax", generated)
 
     def test_numeric_builtin_arity_is_checked(self):
         with self.assertRaises(ImportErrorPython):
