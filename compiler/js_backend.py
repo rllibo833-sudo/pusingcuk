@@ -161,10 +161,10 @@ const pcMean = (value) => {
   const values = pcStatValues("rata_rata", value);
   let total = 0;
   for (const number of values) {
-    total += number;
+    total += number / values.length;
     if (!Number.isFinite(total)) throw new Error("rata_rata() menghasilkan angka non-finite");
   }
-  return pcStatResult("rata_rata", total / values.length);
+  return pcStatResult("rata_rata", total);
 };
 const pcMedian = (value) => {
   const values = pcStatValues("median", value).sort((a, b) => a - b);

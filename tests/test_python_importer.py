@@ -143,12 +143,13 @@ class PythonImporterTests(unittest.TestCase):
             "print(stats.median([1, 4, 8]))\n"
             "print(median([1, 2, 3, 4]))\n"
             "print(average([2, 4]))\n"
+            "print(stats.mean([9007199254740991, 9007199254740991]))\n"
         )
         translated = translate(source)
         self.assertIn("rata_rata([1, 2, 6])", translated)
         self.assertIn("median([1, 2, 3, 4])", translated)
         parse(translated)
-        expected = "3\n4\n2.5\n3\n"
+        expected = "3\n4\n2.5\n3\n9007199254740991\n"
 
         generated_js = generate_js(from_source(translated))
         js_result = subprocess.run(

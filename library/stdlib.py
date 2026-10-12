@@ -110,7 +110,8 @@ def _stat_result(name: str, value: float) -> int | float:
 def _mean(value: Any) -> int | float:
     values = _stat_values("rata_rata", value)
     try:
-        return _stat_result("rata_rata", sum(values) / len(values))
+        count = len(values)
+        return _stat_result("rata_rata", sum(item / count for item in values))
     except OverflowError as exc:
         raise ValueError("rata_rata() menghasilkan angka di luar rentang finite") from exc
 

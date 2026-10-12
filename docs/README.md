@@ -26,6 +26,7 @@ The root [language specification](../SPEC.md) is the primary syntax reference. I
 - [Repository structure](REPO_STRUCTURE.md)
 - [Compiler interoperability](COMPILER_INTEROP.md)
 - [Compiler targets](COMPILER_TARGETS.md)
+- [Python importer and allow-listed standard-library APIs](IMPORT_PYTHON.md)
 - [Compiler type system and standard-library notes](compiler-type-system-and-stdlib.md)
 - [Bytecode VM](BYTECODE_VM.md)
 - [PVM specification](PVM_SPEC.md)

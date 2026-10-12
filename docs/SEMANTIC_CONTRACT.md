@@ -16,6 +16,7 @@ Status: baseline engineering untuk perilaku yang harus dipatuhi front-end, inter
 - dan / atau menggunakan short-circuit: operand kanan tidak dievaluasi jika hasil sudah ditentukan.
 - Boolean benar dan salah adalah tipe berbeda dari angka. Kesetaraan benar == 1 menghasilkan tidak.
 - Output boolean memakai okelah dan tidak, bukan True/False.
+- Builtin statistik eksperimental `rata_rata` dan `median` menerima tepat satu daftar nonkosong yang hanya berisi angka finite; boolean dan tipe lain ditolak. Implementasi yang diuji ada pada backend JS/Python dan HTML, bukan VM/native C.
 - Urutan output dan mutasi koleksi adalah perilaku teramati yang tidak boleh berubah karena optimisasi.
 - Pembagian dengan nol, overflow, angka non-finite, dan diagnostik spesifik harus memiliki fixture sebelum dianggap stabil lintas backend.
 

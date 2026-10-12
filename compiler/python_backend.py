@@ -184,7 +184,9 @@ def pc_stat_result(name, value):
     return value
 def pc_mean(value):
     values = pc_stat_values("rata_rata", value)
-    try: return pc_stat_result("rata_rata", sum(values) / len(values))
+    try:
+        count = len(values)
+        return pc_stat_result("rata_rata", sum(item / count for item in values))
     except OverflowError as exc: raise ValueError("rata_rata() menghasilkan angka non-finite") from exc
 def pc_median(value):
     values = sorted(pc_stat_values("median", value))

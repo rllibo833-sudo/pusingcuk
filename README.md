@@ -146,6 +146,7 @@ The full, categorized documentation catalog is in [docs/README.md](docs/README.m
 - [Runtime compatibility](docs/COMPATIBILITY.md)
 - [Native runtime](docs/NATIVE_RUNTIME.md)
 - [Compiler targets](docs/COMPILER_TARGETS.md)
+- [Python importer and standard-library subset](docs/IMPORT_PYTHON.md)
 - [Native runtime and ecosystem roadmap](docs/NATIVE_SECURE_ECOSYSTEM_ROADMAP.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Security policy](SECURITY.md)
