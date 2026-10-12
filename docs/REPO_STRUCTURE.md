@@ -5,6 +5,7 @@ Dokumen ini menjelaskan fungsi direktori dan file utama agar kontributor baru da
 ## Mulai dari sini
 
 - `README.md`: gambaran proyek, status fitur, dan jalur menjalankan program.
+- `docs/VISION.md`: visi umum, prinsip inklusi, gaya bahasa lintas budaya, dan jalur kontribusi.
 - `docs/PEMULA.md`: tutorial langkah demi langkah untuk pemula.
 - `SPEC.md`: sintaks dan perilaku bahasa yang dimaksudkan.
 - `docs/COMPATIBILITY.md`: batas kompatibilitas antar-runtime.
@@ -53,7 +54,8 @@ Saat mengubah perilaku bahasa, tambahkan atau perbarui fixture konformansi bila 
 - **Compiler dan target:** `docs/COMPILER_TARGETS.md`, `docs/COMPILER_INTEROP.md`, `docs/IR_V1.md`, `docs/C_BACKEND.md`, `docs/JS_BACKEND.md`, `docs/BYTECODE_VM.md`, `docs/PVM_SPEC.md`, `docs/compiler-type-system-and-stdlib.md`.
 - **Native dan Termux:** `docs/NATIVE_RUNTIME.md`, `docs/NATIVE_TERMUX.md`, `docs/NATIVE_PARITY_AUDIT.md`, `docs/NATIVE_AUDIT_2026-10-11.md`, `docs/NATIVE_SECURE_ECOSYSTEM_ROADMAP.md`.
 - **Aplikasi dan alat:** `docs/ANDROID_STUDIO.md`, `docs/WEB_WORKBENCH.md`, `docs/TERMUX_DASHBOARD.md`, `docs/TOOLING.md`.
-- **Rencana lintas-repo/modul:** `docs/THREE_REPO_COMPILER_ROADMAP.md`, `docs/MODULE_SYSTEM.md`.
+- **Rencana modul:** `docs/MODULE_SYSTEM.md`.
+- **Integrasi aplikasi opsional:** `docs/THREE_REPO_COMPILER_ROADMAP.md` dan `docs/NATIVE_SECURE_ECOSYSTEM_ROADMAP.md` adalah proposal untuk satu skenario aplikasi downstream, bukan misi wajib Pusingcuk.
 
 ## Examples, libraries, applications, and website
 
