@@ -9,6 +9,26 @@ SAFE_RUNTIME = """import ast, pathlib, sys, json
 v = {}
 __opened = None
 
+def __offline_data(value):
+    text = str(value)
+    prefix = "data:text/plain,"
+    if not text.startswith(prefix):
+        raise ValueError("network access is disabled")
+    raw = text[len(prefix):]
+    output = bytearray()
+    index = 0
+    while index < len(raw):
+        if raw[index] == "%" and index + 2 < len(raw):
+            try:
+                output.append(int(raw[index + 1:index + 3], 16))
+                index += 3
+                continue
+            except ValueError:
+                pass
+        output.extend(raw[index].encode("utf-8"))
+        index += 1
+    return output.decode("utf-8")
+
 def __parse_expression(source):
     root = ast.parse(source, mode="eval").body
 
@@ -225,7 +245,11 @@ def compile_pvm(records):
             else:
                 emit("print(len(" + val(arg) + "))")
         elif opcode == 18:
-            raise ValueError("network opcode is disabled; Pusingcuk runs offline")
+            match = re.match(r"^([A-Za-z_]\\w*)\\s*=\\s*(.+)$", arg)
+            if match:
+                emit("v[" + repr(match.group(1)) + "] = __offline_data(" + val(match.group(2)) + ")")
+            else:
+                emit("print(__offline_data(" + val(arg) + "))")
         elif opcode == 19:
             emit("print(json.dumps(" + val(arg) + ", ensure_ascii=False, indent=2))")
         else:
