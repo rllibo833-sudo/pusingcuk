@@ -150,6 +150,12 @@ class Parser:
             name = self.take().value
             if self.at("("):
                 return self.call(name, t.line)
+            if name == "tulis":
+                args = [self.expr()]
+                while self.at(","):
+                    self.take()
+                    args.append(self.expr())
+                return node("Call", t.line, name=name, args=args)
 
             target = node("Variable", t.line, name=name)
             while self.at("["):
@@ -186,8 +192,15 @@ class Parser:
         elif t.kind == "IDENT":
             if self.at("("):
                 left = self.call(t.value, t.line)
+            elif t.value == "baca":
+                left = node("Call", t.line, name="baca", args=[self.expr(6)])
             else:
                 left = node("Variable", t.line, name=t.value)
+        elif t.value == "tanya":
+            if self.at("("):
+                left = self.call("tanya", t.line)
+            else:
+                left = node("Call", t.line, name="tanya", args=[self.expr(6)])
         elif t.value in ("benar", "salah"):
             left = node("Literal", t.line, value=(t.value == "benar"))
         elif t.value == "bukan":
