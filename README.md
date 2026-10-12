@@ -4,6 +4,12 @@ Pusingcuk is an experimental programming language with Indonesian-friendly keywo
 
 > **Project status:** experimental, version 0.4-dev. Runtime and compiler support varies by feature. Pusingcuk is not a security sandbox and must not run untrusted programs on systems containing sensitive data.
 
+## Project vision and community
+
+Pusingcuk is intended as a shared learning and engineering space for beginners, experienced developers, educators, testers, translators, and language communities. Its Gen Z/Gen Alpha-inspired slang is an optional style layer, not a requirement for participation or a claim that one slang vocabulary represents every region or generation.
+
+The project welcomes technical criticism and non-code contributions such as documentation, examples, translations, reproducible bug reports, and test cases. Read the [project vision](docs/VISION.md) for the principles behind this approach.
+
 ## Quick start on Android
 
 ### Option A: Termux (Python interpreter)
@@ -123,14 +129,17 @@ The core language interpreter, native runtime, compiler, and tests are designed 
 
 Do not add `os.system`, Python `eval` or `exec`, `requests`, OpenAI SDK dependencies, API-key requirements, or automatic outbound network calls to the core runtime. Keep external integrations out of the default execution path and add offline tests for new features.
 
-**Security note:** the PVM JavaScript and Python backends now use restricted expression parsing. External network URLs are rejected; only local `data:text/plain,` payloads are supported. PVM file operations are still not confined by an operating-system sandbox, so do not run bytecode from untrusted sources. Check [SECURITY.md](SECURITY.md) for current limitations.
+**Security note:** the PVM JavaScript and Python backends use restricted expression parsing. External network URLs are rejected; only local `data:text/plain,` payloads are supported. PVM file operations are still not confined by an operating-system sandbox, so do not run bytecode from untrusted sources. Check [SECURITY.md](SECURITY.md) for current limitations.
 
 ## Repository guide
 
+- [Project vision and community principles](docs/VISION.md)
 - [Repository structure and feature status](docs/REPO_STRUCTURE.md)
 - [Beginner guide](docs/PEMULA.md)
 - [Language and technical dictionary (English)](docs/DICTIONARY.md)
 - [Plain-language dictionary (Indonesian)](docs/KAMUS_PUSINGCUK.md)
+- [Slang and alias design](docs/KOSAKATA_GENZ.md)
+- [Vocabulary registry and examples](library/README.md)
 - [Language specification](SPEC.md)
 - [Runtime compatibility](docs/COMPATIBILITY.md)
 - [Native runtime](docs/NATIVE_RUNTIME.md)
@@ -142,11 +151,11 @@ Do not add `os.system`, Python `eval` or `exec`, `requests`, OpenAI SDK dependen
 
 ## Contributing
 
-Pusingcuk is open to contributions from beginners and experienced developers. Read [CONTRIBUTING.md](CONTRIBUTING.md), describe the problem clearly, include a small reproducible example, add tests, and document any behavior change. Contributions should preserve offline operation and Android compatibility.
+Pusingcuk is open to contributions from beginners and experienced developers. You do not need to be a programmer to contribute: documentation, translations, examples, reproducible bug reports, and thoughtful design feedback are useful too. Read [CONTRIBUTING.md](CONTRIBUTING.md), describe the problem clearly, include a small reproducible example where possible, and add tests for behavior changes. Contributions should preserve offline operation and document Android support honestly.
 
 ## Community extensibility
 
-Pusingcuk is intended to be developed by people and communities beyond its founder, including Ecoslang.org and other language, education, and open-source communities. The shared language specification, conformance fixtures, and intermediate representation are the foundation for compatible runtimes, libraries, compiler targets, and future integrations. New capabilities such as database adapters, server/API tooling, frontend bindings, WebAssembly, and blockchain support are development goals, not claims of production-ready support. See the [English dictionary](docs/DICTIONARY.md), [Indonesian dictionary](docs/KAMUS_PUSINGCUK.md), and [ecosystem roadmap](docs/NATIVE_SECURE_ECOSYSTEM_ROADMAP.md).
+Pusingcuk is intended to be developed by people and communities beyond its founder, including Ecoslang.org and other language, education, and open-source communities. The shared language specification, conformance fixtures, and intermediate representation are the foundation for compatible runtimes, libraries, compiler targets, and future integrations. Database adapters, server/API tooling, frontend bindings, WebAssembly, stable FFI/ABI, configurable regional vocabulary, and blockchain support are development goals, not claims of production-ready support. See the [English dictionary](docs/DICTIONARY.md), [Indonesian dictionary](docs/KAMUS_PUSINGCUK.md), and [ecosystem roadmap](docs/NATIVE_SECURE_ECOSYSTEM_ROADMAP.md).
 
 ## License
 
