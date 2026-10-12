@@ -12,9 +12,25 @@ def main():
     parser = argparse.ArgumentParser(
         description="Jalankan program Pusingcuk."
     )
-    parser.add_argument("file", help="Berkas sumber Pusingcuk")
+    parser.add_argument("--fmt", action="store_true", help="Rapikan indentasi berkas Pusingcuk")
+    parser.add_argument("file", nargs="?", help="Berkas sumber Pusingcuk")
     args = parser.parse_args()
+    if not args.file:
+        parser.error("berkas sumber wajib diisi")
     path = Path(args.file)
+
+    if args.fmt:
+        if not path.is_file():
+            print(f"Kesalahan: berkas tidak ditemukan: {path}", file=sys.stderr)
+            return 3
+        try:
+            from tools.formatter import format_file
+            format_file(path)
+        except (OSError, UnicodeError, ValueError) as exc:
+            print(f"Kesalahan format: {exc}", file=sys.stderr)
+            return 1
+        print(f"Format selesai: {path}")
+        return 0
 
     if not path.is_file():
         print(f"Kesalahan: berkas tidak ditemukan: {path}", file=sys.stderr)
