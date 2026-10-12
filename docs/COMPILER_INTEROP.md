@@ -162,3 +162,8 @@ Jangan mengklaim target eksperimental sebagai stabil atau mengklaim ABI/FFI samp
 The canonical builtin metadata lives in [`library/builtin_contract.json`](../library/builtin_contract.json). The reference registry, Python importer allow-list, JS/Python backend dispatch, and contract consistency tests consume that file instead of maintaining independent name/arity tables. This is metadata centralization, not a claim that backend runtime code is shared or semantically identical: every `supported` target still needs executable tests.
 
 Database, server/API, browser DOM, network, Web3, and blockchain APIs are future capabilities, not core builtins. Each adapter should declare its required capabilities, have a local/mock mode for offline development, and fail clearly when a target or permission is unavailable. Credentials and network/file access must never be silently enabled by importing a module.
+
+
+## Status kapabilitas platform
+
+Metadata `capabilities` dalam kontrak builtin memisahkan fitur bahasa inti dari adapter platform. Saat ini database, server HTTP, jaringan HTTP, DOM browser, Web3/blockchain, dan FFI berstatus **planned** dan tidak mengklaim target yang didukung. Rencana desain tetap offline-first: database lokal atau mock, server loopback, mock transport, serta local development chain dapat dipakai tanpa bergantung pada layanan publik. Mode offline ini adalah sasaran desain, bukan klaim bahwa adapter tersebut sudah tersedia.

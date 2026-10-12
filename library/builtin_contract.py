@@ -78,6 +78,30 @@ def _load() -> dict[str, Any]:
                 raise BuiltinContractError(f"pemetaan fungsi {module} menunjuk builtin yang tidak dikenal")
             if section == "constants" and any(not isinstance(value, str) for value in values.values()):
                 raise BuiltinContractError(f"konstanta {module} harus berupa teks literal")
+    capabilities = data.get("capabilities")
+    if not isinstance(capabilities, list):
+        raise BuiltinContractError("capabilities harus berupa daftar")
+    seen_capabilities: set[str] = set()
+    targets = set(data.get("targets", []))
+    for capability in capabilities:
+        if not isinstance(capability, dict):
+            raise BuiltinContractError("setiap capability harus berupa objek")
+        capability_id = capability.get("id")
+        if not isinstance(capability_id, str) or not capability_id or capability_id in seen_capabilities:
+            raise BuiltinContractError(f"id capability kosong atau duplikat: {capability_id!r}")
+        seen_capabilities.add(capability_id)
+        if capability.get("status") not in {"available", "partial", "planned", "unsupported"}:
+            raise BuiltinContractError(f"status capability tidak valid: {capability_id}")
+        if not isinstance(capability.get("offline_first"), bool):
+            raise BuiltinContractError(f"offline_first harus boolean: {capability_id}")
+        if not isinstance(capability.get("targets"), list) or any(target not in targets for target in capability["targets"]):
+            raise BuiltinContractError(f"target capability tidak valid: {capability_id}")
+        if not isinstance(capability.get("requires"), list) or not all(isinstance(item, str) for item in capability["requires"]):
+            raise BuiltinContractError(f"requires capability tidak valid: {capability_id}")
+        if not isinstance(capability.get("local_mode"), str) or not isinstance(capability.get("notes"), str):
+            raise BuiltinContractError(f"catatan capability hilang: {capability_id}")
+        if capability.get("status") == "planned" and capability["targets"]:
+            raise BuiltinContractError(f"capability planned tidak boleh mengklaim target: {capability_id}")
     return data
 
 

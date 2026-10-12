@@ -31,6 +31,18 @@ class BuiltinContractTests(unittest.TestCase):
             for target, detail in entry["backends"].items():
                 self.assertIn(detail["status"], {"supported", "unsupported", "not-claimed"}, (entry["name"], target))
 
+    def test_platform_capabilities_are_explicit_and_not_overclaimed(self):
+        capabilities = BUILTIN_CONTRACT["capabilities"]
+        ids = [item["id"] for item in capabilities]
+        self.assertEqual(len(ids), len(set(ids)))
+        by_id = {item["id"]: item for item in capabilities}
+        for capability_id in ("data.database", "server.http", "net.http", "web.dom", "web3.blockchain", "backend.ffi"):
+            self.assertEqual(by_id[capability_id]["status"], "planned")
+            self.assertEqual(by_id[capability_id]["targets"], [])
+        self.assertTrue(by_id["core.pure"]["offline_first"])
+        self.assertTrue(by_id["data.database"]["offline_first"])
+        self.assertFalse(by_id["net.http"]["offline_first"])
+
     def test_reference_registry_metadata_is_derived_from_contract(self):
         for name, spec in BUILTIN_BY_NAME.items():
             runtime = BUILTINS[name]

@@ -650,11 +650,104 @@
       "constants": {}
     }
   },
-  "capabilities": {
-    "core": "Offline language and pure computation; no network dependency.",
-    "database": "Not implemented by this builtin contract; future explicit adapter/capability.",
-    "server": "Not implemented by this builtin contract; future explicit adapter/capability.",
-    "web": "HTML output exists, but this contract does not expose browser DOM APIs.",
-    "web3_blockchain": "Not implemented by this builtin contract; future explicit adapter/capability."
-  }
+  "capabilities": [
+    {
+      "id": "core.pure",
+      "status": "available",
+      "offline_first": true,
+      "targets": [
+        "reference",
+        "js",
+        "python",
+        "html",
+        "vm",
+        "native_c"
+      ],
+      "requires": [],
+      "local_mode": "local execution without network",
+      "notes": "Status builtin individual tetap mengikuti tabel backends."
+    },
+    {
+      "id": "io.console",
+      "status": "available",
+      "offline_first": true,
+      "targets": [
+        "reference",
+        "js",
+        "python",
+        "html",
+        "vm",
+        "native_c"
+      ],
+      "requires": [],
+      "local_mode": "stdin/stdout atau panel HTML",
+      "notes": "Perbedaan perilaku input/output tetap harus diuji per target."
+    },
+    {
+      "id": "data.database",
+      "status": "planned",
+      "offline_first": true,
+      "targets": [],
+      "requires": [
+        "filesystem"
+      ],
+      "local_mode": "database lokal tertanam atau mock",
+      "notes": "Belum ada adapter database yang dijanjikan oleh kontrak ini."
+    },
+    {
+      "id": "server.http",
+      "status": "planned",
+      "offline_first": true,
+      "targets": [],
+      "requires": [
+        "network-listener"
+      ],
+      "local_mode": "server loopback lokal",
+      "notes": "Belum ada API server HTTP Pusingcuk yang didukung."
+    },
+    {
+      "id": "net.http",
+      "status": "planned",
+      "offline_first": false,
+      "targets": [],
+      "requires": [
+        "network"
+      ],
+      "local_mode": "mock transport untuk tes offline",
+      "notes": "Permintaan jaringan harus eksplisit dan tidak boleh aktif hanya karena import."
+    },
+    {
+      "id": "web.dom",
+      "status": "planned",
+      "offline_first": true,
+      "targets": [],
+      "requires": [
+        "browser"
+      ],
+      "local_mode": "HTML dapat dibuka lokal, tetapi belum menyediakan DOM bindings Pusingcuk",
+      "notes": "Target HTML bukan klaim dukungan frontend framework atau browser API."
+    },
+    {
+      "id": "web3.blockchain",
+      "status": "planned",
+      "offline_first": true,
+      "targets": [],
+      "requires": [
+        "wallet-or-node-permission"
+      ],
+      "local_mode": "local development chain atau mock; jaringan publik opsional",
+      "notes": "Belum ada SDK, wallet, ABI, atau integrasi blockchain yang diimplementasikan."
+    },
+    {
+      "id": "backend.ffi",
+      "status": "planned",
+      "offline_first": true,
+      "targets": [],
+      "requires": [
+        "explicit-native-adapter"
+      ],
+      "local_mode": "adapter lokal yang di-pin versinya",
+      "notes": "ABI/FFI stabil belum tersedia."
+    }
+  ]
 }

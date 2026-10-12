@@ -64,3 +64,7 @@ Use only these support labels:
 - `not-claimed`: support has not been verified; do not promise compatibility.
 
 Database, server, browser, Web3, and blockchain imports must not be added as names alone. They need explicit adapters, capability permissions, offline-friendly development modes, and target-specific tests.
+
+### Platform adapters: planned, not yet implemented
+
+The same contract lists future capability groups such as `data.database`, `server.http`, `net.http`, `web.dom`, `web3.blockchain`, and `backend.ffi`. They are explicitly marked `planned` with no supported targets. The architecture is offline-first: local databases, loopback servers, mocked HTTP transports, and local blockchain development nodes are intended to make development and tests possible without public internet services. These are design goals, not existing Pusingcuk APIs.

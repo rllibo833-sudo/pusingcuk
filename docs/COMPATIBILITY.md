@@ -98,3 +98,6 @@ The machine-readable source of builtin metadata is [`library/builtin_contract.js
 - `not-claimed`: not verified; do not promise compatibility.
 
 The contract is not a package manager and does not imply network access. Database, server, browser, Web3, and blockchain APIs should be separate capability-scoped adapters with local/mock modes for offline development and explicit target support.
+
+
+The contract also records platform capability status separately from builtin support. Database, HTTP server/client, browser DOM, Web3/blockchain, and stable FFI are currently `planned` with no target claimed. Offline-first modes such as local database files, loopback services, mock network transport, and local development chains are design targets only until adapter implementations and tests land.
