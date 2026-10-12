@@ -1,9 +1,9 @@
-# Arsip historis Pusingcuk
+# Historical Pusingcuk Archive
 
-Isi direktori ini adalah file eksperimen/backup dari tahap awal pengembangan yang dipindahkan dari root repositori agar tidak disalahartikan sebagai entry point atau suite tes resmi.
+This directory contains experiments and backups from early development. They were moved out of the repository root so they are not mistaken for supported entry points or the active test suite.
 
-- `interpreters/`: versi interpreter lama. Tidak didukung, tidak diaudit sebagai runtime saat ini, dan jangan jalankan untuk memproses input tak tepercaya.
-- `programs/`: contoh dan fixture manual lama. Gunakan `examples/` untuk contoh yang didukung dan `tests/` untuk tes otomatis yang aktif.
-- `scripts/`: skrip patch historis. Tidak digunakan oleh build atau CI saat ini.
+- `interpreters/`: old interpreter versions. They are unsupported, have not been audited as current runtimes, and must not be used with untrusted input.
+- `programs/`: old examples and manual fixtures. Use `examples/` for supported examples and `tests/` for active automated tests.
+- `scripts/`: historical patch scripts. They are not used by the current build or CI.
 
-`loop_test.pusingcuk` berisi loop tanpa kondisi berhenti; jangan menjalankannya tanpa batas waktu dan pembatasan sumber daya. Jangan mengandalkan file arsip untuk menentukan perilaku bahasa saat ini.
+`loop_test.pusingcuk` contains a loop without a stopping condition. Do not run it without a time limit and resource restrictions. Do not use archived files as the source of truth for current language behavior.
