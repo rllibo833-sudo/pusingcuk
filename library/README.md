@@ -1,32 +1,36 @@
-# Pustaka Pusingcuk
+# Pusingcuk Standard Examples
 
-Direktori ini berisi referensi kosakata yang mudah dipakai ulang dan contoh program Pusingcuk.
+This directory contains reusable keyword references and example Pusingcuk programs.
 
-- [kosakata.json](kosakata.json): glosarium mesin untuk kata kunci, alias, operator, arti, dan status dukungan runtime.
-- [conditional_logic.pusingcuk](conditional_logic.pusingcuk): contoh perbandingan, boolean, short-circuit, dan kondisi yang kompatibel dengan subset backend C.
-- [loops_functions_genz.pusingcuk](loops_functions_genz.pusingcuk): contoh loop, fungsi rekursif, dan alias Gen Z/Gen Alpha. Jalankan lewat interpreter modular karena contoh ini mencetak teks yang belum didukung backend C.
+- [`kosakata.json`](kosakata.json): machine-readable glossary of keywords, aliases, operators, meanings, and runtime support status.
+- [`conditional_logic.pusingcuk`](conditional_logic.pusingcuk): examples of comparisons, booleans, short-circuit logic, and conditionals supported by the C backend subset.
+- [`loops_functions_genz.pusingcuk`](loops_functions_genz.pusingcuk): examples of loops, recursive functions, and slang aliases. Run this example with the modular interpreter because it prints text not yet supported by the C backend.
 
-## Jalankan contoh dengan interpreter Python
+## Run examples with the Python interpreter
 
-Dari root repository:
+From the repository root:
 
-    python pusingcuk_new.py library/conditional_logic.pusingcuk
-    python pusingcuk_new.py library/loops_functions_genz.pusingcuk
+```sh
+python pusingcuk_new.py library/conditional_logic.pusingcuk
+python pusingcuk_new.py library/loops_functions_genz.pusingcuk
+```
 
-## Kompilasi contoh menjadi C11
+## Compile an example to C11
 
-Dari root repository, dengan Python dan compiler C11 tersedia:
+With Python and a C11 compiler installed:
 
-    python -m compiler.c_backend library/conditional_logic.pusingcuk -o /tmp/conditional_logic.c
-    cc -std=c11 -Wall -Wextra -Werror /tmp/conditional_logic.c -o /tmp/conditional_logic
-    /tmp/conditional_logic
+```sh
+python -m compiler.c_backend library/conditional_logic.pusingcuk -o /tmp/conditional_logic.c
+cc -std=c11 -Wall -Wextra -Werror /tmp/conditional_logic.c -o /tmp/conditional_logic
+/tmp/conditional_logic
+```
 
-Executable hasil kompilasi tidak memerlukan Python saat dijalankan. Python hanya dipakai oleh front-end compiler.
+The compiled executable does not require Python at runtime. Python is only used by the compiler front end.
 
-## Cara membaca status dukungan
+## Understanding support status
 
-- `native_runtime: tested` berarti kemampuan tercatat memiliki tes pada runtime C mandiri; periksa matriks runtime untuk batas detail.
-- `c_backend: supported` berarti fitur berada di subset source-to-C yang diuji.
-- `c_backend: unsupported` berarti jangan gunakan fitur itu dalam contoh untuk compiler C; compiler akan menolaknya secara eksplisit.
+- `native_runtime: tested` means the feature has tests for the standalone C runtime; check the runtime matrix for detailed limits.
+- `c_backend: supported` means the feature is included in the tested source-to-C subset.
+- `c_backend: unsupported` means the feature must not be used in C-backend examples; the compiler should reject it explicitly.
 
-Glosarium adalah indeks praktis, bukan pengganti spesifikasi. Jika ada perbedaan, rujuk SPEC.md dan dokumen semantik.
+The glossary is a practical index, not a replacement for the language specification. If information differs, refer to `SPEC.md` and the semantic documentation.
