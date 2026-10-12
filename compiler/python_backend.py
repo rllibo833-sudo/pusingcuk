@@ -4,6 +4,9 @@ import json
 import sys
 from pathlib import Path
 from compiler.ir import from_source, validate
+from library.builtin_contract import BUILTIN_NAMES, backend_builtins
+
+PYTHON_BACKEND_BUILTINS = backend_builtins("python")
 
 
 class PythonBackendError(ValueError):
@@ -19,7 +22,7 @@ def generate(document):
     for s in root["fields"]["body"]:
         if s["kind"] == "Function":
             f = s["fields"]
-            if f["name"] in functions or f["name"] in ("panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat", "sinus", "kosinus", "rata_rata", "median"):
+            if f["name"] in functions or f["name"] in BUILTIN_NAMES:
                 raise PythonBackendError(f"nama fungsi bentrok: {f['name']}")
             functions[f["name"]] = s
 
@@ -37,20 +40,13 @@ def generate(document):
         if k == "Call":
             name, args = f["name"], f["args"]
             values = ", ".join(expr(x, env) for x in args)
-            if name == "panjang" and len(args) == 1: return f"len({values})"
-            if name == "rentang" and 1 <= len(args) <= 3: return f"pc_range({values})"
-            numeric_builtins = {
-                "mutlak": (1, "pc_abs"), "minimum": (2, "pc_min"),
-                "maksimum": (2, "pc_max"), "bulatkan": (1, "pc_round"),
-                "akar": (1, "pc_sqrt"), "bawah": (1, "pc_floor"),
-                "atas": (1, "pc_ceil"), "pangkat": (2, "pc_pow"),
-                "sinus": (1, "pc_sin"), "kosinus": (1, "pc_cos"),
-                "rata_rata": (1, "pc_mean"), "median": (1, "pc_median"),
-            }
-            if name in numeric_builtins:
-                arity, helper = numeric_builtins[name]
-                if len(args) != arity: raise PythonBackendError(f"baris {line}: {name} membutuhkan {arity} argumen")
-                return f"{helper}({values})"
+            builtin = PYTHON_BACKEND_BUILTINS.get(name)
+            if builtin is not None:
+                if not builtin["min_args"] <= len(args) <= builtin["max_args"]:
+                    low, high = builtin["min_args"], builtin["max_args"]
+                    expected = str(low) if low == high else f"{low}-{high}"
+                    raise PythonBackendError(f"baris {line}: {name} membutuhkan {expected} argumen")
+                return f"{builtin['helper']}({values})"
             if name not in functions: raise PythonBackendError(f"baris {line}: fungsi tidak dikenal: {name}")
             if len(args) != len(functions[name]["fields"]["params"]): raise PythonBackendError(f"baris {line}: jumlah argumen salah untuk {name}")
             return f"pc_fn_{name}({values})"

@@ -1,0 +1,606 @@
+{
+  "schema_version": 1,
+  "contract_version": "0.1.0",
+  "language_version": "0.4-dev",
+  "description": "Canonical metadata contract for Pusingcuk builtins, Python import allow-lists, arity and target capabilities. Implementation code remains in the relevant runtime.",
+  "targets": [
+    "reference",
+    "js",
+    "python",
+    "html",
+    "vm",
+    "native_c"
+  ],
+  "builtins": [
+    {
+      "name": "panjang",
+      "parameters": [
+        "nilai"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Jumlah item pada teks, daftar, atau kamus.",
+      "implementation": "length",
+      "backends": {
+        "js": {
+          "status": "supported",
+          "helper": "pcLength"
+        },
+        "python": {
+          "status": "supported",
+          "helper": "len"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "supported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "teks",
+      "parameters": [
+        "nilai"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Konversi nilai menjadi teks.",
+      "implementation": "text",
+      "backends": {
+        "js": {
+          "status": "unsupported"
+        },
+        "python": {
+          "status": "unsupported"
+        },
+        "html": {
+          "status": "unsupported"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "bilangan",
+      "parameters": [
+        "nilai"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Konversi nilai menjadi bilangan bulat.",
+      "implementation": "integer",
+      "backends": {
+        "js": {
+          "status": "unsupported"
+        },
+        "python": {
+          "status": "unsupported"
+        },
+        "html": {
+          "status": "unsupported"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "desimal",
+      "parameters": [
+        "nilai"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Konversi nilai menjadi bilangan desimal.",
+      "implementation": "float",
+      "backends": {
+        "js": {
+          "status": "unsupported"
+        },
+        "python": {
+          "status": "unsupported"
+        },
+        "html": {
+          "status": "unsupported"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "logika",
+      "parameters": [
+        "nilai"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Konversi nilai menjadi benar/salah.",
+      "implementation": "boolean",
+      "backends": {
+        "js": {
+          "status": "unsupported"
+        },
+        "python": {
+          "status": "unsupported"
+        },
+        "html": {
+          "status": "unsupported"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "rentang",
+      "parameters": [
+        "mulai_atau_akhir",
+        "akhir",
+        "langkah"
+      ],
+      "min_args": 1,
+      "max_args": 3,
+      "description": "Rentang bilangan bulat dengan batas akhir eksklusif.",
+      "implementation": "range",
+      "backends": {
+        "js": {
+          "status": "supported",
+          "helper": "pcRange"
+        },
+        "python": {
+          "status": "supported",
+          "helper": "pc_range"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "supported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "mutlak",
+      "parameters": [
+        "angka"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Nilai absolut angka finite.",
+      "implementation": "abs",
+      "backends": {
+        "js": {
+          "status": "supported",
+          "helper": "pcAbs"
+        },
+        "python": {
+          "status": "supported",
+          "helper": "pc_abs"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "supported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "minimum",
+      "parameters": [
+        "angka1",
+        "angka2"
+      ],
+      "min_args": 2,
+      "max_args": 2,
+      "description": "Nilai terkecil dari dua angka finite.",
+      "implementation": "min",
+      "backends": {
+        "js": {
+          "status": "supported",
+          "helper": "pcMin"
+        },
+        "python": {
+          "status": "supported",
+          "helper": "pc_min"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "supported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "maksimum",
+      "parameters": [
+        "angka1",
+        "angka2"
+      ],
+      "min_args": 2,
+      "max_args": 2,
+      "description": "Nilai terbesar dari dua angka finite.",
+      "implementation": "max",
+      "backends": {
+        "js": {
+          "status": "supported",
+          "helper": "pcMax"
+        },
+        "python": {
+          "status": "supported",
+          "helper": "pc_max"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "supported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "bulatkan",
+      "parameters": [
+        "angka"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Pembulatan ties-to-even ke bilangan terdekat.",
+      "implementation": "round",
+      "backends": {
+        "js": {
+          "status": "supported",
+          "helper": "pcRound"
+        },
+        "python": {
+          "status": "supported",
+          "helper": "pc_round"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "supported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "akar",
+      "parameters": [
+        "angka"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Akar kuadrat angka non-negatif.",
+      "implementation": "sqrt",
+      "backends": {
+        "js": {
+          "status": "supported",
+          "helper": "pcSqrt"
+        },
+        "python": {
+          "status": "supported",
+          "helper": "pc_sqrt"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "bawah",
+      "parameters": [
+        "angka"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Pembulatan ke bawah menuju integer.",
+      "implementation": "floor",
+      "backends": {
+        "js": {
+          "status": "supported",
+          "helper": "pcFloor"
+        },
+        "python": {
+          "status": "supported",
+          "helper": "pc_floor"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "atas",
+      "parameters": [
+        "angka"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Pembulatan ke atas menuju integer.",
+      "implementation": "ceil",
+      "backends": {
+        "js": {
+          "status": "supported",
+          "helper": "pcCeil"
+        },
+        "python": {
+          "status": "supported",
+          "helper": "pc_ceil"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "pangkat",
+      "parameters": [
+        "basis",
+        "eksponen"
+      ],
+      "min_args": 2,
+      "max_args": 2,
+      "description": "Pangkat numerik dengan hasil finite.",
+      "implementation": "pow",
+      "backends": {
+        "js": {
+          "status": "supported",
+          "helper": "pcPow"
+        },
+        "python": {
+          "status": "supported",
+          "helper": "pc_pow"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "sinus",
+      "parameters": [
+        "radian"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Sinus sudut dalam radian.",
+      "implementation": "sin",
+      "backends": {
+        "js": {
+          "status": "supported",
+          "helper": "pcSin"
+        },
+        "python": {
+          "status": "supported",
+          "helper": "pc_sin"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "kosinus",
+      "parameters": [
+        "radian"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Kosinus sudut dalam radian.",
+      "implementation": "cos",
+      "backends": {
+        "js": {
+          "status": "supported",
+          "helper": "pcCos"
+        },
+        "python": {
+          "status": "supported",
+          "helper": "pc_cos"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "rata_rata",
+      "parameters": [
+        "daftar"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Rata-rata aritmetika daftar angka finite yang tidak kosong.",
+      "implementation": "mean",
+      "backends": {
+        "js": {
+          "status": "supported",
+          "helper": "pcMean"
+        },
+        "python": {
+          "status": "supported",
+          "helper": "pc_mean"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    },
+    {
+      "name": "median",
+      "parameters": [
+        "daftar"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Median daftar angka finite yang tidak kosong.",
+      "implementation": "median",
+      "backends": {
+        "js": {
+          "status": "supported",
+          "helper": "pcMedian"
+        },
+        "python": {
+          "status": "supported",
+          "helper": "pc_median"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "not-claimed"
+        }
+      }
+    }
+  ],
+  "python_builtins": [
+    {
+      "source": "len",
+      "target": "panjang"
+    },
+    {
+      "source": "range",
+      "target": "rentang"
+    },
+    {
+      "source": "abs",
+      "target": "mutlak"
+    },
+    {
+      "source": "round",
+      "target": "bulatkan"
+    },
+    {
+      "source": "min",
+      "target": "minimum"
+    },
+    {
+      "source": "max",
+      "target": "maksimum"
+    }
+  ],
+  "python_modules": {
+    "math": {
+      "functions": {
+        "sqrt": "akar",
+        "floor": "bawah",
+        "ceil": "atas",
+        "fabs": "mutlak",
+        "pow": "pangkat",
+        "sin": "sinus",
+        "cos": "kosinus"
+      },
+      "constants": {
+        "pi": "3.141592653589793",
+        "e": "2.718281828459045"
+      }
+    },
+    "statistics": {
+      "functions": {
+        "mean": "rata_rata",
+        "median": "median"
+      },
+      "constants": {}
+    }
+  },
+  "capabilities": {
+    "core": "Offline language and pure computation; no network dependency.",
+    "database": "Not implemented by this builtin contract; future explicit adapter/capability.",
+    "server": "Not implemented by this builtin contract; future explicit adapter/capability.",
+    "web": "HTML output exists, but this contract does not expose browser DOM APIs.",
+    "web3_blockchain": "Not implemented by this builtin contract; future explicit adapter/capability."
+  }
+}

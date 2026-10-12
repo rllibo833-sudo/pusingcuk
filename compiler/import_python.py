@@ -7,6 +7,11 @@ import ast
 import sys
 from pathlib import Path
 
+from library.builtin_contract import (
+    BUILTIN_BY_NAME, BUILTIN_NAMES, PYTHON_BUILTINS, PYTHON_MODULES,
+    imported_builtin, imported_constant,
+)
+
 
 class ImportErrorPython(ValueError):
     """Python source menggunakan sintaks/semantik yang belum didukung."""
@@ -20,15 +25,6 @@ _CMPOPS = {
     ast.Eq: "==", ast.NotEq: "!=", ast.Lt: "<", ast.LtE: "<=",
     ast.Gt: ">", ast.GtE: ">=",
 }
-
-# Only these math APIs have matching Pusingcuk runtime implementations.
-_MATH_FUNCTIONS = {
-    "sqrt": "akar", "floor": "bawah", "ceil": "atas",
-    "fabs": "mutlak", "pow": "pangkat", "sin": "sinus", "cos": "kosinus",
-}
-_MATH_CONSTANTS = {"pi": "3.141592653589793", "e": "2.718281828459045"}
-_STATISTICS_FUNCTIONS = {"mean": "rata_rata", "median": "median"}
-
 
 def _fail(node, message):
     line = getattr(node, "lineno", 1)
@@ -89,12 +85,11 @@ class Importer:
         if isinstance(node, ast.Attribute):
             if isinstance(node.value, ast.Name):
                 module = self.module_aliases.get(node.value.id)
-                if module == "math":
-                    if node.attr in _MATH_CONSTANTS:
-                        return _MATH_CONSTANTS[node.attr]
-                    _fail(node, f"math.{node.attr} belum memiliki padanan Pusingcuk yang teruji")
-                if module == "statistics":
-                    _fail(node, f"statistics.{node.attr} belum memiliki padanan Pusingcuk yang teruji")
+                if module in PYTHON_MODULES:
+                    constant = imported_constant(module, node.attr)
+                    if constant is not None:
+                        return constant
+                    _fail(node, f"{module}.{node.attr} belum memiliki padanan Pusingcuk yang teruji")
             _fail(node, "akses atribut Python belum didukung di luar modul math/statistics yang dipetakan")
         if isinstance(node, ast.BinOp) and type(node.op) in _BINOPS:
             return f"({self.expr(node.left)} {_BINOPS[type(node.op)]} {self.expr(node.right)})"
@@ -127,16 +122,11 @@ class Importer:
                     _fail(node, "pemanggilan atribut hanya didukung untuk API math/statistics yang dipetakan")
                 module = self.module_aliases.get(node.func.value.id)
                 original_name = node.func.attr
-                if module == "math":
-                    if original_name not in _MATH_FUNCTIONS:
-                        _fail(node, f"math.{original_name} belum memiliki padanan Pusingcuk yang teruji")
-                    name = _MATH_FUNCTIONS[original_name]
-                elif module == "statistics":
-                    if original_name not in _STATISTICS_FUNCTIONS:
-                        _fail(node, f"statistics.{original_name} belum memiliki padanan Pusingcuk yang teruji")
-                    name = _STATISTICS_FUNCTIONS[original_name]
-                else:
-                    _fail(node, "pemanggilan atribut hanya didukung untuk API math/statistics yang dipetakan")
+                if module not in PYTHON_MODULES:
+                    _fail(node, "pemanggilan atribut hanya didukung untuk modul standar yang dipetakan")
+                name = imported_builtin(module, original_name)
+                if name is None:
+                    _fail(node, f"{module}.{original_name} belum memiliki padanan Pusingcuk yang teruji")
             elif isinstance(node.func, ast.Name):
                 name = self.imported_symbols.get(node.func.id, node.func.id)
                 if node.func.id in self.imported_constants:
@@ -148,28 +138,13 @@ class Importer:
                     _fail(node, "print() hanya boleh menjadi pernyataan, bukan ekspresi")
                 if name == "input":
                     _fail(node, "input() hanya didukung sebagai nilai assignment sederhana")
-                aliases = {
-                    "len": ("panjang", 1, 1),
-                    "range": ("rentang", 1, 3),
-                    "abs": ("mutlak", 1, 1),
-                    "round": ("bulatkan", 1, 1),
-                    "min": ("minimum", 2, 2),
-                    "max": ("maksimum", 2, 2),
-                    "akar": ("akar", 1, 1),
-                    "bawah": ("bawah", 1, 1),
-                    "atas": ("atas", 1, 1),
-                    "pangkat": ("pangkat", 2, 2),
-                    "sinus": ("sinus", 1, 1),
-                    "kosinus": ("kosinus", 1, 1),
-                    "rata_rata": ("rata_rata", 1, 1),
-                    "median": ("median", 1, 1),
-                }
-                if name in aliases:
-                    target, min_args, max_args = aliases[name]
+                name = PYTHON_BUILTINS.get(name, name)
+                builtin = BUILTIN_BY_NAME.get(name)
+                if builtin is not None:
+                    min_args, max_args = builtin["min_args"], builtin["max_args"]
                     if not min_args <= len(node.args) <= max_args:
-                        _fail(node, f"{name}() pada importer ini membutuhkan {min_args}" +
-                              (f" sampai {max_args} argumen" if min_args != max_args else " argumen"))
-                    name = target
+                        expected = str(min_args) if min_args == max_args else f"{min_args} sampai {max_args}"
+                        _fail(node, f"{name}() membutuhkan {expected} argumen menurut kontrak builtin")
                 return f"{name}(" + ", ".join(self.expr(v) for v in node.args) + ")"
             _fail(node, "pemanggilan melalui atribut/objek belum didukung")
         _fail(node, f"ekspresi Python {type(node).__name__} belum didukung")
@@ -289,23 +264,23 @@ class Importer:
             return
         if isinstance(node, ast.Import):
             for alias in node.names:
-                if alias.name not in ("math", "statistics"):
-                    _fail(node, f"modul {alias.name!r} belum terintegrasi; hanya subset math/statistics yang dipetakan")
+                if alias.name not in PYTHON_MODULES:
+                    _fail(node, f"modul {alias.name!r} belum terintegrasi; hanya modul dengan kontrak eksplisit yang dapat diimpor")
                 self.module_aliases[alias.asname or alias.name] = alias.name
             return
         if isinstance(node, ast.ImportFrom):
-            if node.level != 0 or node.module not in ("math", "statistics"):
-                _fail(node, "hanya from math/statistics import ... yang didukung, dengan nama yang ada di daftar izin")
+            if node.level != 0 or node.module not in PYTHON_MODULES:
+                _fail(node, "hanya from modul standar yang terdaftar dalam kontrak yang didukung")
             for alias in node.names:
                 if alias.name == "*":
                     _fail(node, f"from {node.module} import * tidak didukung; impor nama secara eksplisit")
                 local_name = alias.asname or alias.name
-                if node.module == "math" and alias.name in _MATH_FUNCTIONS:
-                    self.imported_symbols[local_name] = _MATH_FUNCTIONS[alias.name]
-                elif node.module == "math" and alias.name in _MATH_CONSTANTS:
-                    self.imported_constants[local_name] = _MATH_CONSTANTS[alias.name]
-                elif node.module == "statistics" and alias.name in _STATISTICS_FUNCTIONS:
-                    self.imported_symbols[local_name] = _STATISTICS_FUNCTIONS[alias.name]
+                function = imported_builtin(node.module, alias.name)
+                constant = imported_constant(node.module, alias.name)
+                if function is not None:
+                    self.imported_symbols[local_name] = function
+                elif constant is not None:
+                    self.imported_constants[local_name] = constant
                 else:
                     _fail(node, f"{node.module}.{alias.name} belum memiliki padanan Pusingcuk yang teruji")
             return
