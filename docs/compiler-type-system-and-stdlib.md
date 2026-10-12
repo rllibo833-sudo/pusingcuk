@@ -19,13 +19,21 @@ elements use `any`.
 
 The registry provides metadata and callable implementations for
 `panjang`, `teks`, `bilangan`, `desimal`, `logika`, `mutlak`,
-`minimum`, `maksimum`, and `bulatkan`. The compiler JavaScript and Python
-backends and the bytecode VM now execute the numeric subset `mutlak`,
-`minimum`, `maksimum`, and `bulatkan`. These functions validate numeric inputs,
-reject booleans, and use ties-to-even rounding for `bulatkan` across targets.
-The conversion functions remain registry-only until their conversion semantics
-are aligned across every runtime. The registry intentionally excludes file,
-network, shell, and process access. Numeric casts reject booleans explicitly.
+`minimum`, `maksimum`, and `bulatkan`. The JavaScript and Python compiler
+backends and the bytecode VM execute the shared numeric subset `mutlak`,
+`minimum`, `maksimum`, and `bulatkan`. These functions validate numeric
+inputs, reject booleans, and use ties-to-even rounding for `bulatkan` across
+those targets. The conversion functions remain registry-only until their
+conversion semantics are aligned across every runtime. The registry
+intentionally excludes file, network, shell, and process access. Numeric casts
+reject booleans explicitly.
+
+The Python importer additionally maps the allow-listed `math` APIs to
+`akar`, `bawah`, `atas`, `pangkat`, `sinus`, and `kosinus`. Those six
+helpers are implemented in the JavaScript and Python compiler backends; HTML
+uses the same JavaScript runtime. They are **not yet available in the VM or
+native C backend**, so Python programs using those math functions should
+currently target `js`, `html`, or `python`.
 
 ## Required next integration steps
 
