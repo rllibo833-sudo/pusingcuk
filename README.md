@@ -121,7 +121,7 @@ Run cross-runtime conformance checks:
 python tools/conformance.py
 ```
 
-The Python interpreter is the reference development path. The native C runtime and compiler targets support documented subsets and are not yet fully equivalent. See the [runtime compatibility matrix](docs/COMPATIBILITY.md), [native runtime notes](docs/NATIVE_RUNTIME.md), and [compiler targets](docs/COMPILER_TARGETS.md).
+The reference interpreter is the modular Python path launched by `python pusingcuk_new.py program.pusingcuk` (`lexer.py`, `parser.py`, and `evaluator.py`); it must follow `SPEC.md`. The older `interpreter.py` is a separate legacy implementation, not the reference. Native C, compiled Python/JavaScript, and PVM are experimental followers that may support smaller subsets and are not authoritative for language semantics. Syntax and slang aliases are frozen; adding keywords or aliases requires explicit Founder approval. See the [runtime compatibility matrix](docs/COMPATIBILITY.md), [native runtime notes](docs/NATIVE_RUNTIME.md), and [compiler targets](docs/COMPILER_TARGETS.md).
 
 ## Offline-first policy
 
