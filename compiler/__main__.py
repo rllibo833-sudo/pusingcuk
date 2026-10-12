@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 from compiler.ir import from_source
+from library.module_system import expand_file
 
 
 def compile_source(source, source_name, target):
@@ -63,7 +64,9 @@ def main(argv=None):
         print(f"berkas tidak ditemukan: {source_path}", file=sys.stderr)
         return 2
     try:
-        result = compile_source(source_path.read_text(encoding="utf-8"), source_path.name, args.target)
+        # Expand only explicit, local, project-root-confined .pusingcuk imports.
+        source = expand_file(source_path)
+        result = compile_source(source, source_path.name, args.target)
         if args.output:
             Path(args.output).write_text(result, encoding="utf-8")
         else:

@@ -38,6 +38,7 @@ The root [language specification](../SPEC.md) is the primary syntax reference. I
 ## Platform and developer tooling
 
 - [Compatibility matrix](COMPATIBILITY.md)
+- [Offline database, local HTTP and blockchain development adapters](OFFLINE_ADAPTERS.md)
 - [Android Studio](ANDROID_STUDIO.md)
 - [Native Termux guide](NATIVE_TERMUX.md)
 - [Termux dashboard](TERMUX_DASHBOARD.md)
@@ -60,6 +61,5 @@ The machine-readable vocabulary registry and selected examples live in [the libr
 ## How to report a documentation problem
 
 When reporting a mismatch, include the document path, the relevant heading, the runtime or backend involved, the exact command used, and a minimal reproducible example where possible. Do not include passwords, tokens, private data, or details of an unpatched security issue in a public report; follow [SECURITY.md](../SECURITY.md) for security concerns.
-
 
 - [Shared builtin contract](../library/README.md#builtin-contract-one-metadata-source)
