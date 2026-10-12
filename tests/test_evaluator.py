@@ -18,6 +18,11 @@ class EvaluatorTests(unittest.TestCase):
             "lah a = [10, 20]\na[0] = 99\nhedeh a[0]\nhedeh panjang(a)"
         )), "99\n2\n")
 
+    def test_length_of_range(self):
+        self.assertEqual(capture(program(
+            "hedeh panjang(rentang(1, 5))"
+        )), "4\n")
+
     def test_if_and_while(self):
         self.assertEqual(capture(program(
             "lah x = 3\nmumet x > 0\nx = x - 1\nselesai mumet\n"
