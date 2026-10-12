@@ -20,6 +20,7 @@ trap cleanup EXIT
 "$CC" -std=c11 -O2 -Wall -Wextra -Werror src/c-core/main.c -o "$TMP/pvmc"
 command -v node >/dev/null || { echo "Node.js dibutuhkan untuk uji JS" >&2; exit 2; }
 python3 --version >/dev/null
+PYTHONPATH="$ROOT" python3 tests/test_python_importer.py
 printf 'fixture file I/O\n' > "$FIXTURE"
 for src in tests/0[1-6]_*.cuk; do
   name="$(basename "$src" .cuk)"
