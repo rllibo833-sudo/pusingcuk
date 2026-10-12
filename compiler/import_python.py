@@ -105,10 +105,20 @@ class Importer:
                     _fail(node, "print() hanya boleh menjadi pernyataan, bukan ekspresi")
                 if name == "input":
                     _fail(node, "input() hanya didukung sebagai nilai assignment sederhana")
-                if name == "len":
-                    name = "panjang"
-                elif name == "range":
-                    name = "rentang"
+                aliases = {
+                    "len": ("panjang", 1, 1),
+                    "range": ("rentang", 1, 3),
+                    "abs": ("mutlak", 1, 1),
+                    "round": ("bulatkan", 1, 1),
+                    "min": ("minimum", 2, 2),
+                    "max": ("maksimum", 2, 2),
+                }
+                if name in aliases:
+                    target, min_args, max_args = aliases[name]
+                    if not min_args <= len(node.args) <= max_args:
+                        _fail(node, f"{name}() pada importer ini membutuhkan {min_args}" +
+                              (f" sampai {max_args} argumen" if min_args != max_args else " argumen"))
+                    name = target
                 return f"{name}(" + ", ".join(self.expr(v) for v in node.args) + ")"
             _fail(node, "pemanggilan melalui atribut/objek belum didukung")
         _fail(node, f"ekspresi Python {type(node).__name__} belum didukung")
@@ -227,7 +237,7 @@ class Importer:
         if isinstance(node, ast.Pass):
             return
         if isinstance(node, (ast.Import, ast.ImportFrom)):
-            _fail(node, "import Python tidak diterjemahkan otomatis; modul harus diintegrasikan terpisah")
+            _fail(node, "import Python belum didukung otomatis; modul harus dipetakan ke pustaka Pusingcuk yang benar-benar tersedia")
         if isinstance(node, (ast.ClassDef, ast.Try, ast.Raise, ast.With, ast.AsyncWith, ast.AsyncFunctionDef, ast.Lambda, ast.Match, ast.Global, ast.Nonlocal, ast.Delete, ast.Assert)):
             _fail(node, f"{type(node).__name__} belum didukung")
         _fail(node, f"pernyataan Python {type(node).__name__} belum didukung")
