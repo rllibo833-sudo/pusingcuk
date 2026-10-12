@@ -26,7 +26,7 @@ def main():
         try:
             from tools.formatter import format_file
             format_file(path)
-        except (OSError, UnicodeError, ValueError) as exc:
+        except (OSError, UnicodeError, ValueError, SyntaxError) as exc:
             print(f"Kesalahan format: {exc}", file=sys.stderr)
             return 1
         print(f"Format selesai: {path}")

@@ -54,6 +54,66 @@ class FormatterTests(unittest.TestCase):
         self.assertEqual(formatted, "jancuk\n  lah x = 1\nselesai jancuk\n")
         self.assertIn("Format selesai", result.stdout)
 
+    def test_nested_blocks_format_and_parse(self):
+        source = (
+            "jancuk\n"
+            "fungsi hitung(x)\n"
+            "njir x > 0\n"
+            "coba\n"
+            "mumet x > 1\n"
+            "hedeh x\n"
+            "selesai mumet\n"
+            "ketangkep err\n"
+            "hedeh err\n"
+            "akhirnya\n"
+            "hedeh \"done\"\n"
+            "selesai coba\n"
+            "kampret\n"
+            "untuk item dalam [1, 2]\n"
+            "hedeh item\n"
+            "selesai untuk\n"
+            "selesai njir\n"
+            "balek x\n"
+            "selesai fungsi\n"
+            "selesai jancuk\n"
+        )
+        formatted = format_source(source)
+        from parser import parse
+        parse(formatted)
+        self.assertIn("        mumet x > 1\n", formatted)
+        self.assertIn("          hedeh x\n", formatted)
+        self.assertIn("      ketangkep err\n", formatted)
+        self.assertIn("    kampret\n", formatted)
+        self.assertIn("      untuk item dalam [1, 2]\n", formatted)
+
+    def test_invalid_syntax_is_rejected_without_modifying_source(self):
+        from parser import ParserError
+        from tools.formatter import format_file
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "invalid.pusingcuk"
+            original = "jancuk\nlah x =\nselesai jancuk\n"
+            path.write_text(original, encoding="utf-8")
+            with self.assertRaises(ParserError):
+                format_file(path)
+            self.assertEqual(path.read_text(encoding="utf-8"), original)
+            self.assertFalse(path.with_suffix(".pusingcuk.bak").exists())
+
+    def test_formatter_creates_exact_backup(self):
+        from tools.formatter import format_file
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "sample.pusingcuk"
+            original = "jancuk\nlah x = 1\nselesai jancuk"
+            path.write_text(original, encoding="utf-8")
+            format_file(path)
+            self.assertEqual(
+                path.with_suffix(".pusingcuk.bak").read_text(encoding="utf-8"),
+                original,
+            )
+            self.assertEqual(
+                path.read_text(encoding="utf-8"),
+                "jancuk\n  lah x = 1\nselesai jancuk\n",
+            )
+
     def test_cli_fmt_rejects_non_pusingcuk_file(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "sample.txt"

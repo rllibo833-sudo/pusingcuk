@@ -1,6 +1,8 @@
 """Formatter sederhana untuk indentasi sumber Pusingcuk (2 spasi per level)."""
 from pathlib import Path
 
+from parser import parse
+
 
 _BLOCK_STARTS = {"coba", "njir", "mumet", "untuk", "fungsi"}
 _BRANCH_MARKERS = {"ketangkep": "coba", "akhirnya": "coba", "kampret": "njir"}
@@ -66,6 +68,13 @@ def format_file(path):
     if path.suffix != ".pusingcuk":
         raise ValueError("formatter hanya menerima berkas .pusingcuk")
     source = path.read_text(encoding="utf-8")
+    # Validate both the original and formatted program before modifying files.
+    # A formatter must never turn invalid input into an irreversible rewrite.
+    parse(source, filename=str(path))
     formatted = format_source(source)
+    parse(formatted, filename=str(path))
+
+    backup = path.with_suffix(path.suffix + ".bak")
+    backup.write_text(source, encoding="utf-8")
     path.write_text(formatted, encoding="utf-8")
     return formatted
