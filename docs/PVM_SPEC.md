@@ -25,7 +25,7 @@ Little-endian. Header enam byte: ASCII PVM1, diikuti versi u16 bernilai 1. Setia
 | 15 | OP_PETIK | Evaluasi literal ke slot sementara |
 | 16 | OP_CEMPLUNGIN | Tambah nilai ke list: nama_list, nilai |
 | 17 | OP_PANJANG | Panjang ekspresi; bentuk assignment nama = ekspresi |
-| 18 | OP_SENGGOL | Fetch URL: nama = URL atau URL langsung |
+| 18 | OP_SENGGOL | Membaca payload lokal `data:text/plain,...`: `nama = payload` atau payload langsung; URL jaringan eksternal ditolak oleh backend JS/Python yang telah diperkeras |
 | 19 | OP_BEDAH | Cetak representasi JSON ekspresi |
 
 ## Semantik dan portabilitas
@@ -34,4 +34,4 @@ Operand v1 adalah teks sumber UTF-8. Ekspresi portabel dibatasi pada literal str
 Untuk Android Termux, jangan menulis struct C mentah ke file karena padding dan endianness. Path ~/... pada OP_BUKA diselesaikan memakai HOME; jika kosong, fallback adalah /data/data/com.termux/files/home. Path absolut tersebut dipertahankan.
 
 ## Batasan saat ini
-OP_FUNGSI dan semantik file handle lintas backend belum lengkap. Kesetaraan seluruh sintaks PusingCuk belum dijamin. OP_SENGGOL memakai jaringan; fixture data:text/plain,... atau server lokal direkomendasikan agar pengujian deterministik. Jangan jalankan bytecode tak tepercaya: backend dapat membaca/menghapus file dan mengakses jaringan.
+OP_FUNGSI dan semantik file handle lintas backend belum lengkap. Kesetaraan seluruh sintaks PusingCuk belum dijamin. OP_SENGGOL tidak boleh membuat koneksi jaringan. Backend JavaScript/Python yang telah diperkeras hanya menerima payload lokal `data:text/plain,...` dan menolak URL eksternal. Fitur ini bukan HTTP client. Jangan jalankan bytecode tak tepercaya: opcode file masih dapat membaca atau menghapus file yang bisa diakses proses, karena belum ada pembatasan sandbox sistem operasi.
