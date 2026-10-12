@@ -205,7 +205,7 @@ def generate(document: dict) -> str:
             name, params = fields.get("name"), fields.get("params")
             if not isinstance(name, str) or not IDENTIFIER.fullmatch(name):
                 raise JSBackendError(f"baris {line}: nama fungsi tidak valid")
-            if name in {"panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan"} or name in functions:
+            if name in {"panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat", "sinus", "kosinus"} or name in functions:
                 raise JSBackendError(f"baris {line}: nama fungsi {name!r} sudah digunakan")
             if not isinstance(params, list) or any(
                 not isinstance(p, str) or not IDENTIFIER.fullmatch(p) for p in params
