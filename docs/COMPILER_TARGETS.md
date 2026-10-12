@@ -44,7 +44,7 @@ python -m compiler program.cuk --target js --output program.js
 node program.js
 ```
 
-Importer menggunakan struktur sintaks Python, lalu menghasilkan sumber Pusingcuk. Cakupan kini mencakup variabel, fungsi dasar, koleksi, kondisi termasuk `elif`, loop, dan pemetaan builtin numerik `abs/round/min/max` ke pustaka standar Pusingcuk. Ini **hanya subset**, bukan kompatibilitas penuh Python; modul eksternal, kelas, exception handling, comprehension, dan sejumlah konstruksi lain ditolak dengan pesan jelas. Lihat [cakupan dan batas importer](IMPORT_PYTHON.md).
+Importer menggunakan struktur sintaks Python, lalu menghasilkan sumber Pusingcuk. Cakupan mencakup variabel, fungsi dasar, koleksi, kondisi termasuk `elif`, loop, builtin numerik `abs/round/min/max`, dan subset modul standar `math`: `sqrt/floor/ceil/fabs/pow/sin/cos` serta `pi/e`. Builtin math tambahan diuji pada backend JavaScript dan HTML (HTML menyematkan runtime JavaScript yang sama). Ini **hanya subset**, bukan kompatibilitas penuh Python; modul eksternal, API math yang tidak terdaftar, kelas, exception handling, comprehension, dan sejumlah konstruksi lain ditolak dengan pesan jelas. Lihat [cakupan dan batas importer](IMPORT_PYTHON.md).
 
 Backend menolak konstruksi yang belum dikenali alih-alih diam-diam menerjemahkannya secara keliru. Target yang berbeda belum menjamin kesetaraan penuh semua semantik; cakupan tiap backend harus diperluas lewat tes konformansi.
 
