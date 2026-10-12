@@ -31,7 +31,7 @@ function compile(records){
    case 15:out.push("v.__petik="+val(a)+";");break;
    case 16:m=a.match(/^([A-Za-z_]\w*)\s*,\s*(.+)$/);if(m)out.push("(v["+JSON.stringify(m[1])+"]??=[]).push("+val(m[2])+");");else out.push("throw Error('cemplungin perlu: nama_list, nilai');");break;
    case 17:m=a.match(/^([A-Za-z_]\w*)\s*=\s*(.+)$/);if(m)out.push("v["+JSON.stringify(m[1])+"]=globalThis.__len("+val(m[2])+");");else out.push("console.log(globalThis.__len("+val(a)+"));");break;
-   case 18:m=a.match(/^([A-Za-z_]\\w*)\\s*=\\s*(.*)$/);if(m)out.push("v["+JSON.stringify(m[1])+"]=__offlineData("+val(m[2])+");");else out.push("console.log(__offlineData("+val(a)+"));");break;
+   case 18:m=a.match(/^([A-Za-z_]\w*)\s*=\s*(.*)$/);if(m)out.push("v["+JSON.stringify(m[1])+"]=__offlineData("+val(m[2])+");");else out.push("console.log(__offlineData("+val(a)+"));");break;
    default:throw Error("opcode tidak dikenal: "+r.op);
   }
  }
