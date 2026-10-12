@@ -47,6 +47,14 @@ jobs:
           grep -Fq '15000' <<< "$output"
           rm -f database.json
 
+      - name: Uji contoh modular Level 4
+        run: |
+          set -euo pipefail
+          output="$(python pusingcuk_new.py examples/modular.pusingcuk)"
+          printf '%s\n' "$output"
+          grep -Fq 'Halo, Budi!' <<< "$output"
+          grep -Fq 'selesai' <<< "$output"
+
   native-runtime:
     runs-on: ubuntu-latest
     timeout-minutes: 10

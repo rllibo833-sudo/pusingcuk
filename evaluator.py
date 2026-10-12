@@ -4,6 +4,7 @@ from collections.abc import MutableMapping
 from io import StringIO
 from pathlib import Path
 import json
+from datetime import datetime, date
 from ast_nodes import Node
 from parser import parse
 
@@ -89,6 +90,13 @@ def _language_json(value):
     if isinstance(value, list):
         return [_language_json(item) for item in value]
     return value
+
+class ExportedFunction:
+    def __init__(self, evaluator, name, module_env):
+        self.evaluator = evaluator
+        self.name = name
+        self.module_env = module_env
+
 
 class ReturnSignal(Exception):
     def __init__(self, value):
@@ -178,6 +186,40 @@ class Evaluator:
                 return ops[n.op]()
             if k == "Call":
                 args = [self.expr(x, env, depth) for x in n.args]
+                if n.name in ("jam", "tanggal"):
+                    if args:
+                        self.fail(line, f"fungsi '{n.name}' tidak membutuhkan argumen")
+                    if n.name == "jam":
+                        return datetime.now().astimezone().isoformat(timespec="seconds")
+                    return date.today().isoformat()
+                if n.name == "angkut":
+                    if len(args) != 1 or not isinstance(args[0], str):
+                        self.fail(line, "angkut membutuhkan satu path berkas teks")
+                    path = Path(args[0])
+                    try:
+                        source = path.read_text(encoding="utf-8")
+                    except OSError as exc:
+                        self.fail(line, f"modul tidak bisa dibaca: {path} ({exc})")
+                    module_evaluator = Evaluator()
+                    module_env = module_evaluator.run_module(source)
+                    exports = PusingDict()
+                    for key, value in module_env.items():
+                        exports[key] = value
+                    for key in module_evaluator.functions:
+                        exports[key] = ExportedFunction(module_evaluator, key, module_env)
+                    return exports
+                if "." in n.name:
+                    module_name, function_name = n.name.split(".", 1)
+                    module = env.get(module_name)
+                    if not isinstance(module, PusingDict):
+                        self.fail(line, f"modul '{module_name}' tidak ditemukan")
+                    try:
+                        exported = module[function_name]
+                    except KeyError:
+                        self.fail(line, f"modul '{module_name}' tidak mengekspor '{function_name}'")
+                    if not isinstance(exported, ExportedFunction):
+                        self.fail(line, f"ekspor '{function_name}' bukan fungsi")
+                    return exported.evaluator.call_export(exported.name, args, exported.module_env, depth, line)
                 if n.name == "tanya":
                     if len(args) != 1 or not isinstance(args[0], str):
                         self.fail(line, "tanya membutuhkan satu prompt teks")
@@ -253,6 +295,20 @@ class Evaluator:
         except Exception as exc:
             self.fail(line, f"operasi gagal ({type(exc).__name__})")
 
+    def call_export(self, name, args, module_env, depth, line):
+        params, body, _fline = self.functions[name]
+        if len(args) != len(params):
+            self.fail(line, f"fungsi '{name}' membutuhkan {len(params)} argumen")
+        if depth >= 100:
+            self.fail(line, "batas kedalaman pemanggilan fungsi tercapai")
+        local = dict(module_env)
+        local.update(zip(params, args))
+        try:
+            self.block(body, local, depth + 1, True)
+        except ReturnSignal as ret:
+            return ret.value
+        return None
+
     def assign_index(self, target, value, env, line, depth):
         if target.kind == "Variable":
             if target.name not in env:
@@ -309,6 +365,18 @@ class Evaluator:
                 elif value is False:
                     value = "tidak"
                 print(value)
+            elif k == "Try":
+                try:
+                    self.block(n.body, env, depth, in_function)
+                except Exception as exc:
+                    if n.handler_name is None:
+                        raise
+                    catch_env = dict(env)
+                    catch_env[n.handler_name] = str(exc)
+                    self.block(n.handler, catch_env, depth, in_function)
+                    env.update({key: value for key, value in catch_env.items() if key != n.handler_name})
+                finally:
+                    self.block(n.final, env, depth, in_function)
             elif k == "If":
                 branch = n.then_body if self.expr(n.condition, env, depth) else n.else_body
                 self.block(branch, env, depth, in_function)
@@ -348,7 +416,7 @@ class Evaluator:
             else:
                 self.fail(line, f"pernyataan '{k}' belum didukung")
 
-    def run(self, source):
+    def run_module(self, source):
         self.functions.clear()
         self.budget = 0
         tree = parse(source)
@@ -367,7 +435,12 @@ class Evaluator:
                 statement.params, statement.body, line
             )
 
-        self.block(tree.body, {})
+        env = {}
+        self.block(tree.body, env)
+        return env
+
+    def run(self, source):
+        self.run_module(source)
         return None
 
 

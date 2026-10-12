@@ -1,0 +1,16 @@
+inthiseco
+  lah lib = angkut "examples/utils.pusingcuk"
+  coba
+    spill lib.sapa("Budi")
+    lah hilang = bongkar "gaada.txt"
+    njir hilang == salah
+      spill "berkas tidak ada"
+    selesai njir
+  ketangkep eror
+    spill eror
+  akhirnya
+    spill "selesai"
+  gitu coba
+  spill jam()
+  spill tanggal()
+gitu inthiseco

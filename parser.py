@@ -93,6 +93,27 @@ class Parser:
             name = self.name()
             self.need("=")
             return node("Input", t.line, name=name, prompt=self.expr())
+        if self.at("coba"):
+            self.take()
+            self.skip_lines()
+            body = self.statements({("ketangkep", None), ("akhirnya", None), ("gitu", None)})
+            handler_name = None
+            handler = []
+            final = []
+            if self.at("ketangkep"):
+                self.take()
+                handler_name = self.name()
+                self.skip_lines()
+                handler = self.statements({("akhirnya", None), ("gitu", None)})
+            if self.at("akhirnya"):
+                self.take()
+                self.skip_lines()
+                final = self.statements({("gitu", None)})
+            self.need("gitu")
+            self.need("coba")
+            return node("Try", t.line, body=body, handler_name=handler_name, handler=handler, final=final)
+        if self.at("akhirnya") or self.at("ketangkep"):
+            self.fail("akhirnya/ketangkep harus berada di dalam blok coba")
         if self.at("njir"):
             self.take()
             condition = self.expr()
@@ -150,7 +171,7 @@ class Parser:
             name = self.take().value
             if self.at("("):
                 return self.call(name, t.line)
-            if name == "tulis":
+            if name in ("tulis", "angkut"):
                 args = [self.expr()]
                 while self.at(","):
                     self.take()
@@ -190,10 +211,17 @@ class Parser:
         if t.kind in ("INTEGER", "FLOAT", "STRING"):
             left = node("Literal", t.line, value=t.value)
         elif t.kind == "IDENT":
-            if self.at("("):
+            if self.at("."):
+                self.take()
+                member = self.name()
+                if self.at("("):
+                    left = self.call(t.value + "." + member, t.line)
+                else:
+                    left = node("Attribute", t.line, object=node("Variable", t.line, name=t.value), name=member)
+            elif self.at("("):
                 left = self.call(t.value, t.line)
-            elif t.value == "baca":
-                left = node("Call", t.line, name="baca", args=[self.expr(6)])
+            elif t.value in ("baca", "angkut"):
+                left = node("Call", t.line, name=t.value, args=[self.expr(6)])
             else:
                 left = node("Variable", t.line, name=t.value)
         elif t.value == "tanya":

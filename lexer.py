@@ -20,6 +20,8 @@ KEYWORD_ALIASES = {
     "bongkar": "baca",
     "simpen_json": "tulis_json",
     "bongkar_json": "baca_json",
+    "impor": "angkut",
+    "waktu": "jam",
     "kepo": "tanya",
 }
 
@@ -41,11 +43,14 @@ KEYWORDS = frozenset({
     "bukan",
     "benar",
     "salah",
+    "coba",
+    "ketangkep",
+    "akhirnya",
 }) | frozenset(KEYWORD_ALIASES)
 
 MULTI_OPERATORS = ("==", "!=", "<=", ">=", "//")
 SINGLE_OPERATORS = frozenset("+-*/%=<>")
-PUNCTUATION = frozenset("()[],:{}")
+PUNCTUATION = frozenset("()[],:{}.")
 
 
 class LexerError(ValueError):

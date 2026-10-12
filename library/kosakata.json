@@ -312,6 +312,58 @@
       "native_runtime": "reference-python",
       "c_backend": "unsupported",
       "alias_of": "baca_json"
+    },
+    {
+      "word": "angkut",
+      "category": "modules",
+      "meaning": "Memuat dan menjalankan berkas Pusingcuk lalu mengembalikan ekspor variabel dan fungsi.",
+      "aliases": [
+        "impor"
+      ],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "coba",
+      "category": "resilience",
+      "meaning": "Memulai blok try.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "ketangkep",
+      "category": "resilience",
+      "meaning": "Menangkap kesalahan dan mengikat pesannya ke nama variabel.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "akhirnya",
+      "category": "resilience",
+      "meaning": "Blok yang dijalankan setelah coba, baik sukses maupun gagal.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "jam",
+      "category": "datetime",
+      "meaning": "Mengembalikan timestamp lokal ISO 8601.",
+      "aliases": [
+        "waktu"
+      ],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "tanggal",
+      "category": "datetime",
+      "meaning": "Mengembalikan tanggal lokal ISO 8601.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
     }
   ],
   "operators": [
@@ -393,6 +445,7 @@
     "c_backend": "Backend source C eksperimental mendukung integer/boolean, kondisi, loop mumet, dan fungsi pengguna dengan parameter/return integer. String, koleksi, input, loop untuk, dan deklarasi lah di dalam loop masih ditolak eksplisit.",
     "aliases": "Alias baru gas, spill, bestie, valid, zonk, skip, dan kelar saat ini diuji melalui lexer/interpreter Python dan front-end compiler C; dukungan lexer runtime C mandiri belum diklaim.",
     "file_io": "tulis/baca (aliases simpen/bongkar) and expression input tanya (alias kepo) are supported by the Python reference interpreter only. Native C and C backend file I/O are unsupported for now.",
-    "json_io": "tulis_json/baca_json (aliases simpen_json/bongkar_json) use Python's json module and are supported by the Python reference interpreter only. Native C and C backend JSON I/O are unsupported for now."
+    "json_io": "tulis_json/baca_json (aliases simpen_json/bongkar_json) use Python's json module and are supported by the Python reference interpreter only. Native C and C backend JSON I/O are unsupported for now.",
+    "level4": "Modules, try/catch/finally, jam/waktu and tanggal are supported by the Python reference interpreter only."
   }
 }

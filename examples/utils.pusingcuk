@@ -1,0 +1,5 @@
+inthiseco
+fungsi sapa(nama)
+  balek "Halo, " + nama + "!"
+gitu fungsi
+gitu inthiseco
