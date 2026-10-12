@@ -26,12 +26,12 @@ class PythonImporterTests(unittest.TestCase):
 
     def test_variable_declared_in_both_branches(self):
         result = translate(
-            "flag = True\\n"
-            "if flag:\\n"
-            "    value = 1\\n"
-            "else:\\n"
-            "    value = 2\\n"
-            "print(value)\\n"
+            "flag = True\n"
+            "if flag:\n"
+            "    value = 1\n"
+            "else:\n"
+            "    value = 2\n"
+            "print(value)\n"
         )
         self.assertEqual(result.count("lah value ="), 2)
         parse(result)
