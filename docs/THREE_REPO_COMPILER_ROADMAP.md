@@ -1,16 +1,18 @@
 # Pusingcuk Compiler Roadmap for the Three-Repository System
 
-**Status:** Proposed engineering roadmap; not a claim of production readiness.
+**Status:** Optional proposed engineering roadmap; not a claim of production readiness.
 
-## Mission
+> **Scope note:** This document describes one downstream three-repository integration scenario. It does not define the overall Pusingcuk mission, and contributors are not expected to target these repositories. The public project vision is in [VISION.md](VISION.md). All integration ideas below remain proposals until implemented, tested, and reviewed.
 
-Pusingcuk is intended to become the shared implementation language and compiler toolchain for the project's three application repositories:
+## Scope of this optional integration proposal
+
+If this specific application project chooses to adopt Pusingcuk, it could explore a shared implementation language and compiler toolchain for these repositories:
 
 - **Founder-OS / MEMORY:** durable decisions, constraints, review and recovery workflows.
 - **kawasan-masjid-core / CORE:** canonical runtime, backend/data operations, evidence and economic truth.
 - **kawasan-masjid-public / PUBLIC:** website experience, discovery and public-safe interactions.
 
-These remain three distinct layers of one project. Pusingcuk provides a common language/toolchain; it does not collapse repository boundaries or make private CORE data public.
+These remain three distinct layers within that separate application project. A possible Pusingcuk integration would not collapse repository boundaries or make private CORE data public.
 
 ## Current truth
 
@@ -83,7 +85,7 @@ Choose the next backend only after Phase 2 gates pass. JavaScript is a candidate
 
 Start with pure, deterministic, low-risk logic. Keep existing implementations as rollback paths. Use adapters at repository boundaries rather than importing internal code across repositories. Do not migrate database, filesystem, network, process, authentication or secret-handling paths until their capability and security contracts are reviewed.
 
-**Gate per migration:** behavior parity, repository tests, security review for used capabilities, reproducible build, rollback proof and explicit Founder acceptance.
+**Gate per migration:** behavior parity, repository tests, security review for used capabilities, reproducible build, rollback proof and explicit approval from the maintainer responsible for the target application.
 
 ## Repository integration contract
 
@@ -102,7 +104,7 @@ These are candidate areas, not commitments that the current code has already bee
 - Never place credentials in source, generated artifacts, fixtures or logs.
 - PUBLIC may expose only a verified public-safe subset of CORE information.
 - Preserve the project rule: **No Proof, No Claim**.
-- Do not open technical GitHub issues as part of this roadmap without Founder authorization. Use focused pull requests and existing review channels.
+- Coordinate changes with the maintainers of the target repositories and use their established review channels.
 
 ## Definition of success
 
