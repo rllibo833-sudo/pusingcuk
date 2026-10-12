@@ -84,3 +84,8 @@ Expected output:
 ```
 
 These names are reserved for builtins; user-defined functions cannot shadow them.
+
+
+## Statistics subset
+
+The Python importer maps the allow-listed `statistics.mean` / `statistics.median` APIs to `rata_rata` / `median`. Both helpers require a non-empty list of finite numbers and reject booleans. They are implemented in the JavaScript and Python compiler backends; HTML uses the same JavaScript runtime. They are **not available in the VM or native C backend**. This is an explicit subset, not full Python standard-library compatibility.

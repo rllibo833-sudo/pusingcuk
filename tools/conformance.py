@@ -11,6 +11,9 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from library.builtin_contract import BUILTIN_CONTRACT  # validates metadata before fixtures run
+
 FIXTURES = ROOT / "tests" / "conformance"
 MANIFEST = FIXTURES / "manifest.json"
 ALLOWED_RUNTIME_STATES = {"required", "optional", "unsupported"}

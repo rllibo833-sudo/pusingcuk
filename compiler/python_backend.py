@@ -4,6 +4,9 @@ import json
 import sys
 from pathlib import Path
 from compiler.ir import from_source, validate
+from library.builtin_contract import BUILTIN_NAMES, backend_builtins
+
+PYTHON_BACKEND_BUILTINS = backend_builtins("python")
 
 
 class PythonBackendError(ValueError):
@@ -19,7 +22,7 @@ def generate(document):
     for s in root["fields"]["body"]:
         if s["kind"] == "Function":
             f = s["fields"]
-            if f["name"] in functions or f["name"] in ("panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat", "sinus", "kosinus"):
+            if f["name"] in functions or f["name"] in BUILTIN_NAMES:
                 raise PythonBackendError(f"nama fungsi bentrok: {f['name']}")
             functions[f["name"]] = s
 
@@ -37,19 +40,13 @@ def generate(document):
         if k == "Call":
             name, args = f["name"], f["args"]
             values = ", ".join(expr(x, env) for x in args)
-            if name == "panjang" and len(args) == 1: return f"len({values})"
-            if name == "rentang" and 1 <= len(args) <= 3: return f"pc_range({values})"
-            numeric_builtins = {
-                "mutlak": (1, "pc_abs"), "minimum": (2, "pc_min"),
-                "maksimum": (2, "pc_max"), "bulatkan": (1, "pc_round"),
-                "akar": (1, "pc_sqrt"), "bawah": (1, "pc_floor"),
-                "atas": (1, "pc_ceil"), "pangkat": (2, "pc_pow"),
-                "sinus": (1, "pc_sin"), "kosinus": (1, "pc_cos"),
-            }
-            if name in numeric_builtins:
-                arity, helper = numeric_builtins[name]
-                if len(args) != arity: raise PythonBackendError(f"baris {line}: {name} membutuhkan {arity} argumen")
-                return f"{helper}({values})"
+            builtin = PYTHON_BACKEND_BUILTINS.get(name)
+            if builtin is not None:
+                if not builtin["min_args"] <= len(args) <= builtin["max_args"]:
+                    low, high = builtin["min_args"], builtin["max_args"]
+                    expected = str(low) if low == high else f"{low}-{high}"
+                    raise PythonBackendError(f"baris {line}: {name} membutuhkan {expected} argumen")
+                return f"{builtin['helper']}({values})"
             if name not in functions: raise PythonBackendError(f"baris {line}: fungsi tidak dikenal: {name}")
             if len(args) != len(functions[name]["fields"]["params"]): raise PythonBackendError(f"baris {line}: jumlah argumen salah untuk {name}")
             return f"pc_fn_{name}({values})"
@@ -170,6 +167,35 @@ def pc_ceil(value): return math.ceil(pc_numeric("atas", value))
 def pc_pow(a, b): return pc_math_result("pangkat", math.pow(pc_numeric("pangkat", a), pc_numeric("pangkat", b)))
 def pc_sin(value): return pc_math_result("sinus", math.sin(pc_numeric("sinus", value)))
 def pc_cos(value): return pc_math_result("kosinus", math.cos(pc_numeric("kosinus", value)))
+def pc_stat_values(name, value):
+    if not isinstance(value, list) or not value:
+        raise TypeError(name + "() membutuhkan daftar angka yang tidak kosong")
+    values = [pc_numeric(name, item) for item in value]
+    if any(
+        (isinstance(item, int) and abs(item) > 9007199254740991)
+        or (isinstance(item, float) and item.is_integer() and abs(item) > 9007199254740991)
+        for item in values
+    ):
+        raise ValueError(name + "() menolak integer di luar rentang aman lintas target")
+    return values
+def pc_stat_result(name, value):
+    if not math.isfinite(value): raise ValueError(name + "() menghasilkan angka non-finite")
+    if value.is_integer() and abs(value) <= 9007199254740991: return int(value)
+    return value
+def pc_mean(value):
+    values = pc_stat_values("rata_rata", value)
+    try:
+        count = len(values)
+        return pc_stat_result("rata_rata", sum(item / count for item in values))
+    except OverflowError as exc: raise ValueError("rata_rata() menghasilkan angka non-finite") from exc
+def pc_median(value):
+    values = sorted(pc_stat_values("median", value))
+    middle = len(values) // 2
+    if len(values) % 2:
+        result = values[middle]
+        if isinstance(result, int) and abs(result) <= 9007199254740991: return result
+        return pc_stat_result("median", float(result))
+    return pc_stat_result("median", values[middle - 1] / 2 + values[middle] / 2)
 def pc_range(*args):
     if not 1 <= len(args) <= 3 or any(not isinstance(x, int) or isinstance(x, bool) for x in args): raise TypeError("rentang membutuhkan 1-3 integer")
     if len(args) == 3 and args[2] == 0: raise ValueError("langkah rentang tidak boleh nol")

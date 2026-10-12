@@ -38,3 +38,8 @@ python -m unittest tests.test_js_backend -v
 \`\`\`
 
 Tes eksekusi membutuhkan Node.js; tanpa Node.js, tes eksekusi akan dilewati.
+
+
+## Standard-library subset
+
+The Python importer maps only `statistics.mean` and `statistics.median` to `rata_rata` and `median`. These are implemented in the JS runtime and therefore also available in HTML output. Empty lists, booleans, non-numeric values, and non-finite numbers fail at runtime. This is not full Python `statistics` compatibility; VM and native C support are not claimed.

@@ -68,12 +68,14 @@ The repository contains more than one implementation path. A function existing i
 | `minimum(a, b)` | Smaller of two numbers | `minimum(3, 9)` |
 | `maksimum(a, b)` | Larger of two numbers | `maksimum(3, 9)` |
 | `bulatkan(number)` | Rounds a finite number using the documented ties-to-even rule | `bulatkan(2.5)` |
+| `rata_rata(list)` | Arithmetic mean of a non-empty list of finite numbers | `rata_rata([1, 2, 6])` |
+| `median(list)` | Median of a non-empty list of finite numbers | `median([1, 4, 8])` |
 | `teks(value)` | Converts a value to text in the standard-library registry | Check target support first |
 | `bilangan(value)` | Converts a value to an integer in the standard-library registry | Check target support first |
 | `desimal(value)` | Converts a value to a decimal number in the standard-library registry | Check target support first |
 | `logika(value)` | Converts a value to a boolean in the standard-library registry | Check target support first |
 
-For exact implementation status, see [`compiler-type-system-and-stdlib.md`](compiler-type-system-and-stdlib.md), [`COMPILER_TARGETS.md`](COMPILER_TARGETS.md), and [`NATIVE_RUNTIME.md`](NATIVE_RUNTIME.md).
+The new statistics helpers are currently available in the experimental JavaScript, Python, and HTML compiler targets only; VM/native C support is not claimed, and this is not full Python `statistics` compatibility. For exact implementation status, see [`IMPORT_PYTHON.md`](IMPORT_PYTHON.md), [`compiler-type-system-and-stdlib.md`](compiler-type-system-and-stdlib.md), [`COMPILER_TARGETS.md`](COMPILER_TARGETS.md), and [`NATIVE_RUNTIME.md`](NATIVE_RUNTIME.md).
 
 ## 5. A complete small program
 

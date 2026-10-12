@@ -74,7 +74,7 @@ Boolean: benar, salah
 Daftar ditulis menggunakan tanda kurung siku, misalnya `[10, 20, 30]`.
 Kamus ditulis dengan kurung kurawal dan pasangan kunci-nilai, misalnya `{"nama": "Budi", "umur": 20}`. Kunci teks, angka, dan boolean merupakan jenis kunci berbeda; khususnya, kunci `benar` dan kunci angka `1` tidak sama. Operator kesetaraan juga tidak menyamakan boolean dengan angka.
 Indeks daftar dan teks dimulai dari 0. Daftar dapat dibaca dan diubah melalui indeks. Nilai kamus dapat dibaca dan diubah melalui kunci.
-Fungsi `panjang(nilai)` menerima daftar, teks, kamus, atau rentang dan mengembalikan jumlah elemen, code point UTF-8, entri, atau nilai dalam rentang.
+Fungsi `panjang(nilai)` menerima daftar, teks, kamus, atau rentang dan mengembalikan jumlah elemen, code point UTF-8, entri, atau nilai dalam rentang. Target compiler JavaScript, Python, dan HTML juga menyediakan builtin statistik eksperimental `rata_rata(daftar)` dan `median(daftar)`, dari pemetaan allow-list importer Python `statistics.mean` dan `statistics.median`. Keduanya menerima satu daftar nonkosong berisi angka finite dan menolak boolean. Ini bukan kompatibilitas penuh modul Python `statistics`; VM dan runtime native C belum mendukungnya.
 Kunci kamus native dibatasi pada teks, angka, dan boolean. Assignment ke kunci baru menambahkan entri, sedangkan assignment ke kunci yang sudah ada memperbarui nilainya. Kamus kosong bernilai salah dan kamus berisi entri bernilai benar dalam kondisi; perulangan `untuk` menghasilkan kunci kamus. Kunci yang tidak didukung, kunci yang tidak ditemukan, dan indeks di luar batas menghasilkan kesalahan.
 
 ## 9. Perulangan untuk
@@ -154,3 +154,8 @@ Alias tidak mengubah makna sintaks dan tidak menghapus kata kunci lama. Runtime 
 Eksperimen PVM memiliki assembler dan backend JavaScript/Python. Spesifikasi framing, 19 opcode, operand, dan batas kompatibilitas berada di [docs/PVM_SPEC.md](docs/PVM_SPEC.md). Format ini masih draft: parser sumber C bersifat line-oriented, bukan parser ekspresi penuh, dan kesetaraan seluruh fitur belum dijamin. Jangan menganggap PVM v1 sebagai ABI stabil sebelum fixture konformansi lulus di CI.
 
 **Peringatan keamanan:** backend JavaScript PVM memakai parser ekspresi terbatas dan menolak URL jaringan eksternal; backend Python memakai evaluator AST terbatas. Payload lokal `data:text/plain,` tetap didukung oleh opcode PVM terkait, tetapi operasi file PVM belum dibatasi oleh sandbox sistem operasi. Ini bukan sandbox. Jangan menjalankan bytecode atau program Pusingcuk yang tidak dipercaya.
+
+
+## Shared builtin metadata
+
+Canonical builtin names, accepted argument counts, Python standard-library allow-lists, backend helper mappings, and per-target support states are recorded in `library/builtin_contract.json`. This is machine-readable implementation metadata connected to the semantic contract; it does not replace the language specification or imply support in targets marked `unsupported` or `not-claimed`. Platform services such as databases, servers, browser APIs, Web3, and blockchain integrations remain explicit adapters/capabilities, not implicit offline core behavior.

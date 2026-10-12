@@ -80,12 +80,14 @@ Kalau memakai runtime native Termux, ikuti dulu langkah instalasi di `docs/PEMUL
 | `minimum(a, b)` | Memilih angka yang lebih kecil |
 | `maksimum(a, b)` | Memilih angka yang lebih besar |
 | `bulatkan(angka)` | Membulatkan angka dengan aturan yang didokumentasikan |
+| `rata_rata(daftar)` | Menghitung rata-rata daftar angka finite yang tidak kosong pada target compiler JS/Python/HTML | `rata_rata([1, 2, 6])` |
+| `median(daftar)` | Menghitung median daftar angka finite yang tidak kosong pada target compiler JS/Python/HTML | `median([1, 4, 8])` |
 | `teks(nilai)` | Mengubah nilai menjadi teks pada registry pustaka standar; cek dukungan target |
 | `bilangan(nilai)` | Mengubah nilai menjadi integer pada registry pustaka standar; cek dukungan target |
 | `desimal(nilai)` | Mengubah nilai menjadi angka desimal pada registry pustaka standar; cek dukungan target |
 | `logika(nilai)` | Mengubah nilai menjadi benar/salah pada registry pustaka standar; cek dukungan target |
 
-**Catatan penting:** fungsi yang ada di satu file belum tentu otomatis jalan di semua jalur Pusingcuk. Interpreter Python, runtime C, dan compiler target punya kemampuan yang berbeda. Jangan anggap sama sebelum tesnya membuktikan.
+**Catatan penting:** `rata_rata` dan `median` saat ini hanya tersedia pada target compiler JavaScript, Python, dan HTML; belum pada VM atau runtime C. Ini bukan dukungan penuh modul Python `statistics`. Fungsi yang ada di satu file belum tentu otomatis jalan di semua jalur Pusingcuk. Interpreter Python, runtime C, dan compiler target punya kemampuan yang berbeda. Jangan anggap sama sebelum tesnya membuktikan.
 
 ## 5. Kamus istilah teknis
 

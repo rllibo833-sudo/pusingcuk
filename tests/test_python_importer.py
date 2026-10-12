@@ -135,6 +135,109 @@ class PythonImporterTests(unittest.TestCase):
         )
         self.assertEqual(html_result.stdout, expected)
 
+    def test_statistics_module_maps_to_js_html_and_python(self):
+        source = (
+            "import statistics as stats\n"
+            "from statistics import mean as average, median\n"
+            "print(stats.mean([1, 2, 6]))\n"
+            "print(stats.median([1, 4, 8]))\n"
+            "print(median([1, 2, 3, 4]))\n"
+            "print(average([2, 4]))\n"
+            "print(stats.mean([9007199254740991, 9007199254740991]))\n"
+        )
+        translated = translate(source)
+        self.assertIn("rata_rata([1, 2, 6])", translated)
+        self.assertIn("median([1, 2, 3, 4])", translated)
+        parse(translated)
+        expected = "3\n4\n2.5\n3\n9007199254740991\n"
+
+        generated_js = generate_js(from_source(translated))
+        js_result = subprocess.run(
+            ["node", "-e", generated_js], capture_output=True, text=True, check=True
+        )
+        self.assertEqual(js_result.stdout, expected)
+
+        generated_html = compile_source(translated, "statistics_import.cuk", "html")
+        self.assertIn("const pcMean", generated_html)
+        self.assertIn("const pcMedian", generated_html)
+        script = generated_html.split("<script>\n", 1)[1].split("\n</script>", 1)[0]
+        harness = (
+            "global.__pc = {textContent: ''};\n"
+            "global.document = {getElementById: () => global.__pc};\n"
+            + script
+            + "\nprocess.stdout.write(global.__pc.textContent);\n"
+        )
+        html_result = subprocess.run(
+            ["node", "-e", harness], capture_output=True, text=True, check=True
+        )
+        self.assertEqual(html_result.stdout, expected)
+
+        from compiler.python_backend import generate as generate_python
+        python_result = subprocess.run(
+            ["python", "-c", generate_python(from_source(translated))],
+            capture_output=True, text=True, check=True
+        )
+        self.assertEqual(python_result.stdout, expected)
+
+    def test_statistics_runtime_rejects_invalid_samples_on_js_html_and_python(self):
+        from compiler.python_backend import generate as generate_python
+        cases = (
+            "hedeh rata_rata([])",
+            "hedeh median([1, benar])",
+            'hedeh median([1, "x"])',
+            "hedeh median([9007199254740992.0])",
+        )
+        for statement in cases:
+            source = "jancuk\n" + statement + "\nselesai jancuk"
+            generated_js = generate_js(from_source(source))
+            js_result = subprocess.run(
+                ["node", "-e", generated_js], capture_output=True, text=True
+            )
+            self.assertNotEqual(js_result.returncode, 0, statement)
+            self.assertEqual(js_result.stdout, "", statement)
+
+            generated_python = generate_python(from_source(source))
+            py_result = subprocess.run(
+                ["python", "-c", generated_python], capture_output=True, text=True
+            )
+            self.assertNotEqual(py_result.returncode, 0, statement)
+            self.assertEqual(py_result.stdout, "", statement)
+
+            generated_html = compile_source(source, "invalid_statistics.cuk", "html")
+            script = generated_html.split("<script>\n", 1)[1].split("\n</script>", 1)[0]
+            harness = (
+                "global.__pc = {textContent: ''};\n"
+                "global.document = {getElementById: () => global.__pc};\n"
+                + script
+                + "\nprocess.stdout.write(global.__pc.textContent);\n"
+            )
+            html_result = subprocess.run(
+                ["node", "-e", harness], capture_output=True, text=True
+            )
+            self.assertNotEqual(html_result.returncode, 0, statement)
+            self.assertEqual(html_result.stdout, "", statement)
+
+    def test_statistics_module_is_explicitly_allow_listed(self):
+        with self.assertRaisesRegex(ImportErrorPython, "statistics.variance"):
+            translate("import statistics\nprint(statistics.variance([1, 2, 3]))\n")
+        with self.assertRaises(ImportErrorPython):
+            translate("from statistics import *\n")
+        with self.assertRaises(ImportErrorPython):
+            translate("import json\n")
+        with self.assertRaises(ImportErrorPython):
+            translate("print(median())\n")
+
+    def test_statistics_builtins_exist_in_standard_library_registry(self):
+        self.assertIn("rata_rata", BUILTINS)
+        self.assertIn("median", BUILTINS)
+        self.assertEqual(call_builtin("rata_rata", [1, 2, 6]), 3)
+        self.assertEqual(call_builtin("median", [1, 2, 3, 4]), 2.5)
+        self.assertEqual(call_builtin("median", [1, 4, 8]), 4)
+        with self.assertRaises(TypeError):
+            call_builtin("rata_rata", [])
+        with self.assertRaises(TypeError):
+            call_builtin("median", [1, True])
+
     def test_math_builtins_exist_in_standard_library_registry(self):
         for name in ("akar", "bawah", "atas", "pangkat", "sinus", "kosinus"):
             self.assertIn(name, BUILTINS)

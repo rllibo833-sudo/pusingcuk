@@ -146,6 +146,7 @@ The full, categorized documentation catalog is in [docs/README.md](docs/README.m
 - [Runtime compatibility](docs/COMPATIBILITY.md)
 - [Native runtime](docs/NATIVE_RUNTIME.md)
 - [Compiler targets](docs/COMPILER_TARGETS.md)
+- [Python importer and standard-library subset](docs/IMPORT_PYTHON.md)
 - [Native runtime and ecosystem roadmap](docs/NATIVE_SECURE_ECOSYSTEM_ROADMAP.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Security policy](SECURITY.md)
@@ -164,3 +165,8 @@ Pusingcuk is intended to be developed by people and communities beyond its found
 ## License
 
 Pusingcuk is distributed under the MIT License. See [LICENSE](LICENSE).
+
+
+## Builtin contract and offline-first roadmap
+
+Builtin names, arity, Python import mappings, backend helper mappings, and compatibility status are defined in [`library/builtin_contract.json`](library/builtin_contract.json). This helps keep the reference registry, importer, compiler backends, and tests consistent. See [`library/README.md`](library/README.md) for how to extend it.

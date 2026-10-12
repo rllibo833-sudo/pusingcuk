@@ -26,6 +26,7 @@ The root [language specification](../SPEC.md) is the primary syntax reference. I
 - [Repository structure](REPO_STRUCTURE.md)
 - [Compiler interoperability](COMPILER_INTEROP.md)
 - [Compiler targets](COMPILER_TARGETS.md)
+- [Python importer and allow-listed standard-library APIs](IMPORT_PYTHON.md)
 - [Compiler type system and standard-library notes](compiler-type-system-and-stdlib.md)
 - [Bytecode VM](BYTECODE_VM.md)
 - [PVM specification](PVM_SPEC.md)
@@ -59,3 +60,6 @@ The machine-readable vocabulary registry and selected examples live in [the libr
 ## How to report a documentation problem
 
 When reporting a mismatch, include the document path, the relevant heading, the runtime or backend involved, the exact command used, and a minimal reproducible example where possible. Do not include passwords, tokens, private data, or details of an unpatched security issue in a public report; follow [SECURITY.md](../SECURITY.md) for security concerns.
+
+
+- [Shared builtin contract](../library/README.md#builtin-contract-one-metadata-source)
