@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+// TODO: file I/O not yet in C, use Python reference.
+
 #define NV 256
 #define SZ 1024
 
