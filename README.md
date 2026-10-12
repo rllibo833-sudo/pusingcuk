@@ -144,6 +144,10 @@ Do not add `os.system`, Python `eval` or `exec`, `requests`, OpenAI SDK dependen
 
 Pusingcuk is open to contributions from beginners and experienced developers. Read [CONTRIBUTING.md](CONTRIBUTING.md), describe the problem clearly, include a small reproducible example, add tests, and document any behavior change. Contributions should preserve offline operation and Android compatibility.
 
+## Community extensibility
+
+Pusingcuk is intended to be developed by people and communities beyond its founder, including Ecoslang.org and other language, education, and open-source communities. The shared language specification, conformance fixtures, and intermediate representation are the foundation for compatible runtimes, libraries, compiler targets, and future integrations. New capabilities such as database adapters, server/API tooling, frontend bindings, WebAssembly, and blockchain support are development goals, not claims of production-ready support. See the [English dictionary](docs/DICTIONARY.md), [Indonesian dictionary](docs/KAMUS_PUSINGCUK.md), and [ecosystem roadmap](docs/NATIVE_SECURE_ECOSYSTEM_ROADMAP.md).
+
 ## License
 
 Pusingcuk is distributed under the MIT License. See [LICENSE](LICENSE).
