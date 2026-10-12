@@ -1,29 +1,34 @@
-# Kebijakan Keamanan Pusingcuk
+# Pusingcuk Security Policy
 
-## Melaporkan kerentanan
+## Reporting a vulnerability
 
-Jangan membuka issue publik untuk kerentanan yang belum diperbaiki atau menyertakan exploit, token, kata sandi, data pribadi, maupun kode yang dapat membahayakan pengguna.
+Do not publish an unpatched vulnerability, an exploit, access tokens, passwords, personal data, or code that could put users at risk in a public issue.
 
-Jika fitur **Report a vulnerability** tersedia pada tab Security repositori GitHub ini, gunakan pelaporan privat tersebut. Jika fitur itu tidak tersedia, hubungi pemilik repositori melalui profil GitHub dan minta kanal pelaporan privat sebelum mengirim rincian teknis.
+If **Report a vulnerability** is available on this repository's GitHub Security tab, use that private reporting channel. If it is unavailable, contact the repository owner through their GitHub profile and ask for a private reporting channel before sending technical details.
 
-Sertakan versi atau commit yang terdampak, platform, langkah reproduksi minimal, dampak yang diperkirakan, dan mitigasi sementara bila ada. Jangan mengirim rahasia aktif; cabut atau rotasi kredensial yang mungkin sudah terungkap.
+Include the affected version or commit, platform, minimal reproduction steps, expected impact, and any temporary mitigation. Do not send active secrets; revoke or rotate credentials that may have been exposed.
 
-## Cakupan dan batas keamanan
+## Security scope and limitations
 
-Pusingcuk masih eksperimental. Runtime native, Pusingcuk Studio, dan backend PVM **bukan sandbox keamanan** dan tidak boleh dipakai untuk menjalankan kode tak tepercaya dengan akses ke data atau akun penting.
+Pusingcuk is experimental. The native runtime, Pusingcuk Studio, and PVM backends are **not security sandboxes**. Do not use them to run untrusted code on a device that contains sensitive data or accounts.
 
-**Peringatan aktif (prioritas tinggi):** backend JavaScript PVM (`src/backends/js/compiler.js`) menggunakan `Function()` bersama `with` untuk mengevaluasi ekspresi. Ini bukan batas isolasi: ekspresi yang dibuat penyerang dapat berpotensi mencapai kemampuan JavaScript/Node.js. Backend PVM juga menyediakan operasi file dan jaringan; path dan resource belum dibatasi sebagai sandbox OS. Jangan menganggap bytecode PVM sebagai format aman untuk distribusi atau eksekusi dari pihak lain. Pelacakan internal yang sudah ada: [#75](https://github.com/rllibo833-sudo/pusingcuk/issues/75). Jangan membuka issue publik duplikat untuk temuan ini.
+The PVM JavaScript backend now parses expressions with a restricted grammar instead of dynamically compiling expressions, and the PVM network opcode is rejected. The PVM Python backend now uses a restricted AST evaluator and also rejects the network opcode. Neither backend requires an API key or makes an outbound network request as part of normal expression evaluation.
 
-Laporan yang relevan meliputi eksekusi kode di luar batas yang dimaksud, akses file atau jaringan tanpa izin, traversal path atau symlink, kebocoran kredensial, kerusakan memori, bypass batas resource, serta workflow CI yang dapat mengekspos token atau menjalankan kode berbahaya dengan hak istimewa.
+**Important remaining limitation:** PVM still includes file-operation opcodes. File paths are not confined by an operating-system sandbox, and resource limits are not a general security boundary. A program or bytecode file from an untrusted source may still read, modify, or delete accessible files. Do not treat PVM bytecode as a safe distribution format.
 
-## Gerbang keamanan sebelum rilis
+Existing tracking item: [#75](https://github.com/rllibo833-sudo/pusingcuk/issues/75). Do not create a duplicate public issue for the same finding.
 
-- [ ] Evaluasi ekspresi memakai parser/evaluator dengan grammar terbatas; tidak menggunakan `eval`, `Function`, atau `vm` sebagai sandbox.
-- [ ] Akses file dan jaringan nonaktif secara default atau dibatasi melalui isolasi OS dan kebijakan capability eksplisit.
-- [ ] Tes negatif membuktikan bahwa ekspresi tidak dapat mengakses `process`, global host, constructor/prototype escape, path traversal, symlink escape, atau jaringan tanpa izin.
-- [ ] Batas ukuran input, payload, respons jaringan, waktu tunggu, dan penggunaan resource diuji.
-- [ ] CI tidak diberi secret yang tidak diperlukan dan permission token tetap minimum.
+Relevant reports include unintended code execution, unauthorized file access, path traversal or symlink escape, credential exposure, memory corruption, resource-limit bypasses, and CI workflows that expose tokens or run untrusted code with excessive permissions.
 
-## Dukungan versi
+## Release security gates
 
-Versi pengembangan terbaru pada branch `main` adalah fokus utama perbaikan. Belum ada janji dukungan keamanan untuk rilis lama atau versi pra-rilis tertentu. Status perbaikan dan advisori akan dipublikasikan setelah mitigasi tersedia.
+- [ ] Expression evaluation uses a restricted parser/evaluator; it does not use dynamic code compilation as a security boundary.
+- [ ] Network operations are disabled by default and tests confirm that network opcodes are rejected.
+- [ ] File operations are either removed, explicitly capability-gated, or confined by operating-system isolation before untrusted programs are supported.
+- [ ] Negative tests cover host-global access, constructor/prototype escape, path traversal, symlink escape, and attempts to reach the network.
+- [ ] Input size, payload size, execution time, and resource usage limits are tested.
+- [ ] CI receives only the permissions and secrets it needs.
+
+## Supported versions
+
+The latest development version on `main` is the primary focus for fixes. No security support is promised for older releases or pre-release versions. Fix status and advisories will be published when mitigations are available.
