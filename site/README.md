@@ -1,24 +1,24 @@
-# Situs komunitas PusingCuk
+# Pusingcuk Community Website
 
-Situs perkenalan statis berada di `site/index.html`. Tidak memerlukan framework, bundler, dependensi npm, atau backend.
+The static introduction site is located at `site/index.html`. It does not require a framework, bundler, npm dependencies, or a backend.
 
-## Pratinjau lokal
+## Preview locally
 
-Buka `index.html` langsung di browser, atau jalankan server statis dari root repo:
+Open `index.html` directly in a browser, or start a static server from the repository root:
 
 ```sh
 python -m http.server 8000 --directory site
 ```
 
-Kemudian buka `http://localhost:8000`.
+Then open `http://localhost:8000` on the same device.
 
 ## GitHub Pages
 
-Workflow `.github/workflows/pages.yml` memublikasikan folder `site/` melalui GitHub Pages ketika perubahan masuk ke `main`. Jika Pages belum pernah diaktifkan untuk repo, buka **Settings → Pages** dan pilih **GitHub Actions** sebagai build and deployment source.
+The `.github/workflows/pages.yml` workflow publishes the `site/` directory through GitHub Pages when changes reach `main`. If Pages has not been enabled for this repository, open **Settings → Pages** and select **GitHub Actions** as the build and deployment source.
 
-## Catatan
+## Notes
 
-- Halaman utama adalah HTML/CSS statis; compiler belum memiliki backend templating untuk membangun halaman desain bebas langsung dari source PusingCuk.
-- Workflow publikasi benar-benar mengompilasi `examples/halo.pusingcuk` ke target HTML mandiri sebagai `demo.html`. Link hasil kompilasi ada di halaman utama.
-- Situs perkenalan dan contoh hasil compile adalah dua hal terpisah; jangan mengklaim bahwa seluruh landing page telah ditulis dalam bahasa PusingCuk.
-- Status fitur ditulis konservatif dan mengarah ke dokumentasi utama untuk detail teknis.
+- The main page is static HTML/CSS; the compiler does not yet provide a general-purpose templating backend for building arbitrary designs directly from Pusingcuk source.
+- The publishing workflow compiles `examples/halo.pusingcuk` to a standalone HTML target named `demo.html`. The resulting link is included on the main page.
+- The introduction website and the compiled demo are separate artifacts. Do not claim that the entire landing page is written in Pusingcuk.
+- Feature status is described conservatively and links to the main technical documentation.
