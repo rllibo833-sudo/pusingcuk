@@ -48,7 +48,7 @@ Laporan sebelumnya menyatakan list native hanya dibandingkan berdasarkan identit
 3. Perlakukan hasil `UNSUPPORTED` sebagai batas yang terdokumentasi, bukan sebagai PASS.
 4. Perbarui matriks runtime dan dokumentasi hanya berdasarkan bukti fixture/CI yang dapat diulang.
 5. Verifikasi eksekusi native di perangkat Termux fisik dan jalur eksekusi aplikasi Android, bukan hanya keberhasilan build.
-6. Jangan mengganti komponen CORE hanya karena binary native berhasil dibangun. Wajib ada matriks kapabilitas, fixture yang diwajibkan, kontrak integrasi, tinjauan keamanan untuk kapabilitas yang digunakan, build yang dapat direproduksi, bukti rollback, dan persetujuan Founder.
+6. Jangan mengganti komponen penting pada aplikasi/repo lain hanya karena binary native berhasil dibangun. Wajib ada matriks kapabilitas, fixture yang diwajibkan, kontrak integrasi, tinjauan keamanan untuk kapabilitas yang digunakan, build yang dapat direproduksi, bukti rollback, dan persetujuan maintainer yang bertanggung jawab.
 
 ## Arah produk bahasa
 
