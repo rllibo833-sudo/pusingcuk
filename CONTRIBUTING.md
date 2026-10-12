@@ -10,7 +10,7 @@ Terima kasih sudah membantu mengembangkan Pusingcuk. Prioritas proyek adalah bah
 4. Perubahan perilaku bahasa harus memperbarui spesifikasi, tes, dan dokumentasi yang relevan.
 5. Jangan mengklaim dukungan native berdasarkan hasil interpreter Python saja.
 6. Klaim kompatibilitas lintas runtime atau platform harus merujuk pada [kontrak kompatibilitas](docs/COMPATIBILITY.md) dan didukung tes yang relevan.
-6. Jangan merge PR tanpa tinjauan pemilik proyek.
+7. Jangan merge PR tanpa tinjauan pemilik proyek.
 
 ## Nama branch
 
