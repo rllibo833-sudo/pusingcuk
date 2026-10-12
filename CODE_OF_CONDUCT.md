@@ -1,25 +1,33 @@
-# Kode Etik Komunitas Pusingcuk
+# Pusingcuk Community Code of Conduct
 
-## Komitmen
+## Our commitment
 
-Kami ingin komunitas yang ramah, aman, dan terbuka bagi pemula maupun kontributor berpengalaman, tanpa memandang latar belakang, identitas, tingkat keahlian, atau perangkat yang digunakan.
+Pusingcuk welcomes beginners and experienced contributors, across programming backgrounds, languages, regions, identities, and devices. We aim to keep participation respectful, accessible, and constructive.
 
-## Perilaku yang diharapkan
+## Expected behavior
 
-- Bersikap hormat, sabar, dan konstruktif.
-- Terima kritik teknis dengan terbuka dan fokus pada kode, bukan pribadi.
-- Berikan konteks yang cukup agar orang lain dapat mereproduksi masalah.
-- Hormati privasi; jangan mempublikasikan kredensial, data pribadi, atau detail kerentanan yang belum diperbaiki.
-- Akui kontribusi dan karya orang lain dengan semestinya.
+- Be respectful, patient, and constructive.
+- Critique code, designs, and ideas—not a person's worth or background.
+- Explain technical terms when practical and make room for beginner questions.
+- Give enough context for others to reproduce a problem.
+- Respect privacy. Never publish credentials, personal data, or details of an unpatched vulnerability.
+- Credit other people's work appropriately.
+- Welcome cultural and language feedback, including criticism of slang that may be confusing or offensive in another context.
 
-## Perilaku yang tidak dapat diterima
+## Unacceptable behavior
 
-Pelecehan, penghinaan, ancaman, diskriminasi, doxing, spam, serangan pribadi, dan publikasi sengaja atas informasi privat atau eksploit yang belum diperbaiki tidak dapat diterima.
+Harassment, insults, threats, discrimination, doxxing, personal attacks, spam, and knowingly publishing private information or details that enable exploitation of an unpatched vulnerability are not acceptable.
 
-## Penegakan
+## Enforcement and reporting
 
-Laporkan perilaku yang bermasalah kepada pemilik repositori melalui kanal kontak GitHub. Untuk kerentanan keamanan, ikuti [Kebijakan Keamanan](SECURITY.md), bukan issue publik. Pengelola dapat menghapus konten atau membatasi partisipasi bila diperlukan demi keselamatan komunitas.
+Report conduct concerns to the repository maintainer through GitHub's available private contact options. For security vulnerabilities, follow [SECURITY.md](SECURITY.md) rather than posting exploit details publicly. The maintainer may remove content or restrict participation when necessary to protect the community.
 
-## Lingkup
+## Scope
 
-Kode etik ini berlaku pada issue, pull request, diskusi, review, dan ruang komunitas yang mewakili proyek Pusingcuk.
+This code applies to repository issues, pull requests, discussions, reviews, and other spaces where someone is representing the Pusingcuk project.
+
+---
+
+## Ringkasan Bahasa Indonesia
+
+Pusingcuk terbuka untuk pemula maupun ahli, dari berbagai bahasa pemrograman, daerah, dan latar belakang. Kritik teknis boleh tegas, tetapi serang idenya—bukan orangnya. Hormati privasi, beri konteks yang membantu orang lain mengulang masalah, dan jangan membagikan rahasia atau detail eksploit yang belum diperbaiki. Laporkan masalah perilaku melalui kanal privat GitHub; laporan kerentanan mengikuti [SECURITY.md](SECURITY.md).
