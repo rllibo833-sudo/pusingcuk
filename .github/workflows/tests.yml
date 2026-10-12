@@ -30,6 +30,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Jalankan semua tes referensi
         run: python -m unittest discover -s tests -v
+      - name: Uji contoh file I/O dengan input dummy
+        run: |
+          set -euo pipefail
+          output="$(echo -e "Budi\\nBeli kopi" | python pusingcuk_new.py examples/file_io.pusingcuk)"
+          printf '%s\\n' "$output"
+          grep -Fq 'Budi : Beli kopi' <<< "$output"
+          rm -f warung.txt
 
   native-runtime:
     runs-on: ubuntu-latest
