@@ -36,9 +36,12 @@ class BuiltinContractTests(unittest.TestCase):
         ids = [item["id"] for item in capabilities]
         self.assertEqual(len(ids), len(set(ids)))
         by_id = {item["id"]: item for item in capabilities}
-        for capability_id in ("data.database", "server.http", "net.http", "web.dom", "web3.blockchain", "backend.ffi"):
+        for capability_id in ("data.database", "server.http", "web.dom", "web3.blockchain", "backend.ffi"):
             self.assertEqual(by_id[capability_id]["status"], "planned")
             self.assertEqual(by_id[capability_id]["targets"], [])
+        self.assertEqual(by_id["net.http"]["status"], "available")
+        self.assertEqual(by_id["net.http"]["targets"], ["python"])
+        self.assertFalse(by_id["net.http"]["offline_first"])
         self.assertTrue(by_id["core.pure"]["offline_first"])
         self.assertTrue(by_id["data.database"]["offline_first"])
         self.assertFalse(by_id["net.http"]["offline_first"])

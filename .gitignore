@@ -19,6 +19,13 @@ dist/
 *.before_*
 backups/
 
+# Generated local files
+warung.txt
+*.log
+.DS_Store
+venv/
+.venv/
+
 # Local learning programs
 belajar.pusingcuk
 belajar_tanya.pusingcuk

@@ -707,14 +707,16 @@
     },
     {
       "id": "net.http",
-      "status": "planned",
+      "status": "available",
       "offline_first": false,
-      "targets": [],
+      "targets": [
+        "python"
+      ],
       "requires": [
         "network"
       ],
       "local_mode": "mock transport untuk tes offline",
-      "notes": "Permintaan jaringan harus eksplisit dan tidak boleh aktif hanya karena import."
+      "notes": "Explicit HTTP(S) calls only; network activity occurs only when a network builtin is called. Tests use mocked transport."
     },
     {
       "id": "web.dom",
@@ -748,6 +750,238 @@
       ],
       "local_mode": "adapter lokal yang di-pin versinya",
       "notes": "ABI/FFI stabil belum tersedia."
+    }
+  ],
+  "runtime_extensions": [
+    {
+      "name": "kepo_internet",
+      "parameters": [
+        "url"
+      ],
+      "description": "GET HTTP(S) request; response limited to 2 MiB.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "gas_api",
+      "parameters": [
+        "url"
+      ],
+      "description": "Alias for kepo_internet.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "stalking",
+      "parameters": [
+        "url"
+      ],
+      "description": "Alias for kepo_internet.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "kirim_api",
+      "parameters": [
+        "url",
+        "data"
+      ],
+      "description": "POST HTTP(S) request; JSON for dictionaries, text for strings; body limited to 1 MiB.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "kirim_gosip",
+      "parameters": [
+        "url",
+        "data"
+      ],
+      "description": "Alias for kirim_api.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "jadi_json",
+      "parameters": [
+        "teks"
+      ],
+      "description": "Parse JSON; returns null on parse failure and preserves valid JSON false.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "parse_json",
+      "parameters": [
+        "teks"
+      ],
+      "description": "Alias for jadi_json.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "jadi_teks",
+      "parameters": [
+        "objek"
+      ],
+      "description": "Serialize supported values as JSON text.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "warna",
+      "parameters": [
+        "teks",
+        "warna"
+      ],
+      "description": "Wrap text in an ANSI color escape sequence.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "simpen",
+      "parameters": [
+        "path",
+        "teks"
+      ],
+      "description": "Alias for text file write.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "bongkar",
+      "parameters": [
+        "path"
+      ],
+      "description": "Alias for text file read.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "kepo",
+      "parameters": [
+        "prompt"
+      ],
+      "description": "Alias for console input.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "angkut",
+      "parameters": [
+        "path"
+      ],
+      "description": "Load a Pusingcuk module.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "coba",
+      "parameters": [],
+      "description": "Try-block syntax; catches runtime errors, not return control flow.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "ketangkep",
+      "parameters": [
+        "nama_error"
+      ],
+      "description": "Catch-block syntax.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "akhirnya",
+      "parameters": [],
+      "description": "Finally-block syntax.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "jam",
+      "parameters": [],
+      "description": "Current local date-time text.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
+    },
+    {
+      "name": "tanggal",
+      "parameters": [],
+      "description": "Current local date text.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
     }
   ]
 }

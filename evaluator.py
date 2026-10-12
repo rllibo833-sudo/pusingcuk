@@ -4,6 +4,7 @@ from collections.abc import MutableMapping
 from io import StringIO
 from pathlib import Path
 from urllib.request import Request, urlopen
+from urllib.parse import urlsplit
 import json
 from datetime import datetime, date
 from ast_nodes import Node
@@ -99,9 +100,32 @@ class ExportedFunction:
         self.module_env = module_env
 
 
-class ReturnSignal(Exception):
+class ReturnSignal(BaseException):
+    """Internal control-flow signal; runtime try/catch must never swallow returns."""
     def __init__(self, value):
         self.value = value
+
+
+MAX_HTTP_RESPONSE_BYTES = 2 * 1024 * 1024
+MAX_HTTP_REQUEST_BYTES = 1 * 1024 * 1024
+
+
+def _valid_http_url(url):
+    """Accept explicit HTTP(S) URLs only; never pass other schemes to urllib."""
+    try:
+        parsed = urlsplit(url)
+        return parsed.scheme.lower() in ("http", "https") and bool(parsed.hostname)
+    except (TypeError, ValueError):
+        return False
+
+
+def _read_http_response(response):
+    """Read at most the configured response limit plus one sentinel byte."""
+    data = response.read(MAX_HTTP_RESPONSE_BYTES + 1)
+    if len(data) > MAX_HTTP_RESPONSE_BYTES:
+        return False
+    charset = response.headers.get_content_charset() or "utf-8"
+    return data.decode(charset, errors="replace")
 
 
 class Evaluator:
@@ -265,16 +289,19 @@ class Evaluator:
                 if n.name == "kepo_internet":
                     if len(args) != 1 or not isinstance(args[0], str):
                         self.fail(line, "kepo_internet membutuhkan satu URL teks")
+                    if not _valid_http_url(args[0]):
+                        return False
                     try:
                         request = Request(args[0], headers={"User-Agent": "Pusingcuk/0.5 (Internet Native)"}, method="GET")
                         with urlopen(request, timeout=10) as response:
-                            charset = response.headers.get_content_charset() or "utf-8"
-                            return response.read().decode(charset, errors="replace")
+                            return _read_http_response(response)
                     except Exception:
                         return False
                 if n.name == "kirim_api":
                     if len(args) != 2 or not isinstance(args[0], str):
                         self.fail(line, "kirim_api membutuhkan URL dan data")
+                    if not _valid_http_url(args[0]):
+                        return False
                     try:
                         payload = args[1]
                         if isinstance(payload, (dict, PusingDict)):
@@ -284,12 +311,12 @@ class Evaluator:
                             body = payload.encode("utf-8")
                             content_type = "text/plain; charset=utf-8"
                         else:
-                            body = str(payload).encode("utf-8")
-                            content_type = "text/plain; charset=utf-8"
+                            return False
+                        if len(body) > MAX_HTTP_REQUEST_BYTES:
+                            return False
                         request = Request(args[0], data=body, headers={"User-Agent": "Pusingcuk/0.5 (Internet Native)", "Content-Type": content_type}, method="POST")
                         with urlopen(request, timeout=10) as response:
-                            charset = response.headers.get_content_charset() or "utf-8"
-                            return response.read().decode(charset, errors="replace")
+                            return _read_http_response(response)
                     except Exception:
                         return False
                 if n.name == "jadi_json":
@@ -298,7 +325,7 @@ class Evaluator:
                     try:
                         return _language_json(json.loads(args[0]))
                     except (json.JSONDecodeError, ValueError):
-                        return False
+                        return None
                 if n.name == "jadi_teks":
                     if len(args) != 1:
                         self.fail(line, "jadi_teks membutuhkan satu objek")
@@ -312,7 +339,7 @@ class Evaluator:
                     colors = {"merah": "31", "hijau": "32", "kuning": "33", "biru": "34", "pink": "35", "sian": "36"}
                     if not isinstance(args[1], str) or args[1] not in colors:
                         self.fail(line, "warna tidak dikenal; pilih merah, hijau, kuning, biru, pink, atau sian")
-                    return "\\033[" + colors[args[1]] + "m" + str(args[0]) + "\\033[0m"
+                    return "\x1b[" + colors[args[1]] + "m" + str(args[0]) + "\x1b[0m"
                 if n.name == "panjang":
                     if len(args) != 1:
                         self.fail(line, "fungsi 'panjang' membutuhkan 1 argumen")
@@ -420,6 +447,8 @@ class Evaluator:
             elif k == "Try":
                 try:
                     self.block(n.body, env, depth, in_function)
+                except ReturnSignal:
+                    raise
                 except Exception as exc:
                     if n.handler_name is None:
                         raise
