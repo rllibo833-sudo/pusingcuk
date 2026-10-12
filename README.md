@@ -1,78 +1,44 @@
 # Pusingcuk
 
-Pusingcuk adalah bahasa pemrograman eksperimental dengan kosakata ramah bahasa Indonesia dan slang lokal. Tujuannya adalah mudah dipelajari, tetap dapat dikembangkan secara serius, dan perlahan bisa dijalankan native tanpa Python saat runtime.
+Pusingcuk is an experimental programming language with Indonesian-friendly keywords and local slang aliases. The project aims to make programming approachable while building a testable interpreter, a native C runtime, and experimental compiler backends.
 
-## Keamanan
+> **Project status:** experimental, version 0.4-dev. Runtime and compiler support varies by feature. Pusingcuk is not a security sandbox and must not run untrusted programs on systems containing sensitive data.
 
-Lihat [kebijakan keamanan](SECURITY.md) untuk batas keamanan runtime dan cara melaporkan kerentanan secara privat. Pusingcuk masih eksperimental; runtime native bukan sandbox untuk kode tak tepercaya.
+## Quick start on Android
 
-## Status proyek
+### Option A: Termux (Python interpreter)
 
-Versi: 0.4-dev.
-
-**Pusingcuk masih eksperimental.** Fitur interpreter modular, runtime native, compiler C, compiler multi-target, dan PVM memiliki cakupan yang berbeda; gunakan matriks dan spesifikasi untuk memeriksa dukungan sebelum mengandalkan fitur.
-
-### Navigasi komunitas
-
-- **Baru mulai:** [Panduan dari Nol](docs/PEMULA.md) · [Contoh pustaka](library/README.md)
-- **Belajar sintaks:** [Spesifikasi bahasa](SPEC.md) · [Kosakata slang](docs/KOSAKATA_GENZ.md) · [Glosarium mesin](library/kosakata.json)
-- **Memilih runtime:** [Matriks native](docs/NATIVE_RUNTIME.md) · [Kompatibilitas](docs/COMPATIBILITY.md) · [Target compiler](docs/COMPILER_TARGETS.md)
-- **Menjelajahi kode:** [Peta struktur repo dan status fitur](docs/REPO_STRUCTURE.md)
-- **Membantu proyek:** [Panduan kontribusi](CONTRIBUTING.md) · [Kode etik komunitas](CODE_OF_CONDUCT.md) · [Kebijakan keamanan](SECURITY.md) · [Riwayat perubahan](https://github.com/rllibo833-sudo/pusingcuk/commits/main)
-
-**Peringatan keamanan:** runtime native, Studio, dan backend PVM belum merupakan sandbox. Backend JavaScript PVM memakai evaluasi ekspresi `Function()` dan memiliki operasi file/jaringan. Jangan jalankan kode atau bytecode dari sumber yang tidak dipercaya.
-
-Saat ini ada dua jalur eksekusi:
-- **Interpreter modular Python** sebagai jalur referensi pengembangan: `pusingcuk_new.py`, dengan lexer, parser, AST, dan evaluator.
-- **Runtime native C** untuk subset bahasa yang sudah memiliki fixture. Setelah dikompilasi, executable native berjalan tanpa Python.
-
-Kedua jalur belum sepenuhnya setara. Jangan menganggap fitur yang tersedia di interpreter modular otomatis tersedia di native. Daftar kemampuan dan batasnya ada di [matriks runtime native](docs/NATIVE_RUNTIME.md). Sasaran dan status lintas platform dijelaskan di [kontrak kompatibilitas](docs/COMPATIBILITY.md). Arah compiler multi-target dan FFI ada di [arsitektur compiler/interoperabilitas](docs/COMPILER_INTEROP.md); tes lintas runtime dijelaskan di [kontrak fixture konformansi](docs/CONFORMANCE_FIXTURES.md). Kontrak perilaku ada di [Kontrak Semantik](docs/SEMANTIC_CONTRACT.md). Front-end dapat mengekspor dan memvalidasi [IR v1](docs/IR_V1.md). Backend C eksperimental juga dapat menghasilkan source C11 untuk subset integer, boolean, perbandingan, logika short-circuit, kondisi, loop `mumet`, serta fungsi dengan parameter dan nilai balik integer; cakupan dan batasnya ada di [C backend](docs/C_BACKEND.md). Backend JavaScript awal sekarang tersedia melalui [JS backend](docs/JS_BACKEND.md) dan `python -m compiler.js_backend program.pusingcuk -o program.js`; backend ini mendukung subset bahasa dan menghasilkan JavaScript untuk Node.js, belum seluruh fitur atau browser bundling. Compiler multi-target kini memiliki CLI `python -m compiler` untuk target JavaScript (`js`), Python (`python`), HTML/browser (`html`), JSON IR (`json`), dan bytecode VM (`vm`); contoh dan batas target dijelaskan di [Compiler Multi-Target](docs/COMPILER_TARGETS.md) serta [Bytecode VM](docs/BYTECODE_VM.md). Ini belum compiler multi-target penuh, backend WASM, atau ABI/FFI. Sistem modul belum tersedia.
-
-Implementasi historis yang tidak menjadi entry point utama disimpan di `archive/legacy/` untuk referensi saja. File arsip tidak termasuk jalur yang didukung dan tidak boleh dijadikan dasar klaim fitur.
-
-## Mulai untuk pemula
-
-Ikuti [Panduan Pusingcuk dari Nol](docs/PEMULA.md), yang memakai langkah pendek, contoh langsung, dan tantangan kecil. Gaya penulisan dijelaskan di [Panduan Gaya Bahasa Gen Z dan Gen Alpha](docs/GAYA_BAHASA.md). Panduan pemula mengutamakan jalur Termux native tanpa Python untuk menjalankan program. Pengguna yang mengembangkan aplikasi dapat memeriksa [kontrak kompatibilitas](docs/COMPATIBILITY.md) untuk mengetahui fitur yang portabel, status runtime, dan platform yang belum terverifikasi.
-
-## Pusingcuk Studio — aplikasi Android dan workbench web
-
-Aplikasi Android mandiri awal untuk editor, runtime native C, proyek lokal, impor satu file dari repositori GitHub publik, dan berbagi kode didokumentasikan di [Pusingcuk Studio Android](docs/ANDROID_STUDIO.md). APK debug dibangun oleh GitHub Actions. Versi ini belum dapat menulis commit langsung ke GitHub; autentikasi aman masih menjadi pekerjaan lanjutan.
-
-## Pusingcuk Studio — editor dan terminal HTML lokal
-
-Untuk mengembangkan program lewat browser di Android/Termux atau Linux, lihat [panduan Pusingcuk Studio](docs/WEB_WORKBENCH.md). Studio menyediakan editor HTML, tombol Jalankan, input standar, dan terminal keluaran yang menjalankan runtime native C melalui bridge lokal. Python hanya dipakai untuk bridge web; runtime bahasa yang dieksekusi tetap native C. Ini MVP lokal, bukan sandbox atau IDE penuh.
-
-Jalankan di Termux dari root repository:
+Install the tools once:
 
 ```sh
-pkg install python clang -y
-python tools/web_workbench.py
+pkg update
+pkg install python git
+git clone https://github.com/rllibo833-sudo/pusingcuk.git
+cd pusingcuk
+python pusingcuk_new.py examples/halo.pusingcuk
 ```
 
-Lalu buka `http://127.0.0.1:8765` di browser pada perangkat yang sama.
-
-## Jalankan interpreter modular (opsional)
-
-Jalur ini memerlukan Python:
+Run your own program:
 
 ```sh
 python pusingcuk_new.py program.pusingcuk
-python terminal.py
 ```
 
-Terminal interaktif menerima `:bantuan`, `:contoh`, `:batal`, dan `:keluar`. Input `tanya` dimasukkan saat program berjalan.
+### Option B: Pydroid 3
 
-## Runtime native tanpa Python
-
-Setelah memasang compiler C11 dan Make:
+1. Download or copy the repository into a folder on your phone.
+2. Open the folder in Pydroid 3.
+3. Open `pusingcuk_new.py` and run it with a source-file argument, or use the Pydroid terminal if available:
 
 ```sh
-make native
-make run-native FILE=tests/native/for_range.pusingcuk
-make test-native
+python pusingcuk_new.py examples/halo.pusingcuk
 ```
 
-Di Termux, gunakan:
+The Python interpreter uses the standard library; no API key or third-party Python package is required.
+
+### Option C: Native runtime in Termux
+
+The native runtime needs a C compiler and Make for building. After building, running the native executable does not require Python.
 
 ```sh
 pkg update
@@ -83,110 +49,98 @@ bash scripts/install-termux.sh
 pusingcuk-native examples/native/rekap_anggaran.pusingcuk
 ```
 
-Compiler dibutuhkan untuk build, bukan untuk setiap kali menjalankan executable. Runtime native mendukung nilai dasar, list, teks, kamus, kondisi, perulangan, input standar `tanya`, `panjang`, `rentang`, serta fungsi buatan pengguna dengan parameter dan `balek`. Deklarasi fungsi tingkat atas dipindai sebelum eksekusi, sehingga fungsi dapat dipanggil sebelum definisinya dan dapat melakukan rekursi. Detail batas runtime tercatat di [matriks runtime](docs/NATIVE_RUNTIME.md). Runtime ini **bukan sandbox** untuk kode tak tepercaya.
-
-## Contoh program
+## Hello, world
 
 ```pusingcuk
 jancuk
-lah nama = "Budi"
-lah umur = 20
-
-hedeh "Halo, dunia!"
-hedeh nama
-
-njir umur >= 18 dan benar
-    hedeh "Sudah dewasa"
-kampret
-    hedeh "Masih di bawah umur"
-selesai njir
-
-lah i = 1
-mumet i <= 3
-    hedeh i
-    i = i + 1
-selesai mumet
-
+hedeh "Hello, world!"
 selesai jancuk
 ```
 
-## Kosakata utama
+Run it with:
 
-- `jancuk`: memulai program
-- `hedeh`: menampilkan nilai
-- `lah`: mendeklarasikan variabel
-- `njir`: memulai kondisi
-- `kampret`: cabang alternatif
-- `mumet`: memulai perulangan while
-- `untuk nama dalam koleksi`: perulangan koleksi
-- `tanya`: meminta masukan teks
-- `fungsi`: mendefinisikan fungsi
-- `balek`: mengembalikan nilai fungsi
-- `selesai jancuk`: mengakhiri program
+```sh
+python pusingcuk_new.py program.pusingcuk
+```
 
-### Alias slang
+## Language basics
 
-| Kata | Setara dengan | Fungsi |
-|---|---|---|
-| `jir` | `hedeh` | Menampilkan nilai |
-| `adooh` | `kampret` | Cabang alternatif |
-| `gitu` | `selesai` | Menutup blok |
-| `inthiseco` | `jancuk` | Memulai program |
-| `janggal` | `bukan` | Negasi logika |
-| `gas` | `jancuk` | Memulai program |
-| `spill` | `hedeh` | Menampilkan nilai |
-| `bestie` | `lah` | Mendeklarasikan variabel |
-| `valid` | `benar` | Nilai benar |
-| `zonk` | `salah` | Nilai salah |
-| `skip` | `kampret` | Cabang alternatif |
-| `kelar` | `selesai` | Menutup blok |
+| Keyword | Meaning |
+|---|---|
+| `jancuk` | Start a program |
+| `lah` | Declare a variable |
+| `hedeh` | Print a value |
+| `njir` | Start a conditional |
+| `kampret` | Alternative branch |
+| `mumet` | Start a while loop |
+| `tanya` | Read text input |
+| `fungsi` | Define a function |
+| `balek` | Return a value |
+| `selesai jancuk` | End a program |
 
-Alias tidak menghapus kata lama. Penjelasan ada di [Kosakata Slang Pusingcuk](docs/KOSAKATA_GENZ.md). Untuk daftar kosakata yang dapat dibaca mesin dan contoh program siap dicoba, buka [Pustaka Pusingcuk](library/README.md).
+Example:
 
-## Koleksi dan operator
+```pusingcuk
+jancuk
+lah name = "Budi"
+lah age = 20
+hedeh "Hello, " + name
+njir age >= 18
+    hedeh "Adult"
+kampret
+    hedeh "Under 18"
+selesai njir
+selesai jancuk
+```
 
-Nilai yang didukung mencakup teks, angka, boolean, daftar, dan kamus. Operator matematika: `+`, `-`, `*`, `/`, `//`, `%`. Perbandingan: `==`, `!=`, `<`, `<=`, `>`, `>=`. Logika: `dan`, `atau`, `bukan`. Backend compiler C eksperimental kini juga mendukung subset integer/boolean, perbandingan, logika short-circuit, kondisi, loop `mumet`, serta fungsi integer; fitur di luar subset tersebut tetap ditolak. Lihat [matriks kemampuan backend C](docs/C_BACKEND.md).
+See [the language specification](SPEC.md), [the beginner guide](docs/PEMULA.md), and [the slang keyword guide](docs/KOSAKATA_GENZ.md) for more examples and exact syntax.
 
-- Daftar menggunakan tanda siku, misalnya `[10, 20, 30]`.
-- Kamus menggunakan pasangan kunci-nilai, misalnya `{"nama": "Budi", "umur": 20}`.
-- Indeks daftar dan teks dimulai dari 0.
-- `panjang(nilai)` menerima jenis nilai yang tercantum pada matriks runtime.
-- `rentang(akhir)`, `rentang(mulai, akhir)`, dan `rentang(mulai, akhir, langkah)` menghasilkan rentang bilangan bulat; batas akhir tidak termasuk dan langkah tidak boleh nol.
+## Development and tests
 
-## Pengujian
-
-Interpreter modular dan bridge Studio:
+Run the Python test suite offline from the repository root:
 
 ```sh
 python -m unittest discover -s tests -v
 ```
 
-Runtime native:
+Run native-runtime tests (requires a C compiler and Make):
 
 ```sh
 make test-native
 ```
 
-Tes konformansi lintas runtime membandingkan output dan exit code dari interpreter referensi dengan runtime native berdasarkan manifest:
+Run cross-runtime conformance checks:
 
 ```sh
 python tools/conformance.py
 ```
 
-Harness ini memvalidasi metadata fixture dan path sumber, memberi timeout untuk tiap program, serta melaporkan `PASS`, `FAIL`, dan `UNSUPPORTED` secara terpisah. Untuk menghasilkan source C dari subset integer eksperimental: `python -m compiler.c_backend program.pusingcuk -o program.c`, lalu kompilasi source hasil dengan compiler C11. Fitur di luar subset ditolak, bukan diam-diam diterjemahkan dengan semantik berbeda. Tes CI Ubuntu tidak menggantikan pengujian fisik Termux.
+The Python interpreter is the reference development path. The native C runtime and compiler targets support documented subsets and are not yet fully equivalent. See the [runtime compatibility matrix](docs/COMPATIBILITY.md), [native runtime notes](docs/NATIVE_RUNTIME.md), and [compiler targets](docs/COMPILER_TARGETS.md).
 
-## Batasan saat ini
+## Offline-first policy
 
-- Interpreter modular masih menggunakan Python.
-- Runtime native hanya mendukung subset yang didokumentasikan dan diuji.
-- Sistem modul, tipe statis, dan pustaka backend/frontend lengkap belum tersedia.
-- Studio HTML memerlukan Python hanya untuk bridge lokal; CLI native tetap dapat dijalankan tanpa Python. Studio belum memiliki debugger, language server, atau isolasi OS.
-- Bahasa ini belum siap untuk menjalankan kode tak tepercaya.
+The core language interpreter is designed to run locally and does not require a network connection, API key, hosted service, or third-party Python package. Tests should be runnable from local files. Any optional tool that serves a local browser page must bind to loopback only; it must not silently contact external services.
 
-## Kontribusi
+Do not add `os.system`, Python `eval` or `exec`, `requests`, OpenAI SDK dependencies, API-key requirements, or automatic outbound network calls to the core runtime. Keep external integrations out of the default execution path and add offline tests for new features.
 
-Baca [CONTRIBUTING.md](CONTRIBUTING.md) sebelum membuka PR. Gunakan branch terfokus, sertakan tes dan dokumentasi, jangan commit cache/binary/rahasia, dan tunggu review sebelum merge.
+**Security note:** the experimental PVM JavaScript backend and some legacy/optional paths have had unsafe expression evaluation and file/network capabilities. Do not treat PVM output as safe for untrusted programs. Check [SECURITY.md](SECURITY.md) for current limitations before using those paths.
 
-## Situs komunitas
+## Repository guide
 
-Kunjungi [situs perkenalan PusingCuk](https://rllibo833-sudo.github.io/pusingcuk/) atau lihat [sumber situs](site/README.md). Status fitur dan contoh compiler dijelaskan secara eksplisit di sana.
+- [Repository structure and feature status](docs/REPO_STRUCTURE.md)
+- [Beginner guide](docs/PEMULA.md)
+- [Language specification](SPEC.md)
+- [Runtime compatibility](docs/COMPATIBILITY.md)
+- [Native runtime](docs/NATIVE_RUNTIME.md)
+- [Compiler targets](docs/COMPILER_TARGETS.md)
+- [Contributing guide](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
+- [Community code of conduct](CODE_OF_CONDUCT.md)
+
+## Contributing
+
+Pusingcuk is open to contributions from beginners and experienced developers. Read [CONTRIBUTING.md](CONTRIBUTING.md), describe the problem clearly, include a small reproducible example, add tests, and document any behavior change. Contributions should preserve offline operation and Android compatibility.
+
+## License
+
+Pusingcuk is distributed under the MIT License. See [LICENSE](LICENSE).
