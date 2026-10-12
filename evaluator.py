@@ -2,6 +2,7 @@
 from contextlib import redirect_stdout
 from collections.abc import MutableMapping
 from io import StringIO
+from pathlib import Path
 from ast_nodes import Node
 from parser import parse
 
@@ -154,6 +155,27 @@ class Evaluator:
                 return ops[n.op]()
             if k == "Call":
                 args = [self.expr(x, env, depth) for x in n.args]
+                if n.name == "tanya":
+                    if len(args) != 1 or not isinstance(args[0], str):
+                        self.fail(line, "tanya membutuhkan satu prompt teks")
+                    return input(args[0])
+                if n.name == "tulis":
+                    if len(args) != 2 or not all(isinstance(x, str) for x in args):
+                        self.fail(line, "tulis membutuhkan path dan teks berupa string")
+                    try:
+                        Path(args[0]).write_text(args[1], encoding="utf-8")
+                        return True
+                    except OSError:
+                        return False
+                if n.name == "baca":
+                    if len(args) != 1 or not isinstance(args[0], str):
+                        self.fail(line, "baca membutuhkan satu path berupa string")
+                    try:
+                        return Path(args[0]).read_text(encoding="utf-8")
+                    except FileNotFoundError:
+                        return False
+                    except OSError:
+                        return False
                 if n.name == "panjang":
                     if len(args) != 1:
                         self.fail(line, "fungsi 'panjang' membutuhkan 1 argumen")
@@ -205,7 +227,9 @@ class Evaluator:
         for n in body:
             line, k = n.line, n.kind
             self.step(line)
-            if k == "Declare":
+            if k == "Call":
+                self.expr(n, env, depth)
+            elif k == "Declare":
                 if n.name in env:
                     self.fail(line, f"variabel '{n.name}' sudah dibuat")
                 env[n.name] = self.expr(n.value, env, depth)
