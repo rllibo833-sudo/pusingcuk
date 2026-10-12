@@ -132,6 +132,17 @@ const pcRound = (value) => {
   if (fraction > 0.5) return lower + 1;
   return lower % 2 === 0 ? lower : lower + 1;
 };
+const pcMathResult = (name, value) => {
+  if (typeof value !== "number" || !Number.isFinite(value))
+    throw new Error(name + "() menghasilkan angka di luar domain atau non-finite");
+  return value;
+};
+const pcSqrt = (value) => pcMathResult("akar", Math.sqrt(pcNumeric("akar", value)));
+const pcFloor = (value) => Math.floor(pcNumeric("bawah", value));
+const pcCeil = (value) => Math.ceil(pcNumeric("atas", value));
+const pcPow = (a, b) => pcMathResult("pangkat", Math.pow(pcNumeric("pangkat", a), pcNumeric("pangkat", b)));
+const pcSin = (value) => pcMathResult("sinus", Math.sin(pcNumeric("sinus", value)));
+const pcCos = (value) => pcMathResult("kosinus", Math.cos(pcNumeric("kosinus", value)));
 const pcInputLines = (typeof process !== "undefined" && typeof require === "function")
   ? require("fs").readFileSync(0, "utf8").split(/\r?\n/)
   : [];
@@ -231,7 +242,13 @@ def generate(document: dict) -> str:
             if name == "rentang":
                 if not 1 <= len(args) <= 3: raise JSBackendError(f"baris {line}: rentang() membutuhkan 1-3 argumen")
                 return f"pcRange({rendered})"
-            numeric_builtins = {"mutlak": (1, "pcAbs"), "minimum": (2, "pcMin"), "maksimum": (2, "pcMax"), "bulatkan": (1, "pcRound")}
+            numeric_builtins = {
+                "mutlak": (1, "pcAbs"), "minimum": (2, "pcMin"),
+                "maksimum": (2, "pcMax"), "bulatkan": (1, "pcRound"),
+                "akar": (1, "pcSqrt"), "bawah": (1, "pcFloor"),
+                "atas": (1, "pcCeil"), "pangkat": (2, "pcPow"),
+                "sinus": (1, "pcSin"), "kosinus": (1, "pcCos"),
+            }
             if name in numeric_builtins:
                 arity, helper = numeric_builtins[name]
                 if len(args) != arity: raise JSBackendError(f"baris {line}: {name}() membutuhkan {arity} argumen")
