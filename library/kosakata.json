@@ -235,6 +235,49 @@
       "native_runtime": "pending-native-support",
       "c_backend": "supported",
       "alias_of": "selesai"
+    },
+    {
+      "word": "tulis",
+      "category": "file-io",
+      "meaning": "Menulis teks UTF-8 ke berkas dan mengembalikan benar jika berhasil.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "baca",
+      "category": "file-io",
+      "meaning": "Membaca teks UTF-8 dari berkas; mengembalikan salah jika berkas tidak ditemukan.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported"
+    },
+    {
+      "word": "simpen",
+      "category": "file-io",
+      "meaning": "Alias slang untuk menulis teks ke berkas.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported",
+      "alias_of": "tulis"
+    },
+    {
+      "word": "bongkar",
+      "category": "file-io",
+      "meaning": "Alias slang untuk membaca teks dari berkas.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported",
+      "alias_of": "baca"
+    },
+    {
+      "word": "kepo",
+      "category": "input",
+      "meaning": "Alias slang untuk meminta input pengguna.",
+      "aliases": [],
+      "native_runtime": "reference-python",
+      "c_backend": "unsupported",
+      "alias_of": "tanya"
     }
   ],
   "operators": [
@@ -314,6 +357,7 @@
   "runtime_notes": {
     "native_runtime": "Runtime C mandiri mempunyai cakupan lebih luas pada fitur yang memiliki fixture native.",
     "c_backend": "Backend source C eksperimental mendukung integer/boolean, kondisi, loop mumet, dan fungsi pengguna dengan parameter/return integer. String, koleksi, input, loop untuk, dan deklarasi lah di dalam loop masih ditolak eksplisit.",
-    "aliases": "Alias baru gas, spill, bestie, valid, zonk, skip, dan kelar saat ini diuji melalui lexer/interpreter Python dan front-end compiler C; dukungan lexer runtime C mandiri belum diklaim."
+    "aliases": "Alias baru gas, spill, bestie, valid, zonk, skip, dan kelar saat ini diuji melalui lexer/interpreter Python dan front-end compiler C; dukungan lexer runtime C mandiri belum diklaim.",
+    "file_io": "tulis/baca (aliases simpen/bongkar) and expression input tanya (alias kepo) are supported by the Python reference interpreter only. Native C and C backend file I/O are unsupported for now."
   }
 }
