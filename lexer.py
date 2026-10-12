@@ -16,6 +16,9 @@ KEYWORD_ALIASES = {
     "zonk": "salah",
     "skip": "kampret",
     "kelar": "selesai",
+    "simpen": "tulis",
+    "bongkar": "baca",
+    "kepo": "tanya",
 }
 
 KEYWORDS = frozenset({
@@ -155,8 +158,8 @@ class Lexer:
             self._advance()
 
         value = self.source[start:self.position]
-        kind = "KEYWORD" if value in KEYWORDS else "IDENT"
         value = KEYWORD_ALIASES.get(value, value)
+        kind = "KEYWORD" if value in KEYWORDS else "IDENT"
 
         return Token(kind, value, line, column)
 
