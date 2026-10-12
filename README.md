@@ -129,10 +129,13 @@ Do not add `os.system`, Python `eval` or `exec`, `requests`, OpenAI SDK dependen
 
 - [Repository structure and feature status](docs/REPO_STRUCTURE.md)
 - [Beginner guide](docs/PEMULA.md)
+- [Language and technical dictionary (English)](docs/DICTIONARY.md)
+- [Plain-language dictionary (Indonesian)](docs/KAMUS_PUSINGCUK.md)
 - [Language specification](SPEC.md)
 - [Runtime compatibility](docs/COMPATIBILITY.md)
 - [Native runtime](docs/NATIVE_RUNTIME.md)
 - [Compiler targets](docs/COMPILER_TARGETS.md)
+- [Native runtime and ecosystem roadmap](docs/NATIVE_SECURE_ECOSYSTEM_ROADMAP.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Security policy](SECURITY.md)
 - [Community code of conduct](CODE_OF_CONDUCT.md)
