@@ -17,7 +17,7 @@ Versi: 0.4-dev.
 - **Baru mulai:** [Panduan dari Nol](docs/PEMULA.md) · [Contoh pustaka](library/README.md)
 - **Belajar sintaks:** [Spesifikasi bahasa](SPEC.md) · [Kosakata slang](docs/KOSAKATA_GENZ.md) · [Glosarium mesin](library/kosakata.json)
 - **Memilih runtime:** [Matriks native](docs/NATIVE_RUNTIME.md) · [Kompatibilitas](docs/COMPATIBILITY.md) · [Target compiler](docs/COMPILER_TARGETS.md)
-- **Membantu proyek:** [Panduan kontribusi](CONTRIBUTING.md) · [Kebijakan keamanan](SECURITY.md) · [Riwayat perubahan](https://github.com/rllibo833-sudo/pusingcuk/commits/main)
+- **Membantu proyek:** [Panduan kontribusi](CONTRIBUTING.md) · [Kode etik komunitas](CODE_OF_CONDUCT.md) · [Kebijakan keamanan](SECURITY.md) · [Riwayat perubahan](https://github.com/rllibo833-sudo/pusingcuk/commits/main)
 
 **Peringatan keamanan:** runtime native, Studio, dan backend PVM belum merupakan sandbox. Backend JavaScript PVM memakai evaluasi ekspresi `Function()` dan memiliki operasi file/jaringan. Jangan jalankan kode atau bytecode dari sumber yang tidak dipercaya.
 
