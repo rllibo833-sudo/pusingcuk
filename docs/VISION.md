@@ -87,13 +87,26 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md), the [beginner guide](PEMULA.md), the 
 
 The project maintainer can set priorities and protect the repository, while technical reviewers help validate implementation decisions. This division allows the project to welcome expertise without making one person responsible for knowing everything.
 
-## 8. Current reality and future direction
+## 8. Current phase and future direction
 
-Pusingcuk currently has a Python-based interpreter, a native C runtime, tests, a vocabulary registry, and experimental compiler/VM targets. Their supported feature sets are not identical; use [compatibility documentation](COMPATIBILITY.md) and the relevant backend notes for specifics.
+The current engineering goal is a dependable, understandable language with two maintained execution paths:
 
-Database adapters, server/API tooling, frontend integration, WebAssembly, stable FFI/ABI, blockchain integrations, and configurable regional vocabulary remain future work unless a specific document and tests show otherwise. These should be developed as small, reviewable milestones rather than promised in advance.
+- **Python reference interpreter:** `pusingcuk_new.py` using the modular lexer, parser, and evaluator. This is the reference for intended language behavior.
+- **Native C runtime:** `native/pusingcuk.c`, a standalone C11 implementation for a smaller, explicitly documented subset.
 
-Security limitations are documented in [SECURITY.md](../SECURITY.md). In particular, current runtimes are not a general-purpose operating-system sandbox; do not run untrusted programs or bytecode with access to sensitive files or credentials.
+The language specification, semantic contract, vocabulary registry, and executable fixtures must agree. A feature may be called compatible across Python and C only when the same conformance fixture is required and passes on both. If a feature exists only in Python, document it as reference-only; do not silently treat it as native support.
+
+For this phase, priority is given to:
+1. Fixing mismatches in keywords, values, operators, errors, and documented built-ins.
+2. Expanding and maintaining the shared Python/C conformance suite.
+3. Keeping the CLI, Termux instructions, packaging, and developer tests reliable.
+4. Keeping security and runtime limitations visible.
+
+Transpiler backends, PVM work, and Android Studio APK development are deferred. Their source and design documents are retained as experiments, but they are not part of the supported baseline. A native executable build for Termux is distinct from building an Android application. CI cross-compilation is not a substitute for testing on a physical Termux device.
+
+Database adapters, server/API tooling, frontend integration, WebAssembly, stable FFI/ABI, blockchain integrations, and configurable regional vocabulary remain future work unless a specific implementation and tests demonstrate otherwise.
+
+Security limitations are documented in [SECURITY.md](../SECURITY.md) and the [security review guide](security/README.md). The current runtimes are not a general-purpose operating-system sandbox; do not run untrusted programs or bytecode with access to sensitive files or credentials.
 
 ## 9. A healthy measure of progress
 
