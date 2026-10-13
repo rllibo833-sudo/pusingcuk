@@ -1,6 +1,6 @@
 # Pusingcuk Documentation Index
 
-Use this index to choose the right document. The current engineering baseline is the **Python reference interpreter + native C runtime**. Compiler and Android app prototypes remain documented, but they are not part of the baseline compatibility promise.
+Use this index to choose the right document. The current engineering baseline is the **Python reference interpreter + native C runtime**. Numerical edge cases, collection boundaries, function scope, and consistent runtime diagnostics are being expanded through shared fixtures. Compiler and Android app prototypes remain documented, but they are not part of the baseline compatibility promise.
 
 ## Start here
 
