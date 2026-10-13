@@ -34,7 +34,11 @@ Principles:
 
 Regional vocabulary packs, localized aliases, or configurable slang profiles are possible future ideas, not features that should be claimed as implemented today. Any proposal must consider parser ambiguity, compatibility, readability, and test coverage.
 
-## 4. Design principles
+## 4. Source files and language ergonomics
+
+New Pusingcuk source files use the short `.cuk` extension, analogous to Python's `.py`. The older `.pusingcuk` extension remains accepted for existing projects and modules; it is a compatibility path, not a competing language format. Examples, editor tooling, and new tutorials should prefer `.cuk`. Extension support alone does not imply runtime feature parity: interpreter, native, and compiler targets must still pass the same conformance fixtures for each feature they claim.
+
+## 5. Design principles
 
 - **Correctness before feature count.** Define semantics and tests before expanding the language surface.
 - **One clear source of truth.** Keep the language specification, semantic contract, vocabulary registry, examples, and tests aligned.
@@ -45,7 +49,7 @@ Regional vocabulary packs, localized aliases, or configurable slang profiles are
 - **Small, reviewable changes.** Prefer focused changes with clear reasons and regression tests over sweeping rewrites.
 - **Learn in public.** Explain decisions in plain language and record important trade-offs so future contributors can understand them.
 
-## 5. Ways to contribute
+## 6. Ways to contribute
 
 Contributions do not have to begin with compiler code.
 
@@ -72,7 +76,7 @@ Contributions do not have to begin with compiler code.
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md), the [beginner guide](PEMULA.md), the [technical dictionary](DICTIONARY.md), and the [Indonesian dictionary](KAMUS_PUSINGCUK.md).
 
-## 6. How decisions should be made
+## 7. How decisions should be made
 
 - Discuss the problem and intended outcome before large changes.
 - Ask for examples, trade-offs, compatibility impact, security impact, and a way to test the proposal.
@@ -83,7 +87,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md), the [beginner guide](PEMULA.md), the 
 
 The project maintainer can set priorities and protect the repository, while technical reviewers help validate implementation decisions. This division allows the project to welcome expertise without making one person responsible for knowing everything.
 
-## 7. Current reality and future direction
+## 8. Current reality and future direction
 
 Pusingcuk currently has a Python-based interpreter, a native C runtime, tests, a vocabulary registry, and experimental compiler/VM targets. Their supported feature sets are not identical; use [compatibility documentation](COMPATIBILITY.md) and the relevant backend notes for specifics.
 
@@ -91,7 +95,7 @@ Database adapters, server/API tooling, frontend integration, WebAssembly, stable
 
 Security limitations are documented in [SECURITY.md](../SECURITY.md). In particular, current runtimes are not a general-purpose operating-system sandbox; do not run untrusted programs or bytecode with access to sensitive files or credentials.
 
-## 8. A healthy measure of progress
+## 9. A healthy measure of progress
 
 Progress means that:
 - More examples work consistently and have tests.
