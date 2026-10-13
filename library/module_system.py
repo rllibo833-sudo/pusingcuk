@@ -16,6 +16,7 @@ from pathlib import Path
 MAX_MODULES = 128
 MAX_DEPTH = 32
 MAX_SOURCE_BYTES = 1_048_576
+SOURCE_SUFFIXES = frozenset({".cuk", ".pusingcuk"})
 _IMPORT = re.compile(r'^\s*pakai\s+"([^"]+)"\s+sebagai\s+([A-Za-z_][A-Za-z0-9_]*)\s*$')
 _EXPORT = re.compile(r'^\s*ekspor\s+fungsi\s+([A-Za-z_][A-Za-z0-9_]*)\s*$')
 _FUNCTION = re.compile(r'^\s*fungsi\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(')
@@ -117,11 +118,14 @@ def _rewrite(source: str, own_names: dict[str, str],
 def expand_file(source_path: str | Path, *, max_modules: int = MAX_MODULES,
                 max_depth: int = MAX_DEPTH,
                 max_source_bytes: int = MAX_SOURCE_BYTES) -> str:
-    """Expand a .pusingcuk entry file and imports without network access."""
+    """Expand a .cuk/.pusingcuk entry file and imports without network access.
+
+    New projects should use .cuk; .pusingcuk remains supported for compatibility.
+    """
     entry = Path(source_path).resolve()
     root = entry.parent.resolve()
-    if entry.suffix != ".pusingcuk":
-        raise ModuleImportError("berkas sumber harus berekstensi .pusingcuk")
+    if entry.suffix not in SOURCE_SUFFIXES:
+        raise ModuleImportError("berkas sumber harus berekstensi .cuk atau .pusingcuk")
     if not entry.is_file():
         raise ModuleImportError(f"berkas sumber tidak ditemukan: {entry.name}")
     if max_modules < 1 or max_depth < 0 or max_source_bytes < 1:
@@ -150,8 +154,10 @@ def expand_file(source_path: str | Path, *, max_modules: int = MAX_MODULES,
         path = path.resolve()
         if not _inside(path, root):
             raise ModuleImportError(f"impor keluar dari root proyek ditolak: {path.name}")
-        if path.suffix != ".pusingcuk":
-            raise ModuleImportError(f"ekstensi modul harus .pusingcuk: {path.name}")
+        if path.suffix not in SOURCE_SUFFIXES:
+            raise ModuleImportError(
+                f"ekstensi modul harus .cuk atau .pusingcuk: {path.name}"
+            )
         if depth > max_depth:
             raise ModuleImportError("batas kedalaman impor modul tercapai")
         if path in active:
