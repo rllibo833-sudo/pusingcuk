@@ -34,6 +34,15 @@ def _to_bool(value: Any) -> bool:
     return bool(value)
 
 
+def _to_text(value: Any) -> str:
+    """Convert a value to Pusingcuk text, not host-language boolean spelling."""
+    if value is True:
+        return "okelah"
+    if value is False:
+        return "tidak"
+    return str(value)
+
+
 def _numeric(name: str, value: Any) -> int | float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError(name + "() membutuhkan angka, bukan boolean atau tipe lain")
@@ -144,7 +153,7 @@ def _median(value: Any) -> int | float:
 
 _IMPLEMENTATIONS: dict[str, Callable[..., Any]] = {
     "length": len,
-    "text": str,
+    "text": _to_text,
     "integer": _to_int,
     "float": _to_float,
     "boolean": _to_bool,
