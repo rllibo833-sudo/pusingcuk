@@ -42,3 +42,6 @@ include-package-data = true
 where = ["."]
 include = ["compiler*", "library*", "tools*"]
 namespaces = true
+
+[tool.setuptools.package-data]
+library = ["builtin_contract.json", "*.pusingcuk", "adapters/*.py"]
