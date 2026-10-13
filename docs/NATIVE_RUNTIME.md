@@ -8,7 +8,7 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 
 | Kemampuan | Status |
 |---|---|
-| Alias slang: `jir`, `adooh`, `gitu`, `inthiseco`, `janggal` | Teruji |
+| Alias resmi di `SPEC.md`: `jir`, `adooh`, `gitu`, `inthiseco`, `janggal`, `gas`, `spill`, `bestie`, `valid`, `zonk`, `skip`, `kelar` | Teruji melalui fixture konformansi Python/C |
 | Variabel, angka, teks, boolean, operator dasar | Teruji |
 | List, baca/ubah indeks list | Teruji |
 | Batas list 256 item dan penolakan item ke-257 | Fixture native mengharapkan error |
