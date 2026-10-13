@@ -2,6 +2,8 @@
 
 Scope: repository source and workflow review at the offline-adapter work branch. This is a source-level engineering review, not a penetration test, account audit, or security certification.
 
+**Required warning:** Eksekusi PusingCuk tidak ter-sandbox OS. Jangan jalankan kode tidak terpercaya. Compilation, bytecode validation, loopback binding, and timeouts do not provide operating-system isolation.
+
 ## Changes in this branch
 
 - Added a static local module resolver with explicit exports, project-root path checks, cycle detection, and source/module/depth limits for compiler CLI targets.

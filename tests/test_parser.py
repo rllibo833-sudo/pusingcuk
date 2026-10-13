@@ -46,9 +46,13 @@ class ParserTests(unittest.TestCase):
         with self.assertRaises(ParserError):
             parse("jancuk\nlah x = 1")
 
-    def test_invalid_statement(self):
-        with self.assertRaises(ParserError):
-            parse("jancuk\n???\nselesai jancuk")
+
+
+    def test_balek_without_expression_is_a_controlled_parse_error(self):
+        source = "jancuk\nfungsi ambil()\nbalek\nselesai fungsi\nselesai jancuk"
+        with self.assertRaises(ParserError) as caught:
+            parse(source)
+        self.assertIn("balek butuh ekspresi", str(caught.exception))
 
 
 if __name__ == "__main__":

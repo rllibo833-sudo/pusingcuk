@@ -159,6 +159,7 @@ def _valid_http_url(url):
     """Accept HTTP(S) URLs only when their host is not a local/private address."""
     try:
         parsed = urlsplit(url)
+        # TODO: bind resolved IP to connection to prevent DNS-rebinding TOCTOU - see test_level6_ssrf.py
         return (
             parsed.scheme.lower() in ("http", "https")
             and bool(parsed.hostname)
@@ -449,8 +450,8 @@ class Evaluator:
                         self.fail(line, "jadi_json membutuhkan satu teks JSON")
                     try:
                         return _language_json(json.loads(args[0]))
-                    except (json.JSONDecodeError, ValueError):
-                        return None
+                    except json.JSONDecodeError:
+                        return False
                 if n.name == "jadi_teks":
                     if len(args) != 1:
                         self.fail(line, "jadi_teks membutuhkan satu objek")

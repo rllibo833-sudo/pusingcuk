@@ -2,6 +2,8 @@
 
 Use this index to choose the right document. The current engineering baseline is the **Python reference interpreter + native C runtime**. Shared fixtures now cover numerical edge cases, collection boundaries, function scope, and consistent runtime diagnostics, including `akar`, `pangkat`, `sinus`, `kosinus`, `jumlah`, `rata_rata`, and `median` in native C. Compiler and Android app prototypes remain documented, but they are not part of the baseline compatibility promise.
 
+**Canonical language version:** `0.4-dev`. New examples should use `.cuk`; `.pusingcuk` remains accepted for existing programs. The manifest contains 61 fixtures: 61 required reference results, 56 required native results, and 5 explicit native-unsupported cases.
+
 ## Start here
 
 - [Beginner guide](PEMULA.md) — first program, syntax basics, and guided examples.

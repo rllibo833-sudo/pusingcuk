@@ -1,4 +1,4 @@
-# Audit Native Pusingcuk — 2026-10-12
+# Audit Native Pusingcuk — 2026-10-11
 
 **Status:** Audit berbasis sumber GitHub; bukan sertifikasi keamanan atau bukti kesetaraan penuh seluruh bahasa. Dokumen ini diperbarui terhadap `main` setelah temuan historis diperiksa ulang.
 

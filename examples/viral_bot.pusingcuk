@@ -1,5 +1,5 @@
 inthiseco
-  lah util = angkut "examples/utils.pusingcuk"
+  lah util = angkut "utils.pusingcuk"
   lah pesan = {"pesan": util.sapa("bestie"), "sumber": "Pusingcuk Level 5"}
   lah payload = jadi_teks(pesan)
   spill warna("=== Viral Bot ===", "pink")

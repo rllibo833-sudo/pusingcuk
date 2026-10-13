@@ -14,6 +14,8 @@ SHARED_FIXTURES = (
     "tests/native/for_range.pusingcuk",
     "tests/native/slang_aliases.pusingcuk",
     "examples/native/rekap_anggaran.pusingcuk",
+    "examples/rekap_anggaran.cuk",
+    "examples/warung.cuk",
 )
 
 

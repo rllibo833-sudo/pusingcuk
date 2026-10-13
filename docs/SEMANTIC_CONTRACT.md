@@ -1,5 +1,7 @@
 # Kontrak Semantik Pusingcuk v1
 
+**Versi bahasa yang diatur:** `0.4-dev`. Nomor `v1` pada judul adalah revisi dokumen kontrak semantik, bukan versi bahasa.
+
 Status: baseline engineering untuk perilaku yang harus dipatuhi front-end, interpreter, runtime native, dan backend berikutnya. Hanya perilaku yang ditetapkan spesifikasi atau dibuktikan fixture boleh diklaim stabil lintas runtime.
 
 ## Satu sumber kebenaran

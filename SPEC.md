@@ -1,4 +1,4 @@
-# Spesifikasi Sintaks Pusingcuk v0.4-dev
+# Spesifikasi Sintaks Pusingcuk 0.4-dev
 
 > Konvensi berkas: gunakan ekstensi `.cuk` untuk program baru, setara peran `.py` di Python. Ekstensi `.pusingcuk` tetap diterima oleh interpreter, runtime native, dan compiler yang relevan demi kompatibilitas. Ekstensi tidak menentukan fitur runtime; fitur harus tetap diverifikasi melalui tes konformansi.
 
@@ -76,7 +76,7 @@ Boolean: benar, salah
 Daftar ditulis menggunakan tanda kurung siku, misalnya `[10, 20, 30]`.
 Kamus ditulis dengan kurung kurawal dan pasangan kunci-nilai, misalnya `{"nama": "Budi", "umur": 20}`. Kunci teks, angka, dan boolean merupakan jenis kunci berbeda; khususnya, kunci `benar` dan kunci angka `1` tidak sama. Operator kesetaraan juga tidak menyamakan boolean dengan angka.
 Indeks daftar dan teks dimulai dari 0. Daftar dapat dibaca dan diubah melalui indeks. Nilai kamus dapat dibaca dan diubah melalui kunci.
-`panjang(nilai)` menghitung elemen teks, daftar, kamus, atau rentang. `rentang(akhir)`, `rentang(mulai, akhir)`, dan `rentang(mulai, akhir, langkah)` membuat urutan bilangan bulat dengan batas akhir eksklusif; langkah tidak boleh nol. Interpreter referensi Python menyediakan 19 built-in terkontrak, termasuk konversi, matematika, trigonometri, dan statistik. Runtime native C telah diuji untuk 15 built-in: `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`, `sinus`, `kosinus`, `jumlah`, `rata_rata`, dan `median`; konversi `teks`, `bilangan`, `desimal`, dan `logika` belum tersedia di C. `bulatkan` memakai aturan ties-to-even, misalnya `bulatkan(2.5)` menjadi `2` dan `bulatkan(3.5)` menjadi `4`. `akar(nilai)` menerima tepat satu angka finite non-boolean dan menolak nilai negatif. `pangkat(basis, eksponen)` menerima tepat dua angka finite non-boolean; basis negatif memerlukan eksponen bulat, dan basis nol tidak boleh dipangkatkan dengan eksponen negatif. `sinus(radian)` dan `kosinus(radian)` menerima satu angka finite non-boolean dalam radian. `jumlah(daftar)` menerima satu daftar angka finite non-boolean; daftar kosong menghasilkan nol. Input integer-valued serta setiap hasil akumulasi integral sementara atau akhir `jumlah` yang berada di luar rentang aman `±(2^53 - 1)` ditolak agar perilaku Python/C konsisten. `rata_rata(daftar)` dan `median(daftar)` menerima satu daftar tidak kosong berisi angka finite non-boolean; nilai di luar rentang integer aman `±(2^53 - 1)` ditolak. Rata-rata menjumlahkan elemen yang masing-masing dibagi panjang daftar; median mengurutkan nilai lalu mengambil nilai tengah atau rata-rata dua nilai tengah. Overflow dan hasil non-finite menjadi kesalahan runtime, bukan output parsial. Hasil non-finite merupakan kesalahan runtime. Hasil matematika bulat dalam rentang integer aman lintas target dinormalisasi menjadi integer; hasil pecahan memakai representasi desimal terpendek yang mempertahankan nilai binary64. `teks(benar)` menghasilkan `okelah`; `teks(salah)` menghasilkan `tidak`. Detail argumen dan dukungan per target harus mengikuti [katalog built-in](docs/language/BUILTINS.md).
+`panjang(nilai)` menghitung elemen teks, daftar, kamus, atau rentang. `rentang(akhir)`, `rentang(mulai, akhir)`, dan `rentang(mulai, akhir, langkah)` membuat urutan bilangan bulat dengan batas akhir eksklusif; langkah tidak boleh nol. Interpreter referensi Python menyediakan 19 built-in terkontrak, termasuk konversi, matematika, trigonometri, dan statistik. Runtime native C telah diuji untuk 15 built-in: `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`, `sinus`, `kosinus`, `jumlah`, `rata_rata`, dan `median`; konversi `teks`, `bilangan`, `desimal`, dan `logika` belum tersedia di C. `bulatkan` memakai aturan ties-to-even, misalnya `bulatkan(2.5)` menjadi `2` dan `bulatkan(3.5)` menjadi `4`. `akar(nilai)` menerima tepat satu angka finite non-boolean dan menolak nilai negatif. `pangkat(basis, eksponen)` menerima tepat dua angka finite non-boolean; basis negatif memerlukan eksponen bulat, dan basis nol tidak boleh dipangkatkan dengan eksponen negatif. `sinus(radian)` dan `kosinus(radian)` menerima satu angka finite non-boolean dalam radian. `jumlah(daftar)` menerima satu daftar angka finite non-boolean; daftar kosong menghasilkan nol. Input integer-valued serta setiap hasil akumulasi integral sementara atau akhir `jumlah` yang berada di luar rentang aman `±(2^53 - 1)` ditolak agar perilaku Python/C konsisten. `rata_rata(daftar)` dan `median(daftar)` menerima satu daftar tidak kosong berisi angka finite non-boolean; nilai di luar rentang integer aman `±(2^53 - 1)` ditolak. Rata-rata menjumlahkan elemen yang masing-masing dibagi panjang daftar; median mengurutkan nilai lalu mengambil nilai tengah atau rata-rata dua nilai tengah. Overflow dan hasil non-finite menjadi kesalahan runtime, bukan output parsial. Hasil non-finite merupakan kesalahan runtime. Hasil matematika bulat dalam rentang integer aman lintas target dinormalisasi menjadi integer; hasil pecahan memakai representasi desimal terpendek yang mempertahankan nilai binary64. `jadi_json(teks)` mengembalikan `salah` jika teks bukan JSON valid, sementara teks JSON `null` yang valid menghasilkan nilai None pada interpreter reference. `teks(benar)` menghasilkan `okelah`; `teks(salah)` menghasilkan `tidak`. Detail argumen dan dukungan per target harus mengikuti [katalog built-in](docs/language/BUILTINS.md).
 Kunci kamus native dibatasi pada teks, angka, dan boolean. Assignment ke kunci baru menambahkan entri, sedangkan assignment ke kunci yang sudah ada memperbarui nilainya. Kamus kosong bernilai salah dan kamus berisi entri bernilai benar dalam kondisi; perulangan `untuk` menghasilkan kunci kamus. Kunci yang tidak didukung, kunci yang tidak ditemukan, dan indeks di luar batas menghasilkan kesalahan.
 
 ## 9. Perulangan untuk
@@ -95,7 +95,7 @@ Perulangan modular untuk nama dalam koleksi mengunjungi setiap elemen daftar ata
 
 ## 10. Fungsi buatan pengguna
 
-Fungsi dideklarasikan dengan `fungsi nama(parameter)` dan diakhiri dengan `selesai fungsi`. Gunakan `balek ekspresi` untuk mengembalikan nilai. Jumlah argumen harus sesuai dengan jumlah parameter. Fungsi tingkat atas dipindai sebelum program berjalan, sehingga pemanggilan sebelum definisi dan rekursi didukung. Parameter dan variabel lokal terisolasi dari variabel pemanggil; nilai koleksi yang diberikan sebagai argumen tetap merujuk pada objek koleksi yang sama. Kedalaman pemanggilan dibatasi hingga 100 pada runtime native dan interpreter modular membatasi kedalaman hingga 100.
+Fungsi dideklarasikan dengan `fungsi nama(parameter)` dan diakhiri dengan `selesai fungsi`. Aturan mutlak: `balek` wajib diikuti ekspresi pada baris yang sama; `balek` kosong adalah kesalahan sintaks terkontrol. Gunakan `balek ekspresi` untuk mengembalikan nilai. Jumlah argumen harus sesuai dengan jumlah parameter. Fungsi tingkat atas dipindai sebelum program berjalan, sehingga pemanggilan sebelum definisi dan rekursi didukung. Parameter dan variabel lokal terisolasi dari variabel pemanggil; nilai koleksi yang diberikan sebagai argumen tetap merujuk pada objek koleksi yang sama. Kedalaman pemanggilan dibatasi hingga 100 pada runtime native dan interpreter modular membatasi kedalaman hingga 100.
 
 Contoh:
 
@@ -140,22 +140,40 @@ Runtime C dapat dibangun dengan compiler C11 dan dijalankan sebagai executable t
 
 Kosakata slang adalah lapisan gaya bahasa Pusingcuk, bukan bahasa inti terpisah. Daftar alias berikut dibekukan bersama sintaks; jangan menambah alias atau kata kunci baru tanpa izin eksplisit Founder.
 
-Lexer menerima alias berikut dan menormalkannya ke kata kunci kanonis sebelum parsing:
+Alias dinormalisasi oleh lexer sebelum parsing. Daftar lengkap 23 alias terbagi menjadi dua kelompok. Alias API tambahan bukan bagian dari sintaks inti dan dukungannya bergantung pada target runtime.
 
-- `jir` → `hedeh`
-- `adooh` → `kampret`
-- `gitu` → `selesai`
-- `inthiseco` → `jancuk`
-- `janggal` → `bukan`
-- `gas` → `jancuk`
-- `spill` → `hedeh`
-- `bestie` → `lah`
-- `valid` → `benar`
-- `zonk` → `salah`
-- `skip` → `kampret`
-- `kelar` → `selesai`
+### Alias inti (12)
 
-Alias tidak mengubah makna sintaks dan tidak menghapus kata kunci lama. Runtime C mandiri diuji terhadap subset alias ini; fitur lain pada runtime C belum dinyatakan setara dengan interpreter modular.
+- `jir` → `hedeh` — output
+- `adooh` → `kampret` — cabang alternatif
+- `gitu` → `selesai` — penutup blok
+- `inthiseco` → `jancuk` — pembuka program alternatif
+- `janggal` → `bukan` — negasi logika
+- `gas` → `jancuk` — pembuka program alternatif
+- `spill` → `hedeh` — output
+- `bestie` → `lah` — deklarasi variabel
+- `valid` → `benar` — boolean benar
+- `zonk` → `salah` — boolean salah
+- `skip` → `kampret` — cabang alternatif
+- `kelar` → `selesai` — penutup blok
+
+### Alias API tambahan (11)
+
+Alias berikut adalah nama alternatif untuk API reference Python; alias tersebut tidak menyatakan kompatibilitas native atau lintas-backend:
+
+- `simpen` → `tulis` — menulis teks ke berkas
+- `bongkar` → `baca` — membaca teks dari berkas
+- `simpen_json` → `tulis_json` — menulis JSON ke berkas
+- `bongkar_json` → `baca_json` — membaca JSON dari berkas
+- `impor` → `angkut` — memuat modul lokal
+- `waktu` → `jam` — waktu lokal
+- `gas_api` → `kepo_internet` — HTTP GET
+- `stalking` → `kepo_internet` — HTTP GET
+- `kirim_gosip` → `kirim_api` — HTTP POST
+- `parse_json` → `jadi_json` — parse JSON
+- `kepo` → `tanya` — input pengguna
+
+Alias inti tidak mengubah makna sintaks dan tidak menghapus kata kanonis. Runtime C mandiri hanya diuji terhadap subset alias inti yang tercatat di `docs/NATIVE_RUNTIME.md`. Alias API tambahan tidak membuat kapabilitas menjadi lintas-runtime.
 
 
 ## 17. Bytecode PVM v1 (draft) dan batas keamanan

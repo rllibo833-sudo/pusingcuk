@@ -1,5 +1,5 @@
 inthiseco
-  lah lib = angkut "examples/utils.pusingcuk"
+  lah lib = angkut "utils.pusingcuk"
   coba
     spill lib.sapa("Budi")
     lah hilang = bongkar "gaada.txt"

@@ -1,5 +1,7 @@
 # Contributing to Pusingcuk
 
+**Canonical language version:** `0.4-dev`. New source examples use `.cuk`; legacy `.pusingcuk` files remain valid compatibility fixtures.
+
 Start with the [project vision and community principles](docs/VISION.md). Pusingcuk welcomes code and non-code contributions; technical changes must still be tested and reviewed.
 
 Thank you for helping develop Pusingcuk. The project aims to be easy for beginners, technically extensible by independent communities, and increasingly capable of running natively without Python at runtime.

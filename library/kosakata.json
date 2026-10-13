@@ -389,7 +389,7 @@
     {
       "word": "jadi_json",
       "category": "json",
-      "meaning": "Mengurai teks JSON menjadi nilai Pusingcuk; mengembalikan salah jika JSON tidak valid.",
+      "meaning": "Mengurai teks JSON menjadi nilai Pusingcuk; mengembalikan salah jika JSON tidak valid dan None untuk JSON null yang valid.",
       "aliases": [
         "parse_json"
       ],

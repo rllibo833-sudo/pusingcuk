@@ -8,6 +8,8 @@ The goal is not to replace established programming languages or claim that slang
 
 Pusingcuk is a work in progress. Runtime support, compiler targets, and security guarantees differ by feature. The project must describe those limits honestly.
 
+**Canonical language version:** `0.4-dev`. The opening keyword `jancuk` is a deliberate part of Pusingcuk's identity.
+
 ## 2. Who should feel welcome
 
 Pusingcuk welcomes:
@@ -124,6 +126,9 @@ Pusingcuk should grow because it becomes more useful, understandable, and trustw
 
 ---
 
+## Formal learning path / Jalur Formal
+
+Pusingcuk keeps `jancuk ... selesai jancuk` as part of its identity; the formal learning path does not rename or hide that syntax. A teacher can introduce `halo.cuk` with a short, respectful explanation of the word's regional/cultural context, then focus on variables, expressions, and program structure. The lesson may use a neutral program title and formal explanations without requiring a different opening keyword or forcing students to adopt slang in conversation.
 ## Ringkasan Bahasa Indonesia
 
 Pusingcuk ingin menjadi ruang belajar dan eksperimen bahasa pemrograman yang terbuka untuk pemula, engineer berpengalaman, pengajar, penguji, penerjemah, dan komunitas bahasa lokal maupun internasional.

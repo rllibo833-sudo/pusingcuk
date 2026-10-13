@@ -2,6 +2,8 @@
 
 Halaman ini adalah katalog built-in yang dipakai bersama oleh dokumentasi dan pengujian. Jumlah argumen, deskripsi ringkas, dan status setiap target diambil dari `library/builtin_contract.json`; tes memeriksa agar tabel ini tidak menyimpang dari metadata.
 
+**Versi bahasa:** `0.4-dev`. Bagian pertama berisi tepat 19 built-in terkontrak; fungsi tambahan yang langsung ditangani evaluator reference dipisahkan dan tidak masuk hitungan built-in lintas target.
+
 Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python mentah. Misalnya, `teks(benar)` menghasilkan `okelah` dan `teks(salah)` menghasilkan `tidak`, bukan ejaan boolean dari bahasa host. Statistik `rata_rata` dan `median` menerima daftar angka finite non-boolean yang tidak kosong; `jumlah` menerima daftar termasuk daftar kosong yang menghasilkan nol. Nilai integer di luar rentang aman dan hasil non-finite ditolak.
 
 ## Status target
@@ -11,7 +13,7 @@ Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python m
 - `not-claimed`: dukungan belum diverifikasi; jangan menjanjikan kompatibilitas.
 - **Python reference** adalah interpreter bahasa utama. **Python transpiler** adalah target compiler yang berbeda dan tidak boleh disamakan dengannya.
 
-## Daftar built-in
+## 19 Built-in Terkontrak
 
 | Built-in | Argumen | Perilaku | Python reference | Native C | JS transpiler | Python transpiler | HTML | VM |
 |---|---:|---|---|---|---|---|---|---|
@@ -34,6 +36,18 @@ Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python m
 | `jumlah` | 1 | Jumlah berurutan angka finite non-boolean dalam daftar; daftar kosong bernilai nol dan setiap hasil integral antara/akhir dibatasi rentang aman lintas target. | supported | supported | unsupported | unsupported | unsupported | unsupported |
 | `rata_rata` | 1 | Rata-rata aritmetika daftar nonkosong angka finite non-boolean dalam rentang aman lintas target. | supported | supported | supported | supported | supported | unsupported |
 | `median` | 1 | Median daftar nonkosong angka finite non-boolean dalam rentang aman lintas target. | supported | supported | supported | supported | supported | unsupported |
+
+## Intrinsics Tambahan Python (reference only)
+
+Fungsi berikut ditangani langsung oleh evaluator Python dan bukan bagian dari 19 built-in terkontrak. Ketersediaannya tidak boleh diasumsikan pada runtime native C, transpiler, HTML, atau VM.
+
+- **Berkas/JSON:** `baca`, `tulis`, `baca_json`, `tulis_json`
+- **Modul dan waktu:** `angkut`, `jam`, `tanggal`
+- **HTTP:** `kepo_internet` (GET), `kirim_api` (POST)
+- **Nilai/terminal/JSON tambahan:** `jadi_json`, `jadi_teks`, `warna`
+- **Input:** `tanya` (statement/input intrinsic; juga punya alias slang reference)
+
+Semua API ini harus diperlakukan sebagai reference-only kecuali target lain memiliki implementasi dan fixture yang jelas.
 
 ## Contoh penggunaan
 

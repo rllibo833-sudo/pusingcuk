@@ -40,7 +40,7 @@ class BuiltinContractTests(unittest.TestCase):
             self.assertEqual(by_id[capability_id]["status"], "planned")
             self.assertEqual(by_id[capability_id]["targets"], [])
         self.assertEqual(by_id["net.http"]["status"], "available")
-        self.assertEqual(by_id["net.http"]["targets"], ["python"])
+        self.assertEqual(by_id["net.http"]["targets"], ["reference"])
         self.assertFalse(by_id["net.http"]["offline_first"])
         self.assertTrue(by_id["core.pure"]["offline_first"])
         self.assertTrue(by_id["data.database"]["offline_first"])

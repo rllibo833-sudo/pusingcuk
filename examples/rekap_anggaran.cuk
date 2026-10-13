@@ -1,0 +1,24 @@
+jancuk
+lah pendapatan = 2500000
+lah pengeluaran = {"pangan": 750000, "transport": 250000, "listrik": 200000}
+
+fungsi hitung_total(data)
+    lah total = data["pangan"] + data["transport"] + data["listrik"]
+    balek total
+selesai fungsi
+
+lah total = hitung_total(pengeluaran)
+lah sisa = pendapatan - total
+hedeh "REKAP ANGGARAN BULANAN"
+hedeh "Pendapatan:"
+hedeh pendapatan
+hedeh "Total pengeluaran:"
+hedeh total
+hedeh "Sisa anggaran:"
+hedeh sisa
+njir sisa >= 0
+    hedeh "Status: anggaran aman"
+kampret
+    hedeh "Status: defisit"
+selesai njir
+selesai jancuk

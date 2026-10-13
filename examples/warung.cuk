@@ -1,0 +1,16 @@
+jancuk
+lah harga_kopi = 5000
+lah harga_teh = 3000
+lah kopi = 2
+lah teh = 1
+lah total = harga_kopi * kopi + harga_teh * teh
+
+hedeh "WARUNG DIGITAL"
+hedeh "Total transaksi:"
+hedeh total
+njir total <= 15000
+    hedeh "Status: transaksi aman"
+kampret
+    hedeh "Status: cek transaksi"
+selesai njir
+selesai jancuk

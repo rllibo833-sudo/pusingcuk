@@ -94,9 +94,10 @@ class Level5HardeningTests(unittest.TestCase):
         )
         self.assertEqual(capture(source), "42\n")
 
-    def test_valid_json_false_is_distinct_from_parse_failure(self):
+    def test_valid_json_false_and_null_are_distinct_from_parse_failure(self):
         self.assertEqual(capture(program('hedeh jadi_json("false")')), "tidak\n")
-        self.assertEqual(capture(program('hedeh jadi_json("not json")')), "None\n")
+        self.assertEqual(capture(program('hedeh jadi_json("null")')), "None\n")
+        self.assertEqual(capture(program('hedeh jadi_json("not json")')), "tidak\n")
 
     def test_jadi_teks_serializes_boolean_and_null_as_json(self):
         self.assertEqual(

@@ -1,5 +1,7 @@
 # Runtime Native Pusingcuk
 
+**Versi bahasa:** `0.4-dev`. Native C adalah subset eksekusi mandiri, bukan implementasi seluruh intrinsics reference.
+
 ## Tujuan
 
 Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk dalam subset native teruji. Setelah dikompilasi, executable berjalan tanpa Python. Build membutuhkan compiler C11 dan library matematika sistem.

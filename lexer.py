@@ -1,4 +1,4 @@
-"""Lexer mandiri untuk bahasa pemrograman Pusingcuk v0.3-dev."""
+"""Lexer mandiri untuk bahasa pemrograman Pusingcuk 0.4-dev."""
 
 from dataclasses import dataclass
 

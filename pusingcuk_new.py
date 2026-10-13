@@ -57,7 +57,7 @@ def main():
         return 0
 
     try:
-        run(source, source_path=path)
+        run(source, source_path=path, project_root=path.resolve().parent)
     except ParserError as exc:
         print(f"Kesalahan sintaks: {exc}", file=sys.stderr)
         return 2

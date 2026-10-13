@@ -194,7 +194,9 @@ class Parser:
                         params=params, body=body)
         if self.at("balek"):
             self.take()
-            value = None if self.at(kind="NEWLINE") else self.expr()
+            if self.at(kind="NEWLINE") or self.at(kind="EOF"):
+                self.fail("balek butuh ekspresi")
+            value = self.expr()
             return node("Return", t.line, value=value)
         if self.at(kind="IDENT"):
             name = self.take().value

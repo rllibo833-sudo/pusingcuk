@@ -2,11 +2,26 @@
 
 Pusingcuk is an experimental programming language built around Indonesian-friendly keywords and readable examples. Its near-term goal is not to support every compiler target; it is to make one language behave predictably across its **Python reference interpreter** and **native C runtime**.
 
+**Canonical language version:** `0.4-dev`. New programs use `.cuk`; `.pusingcuk` remains a compatibility extension.
+
+### Runtime capability matrix
+
+| Target | Contracted built-ins | Status |
+|---|---:|---|
+| Reference Python | 19 | Full contracted built-in set; additional reference-only intrinsics are separate |
+| Native C | 15 | Subset; no file I/O, HTTP, or module system |
+| JS transpiler | 14 | Subset |
+| Python transpiler | 14 | Subset |
+| VM | 6 | Experimental |
+
+
 [![Core CI](https://github.com/rllibo833-sudo/pusingcuk/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/rllibo833-sudo/pusingcuk/actions/workflows/tests.yml)
 [![Packaging](https://github.com/rllibo833-sudo/pusingcuk/actions/workflows/build-test.yml/badge.svg?branch=main)](https://github.com/rllibo833-sudo/pusingcuk/actions/workflows/build-test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 > **Status:** experimental. Python defines the reference behavior; native C implements a tested subset. A feature is portable between them only when the same conformance fixture passes on both. Pusingcuk is not a security sandbox.
+>
+> **Security warning:** Eksekusi PusingCuk tidak ter-sandbox OS. Jangan jalankan kode tidak terpercaya. Execution runs with the current process's operating-system permissions; do not run untrusted code or bytecode.
 
 ## Try Pusingcuk on Termux
 
@@ -52,7 +67,7 @@ For the native C runtime on Termux:
 ```sh
 pkg install git clang make
 bash scripts/install-termux.sh
-pusingcuk-native examples/native/rekap_anggaran.pusingcuk
+pusingcuk-native examples/rekap_anggaran.cuk
 ```
 
 The native runtime and its limits are documented in the [native runtime guide](docs/NATIVE_RUNTIME.md). The existing Linux `pusingcuk` release asset is not a Termux ARM64 binary. Choose an explicitly named Android ARM64 native asset when available, or build from source; physical Termux device compatibility must not be inferred from Ubuntu CI alone.
@@ -74,6 +89,7 @@ Run the same checks used by the maintained Python/C baseline:
 python -m unittest discover -s tests -v
 make test-native
 python tools/conformance.py
+python tests/conformance/runner.py
 ```
 
 CI tests the reference interpreter on Python 3.11 and 3.12 and builds the native runtime with GCC and Clang. The manifest distinguishes required, optional, and unsupported runtime behavior; unsupported features are not counted as parity.
