@@ -1,6 +1,6 @@
 # Pusingcuk Language and Technical Dictionary
 
-This is the plain-language map for learners and contributors. It describes the current `0.4-dev` repository, not a promise that every feature works on every backend.
+This is the plain-language map for learners and contributors. It describes the `0.4-dev` language-spec contract; the implementation release line is versioned separately. It is not a promise that every feature works on every backend.
 
 ## 1. Start here
 
@@ -102,13 +102,13 @@ selesai jancuk
 Run it with the reference interpreter from the repository root:
 
 ```sh
-python pusingcuk_new.py halo.pusingcuk
+python pusingcuk_new.py halo.cuk
 ```
 
 Or use the compiler CLI to generate a documented experimental target:
 
 ```sh
-python -m compiler halo.pusingcuk --target python --output /tmp/halo.py
+python -m compiler halo.cuk --target python --output /tmp/halo.py
 python /tmp/halo.py
 ```
 
