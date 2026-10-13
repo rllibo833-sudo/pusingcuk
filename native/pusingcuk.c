@@ -873,7 +873,8 @@ static void print_usage(FILE *out, const char *program) {
     fprintf(out,
         "Pusingcuk native %s\n"
         "Penggunaan: %s [opsi]\n"
-        "           %s <program.pusingcuk>\n\n"
+        "           %s <program.cuk>\n"
+        "           (ekstensi .pusingcuk tetap diterima)\n\n"
         "Opsi:\n"
         "  -h, --help       Tampilkan bantuan\n"
         "  -v, --version    Tampilkan versi runtime\n",
