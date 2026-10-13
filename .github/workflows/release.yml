@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Install PyInstaller
+        run: python -m pip install pyinstaller==6.11.1
+      - name: Build binary
+        run: pyinstaller --noconfirm --clean pusingcuk.spec
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" dist/pusingcuk \
+            --title "${GITHUB_REF_NAME}" \
+            --notes "v0.7.1 - Python interpreter only, PVM/native NOT sandboxed. Includes SSRF DNS fix (8ab6a5c), safe formatter, 3 Good First Issues. Run: ./pusingcuk examples/hello.pusingcuk"
