@@ -24,9 +24,9 @@ The native runtime and local workbench execute code with the permissions of the 
 
 Required before public multi-user execution: a dedicated low-privilege account/container or OS sandbox, read-only filesystem by default, restricted syscalls/network, resource limits, and independent testing.
 
-### Medium — supply-chain pinning
+### Supply-chain pinning — branch snapshot vs current main
 
-Workflow permissions are limited and the test workflow does not use privileged pull-request triggers. However, third-party GitHub Actions are referenced by version tags rather than immutable commit SHAs. Pin actions to reviewed full commit SHAs and automate update review for stronger supply-chain reproducibility.
+The offline-adapter branch snapshot reviewed when this note was first written used version tags rather than immutable commit SHAs. During the current-main audit, all `uses:` entries in `.github/workflows/build-test.yml`, `pages.yml`, `release.yml`, and `tests.yml` were found pinned to full commit SHAs, with human-readable version comments. The older tag-pinning note is therefore not a current-main finding. Keep SHA pinning and periodically review Dependabot updates; this source review does not validate the contents of each action commit.
 
 ### Out of scope
 
