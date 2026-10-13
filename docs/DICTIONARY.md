@@ -108,7 +108,7 @@ python pusingcuk_new.py halo.pusingcuk
 Or use the compiler CLI to generate a documented experimental target:
 
 ```sh
-python -m compiler examples/halo.pusingcuk --target python --output /tmp/halo.py
+python -m compiler halo.pusingcuk --target python --output /tmp/halo.py
 python /tmp/halo.py
 ```
 
