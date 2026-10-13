@@ -12,6 +12,7 @@ import json
 from datetime import datetime, date
 from ast_nodes import Node
 from parser import parse
+from library.stdlib import BUILTINS, call_builtin
 
 
 class PusingDict(MutableMapping):
@@ -479,6 +480,11 @@ class Evaluator:
                         return range(*args)
                     except ValueError:
                         self.fail(line, "langkah rentang tidak boleh nol")
+                if n.name in BUILTINS:
+                    try:
+                        return call_builtin(n.name, *args)
+                    except (TypeError, ValueError, OverflowError) as exc:
+                        self.fail(line, str(exc))
                 if n.name not in self.functions:
                     self.fail(line, f"fungsi '{n.name}' tidak dikenal")
                 params, body, fline = self.functions[n.name]
