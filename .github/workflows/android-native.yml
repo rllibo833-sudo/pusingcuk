@@ -20,7 +20,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: pusingcuk-android-native-${{ github.ref }}
+  group: pusingcuk-android-native-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
