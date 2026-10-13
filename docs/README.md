@@ -27,6 +27,7 @@ Use this index to choose the right document. The current engineering baseline is
 - [Conformance fixtures](CONFORMANCE_FIXTURES.md) — how Python and native C behavior is compared.
 - [Native C runtime](NATIVE_RUNTIME.md) — supported subset, limits, and build instructions.
 - [Native Termux setup](NATIVE_TERMUX.md) — source build and installation details.
+- [Android distribution/verification](ANDROID_DISTRIBUTION.md) — separates cross-build, emulator smoke test, and physical Termux validation.
 - [Module system](MODULE_SYSTEM.md) — current import behavior and limitations.
 - [Shared built-in contract](../library/README.md#builtin-contract-one-metadata-source) — machine-readable built-in metadata and update rules.
 
@@ -55,6 +56,7 @@ The documents below describe prototypes or possible future work. Read them only 
 - [Experimental JavaScript backend](JS_BACKEND.md)
 - [Bytecode VM](BYTECODE_VM.md) and [PVM format](PVM_SPEC.md)
 - [Compiler type system / standard-library notes](compiler-type-system-and-stdlib.md)
+- [Android emulator smoke-test workflow](../.github/workflows/android-emulator-smoke.yml) — manual validation, separate from the core CI gate.
 - [Android Studio prototype](ANDROID_STUDIO.md)
 - [Local web workbench](WEB_WORKBENCH.md) and [Termux dashboard](TERMUX_DASHBOARD.md)
 - [Three-repository compiler roadmap](THREE_REPO_COMPILER_ROADMAP.md)
