@@ -19,61 +19,31 @@ Pusingcuk is not tied to one company, school, or community. Contributors from Ec
 
 ## Where to start
 
-- Learn the language: [`SPEC.md`](SPEC.md)
-- Learn terms and features: [English dictionary](docs/DICTIONARY.md) and [Indonesian plain-language dictionary](docs/KAMUS_PUSINGCUK.md)
-- Understand runtime differences: [compatibility matrix](docs/COMPATIBILITY.md)
-- Learn the compiler architecture: [compiler interoperability](docs/COMPILER_INTEROP.md) and [IR v1](docs/IR_V1.md)
-- Review native support: [native runtime matrix](docs/NATIVE_RUNTIME.md)
-- Understand security limitations: [`SECURITY.md`](SECURITY.md)
-
-## Branch naming
-
-Use a descriptive branch name:
-
-- `feat/<short-feature>` — a language capability or new feature.
-- `fix/<short-problem>` — a bug fix.
-- `test/<short-scope>` — tests only.
-- `docs/<short-topic>` — documentation or tutorials.
-- `audit/<short-topic>` — findings that do not intentionally change behavior.
-- `refactor/<short-topic>` — restructuring without intended behavior changes.
-
-Avoid vague names such as `update`, `new-feature`, or `final-fix`. Do not repurpose another contributor's experimental branch without checking its purpose.
-
-## Before making changes
-
-From a clean working directory:
-
-```sh
-git switch main
-git pull --ff-only
-git status --short
-git switch -c docs/short-topic
-```
-
-If `git status --short` shows changes you do not understand, stop and inspect them before switching branches. Do not automatically delete or overwrite a user's local changes.
+- Learn how to use the language: [beginner guide](docs/PEMULA.md) and [Termux quick start](docs/termux/README.md)
+- Find keywords, aliases, and built-ins: [language-reference map](docs/language/README.md)
+- Understand the implementation boundary: [semantic contract](docs/SEMANTIC_CONTRACT.md) and [compatibility matrix](docs/COMPATIBILITY.md)
+- Review the native subset: [native runtime guide](docs/NATIVE_RUNTIME.md)
+- Understand security limits: [SECURITY.md](SECURITY.md) and [security review guide](docs/security/README.md)
+- Find test commands and support rules: [development gates](docs/development/README.md)
 
 ## Test gates
 
-For changes to the modular language implementation:
+For changes to the Python reference interpreter:
 
 ```sh
 python -m unittest discover -s tests -v
 ```
 
-For changes to the native runtime:
+For changes to the native C runtime or any behavior that claims Python/C parity:
 
 ```sh
 make test-native
-```
-
-If a change affects both implementations, test both. Run the compiler and conformance checks when those paths are affected:
-
-```sh
 python tools/conformance.py
-python -m compiler examples/halo.pusingcuk --target js --output /tmp/halo.js
 ```
 
-CI must pass on the final revision before a change is considered verified. Physical Termux testing is still required for claims about actual Android devices; Ubuntu CI is not a substitute for Android testing.
+The maintained CI baseline tests Python 3.11/3.12 and native C with GCC/Clang. A cross-runtime feature must have a fixture that requires both `reference` and `native`; tests that mark a runtime unsupported do not prove parity.
+
+Compiler/PVM prototypes and Android Studio APK development are intentionally outside the baseline. They remain available through manual workflows and should only be changed with explicit scope and relevant checks. Physical Termux testing is needed for claims about actual Android devices; Ubuntu CI alone is not sufficient.
 
 ## Contributor checklist
 
