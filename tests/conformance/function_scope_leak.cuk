@@ -1,0 +1,8 @@
+jancuk
+fungsi buat_lokal()
+    lah hanya_di_dalam = 9
+    balek hanya_di_dalam
+selesai fungsi
+lah hasil = buat_lokal()
+hedeh hanya_di_dalam
+selesai jancuk

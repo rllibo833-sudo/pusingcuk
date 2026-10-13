@@ -62,11 +62,11 @@ Manifest tidak mengizinkan `exit_code_by_runtime`. Bila suatu runtime belum meng
 ## Cakupan yang dijaga
 
 1. Sintaks, alias resmi, komentar, string, ekstensi `.cuk`, dan error parsing.
-2. Nilai, operator, precedence, boolean, short-circuit, dan aritmetika.
-3. Fungsi, scope, return, jumlah argumen, nama belum dikenal, dan rekursi.
-4. List, kamus, identitas kunci, indeks, mutasi, dan batas kapasitas.
+2. Nilai dan angka: precedence, pembagian lantai/modulo negatif, boolean, short-circuit, dan pembagian nol.
+3. Fungsi dan scope: return, aritas, nama belum dikenal, scope lokal tidak bocor, alias koleksi, dan rekursi.
+4. List/kamus: identitas kunci, mutasi termasuk melalui parameter, indeks di luar batas, kunci hilang, dan batas kapasitas.
 5. Kondisi, loop, iterasi rentang, dan batas eksekusi.
-6. Built-in: kasus sukses, aritas salah, domain numerik, serta status dukungan per target.
+6. Built-in: hasil numerik, ties-to-even, aritas salah, tipe boolean yang ditolak sebagai angka, domain numerik, serta status dukungan per target.
 7. CLI: kelas error, nomor baris, kode keluar, output dan input standar.
 8. File, jaringan, browser, FFI, dan kapabilitas platform hanya diuji pada target yang secara eksplisit mendukungnya.
 

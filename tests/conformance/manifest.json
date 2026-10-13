@@ -404,6 +404,184 @@
         "reference": "required",
         "native": "unsupported"
       }
+    },
+    {
+      "id": "numbers.negative-floor-division-and-modulo",
+      "source": "numeric_floor_modulo.cuk",
+      "profile": "core",
+      "requires": [
+        "numbers",
+        "floor-division",
+        "modulo"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "-3\n2\n0.5\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "builtins.native-numeric-core",
+      "source": "builtins_native_numeric.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-builtins",
+        "rounding"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "4\n3\n8\n2\n4\n-2\n2\n-3\n-2\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.numeric-division-by-zero",
+      "source": "division_by_zero.cuk",
+      "profile": "core",
+      "requires": [
+        "arithmetic",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.native-builtin-wrong-arity",
+      "source": "builtin_native_arity_error.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.native-builtin-rejects-boolean",
+      "source": "builtin_native_type_error.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "collections.list-index-boundary",
+      "source": "list_index_out_of_range.cuk",
+      "profile": "core",
+      "requires": [
+        "lists",
+        "indexing",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 3
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "collections.dictionary-missing-key",
+      "source": "dictionary_missing_key.cuk",
+      "profile": "core",
+      "requires": [
+        "dictionaries",
+        "key-lookup",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 3
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "functions.scope-local-does-not-leak",
+      "source": "function_scope_leak.cuk",
+      "profile": "core",
+      "requires": [
+        "functions",
+        "scope",
+        "local-variables",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 7
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "collections.mutation-through-function-argument",
+      "source": "collection_mutation_function_arg.cuk",
+      "profile": "core",
+      "requires": [
+        "functions",
+        "lists",
+        "mutation",
+        "aliasing"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "7\n7\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
     }
   ]
 }

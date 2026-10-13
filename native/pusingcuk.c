@@ -245,6 +245,65 @@ static int string_index(Val v, Val idx, size_t *start, size_t *end) {
 }
 
 
+static int is_builtin_name(const char *name) {
+    static const char *const names[] = {
+        "panjang", "teks", "bilangan", "desimal", "logika", "rentang",
+        "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah",
+        "atas", "pangkat", "sinus", "kosinus", "rata_rata", "median"
+    };
+    for (size_t i = 0; i < sizeof names / sizeof names[0]; i++)
+        if (!strcmp(name, names[i])) return 1;
+    return 0;
+}
+
+static int is_native_numeric_builtin(const char *name) {
+    static const char *const names[] = {
+        "mutlak", "minimum", "maksimum", "bulatkan", "bawah", "atas"
+    };
+    for (size_t i = 0; i < sizeof names / sizeof names[0]; i++)
+        if (!strcmp(name, names[i])) return 1;
+    return 0;
+}
+
+static double round_ties_even(double value) {
+    double lower = floor(value);
+    double fraction = value - lower;
+    if (fraction < 0.5) return lower;
+    if (fraction > 0.5) return lower + 1.0;
+    return fmod(fabs(lower), 2.0) == 0.0 ? lower : lower + 1.0;
+}
+
+static Val call_native_numeric_builtin(const char *name, Val *args, int argc, int *handled) {
+    *handled = is_native_numeric_builtin(name);
+    if (!*handled) return num(0);
+
+    int expected = (!strcmp(name, "minimum") || !strcmp(name, "maksimum")) ? 2 : 1;
+    if (argc != expected) {
+        fail("jumlah argumen built-in numerik tidak sesuai kontrak");
+        return num(0);
+    }
+    for (int i = 0; i < argc; i++) {
+        if (args[i].t != NUM || !isfinite(args[i].n)) {
+            fail("built-in numerik membutuhkan argumen angka finite; boolean bukan angka");
+            return num(0);
+        }
+    }
+
+    if (!strcmp(name, "mutlak"))
+        return checked_num(fabs(args[0].n), "mutlak() menghasilkan angka tidak valid");
+    if (!strcmp(name, "minimum"))
+        return args[1].n < args[0].n ? args[1] : args[0];
+    if (!strcmp(name, "maksimum"))
+        return args[1].n > args[0].n ? args[1] : args[0];
+    if (!strcmp(name, "bulatkan"))
+        return checked_num(round_ties_even(args[0].n), "bulatkan() menghasilkan angka tidak valid");
+    if (!strcmp(name, "bawah"))
+        return checked_num(floor(args[0].n), "bawah() menghasilkan angka tidak valid");
+    if (!strcmp(name, "atas"))
+        return checked_num(ceil(args[0].n), "atas() menghasilkan angka tidak valid");
+    return num(0);
+}
+
 static Val primary(void) {
     ws();
     if (take("{")) {
@@ -362,6 +421,13 @@ static Val primary(void) {
                 }
                 if (step == 0) { fail("langkah rentang() tidak boleh nol"); return num(0); }
                 return rangeval(start, end, step);
+            }
+            int builtin_handled = 0;
+            Val builtin_result = call_native_numeric_builtin(name, args, argc, &builtin_handled);
+            if (builtin_handled) return builtin_result;
+            if (is_builtin_name(name)) {
+                fail("built-in ini belum didukung pada runtime native C");
+                return num(0);
             }
             return call_user_function(name, args, argc);
         }
@@ -578,7 +644,7 @@ static int register_function(int header, int end) {
         syntax_fail("deklarasi fungsi harus berbentuk fungsi nama(parameter)");
         p = saved_p; line_no = saved_line; return 0;
     }
-    if (!strcmp(name, "panjang") || !strcmp(name, "rentang")) {
+    if (is_builtin_name(name)) {
         fail("nama fungsi bawaan tidak boleh digunakan ulang");
         p = saved_p; line_no = saved_line; return 0;
     }

@@ -226,7 +226,7 @@
           "status": "supported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "reference": {
           "status": "supported"
@@ -260,7 +260,7 @@
           "status": "supported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "reference": {
           "status": "supported"
@@ -294,7 +294,7 @@
           "status": "supported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "reference": {
           "status": "supported"
@@ -327,7 +327,7 @@
           "status": "supported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "reference": {
           "status": "supported"
@@ -393,7 +393,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "reference": {
           "status": "supported"
@@ -426,7 +426,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "reference": {
           "status": "supported"

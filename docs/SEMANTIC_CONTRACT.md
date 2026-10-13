@@ -31,16 +31,19 @@ Compiler/transpiler lain dan PVM tetap eksperimental. Keduanya tidak mengubah se
 - dan / atau menggunakan short-circuit: operand kanan tidak dievaluasi jika hasil sudah ditentukan.
 - Boolean benar dan salah adalah tipe berbeda dari angka. Kesetaraan benar == 1 menghasilkan tidak.
 - Output boolean memakai `okelah` dan `tidak`, bukan `True`/`False`. Built-in `teks` juga menggunakan ejaan bahasa Pusingcuk untuk boolean.
-- Kontrak built-in disimpan di `library/builtin_contract.json`, diuji oleh `tests/test_builtin_contract.py`, dan didokumentasikan di `docs/language/BUILTINS.md`. Interpreter referensi mendukung 18 built-in yang terdaftar; native C saat ini hanya mengklaim `panjang` dan `rentang`. Transpiler/VM memiliki subset tersendiri.
+- Kontrak built-in disimpan di `library/builtin_contract.json`, diuji oleh `tests/test_builtin_contract.py`, dan didokumentasikan di `docs/language/BUILTINS.md`. Interpreter referensi mendukung 18 built-in terdaftar; native C memiliki fixture untuk delapan: `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, dan `atas`. Transpiler/VM memiliki subset tersendiri.
 - Built-in statistik `rata_rata` dan `median` menerima tepat satu daftar nonkosong berisi angka finite; boolean dan tipe lain ditolak.
 - Urutan output dan mutasi koleksi adalah perilaku teramati yang tidak boleh berubah karena optimisasi.
-- Pembagian dengan nol, overflow, angka non-finite, dan diagnostik spesifik harus memiliki fixture sebelum dianggap stabil lintas backend.
+- Pembagian dengan nol harus gagal sebagai `runtime_error` pada baris sumber operasi; pembagian lantai negatif mengikuti floor matematika (`-7 // 3` menjadi `-3`) dan modulo memakai aturan `a - floor(a / b) * b` (`-7 % 3` menjadi `2`).
+- Overflow dan angka non-finite harus memiliki fixture khusus sebelum dianggap stabil lintas backend.
+- `bulatkan` menggunakan ties-to-even; input boolean bukan angka untuk built-in numerik. Native C mendukung `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, dan `atas` hanya setelah fixture positif, aritas salah, serta penolakan boolean lulus.
 
 ## Kontrol dan fungsi
 
 - Kondisi njir dan mumet memilih cabang/pengulangan sesuai truthiness nilai.
 - Fungsi menggunakan ruang nama fungsi; balek mengembalikan nilai dan hanya sah di dalam fungsi.
 - Jumlah argumen harus cocok dengan jumlah parameter.
+- Parameter dan variabel lokal tidak boleh bocor ke scope pemanggil; mutasi koleksi yang diteruskan sebagai argumen tetap terlihat karena kedua scope merujuk objek koleksi yang sama.
 - Alias keyword dinormalisasi pada front-end; backend tidak boleh mengurai slang lewat pencocokan teks.
 - Kegagalan batas resource harus menjadi error, bukan hasil parsial yang terlihat sukses.
 
@@ -49,7 +52,8 @@ Compiler/transpiler lain dan PVM tetap eksperimental. Keduanya tidak mengubah se
 - Indeks list dimulai dari nol.
 - Kesetaraan list membandingkan panjang dan elemen secara rekursif; list dengan isi sama dibandingkan setara, termasuk list bersarang. Runtime native membatasi kedalaman perbandingan rekursif untuk melindungi stack.
 - Kesetaraan kamus masih berbasis identitas objek; perubahan ke kesetaraan struktural memerlukan keputusan kontrak terpisah.
-- Mutasi indeks mempertahankan identitas koleksi yang dirujuk variabel.
+- Mutasi indeks mempertahankan identitas koleksi yang dirujuk variabel; mutasi melalui parameter fungsi juga harus terlihat dari variabel pemanggil.
+- Indeks list di luar batas dan kunci kamus yang tidak ditemukan harus gagal secara eksplisit dengan kelas `runtime_error` dan nomor baris yang sama pada fixture lintas-runtime.
 - Kunci dictionary teks, angka, dan boolean memiliki identitas tipe; boolean tidak boleh bertabrakan dengan angka yang nilainya sama.
 - Urutan iterasi dictionary harus dinyatakan eksplisit sebelum dijadikan jaminan portabel.
 - Kapasitas, indeks negatif, Unicode penuh, dan serialisasi koleksi mengikuti matriks runtime serta fixture yang sudah ada. Jangan simpulkan dukungan lintas backend dari satu implementasi.

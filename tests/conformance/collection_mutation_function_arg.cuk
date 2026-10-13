@@ -1,0 +1,9 @@
+jancuk
+lah nilai = [1]
+fungsi ubah(daftar)
+    daftar[0] = 7
+    balek daftar[0]
+selesai fungsi
+hedeh ubah(nilai)
+hedeh nilai[0]
+selesai jancuk

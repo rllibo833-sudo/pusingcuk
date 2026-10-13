@@ -135,7 +135,7 @@ class BuiltinContractTests(unittest.TestCase):
                     call_builtin(name, *args, None)
 
     def test_native_c_support_status_matches_implemented_builtin_surface(self):
-        native_supported = {"panjang", "rentang"}
+        native_supported = {"panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan", "bawah", "atas"}
         for name, entry in BUILTIN_BY_NAME.items():
             with self.subTest(builtin=name):
                 expected = "supported" if name in native_supported else "unsupported"
