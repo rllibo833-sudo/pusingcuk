@@ -29,11 +29,11 @@ mkdir -p "$OUTPUT_DIR"
 CFLAGS=(-std=c11 -O2 -Wall -Wextra -Werror)
 
 "$NDK_BIN/aarch64-linux-android${ANDROID_API}-clang" "${CFLAGS[@]}" \
-  -DPUSINGCUK_VERSION='"0.7.1-android"' \
+  "$VERSION_DEFINE" \
   native/pusingcuk.c -lm -o "$OUTPUT_DIR/pusingcuk-native-android-arm64"
 
 "$NDK_BIN/x86_64-linux-android${ANDROID_API}-clang" "${CFLAGS[@]}" \
-  -DPUSINGCUK_VERSION='"0.7.1-android"' \
+  "$VERSION_DEFINE" \
   native/pusingcuk.c -lm -o "$OUTPUT_DIR/pusingcuk-native-android-x86_64"
 
 chmod 755 "$OUTPUT_DIR/pusingcuk-native-android-arm64" "$OUTPUT_DIR/pusingcuk-native-android-x86_64"
@@ -42,5 +42,5 @@ command -v file >/dev/null 2>&1 && file "$OUTPUT_DIR"/pusingcuk-native-android-*
 readelf -h "$OUTPUT_DIR/pusingcuk-native-android-arm64" | grep -q "Machine:.*AArch64"
 readelf -h "$OUTPUT_DIR/pusingcuk-native-android-x86_64" | grep -Eq "Machine:.*(Advanced Micro Devices X86-64|X86-64)"
 strings "$OUTPUT_DIR/pusingcuk-native-android-arm64" | grep -Fq "$PUSINGCUK_VERSION"
-strings "$OUTPUT_DIR/pusingcuk-native-android-x86_64" | grep -Fq "0.7.1-android"
+strings "$OUTPUT_DIR/pusingcuk-native-android-x86_64" | grep -Fq "$PUSINGCUK_VERSION"
 sha256sum "$OUTPUT_DIR"/pusingcuk-native-android-*
