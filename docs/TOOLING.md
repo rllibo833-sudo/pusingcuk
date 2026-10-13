@@ -8,8 +8,9 @@
 | Jalankan program native | `make run-native FILE=program.pusingcuk` atau `pusingcuk-native program.pusingcuk` | Hanya subset native teruji |
 | Tes runtime native | `make test-native` | CI berjalan di Ubuntu; uji Termux fisik tetap diperlukan |
 | Tes interpreter modular | `python -m unittest discover -s tests -v` | Membutuhkan Python |
+| Periksa sintaks tanpa menjalankan | `python pusingcuk_new.py --check program.cuk` | Tidak menjalankan input, file I/O, atau fungsi program | 
 | Terminal interaktif modular | `python terminal.py` | Ini bukan runtime native |
-| CLI interpreter modular | `python pusingcuk_new.py program.pusingcuk` | Membutuhkan Python |
+| CLI interpreter modular | `python pusingcuk_new.py program.cuk` | Membutuhkan Python; `.pusingcuk` lama tetap diterima |
 | Panduan pengguna | `docs/PEMULA.md` | Mengutamakan native Termux |
 | Kemampuan native | `docs/NATIVE_RUNTIME.md` | Hanya fitur yang memiliki tes boleh disebut teruji |
 
