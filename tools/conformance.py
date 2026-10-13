@@ -53,8 +53,8 @@ def load_manifest():
             source_path.relative_to(FIXTURES.resolve())
         except ValueError as exc:
             raise ManifestError(f"{fixture_id}: path source keluar dari direktori fixture") from exc
-        if not source_path.is_file() or source_path.suffix != ".pusingcuk":
-            raise ManifestError(f"{fixture_id}: source harus file .pusingcuk yang ada")
+        if not source_path.is_file() or source_path.suffix not in {".cuk", ".pusingcuk"}:
+            raise ManifestError(f"{fixture_id}: source harus file .cuk atau .pusingcuk yang ada")
 
         expected = item.get("expected")
         if not isinstance(expected, dict) or set(expected) - ALLOWED_EXPECTED_KEYS:
