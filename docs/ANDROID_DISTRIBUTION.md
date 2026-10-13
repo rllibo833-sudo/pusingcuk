@@ -24,15 +24,15 @@ Skrip memeriksa ELF machine architecture menggunakan `readelf`, permission execu
 
 ## Bukti CI saat ini
 
-Workflow [Android native runtime](../.github/workflows/android-native.yml):
+Workflow [Android native runtime](../.github/workflows/android-native.yml) melakukan hal berikut secara otomatis ketika source runtime terkait berubah:
 
-1. Membuat kedua target menggunakan Android NDK.
-2. Memverifikasi ELF architecture dan bit executable.
-3. Menjalankan binary Android x86-64 pada Android API 35 emulator dengan program `halo.cuk`.
-4. Memeriksa output program dan versi runtime.
-5. Mengunggah kedua binary sebagai artifact CI selama 14 hari.
+1. Membuat target Android ARM64 dan x86-64 dengan Android NDK.
+2. Memverifikasi arsitektur ELF dan permission executable.
+3. Mengunggah kedua binary sebagai artifact CI selama 14 hari.
 
-Ini membuktikan bahwa source native bisa dibangun untuk Android dan bahwa executable yang dibangun untuk ABI emulator dapat berjalan di Android. Itu **belum membuktikan** bahwa binary ARM64 sudah diuji pada perangkat fisik ARM64 yang menjalankan Termux. CI emulator x86-64 tidak bisa membuktikan kondisi runtime ARM64 pada ponsel pengguna.
+Eksekusi binary di emulator dipisahkan ke workflow manual [Android emulator smoke test](../.github/workflows/android-emulator-smoke.yml) agar emulator yang lambat tidak menahan pemeriksaan Python/C inti. Jalankan workflow tersebut saat memvalidasi jalur emulator.
+
+Cross-build hanya membuktikan bahwa source berhasil dikompilasi untuk ABI target. Tes emulator membuktikan jalur eksekusi pada emulator x86-64 jika berhasil; keduanya **belum membuktikan** binary ARM64 telah diuji pada perangkat fisik ARM64 yang menjalankan Termux. Verifikasi perangkat nyata tetap terpisah.
 
 ## Jalur yang disarankan untuk Termux ARM64
 
