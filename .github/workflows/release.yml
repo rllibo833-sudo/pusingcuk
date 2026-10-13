@@ -1,4 +1,4 @@
-name: Release
+name: Release binary
 
 on:
   push:
@@ -8,25 +8,65 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: pusingcuk-release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
-      - name: Install PyInstaller
-        run: python -m pip install pyinstaller==6.11.1
-      - name: Build binary
-        run: pyinstaller --noconfirm --clean pusingcuk.spec
+          cache: pip
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install project and build dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f requirements.txt ]]; then
+            python -m pip install -r requirements.txt
+          fi
+          python -m pip install pyinstaller==6.11.1
+
+      - name: Inspect build inputs
+        run: ls -R
+
+      - name: Build standalone executable
+        run: pyinstaller --noconfirm --clean --log-level DEBUG pusingcuk.spec
+
+      - name: Verify executable and bundled example
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s dist/pusingcuk
+          chmod +x dist/pusingcuk
+          output="$(./dist/pusingcuk examples/modular.pusingcuk)"
+          printf '%s\n' "$output"
+          grep -Fq 'Halo, Budi!' <<< "$output"
+          grep -Fq 'selesai' <<< "$output"
+
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
-          gh release create "${GITHUB_REF_NAME}" dist/pusingcuk \
-            --title "${GITHUB_REF_NAME}" \
-            --notes "v0.7.1 - Python interpreter only, PVM/native NOT sandboxed. Includes SSRF DNS fix (8ab6a5c), safe formatter, 3 Good First Issues. Run: ./pusingcuk examples/hello.pusingcuk"
+          set -euo pipefail
+          notes="v0.7.1 - Python interpreter only; PVM/native are NOT sandboxed. Includes SSRF DNS fix (8ab6a5c), safe formatter, and 3 Good First Issues. Run: ./pusingcuk examples/modular.pusingcuk"
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/pusingcuk --clobber
+            gh release edit "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes "$notes"
+          else
+            gh release create "$GITHUB_REF_NAME" dist/pusingcuk \
+              --title "$GITHUB_REF_NAME" \
+              --notes "$notes"
+          fi
