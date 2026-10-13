@@ -4,6 +4,13 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Existing tag to build and publish"
+        required: true
+        default: "v0.7.1"
+        type: string
 
 permissions:
   contents: write
@@ -19,6 +26,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.release_tag || github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -76,15 +85,16 @@ jobs:
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
         shell: bash
         run: |
           set -euo pipefail
           notes="v0.7.1 - Python interpreter only; PVM/native are NOT sandboxed. Includes SSRF DNS fix (8ab6a5c), safe formatter, and 3 Good First Issues. Run: ./pusingcuk examples/modular.pusingcuk"
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" dist/pusingcuk --clobber
-            gh release edit "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes "$notes"
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" dist/pusingcuk --clobber
+            gh release edit "$RELEASE_TAG" --title "$RELEASE_TAG" --notes "$notes"
           else
-            gh release create "$GITHUB_REF_NAME" dist/pusingcuk \
-              --title "$GITHUB_REF_NAME" \
+            gh release create "$RELEASE_TAG" dist/pusingcuk \
+              --title "$RELEASE_TAG" \
               --notes "$notes"
           fi
