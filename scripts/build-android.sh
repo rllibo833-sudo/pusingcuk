@@ -7,6 +7,11 @@ ANDROID_NDK_VERSION="${ANDROID_NDK_VERSION:-27.2.12479018}"
 ANDROID_API="${ANDROID_API:-24}"
 ANDROID_HOME="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
 OUTPUT_DIR="${1:-dist/android}"
+if [[ -z "${PUSINGCUK_VERSION:-}" ]]; then
+  SOURCE_VERSION="$(awk '$1 == "VERSION" && $2 == "?=" { print $3; exit }' Makefile)"
+  PUSINGCUK_VERSION="${SOURCE_VERSION:-0.7.1}-android"
+fi
+VERSION_DEFINE="-DPUSINGCUK_VERSION=\\\"${PUSINGCUK_VERSION}\\\""
 
 if [[ -z "$ANDROID_HOME" ]]; then
   echo "ANDROID_HOME or ANDROID_SDK_ROOT must point to an installed Android SDK." >&2
@@ -36,6 +41,6 @@ chmod 755 "$OUTPUT_DIR/pusingcuk-native-android-arm64" "$OUTPUT_DIR/pusingcuk-na
 command -v file >/dev/null 2>&1 && file "$OUTPUT_DIR"/pusingcuk-native-android-*
 readelf -h "$OUTPUT_DIR/pusingcuk-native-android-arm64" | grep -q "Machine:.*AArch64"
 readelf -h "$OUTPUT_DIR/pusingcuk-native-android-x86_64" | grep -Eq "Machine:.*(Advanced Micro Devices X86-64|X86-64)"
-strings "$OUTPUT_DIR/pusingcuk-native-android-arm64" | grep -Fq "0.7.1-android"
+strings "$OUTPUT_DIR/pusingcuk-native-android-arm64" | grep -Fq "$PUSINGCUK_VERSION"
 strings "$OUTPUT_DIR/pusingcuk-native-android-x86_64" | grep -Fq "0.7.1-android"
 sha256sum "$OUTPUT_DIR"/pusingcuk-native-android-*
