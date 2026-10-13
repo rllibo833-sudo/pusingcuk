@@ -38,6 +38,7 @@ Transpiler backends, PVM, and Android Studio APK generation are outside the requ
 
 - [Experimental PVM workflow](../../.github/workflows/experimental-pvm.yml)
 - [Android Studio APK workflow](../../.github/workflows/android-studio-apk.yml)
+- [Android emulator smoke-test workflow](../../.github/workflows/android-emulator-smoke.yml)
 
 Building the standalone C runtime for Termux is separate from building an Android application. Actual device claims still require testing on a physical Termux ARM64 device.
 
