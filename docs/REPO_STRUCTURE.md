@@ -70,8 +70,9 @@ Indeks lengkap tersedia di [docs/README.md](README.md).
 | `.github/workflows/tests.yml` | CI utama: unit test Python, native C, dan konformansi |
 | `.github/workflows/build-test.yml` | Verifikasi paket CLI Python dan executable PyInstaller |
 | `.github/workflows/release.yml` | Build aset rilis untuk tag |
-| `.github/workflows/android-native.yml` | Cross-build dan smoke test runtime C untuk Android; bukan build aplikasi APK |
+| `.github/workflows/android-native.yml` | Cross-build dan validasi binary runtime C untuk Android; bukan build aplikasi APK |
 | `.github/workflows/experimental-pvm.yml` | Pemeriksaan PVM manual, di luar gate baseline |
+| `.github/workflows/android-emulator-smoke.yml` | Smoke test emulator Android manual, tidak menahan gate inti | 
 | `.github/workflows/android-studio-apk.yml` | Build APK Studio manual, ditunda dari CI inti |
 
 Artefak build dan cache tidak boleh dimasukkan ke Git. `.gitignore` mengabaikan `__pycache__`, hasil test/coverage, `build/`, `dist/`, metadata paket, output Gradle, dan binary lokal. Cache Actions bersifat eksternal dan harus diatur pada workflow, bukan di-commit ke repositori.
