@@ -495,5 +495,6 @@
     "json_io": "tulis_json/baca_json (aliases simpen_json/bongkar_json) use Python's json module and are supported by the Python reference interpreter only. Native C and C backend JSON I/O are unsupported for now.",
     "level4": "Modules, try/catch/finally, jam/waktu and tanggal are supported by the Python reference interpreter only.",
     "level5": "HTTP GET/POST, parsing dan serialisasi JSON, serta warna ANSI tersedia di interpreter referensi Python saja. Permintaan jaringan memakai timeout 10 detik dan mengembalikan salah saat gagal."
-  }
+  },
+  "package_version": "0.7.1"
 }

@@ -35,3 +35,8 @@ Untuk Android Termux, jangan menulis struct C mentah ke file karena padding dan 
 
 ## Batasan saat ini
 OP_FUNGSI dan semantik file handle lintas backend belum lengkap. Kesetaraan seluruh sintaks PusingCuk belum dijamin. OP_SENGGOL tidak boleh membuat koneksi jaringan. Backend JavaScript/Python yang telah diperkeras hanya menerima payload lokal `data:text/plain,...` dan menolak URL eksternal. Fitur ini bukan HTTP client. Jangan jalankan bytecode tak tepercaya: opcode file masih dapat membaca atau menghapus file yang bisa diakses proses, karena belum ada pembatasan sandbox sistem operasi.
+
+
+## Filesystem confinement
+
+PVM Python and JavaScript runtimes resolve file operands relative to the execution working directory, reject absolute paths and parent traversal, and reject symlink components. These controls reduce path escapes but are not an OS sandbox or a guarantee against a hostile concurrent process mutating the project directory. Never execute untrusted PVM bytecode on a device with sensitive files.

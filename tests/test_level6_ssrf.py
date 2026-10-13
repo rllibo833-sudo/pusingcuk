@@ -43,5 +43,23 @@ class DnsRebindingTests(unittest.TestCase):
             self.assertFalse(_is_blocked_hostname("public.example"))
 
 
+    def test_dns_rebinding_between_precheck_and_connect_is_blocked(self):
+        from urllib.request import Request
+        from evaluator import urlopen
+        public, private = addrinfo("93.184.216.34"), addrinfo("127.0.0.1")
+        request = Request("https://rebind.example/data")
+        with patch("evaluator.socket.getaddrinfo", side_effect=[public, private]):
+            self.assertTrue(_valid_http_url("https://rebind.example/data"))
+            with self.assertRaises(ValueError):
+                urlopen(request, timeout=1)
+
+    def test_resolver_rejects_mixed_public_and_private_answers(self):
+        from evaluator import _resolve_public_address
+        mixed = addrinfo("93.184.216.34") + addrinfo("10.0.0.3")
+        with patch("evaluator.socket.getaddrinfo", return_value=mixed):
+            with self.assertRaises(ValueError):
+                _resolve_public_address("mixed.example", 443)
+
+
 if __name__ == "__main__":
     unittest.main()

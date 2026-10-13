@@ -57,3 +57,24 @@ A successful NDK cross-build or Android emulator test is not the same as testing
 - [Security limits](../../SECURITY.md)
 
 Do not execute programs from unknown sources with access to files, credentials, or sensitive data. Pusingcuk is not a sandbox.
+
+
+## Menjalankan skrip `.cuk` langsung
+
+Setelah CLI Python Pusingcuk terpasang dan tersedia di `PATH`, skrip dapat memakai shebang:
+
+```cuk
+#!/usr/bin/env pusingcuk
+jancuk
+hedeh "Halo, Termux"
+selesai jancuk
+```
+
+Jadikan executable dan jalankan:
+
+```sh
+chmod +x script.cuk
+./script.cuk
+```
+
+Di Linux desktop, ekstensi sumber didaftarkan lewat `pusingcuk.xml` (`text/x-pusingcuk`). Registrasi MIME bukan fasilitas shell yang dibutuhkan Termux.

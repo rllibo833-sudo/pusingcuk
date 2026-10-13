@@ -8,6 +8,28 @@ import sys
 SAFE_RUNTIME = """import ast, pathlib, sys, json
 v = {}
 __opened = None
+__pvm_root = pathlib.Path.cwd().resolve()
+
+def __safe_path(value):
+    if not isinstance(value, str) or not value:
+        raise ValueError("path harus berupa teks relatif non-kosong")
+    raw = pathlib.Path(value)
+    windows = pathlib.PureWindowsPath(value)
+    if raw.is_absolute() or windows.is_absolute() or windows.drive:
+        raise ValueError("path absolut tidak diizinkan")
+    if ".." in value.replace("\\\\", "/").split("/"):
+        raise ValueError("path traversal tidak diizinkan")
+    parts = tuple(part for part in raw.parts if part not in ("", "."))
+    if not parts:
+        raise ValueError("path harus menunjuk ke berkas di dalam project root")
+    current = __pvm_root
+    for part in parts:
+        current = current / part
+        if current.is_symlink():
+            raise ValueError("symlink tidak diizinkan untuk operasi berkas")
+        current.resolve(strict=False).relative_to(__pvm_root)
+    return current.resolve(strict=False)
+
 
 def __offline_data(value):
     text = str(value)
@@ -212,15 +234,15 @@ def compile_pvm(records):
         elif opcode == 9:
             emit("return " + val(arg or "None"))
         elif opcode == 10:
-            emit("__opened = open(" + val(arg) + ", 'a+', encoding='utf-8')")
+            emit("__opened = open(__safe_path(" + val(arg) + "), 'a+', encoding='utf-8')")
         elif opcode == 11:
             match = re.match(r"^([A-Za-z_]\w*)\s+(?:dari|from)\s+(.+)$", arg)
             if match:
-                emit("v[" + repr(match.group(1)) + "] = pathlib.Path(" + val(match.group(2)) + ").read_text(encoding='utf-8')")
+                emit("v[" + repr(match.group(1)) + "] = __safe_path(" + val(match.group(2)) + ").read_text(encoding='utf-8')")
             else:
-                emit("print(pathlib.Path(" + val(arg) + ").read_text(encoding='utf-8'))")
+                emit("print(__safe_path(" + val(arg) + ").read_text(encoding='utf-8'))")
         elif opcode == 12:
-            emit("pathlib.Path(" + val(arg) + ").unlink(missing_ok=True)")
+            emit("__safe_path(" + val(arg) + ").unlink(missing_ok=True)")
         elif opcode == 13:
             if arg in ("njir", "mumet", "untuk", "for") and blocks:
                 indent = max(1, indent - 1)

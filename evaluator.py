@@ -3,12 +3,16 @@ from contextlib import redirect_stdout
 from collections.abc import MutableMapping
 from io import StringIO
 from pathlib import Path
-from urllib.request import Request, build_opener, HTTPRedirectHandler
-from urllib.error import HTTPError
-from urllib.parse import urlsplit
+from urllib.request import Request
+from urllib.parse import urlsplit, urljoin
+import http.client
 import ipaddress
+import os
 import socket
+import ssl
+import stat
 import json
+from pathlib import Path, PureWindowsPath
 from datetime import datetime, date
 from ast_nodes import Node
 from parser import parse
@@ -136,53 +140,166 @@ def _is_blocked_address(address):
 
 
 def _is_blocked_hostname(hostname):
+    """Fail closed if any DNS answer is non-public."""
     host = hostname.lower().rstrip(".")
     if host == "localhost" or host.endswith(".localhost"):
         return True
     try:
-        address = ipaddress.ip_address(host)
+        literal = ipaddress.ip_address(host.split("%", 1)[0])
     except ValueError:
-        # Resolve before handing the URL to urllib. Fail closed when DNS cannot
-        # be resolved, and inspect both IPv4 and IPv6 answers.
         try:
-            ipv4 = socket.gethostbyname(host)
-            addresses = [ipaddress.ip_address(ipv4)]
-            for result in socket.getaddrinfo(host, None, type=socket.SOCK_STREAM):
-                addresses.append(ipaddress.ip_address(result[4][0].split("%", 1)[0]))
+            results = socket.getaddrinfo(host, None, type=socket.SOCK_STREAM)
+            if not results:
+                return True
+            addresses = [ipaddress.ip_address(result[4][0].split("%", 1)[0]) for result in results]
         except (OSError, ValueError):
             return True
         return any(_is_blocked_address(address) for address in addresses)
-    return _is_blocked_address(address)
+    return _is_blocked_address(literal)
 
 
 def _valid_http_url(url):
     """Accept HTTP(S) URLs only when their host is not a local/private address."""
     try:
         parsed = urlsplit(url)
-        # TODO: bind resolved IP to connection to prevent DNS-rebinding TOCTOU - see test_level6_ssrf.py
         return (
             parsed.scheme.lower() in ("http", "https")
             and bool(parsed.hostname)
+            and parsed.username is None
+            and parsed.password is None
             and not _is_blocked_hostname(parsed.hostname)
         )
     except (TypeError, ValueError):
         return False
 
 
-class _SafeRedirectHandler(HTTPRedirectHandler):
-    """Reject private redirect targets and stop after three redirects."""
-    max_redirections = 3
-    max_repeats = 3
+def _resolve_public_address(hostname, port):
+    """Resolve once, validate every answer and return a numeric socket address."""
+    host = hostname.split("%", 1)[0]
+    try:
+        literal = ipaddress.ip_address(host)
+    except ValueError:
+        try:
+            results = socket.getaddrinfo(hostname, port, type=socket.SOCK_STREAM)
+        except OSError as exc:
+            raise ValueError("DNS tidak dapat diresolusikan") from exc
+        if not results:
+            raise ValueError("DNS tidak memiliki alamat")
+        candidates = []
+        for family, _socktype, _proto, _canonname, sockaddr in results:
+            address = ipaddress.ip_address(sockaddr[0].split("%", 1)[0])
+            if _is_blocked_address(address):
+                raise ValueError("tujuan HTTP non-publik diblokir")
+            if family in (socket.AF_INET, socket.AF_INET6):
+                sockaddr = (sockaddr[0], port, *sockaddr[2:]) if family == socket.AF_INET6 else (sockaddr[0], port)
+                candidates.append((family, sockaddr))
+        if not candidates:
+            raise ValueError("DNS tidak memiliki alamat yang didukung")
+        return candidates[0]
+    if _is_blocked_address(literal):
+        raise ValueError("tujuan HTTP non-publik diblokir")
+    family = socket.AF_INET6 if literal.version == 6 else socket.AF_INET
+    sockaddr = (str(literal), port, 0, 0) if family == socket.AF_INET6 else (str(literal), port)
+    return family, sockaddr
 
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        if not _valid_http_url(newurl):
-            raise HTTPError(newurl, code, "redirect target blocked", headers, fp)
-        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+class _PinnedHTTPConnection(http.client.HTTPConnection):
+    def __init__(self, host, port, family, sockaddr, timeout):
+        super().__init__(host, port, timeout=timeout)
+        self._pinned_family, self._pinned_sockaddr = family, sockaddr
+
+    def connect(self):
+        sock = socket.socket(self._pinned_family, socket.SOCK_STREAM)
+        sock.settimeout(self.timeout)
+        try:
+            sock.connect(self._pinned_sockaddr)
+        except Exception:
+            sock.close()
+            raise
+        self.sock = sock
+
+
+class _PinnedHTTPSConnection(http.client.HTTPSConnection):
+    def __init__(self, host, port, family, sockaddr, timeout):
+        super().__init__(host, port, timeout=timeout, context=ssl.create_default_context())
+        self._pinned_family, self._pinned_sockaddr = family, sockaddr
+
+    def connect(self):
+        sock = socket.socket(self._pinned_family, socket.SOCK_STREAM)
+        sock.settimeout(self.timeout)
+        try:
+            sock.connect(self._pinned_sockaddr)
+            self.sock = self._context.wrap_socket(sock, server_hostname=self.host)
+        except Exception:
+            sock.close()
+            raise
+
+
+class _PinnedResponse:
+    """Keep the validated connection alive while reading its bounded response."""
+    def __init__(self, response, connection, url):
+        self._response, self._connection, self._url = response, connection, url
+        self.headers = response.headers
+
+    def read(self, size=-1):
+        return self._response.read(size)
+
+    def geturl(self):
+        return self._url
+
+    def close(self):
+        try:
+            self._response.close()
+        finally:
+            self._connection.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, traceback):
+        self.close()
+        return False
 
 
 def urlopen(request, timeout=10):
-    """Open HTTP requests with a private-address-aware redirect handler."""
-    return build_opener(_SafeRedirectHandler()).open(request, timeout=timeout)
+    """Connect directly to a validated numeric IP, never re-resolving for TCP."""
+    current_url = request.full_url
+    method, body = request.get_method().upper(), request.data
+    headers = dict(request.header_items())
+    for redirect_count in range(4):
+        parsed = urlsplit(current_url)
+        scheme, hostname = parsed.scheme.lower(), parsed.hostname
+        if scheme not in ("http", "https") or not hostname or parsed.username is not None:
+            raise ValueError("URL HTTP(S) tidak valid")
+        port = parsed.port or (443 if scheme == "https" else 80)
+        family, sockaddr = _resolve_public_address(hostname, port)
+        connection = (
+            _PinnedHTTPSConnection(hostname, port, family, sockaddr, timeout)
+            if scheme == "https" else
+            _PinnedHTTPConnection(hostname, port, family, sockaddr, timeout)
+        )
+        target = parsed.path or "/"
+        if parsed.query:
+            target += "?" + parsed.query
+        try:
+            connection.request(method, target, body=body, headers=headers)
+            response = connection.getresponse()
+        except Exception:
+            connection.close()
+            raise
+        status, location = response.status, response.getheader("Location")
+        if status in (301, 302, 303, 307, 308) and location:
+            response.close()
+            connection.close()
+            if redirect_count >= 3:
+                raise ValueError("terlalu banyak redirect HTTP")
+            current_url = urljoin(current_url, location)
+            if status == 303 or (status in (301, 302) and method not in ("GET", "HEAD")):
+                method, body = "GET", None
+                headers = {key: value for key, value in headers.items() if key.lower() not in ("content-type", "content-length", "host")}
+            continue
+        return _PinnedResponse(response, connection, current_url)
+    raise ValueError("terlalu banyak redirect HTTP")
 
 
 def _response_url_is_safe(response, original_url):
@@ -206,6 +323,114 @@ def _read_http_response(response):
 MAX_MODULE_FILE_BYTES = 1 * 1024 * 1024
 MAX_MODULE_DEPTH = 20
 _REPO_ROOT = Path(__file__).resolve().parent
+
+
+def _project_path_parts(project_root, raw_path, base_dir=None):
+    if not isinstance(raw_path, (str, Path)) or not str(raw_path):
+        raise ValueError("path harus berupa teks relatif non-kosong")
+    raw_text = str(raw_path)
+    lexical, windows = Path(raw_text), PureWindowsPath(raw_text)
+    if lexical.is_absolute() or windows.is_absolute() or windows.drive:
+        raise ValueError("path absolut tidak diizinkan")
+    if ".." in raw_text.replace("\\", "/").split("/"):
+        raise ValueError("path traversal tidak diizinkan")
+    root = Path(project_root).resolve()
+    base = Path(base_dir or root).resolve()
+    try:
+        base_parts = base.relative_to(root).parts
+    except ValueError as exc:
+        raise ValueError("direktori dasar berada di luar project root") from exc
+    parts = tuple(base_parts) + tuple(part for part in lexical.parts if part not in ("", "."))
+    if not parts:
+        raise ValueError("path harus menunjuk ke berkas di dalam project root")
+    return root, parts
+
+
+def _confined_project_path(project_root, raw_path, base_dir=None):
+    root, parts = _project_path_parts(project_root, raw_path, base_dir)
+    candidate = root
+    for part in parts:
+        candidate = candidate / part
+        if candidate.is_symlink():
+            raise ValueError("symlink tidak diizinkan untuk operasi berkas")
+        candidate = candidate.resolve(strict=False)
+        try:
+            candidate.relative_to(root)
+        except ValueError as exc:
+            raise ValueError("path keluar dari project root") from exc
+    if candidate == root:
+        raise ValueError("operasi berkas tidak boleh menunjuk ke project root")
+    return candidate
+
+
+def _open_project_file(project_root, raw_path, flags, mode=0o666, base_dir=None):
+    root, parts = _project_path_parts(project_root, raw_path, base_dir)
+    nofollow, directory_flag = getattr(os, "O_NOFOLLOW", 0), getattr(os, "O_DIRECTORY", 0)
+    if nofollow and directory_flag and os.open in getattr(os, "supports_dir_fd", set()):
+        root_fd = os.open(root, os.O_RDONLY | directory_flag)
+        opened_dirs, current_fd = [], root_fd
+        try:
+            for part in parts[:-1]:
+                next_fd = os.open(part, os.O_RDONLY | directory_flag | nofollow, dir_fd=current_fd)
+                opened_dirs.append(next_fd)
+                current_fd = next_fd
+            fd = os.open(parts[-1], flags | nofollow, mode, dir_fd=current_fd)
+            if not stat.S_ISREG(os.fstat(fd).st_mode):
+                os.close(fd)
+                raise ValueError("hanya berkas reguler yang diizinkan")
+            return fd
+        finally:
+            for directory_fd in reversed(opened_dirs):
+                os.close(directory_fd)
+            os.close(root_fd)
+    path = _confined_project_path(root, raw_path, base_dir)
+    fd = os.open(path, flags | nofollow, mode)
+    try:
+        Path(os.path.realpath(path)).relative_to(root)
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            raise ValueError("hanya berkas reguler yang diizinkan")
+        return fd
+    except Exception:
+        os.close(fd)
+        raise
+
+
+def _read_project_text(project_root, raw_path, base_dir=None, max_bytes=None):
+    fd = _open_project_file(project_root, raw_path, os.O_RDONLY, base_dir=base_dir)
+    with os.fdopen(fd, "rb") as stream:
+        data = stream.read(max_bytes + 1 if max_bytes is not None else -1)
+    if max_bytes is not None and len(data) > max_bytes:
+        raise ValueError("berkas melebihi batas ukuran")
+    return data.decode("utf-8")
+
+
+def _write_project_text(project_root, raw_path, text, base_dir=None):
+    fd = _open_project_file(project_root, raw_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, base_dir=base_dir)
+    with os.fdopen(fd, "w", encoding="utf-8") as stream:
+        stream.write(text)
+
+
+def _delete_project_file(project_root, raw_path):
+    root, parts = _project_path_parts(project_root, raw_path)
+    nofollow, directory_flag = getattr(os, "O_NOFOLLOW", 0), getattr(os, "O_DIRECTORY", 0)
+    if not (nofollow and directory_flag and os.open in getattr(os, "supports_dir_fd", set())):
+        _confined_project_path(root, raw_path).unlink()
+        return
+    root_fd = os.open(root, os.O_RDONLY | directory_flag)
+    opened_dirs, current_fd = [], root_fd
+    try:
+        for part in parts[:-1]:
+            next_fd = os.open(part, os.O_RDONLY | directory_flag | nofollow, dir_fd=current_fd)
+            opened_dirs.append(next_fd)
+            current_fd = next_fd
+        entry_stat = os.stat(parts[-1], dir_fd=current_fd, follow_symlinks=False)
+        if stat.S_ISLNK(entry_stat.st_mode):
+            raise ValueError("symlink tidak diizinkan untuk operasi berkas")
+        os.unlink(parts[-1], dir_fd=current_fd)
+    finally:
+        for directory_fd in reversed(opened_dirs):
+            os.close(directory_fd)
+        os.close(root_fd)
 
 
 class Evaluator:
@@ -310,21 +535,20 @@ class Evaluator:
                     if len(args) != 1 or not isinstance(args[0], str):
                         self.fail(line, "angkut membutuhkan satu path berkas teks")
                     raw_path = Path(args[0])
-                    # Main-program imports start at the repository root. Imports made
-                    # inside a module are relative to that module's own source file.
-                    if raw_path.is_absolute() or ".." in raw_path.parts:
-                        return False
-                    # .cuk is canonical; keep .pusingcuk imports compatible.
                     if raw_path.suffix not in {".cuk", ".pusingcuk"}:
                         return False
                     if self._module_depth >= MAX_MODULE_DEPTH:
                         return False
-                    base_dir = self.project_root if self._is_main or self.source_path is None else self.source_path.parent
-                    path = (base_dir / raw_path).resolve()
+                    # Module paths are relative to the entrypoint's directory (or the importing module's directory).
+                    base_dir = self.source_path.parent if self.source_path is not None else self.project_root
                     try:
-                        path.relative_to(self.project_root)
-                    except ValueError:
+                        path = _confined_project_path(self.project_root, args[0], base_dir)
+                        if not path.is_file() or path.stat().st_size > MAX_MODULE_FILE_BYTES:
+                            return False
+                        source = _read_project_text(self.project_root, args[0], base_dir, max_bytes=MAX_MODULE_FILE_BYTES)
+                    except (OSError, UnicodeError, ValueError):
                         return False
+
                     if path in self._module_loading_stack:
                         # A cycle is a failed import, not unbounded recursive evaluation.
                         return False
@@ -377,28 +601,23 @@ class Evaluator:
                     if len(args) != 2 or not all(isinstance(x, str) for x in args):
                         self.fail(line, "tulis membutuhkan path dan teks berupa string")
                     try:
-                        Path(args[0]).write_text(args[1], encoding="utf-8")
+                        _write_project_text(self.project_root, args[0], args[1])
                         return True
-                    except OSError:
+                    except (OSError, ValueError):
                         return False
                 if n.name == "baca":
                     if len(args) != 1 or not isinstance(args[0], str):
                         self.fail(line, "baca membutuhkan satu path berupa string")
                     try:
-                        return Path(args[0]).read_text(encoding="utf-8")
-                    except FileNotFoundError:
-                        return False
-                    except OSError:
+                        return _read_project_text(self.project_root, args[0])
+                    except (OSError, ValueError, UnicodeError):
                         return False
                 if n.name == "tulis_json":
                     if len(args) != 2 or not isinstance(args[0], str):
                         self.fail(line, "tulis_json membutuhkan path teks dan satu objek")
                     try:
                         data = _json_ready(args[1])
-                        Path(args[0]).write_text(
-                            json.dumps(data, ensure_ascii=False, indent=2),
-                            encoding="utf-8",
-                        )
+                        _write_project_text(self.project_root, args[0], json.dumps(data, ensure_ascii=False, indent=2))
                         return True
                     except (OSError, TypeError, ValueError):
                         return False
@@ -406,9 +625,9 @@ class Evaluator:
                     if len(args) != 1 or not isinstance(args[0], str):
                         self.fail(line, "baca_json membutuhkan satu path berupa teks")
                     try:
-                        data = json.loads(Path(args[0]).read_text(encoding="utf-8"))
+                        data = json.loads(_read_project_text(self.project_root, args[0]))
                         return _language_json(data)
-                    except (OSError, json.JSONDecodeError):
+                    except (OSError, ValueError, UnicodeError):
                         return False
                 if n.name == "kepo_internet":
                     if len(args) != 1 or not isinstance(args[0], str):

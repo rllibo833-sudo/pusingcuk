@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="text/x-pusingcuk">
+    <comment>Pusingcuk source code</comment>
+    <sub-class-of type="text/plain"/>
+    <glob pattern="*.cuk" weight="80"/>
+    <glob pattern="*.pusingcuk" weight="60"/>
+  </mime-type>
+</mime-info>

@@ -3,13 +3,22 @@ CFLAGS ?= -std=c11 -O2 -Wall -Wextra
 LDLIBS ?= -lm
 NATIVE_BIN ?= $(CURDIR)/pusingcuk-native
 VERSION ?= 0.7.1
+LANGUAGE_VERSION ?= 0.4-dev
 PREFIX ?= /usr/local
 DESTDIR ?=
 
-.PHONY: native run-native test-native test-cli version install package
+.PHONY: native run-native test test-native test-cli version language-version install package
 
 version:
 	@printf '%s\n' '$(VERSION)'
+
+language-version:
+	@printf '%s\n' '$(LANGUAGE_VERSION)'
+
+test:
+	python -m unittest discover -s tests -v
+	python tools/conformance.py
+	$(MAKE) test-native
 
 native:
 	$(CC) $(CFLAGS) -DPUSINGCUK_VERSION='"$(VERSION)"' native/pusingcuk.c $(LDLIBS) -o "$(NATIVE_BIN)"

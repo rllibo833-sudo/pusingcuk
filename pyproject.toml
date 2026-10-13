@@ -25,6 +25,10 @@ classifiers = [
 pusingcuk = "pusingcuk_new:main"
 pusingcuk-repl = "terminal:main"
 
+[tool.pusingcuk]
+language-version = "0.4-dev"
+# [project].version is the package/release version, not the language version.
+
 [tool.setuptools]
 py-modules = [
   "ast_nodes",

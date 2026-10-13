@@ -13,7 +13,7 @@ on:
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: pusingcuk-release-${{ github.ref }}
@@ -23,11 +23,35 @@ jobs:
   release:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
+    outputs:
+      release_tag: ${{ steps.tag.outputs.release_tag }}
     steps:
+      - name: Validate release tag
+        id: tag
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG: ${{ inputs.release_tag }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then release_tag="$INPUT_TAG"; else release_tag="$REF_NAME"; fi
+          if [[ ! "$release_tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Invalid release tag: $release_tag"
+            exit 1
+          fi
+          echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.release_tag || github.ref }}
+          ref: ${{ steps.tag.outputs.release_tag }}
+
+      - name: Verify checked-out revision
+        env:
+          RELEASE_TAG: ${{ steps.tag.outputs.release_tag }}
+        run: git rev-parse --verify "refs/tags/$RELEASE_TAG^{commit}" >/dev/null
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -116,14 +140,38 @@ jobs:
           strings dist/android/pusingcuk-native-android-arm64 | grep -Fq "$ANDROID_VERSION"
           sha256sum dist/android/pusingcuk-native-android-arm64
 
+      - name: Upload validated release assets
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: pusingcuk-release-assets
+          path: |
+            dist/pusingcuk
+            dist/android/pusingcuk-native-android-arm64
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download validated release assets
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: pusingcuk-release-assets
+          path: dist
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+          RELEASE_TAG: ${{ needs.release.outputs.release_tag }}
         shell: bash
         run: |
           set -euo pipefail
-          notes="$RELEASE_TAG - Linux x86-64 PyInstaller CLI plus Android ARM64 native CLI built with Android NDK API 24. The Android binary is a subset runtime, not a sandbox; Termux device testing must be completed by maintainers/users. Run Linux: ./pusingcuk examples/modular.pusingcuk; Android/Termux: chmod +x pusingcuk-native-android-arm64 && ./pusingcuk-native-android-arm64 program.cuk"
+          test -s dist/pusingcuk
+          test -s dist/android/pusingcuk-native-android-arm64
+          notes="$RELEASE_TAG - Linux x86-64 PyInstaller CLI plus Android ARM64 native CLI. The native runtime is a subset, not an OS sandbox; do not run untrusted programs."
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             gh release upload "$RELEASE_TAG" dist/pusingcuk dist/android/pusingcuk-native-android-arm64 --clobber
             gh release edit "$RELEASE_TAG" --title "$RELEASE_TAG" --notes "$notes"

@@ -48,3 +48,6 @@ Only the relevant command may be needed for a narrow change, but a security-sens
 ## Keep the repository clean
 
 Do not commit `__pycache__`, test caches, coverage output, build directories, wheel metadata, compiled binaries, Gradle output, local credentials, or backup snapshots. These are ignored by `.gitignore`; review `git status --short` before committing. Workflow caches and artifacts are GitHub-side resources, not files that should be added to the repository.
+
+
+PVM file operations reject absolute paths, parent traversal, and symlink components outside the execution working directory. These checks are defense in depth, not an OS sandbox; untrusted bytecode still requires OS-level isolation.

@@ -19,7 +19,17 @@ def main():
     args = parser.parse_args()
     if not args.file:
         parser.error("berkas sumber wajib diisi (gunakan --help untuk petunjuk)")
-    path = Path(args.file)
+    input_path = Path(args.file).expanduser()
+    path = input_path.resolve()
+    cwd = Path.cwd().resolve()
+    if input_path.is_absolute():
+        project_root = path.parent
+    else:
+        try:
+            path.relative_to(cwd)
+            project_root = cwd
+        except ValueError:
+            project_root = path.parent
 
     if args.fmt:
         if not path.is_file():
@@ -57,7 +67,7 @@ def main():
         return 0
 
     try:
-        run(source, source_path=path, project_root=path.resolve().parent)
+        run(source, source_path=path, project_root=project_root)
     except ParserError as exc:
         print(f"Kesalahan sintaks: {exc}", file=sys.stderr)
         return 2

@@ -1,4 +1,4 @@
-"""Lexer mandiri untuk bahasa pemrograman Pusingcuk 0.4-dev."""
+"""Lexer untuk bahasa Pusingcuk 0.4-dev (paket CLI/rilis saat ini: 0.7.1)."""
 
 from dataclasses import dataclass
 

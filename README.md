@@ -55,6 +55,12 @@ python pusingcuk_new.py --check program.cuk
 
 The `.cuk` extension is Pusingcuk's canonical source-file identity for new programs. The distinctive identity comes from its Indonesian-readable syntax and tested language rules—not the suffix alone. Existing `.pusingcuk` files remain supported for compatibility.
 
+The Python package/release version is `0.7.1` (`pyproject.toml`, `Makefile`); the language contract version is `0.4-dev` (`lexer.py`, `SPEC.md`). These identifiers have different purposes. Use `make version` and `make language-version` to inspect them.
+
+After installing the CLI, run `pusingcuk script.cuk` directly. Executable scripts can start with `#!/usr/bin/env pusingcuk` and use `chmod +x script.cuk`; the CLI must be installed and on `PATH`.
+
+For Linux desktop MIME registration, install `pusingcuk.xml` into `~/.local/share/mime/packages/` and run `update-mime-database ~/.local/share/mime`. MIME registration is a desktop/Linux facility; Termux shell execution uses the shebang and `PATH`.
+
 ## Two maintained execution paths
 
 | Path | What it is | Important limit |
