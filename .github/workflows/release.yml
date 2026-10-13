@@ -51,6 +51,35 @@ jobs:
       - name: Inspect build inputs
         run: ls -R
 
+      - name: Set up Java for Android NDK
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
+        with:
+          packages: platform-tools
+
+      - name: Install pinned Android NDK
+        run: sdkmanager "platforms;android-35" "ndk;27.2.12479018"
+
+      - name: Build Android ARM64 native executable
+        shell: bash
+        run: |
+          set -euo pipefail
+          NDK_BIN="$ANDROID_HOME/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          mkdir -p dist/android
+          "$NDK_BIN/aarch64-linux-android24-clang" -std=c11 -O2 -Wall -Wextra -Werror \
+            -DPUSINGCUK_VERSION='"0.7.1-android"' \
+            native/pusingcuk.c -lm -o dist/android/pusingcuk-native-android-arm64
+          chmod 755 dist/android/pusingcuk-native-android-arm64
+          file dist/android/pusingcuk-native-android-arm64
+          readelf -h dist/android/pusingcuk-native-android-arm64 | grep -q 'Machine:.*AArch64'
+          dist/android/pusingcuk-native-android-arm64 --version
+          sha256sum dist/android/pusingcuk-native-android-arm64
+
       - name: Build standalone executable (spec, with one-file fallback)
         shell: bash
         run: |
@@ -89,12 +118,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          notes="v0.7.1 - Python interpreter only; PVM/native are NOT sandboxed. Includes SSRF DNS fix (8ab6a5c), safe formatter, and 3 Good First Issues. Run: ./pusingcuk examples/modular.pusingcuk"
+          notes="$RELEASE_TAG - Linux x86-64 PyInstaller CLI plus Android ARM64 native CLI built with Android NDK API 24. The Android binary is a subset runtime, not a sandbox; Termux device testing must be completed by maintainers/users. Run Linux: ./pusingcuk examples/modular.pusingcuk; Android/Termux: chmod +x pusingcuk-native-android-arm64 && ./pusingcuk-native-android-arm64 program.cuk"
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" dist/pusingcuk --clobber
+            gh release upload "$RELEASE_TAG" dist/pusingcuk dist/android/pusingcuk-native-android-arm64 --clobber
             gh release edit "$RELEASE_TAG" --title "$RELEASE_TAG" --notes "$notes"
           else
-            gh release create "$RELEASE_TAG" dist/pusingcuk \
+            gh release create "$RELEASE_TAG" dist/pusingcuk dist/android/pusingcuk-native-android-arm64 \
               --title "$RELEASE_TAG" \
               --notes "$notes"
           fi
