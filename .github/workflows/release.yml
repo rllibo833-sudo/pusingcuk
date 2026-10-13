@@ -41,8 +41,25 @@ jobs:
       - name: Inspect build inputs
         run: ls -R
 
-      - name: Build standalone executable
-        run: pyinstaller --noconfirm --clean --log-level DEBUG pusingcuk.spec
+      - name: Build standalone executable (spec, with one-file fallback)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if pyinstaller --noconfirm --clean --log-level DEBUG pusingcuk.spec; then
+            echo "Built executable using pusingcuk.spec"
+          else
+            echo "::warning::Spec build failed; retrying with explicit one-file configuration"
+            rm -rf build dist
+            pyinstaller --noconfirm --clean --log-level DEBUG --onefile pusingcuk_new.py \
+              --name pusingcuk \
+              --add-data "examples:examples" \
+              --hidden-import evaluator \
+              --hidden-import parser \
+              --hidden-import lexer \
+              --hidden-import ast_nodes \
+              --hidden-import tools \
+              --hidden-import tools.formatter
+          fi
 
       - name: Verify executable and bundled example
         shell: bash
@@ -51,7 +68,7 @@ jobs:
           test -s dist/pusingcuk
           chmod +x dist/pusingcuk
           output="$(./dist/pusingcuk examples/modular.pusingcuk)"
-          printf '%s\n' "$output"
+          printf '%s\\n' "$output"
           grep -Fq 'Halo, Budi!' <<< "$output"
           grep -Fq 'selesai' <<< "$output"
 
