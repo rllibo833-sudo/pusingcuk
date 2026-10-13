@@ -11,7 +11,7 @@ if [[ -z "${PUSINGCUK_VERSION:-}" ]]; then
   SOURCE_VERSION="$(awk '$1 == "VERSION" && $2 == "?=" { print $3; exit }' Makefile)"
   PUSINGCUK_VERSION="${SOURCE_VERSION:-0.7.1}-android"
 fi
-VERSION_DEFINE="-DPUSINGCUK_VERSION=\\\"${PUSINGCUK_VERSION}\\\""
+VERSION_DEFINE="-DPUSINGCUK_VERSION=\"${PUSINGCUK_VERSION}\""
 
 if [[ -z "$ANDROID_HOME" ]]; then
   echo "ANDROID_HOME or ANDROID_SDK_ROOT must point to an installed Android SDK." >&2
