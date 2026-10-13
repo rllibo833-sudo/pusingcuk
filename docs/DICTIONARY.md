@@ -56,7 +56,7 @@ A declaration creates a new variable; assignment updates an existing one. Redecl
 
 ## 4. Built-in functions
 
-The complete and test-checked list of 18 built-ins, argument counts, and per-target support is in the [built-in catalogue](language/BUILTINS.md). The examples below are a learner-friendly subset; an entry in a registry does not mean every target supports it.
+The complete and test-checked list of 18 built-ins, argument counts, and per-target support is in the [built-in catalogue](language/BUILTINS.md). The native C runtime currently has fixtures for eight (`panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, and `atas`); the remaining entries stay unsupported there. The examples below are a learner-friendly subset; an entry in a registry does not mean every target supports it.
 
 | Function | Purpose | Example |
 |---|---|---|
