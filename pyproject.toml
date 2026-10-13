@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pusingcuk"
+version = "0.7.1"
+description = "Bahasa pemrograman dengan sintaks Indonesia dan alias slang, untuk belajar dan eksperimen compiler."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+keywords = ["programming-language", "interpreter", "indonesian", "termux"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Education",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+
+[project.scripts]
+pusingcuk = "pusingcuk_new:main"
+pusingcuk-repl = "terminal:main"
+
+[tool.setuptools]
+py-modules = [
+  "ast_nodes",
+  "compiler_ir",
+  "evaluator",
+  "interpreter",
+  "lexer",
+  "parser",
+  "pusingcuk_new",
+  "terminal",
+]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["compiler*", "library*", "tools*"]
+namespaces = true
