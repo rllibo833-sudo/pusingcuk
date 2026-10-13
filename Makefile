@@ -2,7 +2,7 @@ CC ?= cc
 CFLAGS ?= -std=c11 -O2 -Wall -Wextra
 LDLIBS ?= -lm
 NATIVE_BIN ?= $(CURDIR)/pusingcuk-native
-VERSION ?= 0.7.1
+VERSION ?= 0.7.2
 LANGUAGE_VERSION ?= 0.4-dev
 PREFIX ?= /usr/local
 DESTDIR ?=

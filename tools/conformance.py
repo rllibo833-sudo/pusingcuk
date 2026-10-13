@@ -105,9 +105,13 @@ def classify_stderr(returncode, stderr):
     text = stderr.lstrip()
     if returncode == 0:
         return None if not text else "error"
-    if text.startswith("Kesalahan sintaks:"):
+    # Python diagnostics include a source location before the category label;
+    # C diagnostics may begin directly with the category. Classify the first
+    # diagnostic line, not just the first characters of stderr.
+    header = text.splitlines()[0] if text else ""
+    if "Kesalahan sintaks:" in header:
         return "syntax_error"
-    if text.startswith("Kesalahan runtime:"):
+    if "Kesalahan runtime:" in header:
         return "runtime_error"
     return "error"
 

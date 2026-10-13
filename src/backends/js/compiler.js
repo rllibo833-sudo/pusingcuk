@@ -23,9 +23,9 @@ function compile(records){
    case 7:m=a.match(/^([A-Za-z_]\w*)\s*=\s*(.*)$/);if(m)out.push("{const rl=readline.createInterface({input:process.stdin,output:process.stdout});try{v["+JSON.stringify(m[1])+"]=await rl.question("+val(m[2]||"''")+");}finally{rl.close();}}");break;
    case 8:out.push("throw Error('OP_FUNGSI belum didukung oleh backend PVM v1');");break;
    case 9:out.push("return "+val(a||"null")+";");break;
-   case 10:out.push("__opened=fs.openSync(__safePath("+val(a)+"),'a+');");break;
-   case 11:m=a.match(/^([A-Za-z_]\w*)\s+(?:dari|from)\s+(.+)$/);if(m)out.push("v["+JSON.stringify(m[1])+"]=fs.readFileSync(__safePath("+val(m[2])+") ,'utf8');");else out.push("console.log(fs.readFileSync(__safePath("+val(a)+") ,'utf8'));");break;
-   case 12:out.push("fs.rmSync(__safePath("+val(a)+"),{force:true});");break;
+   case 10:out.push("throw Error('PVM JavaScript backend menonaktifkan opcode file; gunakan runtime terisolasi bila akses ini diperlukan');");break;
+   case 11:out.push("throw Error('PVM JavaScript backend menonaktifkan opcode file; baca berkas tidak tersedia');");break;
+   case 12:out.push("throw Error('PVM JavaScript backend menonaktifkan opcode file; hapus berkas tidak tersedia');");break;
    case 13:if(["njir","mumet","untuk","for"].includes(a)){if(blocks.length){blocks.pop();out.push("}");}}else if(a==="buka")out.push("if(__opened!==null){fs.closeSync(__opened);__opened=null;}");break;
    case 14:out.push("v.__gerombolan="+val(a)+";");break;
    case 15:out.push("v.__petik="+val(a)+";");break;

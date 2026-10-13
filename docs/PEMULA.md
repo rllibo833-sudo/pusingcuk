@@ -118,6 +118,16 @@ Program membaca satu baris teks. Jika input kosong, program menampilkan pesan ba
 
 **Mini-challenge:** ubah kalimat sapaan. Jalankan lagi dan lihat apakah output berubah sesuai editmu.
 
+## 5.1 Kalkulator sederhana
+
+Repositori juga menyediakan kalkulator interaktif yang meminta dua angka dan operasi `+`, `-`, `*`, atau `/`:
+
+```sh
+python pusingcuk_new.py examples/kalkulator.cuk
+```
+
+Kalkulator ini memakai keyword resmi `njir`, `kampret`, dan `selesai njir`, bukan keyword `jika`. Ia juga menunjukkan penanganan input nonnumerik dan pembagian dengan nol. Contoh tersebut memakai built-in konversi yang belum tersedia di runtime native C, jadi jalankan dengan interpreter Python. Perbedaan ini disengaja dan dijelaskan dalam [matriks kompatibilitas](COMPATIBILITY.md).
+
 ## 6. Coba perulangan
 
 ```pusingcuk

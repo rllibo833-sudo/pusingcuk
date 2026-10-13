@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pusingcuk"
-version = "0.7.1"
+version = "0.7.2"
 description = "Bahasa pemrograman dengan sintaks Indonesia dan alias slang, untuk belajar dan eksperimen compiler."
 readme = "README.md"
 requires-python = ">=3.11"

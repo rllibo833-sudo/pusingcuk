@@ -19,6 +19,9 @@ pusingcuk halo.cuk
 | Build executable native | `make native` | Membutuhkan compiler C11 |
 | Jalankan program native | `make run-native FILE=program.pusingcuk` atau `pusingcuk-native program.pusingcuk` | Hanya subset native teruji |
 | Tes runtime native | `make test-native` | CI berjalan di Ubuntu; uji Termux fisik tetap diperlukan |
+| Tes konformansi Python/C | `python tools/conformance.py` | Hanya fixture `required` yang membuktikan paritas |
+| Tes batas keamanan PVM | `bash tests/test_all.sh` | JS menonaktifkan opcode file; Python perlu `--allow-file-io` untuk bytecode tepercaya |
+| Tes integrasi Termux fisik | `bash scripts/test-termux-device.sh` | Harus dijalankan di perangkat nyata; cross-build CI bukan bukti uji perangkat |
 | Tes interpreter modular | `python -m unittest discover -s tests -v` | Membutuhkan Python |
 | Periksa sintaks tanpa menjalankan | `python pusingcuk_new.py --check program.cuk` | Tidak menjalankan input, file I/O, atau fungsi program | 
 | Terminal interaktif modular | `python terminal.py` | Ini bukan runtime native |
@@ -42,5 +45,6 @@ pusingcuk halo.cuk
 4. Buat uji konformansi yang menjalankan contoh sama pada runtime modular dan native.
 5. Integrasikan Pusingcuk Studio sebagai editor/run/test front-end; jangan menjanjikan fitur yang belum diuji dengan runtime native.
 6. Tambahkan benchmark dan batas sumber daya setelah semantik modul serta cleanup memori stabil.
+7. Pertahankan pesan parser berisi file/baris/kolom, potongan sumber, pointer, dan saran; tambahkan tes regresi untuk setiap perubahan.
 
 Tooling tidak boleh menjadi alasan menambah dependensi runtime Python pada executable native.

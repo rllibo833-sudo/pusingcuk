@@ -31,12 +31,30 @@ Little-endian. Header enam byte: ASCII PVM1, diikuti versi u16 bernilai 1. Setia
 ## Semantik dan portabilitas
 Operand v1 adalah teks sumber UTF-8. Ekspresi portabel dibatasi pada literal string/angka, boolean benar/salah, nama, list, aritmetika, perbandingan, dan logika dan/atau/bukan. Backend menerjemahkan subset ini ke sintaks target. selesai jancuk tidak menghasilkan instruksi; penutup blok lain menghasilkan OP_TUTUP. AST assembler saat ini berupa daftar node instruksi dari parser baris, bukan AST ekspresi lengkap.
 
-Untuk Android Termux, jangan menulis struct C mentah ke file karena padding dan endianness. Path ~/... pada OP_BUKA diselesaikan memakai HOME; jika kosong, fallback adalah /data/data/com.termux/files/home. Path absolut tersebut dipertahankan.
+Untuk Android Termux, jangan menulis struct C mentah ke file karena padding dan endianness. Operasi file PVM tidak menerima path absolut atau ekspansi `~/`; berkas harus berada relatif terhadap direktori proyek saat proses runtime dimulai.
 
 ## Batasan saat ini
-OP_FUNGSI dan semantik file handle lintas backend belum lengkap. Kesetaraan seluruh sintaks PusingCuk belum dijamin. OP_SENGGOL tidak boleh membuat koneksi jaringan. Backend JavaScript/Python yang telah diperkeras hanya menerima payload lokal `data:text/plain,...` dan menolak URL eksternal. Fitur ini bukan HTTP client. Jangan jalankan bytecode tak tepercaya: opcode file masih dapat membaca atau menghapus file yang bisa diakses proses, karena belum ada pembatasan sandbox sistem operasi.
+OP_FUNGSI dan semantik file handle lintas backend belum lengkap. Kesetaraan seluruh sintaks PusingCuk belum dijamin. OP_SENGGOL tidak boleh membuat koneksi jaringan. Backend JavaScript/Python hanya menerima payload lokal `data:text/plain,...` dan menolak URL eksternal. Fitur ini bukan HTTP client. Operasi file PVM berada di luar kontrak bahasa stabil.
 
 
 ## Filesystem confinement
 
-PVM Python and JavaScript runtimes resolve file operands relative to the execution working directory, reject absolute paths and parent traversal, and reject symlink components. These controls reduce path escapes but are not an OS sandbox or a guarantee against a hostile concurrent process mutating the project directory. Never execute untrusted PVM bytecode on a device with sensitive files.
+### Python backend
+
+File opcodes `OP_BUKA`, `OP_NGINTIP`, dan `OP_CORET` **ditolak secara default**. Untuk bytecode yang memang dipercaya, operator harus memberikan kapabilitas eksplisit pada saat runtime:
+
+```sh
+python3 generated_program.py --allow-file-io
+```
+
+Pada POSIX yang mendukung `openat`/`dir_fd`, `O_NOFOLLOW`, dan `O_DIRECTORY`, runtime membuka direktori proyek sebagai file descriptor tetap lalu menuruni setiap komponen relatif dengan descriptor tersebut. File final dibuka dengan `O_NOFOLLOW`; penghapusan dilakukan relatif terhadap descriptor direktori yang sudah terbuka. Path absolut, drive Windows, `..`, dan symlink ditolak. Perubahan current working directory setelah runtime dimulai tidak mengalihkan root descriptor.
+
+Jika primitive OS itu tidak tersedia, operasi file tetap ditolak. Ini memperkuat batas path aplikasi tetapi **bukan sandbox OS umum**: program tepercaya yang diberi kapabilitas masih berjalan dengan hak akses proses untuk kemampuan lain yang tersedia di runtime.
+
+### JavaScript backend
+
+Opcode file (`OP_BUKA`, `OP_NGINTIP`, `OP_CORET`) secara sengaja gagal dengan pesan bahwa operasi tersebut dinonaktifkan. Backend JS tidak menawarkan flag untuk membuka kembali file I/O karena ia belum memiliki implementasi portabel yang tahan terhadap symlink race dengan descriptor relatif ke root.
+
+### Cakupan jaminan
+
+PVM masih draft dan bukan ABI stabil. Parser, resource limits, dan pembatasan path tidak membuat bytecode tak tepercaya aman. Jangan menjalankannya di perangkat berisi file sensitif atau kredensial. Issue #75 tetap terbuka sampai review independen menyatakan kriteria keamanan yang tersisa terpenuhi.

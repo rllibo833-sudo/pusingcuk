@@ -61,7 +61,10 @@ def main():
         try:
             parse_source(source, filename=str(path))
         except ParserError as exc:
-            print(f"Kesalahan sintaks: {exc}", file=sys.stderr)
+            message = str(exc)
+            if "Kesalahan sintaks:" not in message:
+                message = f"Kesalahan sintaks: {message}"
+            print(message, file=sys.stderr)
             return 2
         print(f"OK: sintaks valid — {path}")
         return 0
@@ -69,7 +72,10 @@ def main():
     try:
         run(source, source_path=path, project_root=project_root)
     except ParserError as exc:
-        print(f"Kesalahan sintaks: {exc}", file=sys.stderr)
+        message = str(exc)
+        if "Kesalahan sintaks:" not in message:
+            message = f"Kesalahan sintaks: {message}"
+        print(message, file=sys.stderr)
         return 2
     except (RuntimeError, ValueError, TypeError, IndexError, OSError) as exc:
         print(f"Kesalahan runtime: {exc}", file=sys.stderr)

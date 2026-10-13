@@ -1038,7 +1038,7 @@ static Val call_user_function(const char *name, Val *args, int argc) {
 
 
 #ifndef PUSINGCUK_VERSION
-#define PUSINGCUK_VERSION "0.4.0-alpha.1"
+#define PUSINGCUK_VERSION "0.7.2"
 #endif
 
 static void print_usage(FILE *out, const char *program) {

@@ -16,6 +16,20 @@ class ConformanceContractTests(unittest.TestCase):
             "syntax_error",
         )
         self.assertEqual(
+            classify_stderr(
+                2,
+                "[contoh.cuk] Baris 2, kolom 8: Kesalahan sintaks: ekspresi tidak valid\\n",
+            ),
+            "syntax_error",
+        )
+        self.assertEqual(
+            classify_stderr(
+                1,
+                "[contoh.cuk] Baris 7, kolom 4: Kesalahan runtime: variabel belum dibuat\\n",
+            ),
+            "runtime_error",
+        )
+        self.assertEqual(
             classify_stderr(2, "Kesalahan sintaks: Baris 2: ekspresi tidak valid\n"),
             "syntax_error",
         )

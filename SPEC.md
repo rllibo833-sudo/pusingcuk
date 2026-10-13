@@ -114,7 +114,7 @@ Baris yang setelah spasi awalnya dimulai dengan # dianggap komentar.
 
 ## 12. Penanganan kesalahan
 
-Kesalahan sumber dibedakan menjadi **kesalahan sintaks** dan **kesalahan runtime**. Keduanya ditulis ke stderr dan menyertakan nomor baris jika tersedia. Interpreter referensi dan runtime native C menggunakan kode keluar yang sama untuk program: `0` berhasil, `1` kesalahan runtime, dan `2` kesalahan sintaks. CLI Python menggunakan kode `3` untuk berkas sumber yang tidak ditemukan; runtime native menyamakan kode itu untuk kasus yang sama. Pesan internal boleh berbeda, tetapi kelas error dan baris sumber pada fixture lintas-runtime harus sama.
+Kesalahan sumber dibedakan menjadi **kesalahan sintaks** dan **kesalahan runtime**. Keduanya ditulis ke stderr dan menyertakan nomor baris jika tersedia. Interpreter referensi dan runtime native C menggunakan kode keluar yang sama untuk program: `0` berhasil, `1` kesalahan runtime, dan `2` kesalahan sintaks. CLI Python menggunakan kode `3` untuk berkas sumber yang tidak ditemukan; runtime native menyamakan kode itu untuk kasus yang sama. Pesan internal boleh berbeda, tetapi kelas error dan baris sumber pada fixture lintas-runtime harus sama. Pada CLI interpreter referensi, diagnostik parser menampilkan nama berkas, baris, kolom, potongan sumber, penunjuk, dan saran koreksi dalam Bahasa Indonesia yang sopan. Runtime lain boleh memakai susunan pesan berbeda; kontrak lintas-runtime tetap kelas error, kode keluar, stdout, dan nomor baris. Perubahan detail pesan tidak boleh menyembunyikan penyebab teknis atau menambahkan keyword/alias baru.
 
 ## 13. Arah compiler dan portabilitas
 

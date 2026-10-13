@@ -11,6 +11,8 @@ python -m compiler.vm program.pbc.json
 
 The compiler parses and validates the source before emitting bytecode. The VM validates the bytecode envelope and instructions before execution. It has an instruction budget and a function-call depth limit; it is **not a security sandbox** for untrusted programs.
 
+This JSON bytecode VM (`python -m compiler.vm`) is distinct from the draft binary PVM v1 assembler/backends described in [PVM_SPEC.md](PVM_SPEC.md). Neither format is a trust boundary. The explicit PVM file-opcode policy applies to the PVM Python/JavaScript backends; it must not be generalized into a claim that all executable formats are sandboxed.
+
 ## Implemented instructions
 
 Constants, variables, input/output, arithmetic/comparison/logical operations, short-circuit jumps, list and dictionary creation, indexing/mutation, conditionals, while/for loops, built-in `panjang` and `rentang`, functions and return values.

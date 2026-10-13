@@ -30,6 +30,7 @@ Pusingcuk harus mudah dimulai oleh pemula, tetap dapat dipakai untuk proyek seri
 | UTF-8 | Berkas sumber dibaca sebagai teks UTF-8 pada CLI Python; native menangani sebagian operasi UTF-8 | Validasi UTF-8 penuh, normalisasi, dan semantik Unicode lintas runtime belum dijamin |
 | File, jaringan, database | Belum ada pustaka standar lintas runtime yang lengkap | Gunakan hanya API yang secara eksplisit tersedia pada runtime target |
 | Keamanan kode tak tepercaya | Tidak ada sandbox yang dijamin | Jangan menjalankan program tak tepercaya dengan hak akses penting |
+| Operasi file PVM | JavaScript: dinonaktifkan; Python: ditolak secara default, kapabilitas eksplisit dan POSIX descriptor-relative no-follow bila tersedia | Tetap bukan sandbox OS; tidak ada dukungan untuk program/bytecode tak tepercaya |
 
 ## Compiler dan interoperabilitas
 

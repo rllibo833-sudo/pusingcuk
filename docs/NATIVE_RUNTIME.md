@@ -30,7 +30,7 @@ Fixture konformansi `.cuk` kini menguji aritmetika lantai/modulo negatif, ties-t
 
 ## Contoh aplikasi native
 
-Contoh rekap anggaran yang memakai fungsi buatan, kamus, iterasi kunci, dan perhitungan total tersedia di `examples/native/rekap_anggaran.pusingcuk`. Panduan pemasangan executable pada Termux tersedia di [NATIVE_TERMUX.md](NATIVE_TERMUX.md).
+Contoh rekap anggaran yang memakai fungsi buatan, kamus, iterasi kunci, dan perhitungan total tersedia di `examples/native/rekap_anggaran.pusingcuk`. Panduan pemasangan executable pada Termux tersedia di [NATIVE_TERMUX.md](NATIVE_TERMUX.md). Skrip validasi integrasi pada perangkat fisik adalah [`scripts/test-termux-device.sh`](../scripts/test-termux-device.sh); hasil Ubuntu CI atau cross-build Android tidak menggantikannya.
 
 ## Build dan jalankan
 

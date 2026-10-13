@@ -77,3 +77,5 @@ Indeks lengkap tersedia di [docs/README.md](README.md).
 | `.github/workflows/android-studio-apk.yml` | Build APK Studio manual, ditunda dari CI inti |
 
 Artefak build dan cache tidak boleh dimasukkan ke Git. `.gitignore` mengabaikan `__pycache__`, hasil test/coverage, `build/`, `dist/`, metadata paket, output Gradle, dan binary lokal. Cache Actions bersifat eksternal dan harus diatur pada workflow, bukan di-commit ke repositori.
+
+- `scripts/test-termux-device.sh`: validasi integrasi yang harus dijalankan manual pada perangkat fisik Termux ARM64.

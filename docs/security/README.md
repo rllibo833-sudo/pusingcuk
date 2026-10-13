@@ -10,7 +10,9 @@ Pusingcuk is experimental and does not provide a general-purpose operating-syste
 |---|---|
 | Python reference interpreter | A URL/address filter in the evaluator is not proof that every network path, redirect, or host interaction is safe. |
 | Native C runtime | Resource/loop limits do not isolate file access, memory, or host permissions. |
-| PVM and experimental backends | Restricted expression parsing does not make file operations safe or confine them to an OS sandbox. |
+| PVM Python backend | File opcodes default-deny; explicit capability enables descriptor-relative POSIX path access with no-follow checks. Still not an OS sandbox. |
+| PVM JavaScript backend | File opcodes are disabled because safe portable descriptor-relative access is unavailable. |
+| Other experimental backends | Restricted expression parsing does not make file operations safe or confine them to an OS sandbox. |
 | Compiler output and Android Studio prototype | Generated code and an editor are not security boundaries. |
 
 Always verify the exact entry point and target being reviewed. Security behavior in the Python evaluator must not be credited to the native runtime, PVM, or generated code unless those paths have their own implementation and regression tests.
@@ -50,4 +52,4 @@ Only the relevant command may be needed for a narrow change, but a security-sens
 Do not commit `__pycache__`, test caches, coverage output, build directories, wheel metadata, compiled binaries, Gradle output, local credentials, or backup snapshots. These are ignored by `.gitignore`; review `git status --short` before committing. Workflow caches and artifacts are GitHub-side resources, not files that should be added to the repository.
 
 
-PVM file operations reject absolute paths, parent traversal, and symlink components outside the execution working directory. These checks are defense in depth, not an OS sandbox; untrusted bytecode still requires OS-level isolation.
+PVM Python file opcodes are denied unless `--allow-file-io` is passed for trusted bytecode; the enabled implementation uses a pinned POSIX root descriptor and descriptor-relative no-follow operations. JavaScript PVM file opcodes are disabled. These are application-level defenses, not an OS sandbox; never run untrusted bytecode.

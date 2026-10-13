@@ -39,6 +39,25 @@
       }
     },
     {
+      "id": "syntax.actionable-diagnostic-location",
+      "source": "actionable_syntax_error.cuk",
+      "profile": "core",
+      "requires": [
+        "syntax-diagnostics",
+        "source-location"
+      ],
+      "expected": {
+        "exit_code": 2,
+        "stdout": "",
+        "stderr_class": "syntax_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
       "id": "functions.return-value",
       "source": "functions.pusingcuk",
       "profile": "core",

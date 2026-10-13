@@ -1,12 +1,12 @@
 name: "Good first issue: contoh kalkulator"
-description: "Tambahkan contoh kalkulator pemula memakai tanya dan jika."
+description: "Tambahkan contoh kalkulator pemula memakai tanya dan percabangan resmi."
 labels: ["good first issue"]
-title: "[Good First Issue] Tambahkan contoh kalkulator dengan tanya + jika"
+title: "[Good First Issue] Tambahkan contoh kalkulator .cuk dengan tanya dan njir"
 body:
   - type: markdown
     attributes:
       value: |
-        Tambahkan `contoh/kalkulator.pusingcuk` yang ramah pemula. Cek `SPEC.md` untuk sintaks yang benar dan pastikan `jika` memang didukung oleh jalur interpreter yang dituju.
+        Tambahkan `examples/kalkulator.cuk` yang ramah pemula. Keyword percabangan kanonis di `SPEC.md` adalah `njir`, `kampret`, dan `selesai njir`; jangan menambahkan keyword `jika` tanpa perubahan kontrak bahasa yang disetujui.
   - type: textarea
     id: plan
     attributes:

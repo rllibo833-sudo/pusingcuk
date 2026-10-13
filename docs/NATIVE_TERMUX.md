@@ -64,7 +64,19 @@ Perintah ini membangun runtime dan menjalankan fixture native, termasuk kamus, i
 python -m unittest discover -s tests -v
 ```
 
-## 5. Cakupan dan batasan
+## 5. Uji pada perangkat Termux fisik
+
+Cross-build CI bukan bukti eksekusi pada perangkat ARM64. Setelah mengikuti instruksi instalasi di atas, jalankan skrip pemeriksaan integrasi ini langsung di Termux dari root repositori:
+
+```sh
+bash scripts/test-termux-device.sh
+```
+
+Skrip memeriksa interpreter Python, instalasi CLI ke virtual environment, izin executable dan shebang `.cuk`, input interaktif, kalkulator, build runtime C, versi paket, contoh anggaran, serta exit code untuk file hilang, kesalahan sintaks, dan kesalahan runtime. Instalasi Python melalui `pip` dapat memerlukan akses jaringan. Skrip **belum dijalankan otomatis oleh CI** dan hasilnya hanya dapat diklaim setelah benar-benar dijalankan pada perangkat; catat model perangkat, versi Android/API, arsitektur, versi paket Termux, dan output.
+
+Python reference dan native C memiliki batas fitur berbeda. Contoh kalkulator memakai built-in `bilangan` dan `teks`, yang belum didukung pada native C; jalankan dengan `python pusingcuk_new.py examples/kalkulator.cuk`. Native C memakai `pusingcuk-native` dan hanya menjalankan subset pada matriks runtime.
+
+## 6. Cakupan dan batasan
 
 Runtime native mendukung subset yang didokumentasikan di [matriks runtime](NATIVE_RUNTIME.md), termasuk fungsi buatan pengguna, parameter, nilai balik `balek`, dan rekursi. Sistem modul belum tersedia. Jalankan `make test-native` setelah setiap perubahan untuk memeriksa kompatibilitas executable mandiri.
 

@@ -1,4 +1,4 @@
-"""Lexer untuk bahasa Pusingcuk 0.4-dev (paket CLI/rilis saat ini: 0.7.1)."""
+"""Lexer untuk bahasa Pusingcuk 0.4-dev (metadata paket main: 0.7.2)."""
 
 from dataclasses import dataclass
 

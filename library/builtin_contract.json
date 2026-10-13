@@ -2,7 +2,7 @@
   "schema_version": 1,
   "contract_version": "0.4-dev",
   "language_version": "0.4-dev",
-  "description": "Canonical metadata contract for Pusingcuk builtins, Python import allow-lists, arity and target capabilities. Implementation code remains in the relevant runtime.",
+  "description": "Canonical metadata contract for Pusingcuk language 0.4-dev built-ins, Python import allow-lists, arity, and target capabilities. Metadata and documentation are validated by tests; implementation code remains target-specific.",
   "targets": [
     "reference",
     "js",

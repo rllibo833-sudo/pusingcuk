@@ -34,7 +34,9 @@ This table describes the Python interpreter's current filter, not a universal ne
 
 The PVM JavaScript backend parses expressions with a restricted grammar instead of dynamically compiling expressions. PVM backends have other restrictions, but they do **not** inherit the Python interpreter's SSRF filtering simply by being PVM. The native runtime and PVM backends are not security sandboxes.
 
-**Important remaining limitation:** PVM still includes file-operation opcodes. File paths are not confined by an operating-system sandbox, and resource limits are not a general security boundary. A program or bytecode file from an untrusted source may still read, modify, or delete accessible files. Do not treat PVM bytecode as a safe distribution format.
+**PVM file-operation mitigation:** the JavaScript PVM backend now disables `OP_BUKA`, `OP_NGINTIP`, and `OP_CORET`. The generated Python backend denies these operations by default; a trusted program must explicitly pass `--allow-file-io`. When enabled, the Python backend requires POSIX `dir_fd`/`openat` support, `O_NOFOLLOW`, and `O_DIRECTORY`, pins the project root to an open directory descriptor, and rejects absolute paths, drive paths, parent traversal, and symlink components. Platforms lacking those primitives fail closed.
+
+These are defense-in-depth controls, not a general OS sandbox. Explicitly enabling file access is only for trusted bytecode; the process retains its operating-system privileges for other available capabilities. PVM remains experimental and must not be used to run untrusted bytecode. Issue #75 stays open pending independent review and acceptance of remaining security requirements.
 
 ### Evidence and regression coverage
 
@@ -49,7 +51,8 @@ Relevant reports include unintended code execution, unauthorized file access, pa
 - [ ] Clearly scope and test SSRF protections for every supported entry point; do not describe the project as SSRF-proof.
 - [ ] Expression evaluation uses a restricted parser/evaluator; it does not use dynamic code compilation as a security boundary.
 - [ ] Network behavior is explicitly documented and tested for each backend; Python interpreter filtering must not be assumed for PVM/native.
-- [ ] File operations are removed, explicitly capability-gated, or confined by operating-system isolation before untrusted programs are supported.
+- [x] PVM file operations are disabled in JS and capability-gated in the Python backend with POSIX descriptor-relative no-follow path access.
+- [ ] Independent security review confirms the PVM mitigation and determines whether OS-level isolation is required before any untrusted-program claim.
 - [ ] Negative tests cover host-global access, constructor/prototype escape, path traversal, symlink escape, and attempts to reach the network.
 - [ ] Input size, payload size, execution time, and resource usage limits are tested.
 - [ ] CI receives only the permissions and secrets it needs.

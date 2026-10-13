@@ -10,16 +10,41 @@ class ParserError(SyntaxError):
 
 
 
+def _diagnostic_suggestion(message):
+    """Return one useful next step without changing the underlying error class."""
+    lower = message.lower()
+    if "balek butuh ekspresi" in lower:
+        return "Tambahkan nilai setelah 'balek', misalnya: balek hasil."
+    if "ketangkep" in lower or "akhirnya" in lower:
+        return "Pastikan 'ketangkep' dan 'akhirnya' berada di dalam blok 'coba ... selesai coba'."
+    if "baris baru" in lower:
+        return "Letakkan setiap pernyataan pada baris baru dan periksa penutup blok."
+    if "mengharapkan identifier" in lower or "identifier/nama" in lower or "nama variabel" in lower:
+        return "Gunakan nama yang diawali huruf atau garis bawah, lalu periksa tanda baca di sekitarnya."
+    if "operator" in lower or "ekspresi" in lower:
+        return "Periksa nilai di sekitar operator dan bandingkan bentuknya dengan contoh di SPEC.md."
+    if "assignment" in lower or "pemanggilan" in lower:
+        return "Gunakan assignment ke variabel yang sudah dibuat atau panggil fungsi dengan tanda kurung."
+    if "token tidak cocok" in lower or "token tidak sesuai" in lower:
+        return "Periksa keyword yang diharapkan, tanda kurung, koma, dan penutup blok."
+    return "Periksa struktur pernyataan dan contoh sintaks di SPEC.md; koreksi bagian yang ditunjuk lalu jalankan --check lagi."
+
+
 def format_diagnostic(source, filename, line, column, message):
-    """Format a compact Indonesian Gen Z diagnostic with a source pointer."""
+    """Format a precise, actionable diagnostic in Indonesian."""
     lines = source.splitlines()
     line = max(1, int(line or 1))
     column = max(1, int(column or 1))
     snippet = lines[line - 1] if line <= len(lines) else ""
-    pointer = "   " + " " * min(column - 1, len(snippet)) + "^"
+    # Expand tabs in both the source and caret prefix so the pointer remains aligned.
+    shown = snippet.expandtabs(4)
+    prefix = snippet[:max(0, min(column - 1, len(snippet)))].expandtabs(4)
+    pointer = "  " + " " * len(prefix) + "^"
+    suggestion = _diagnostic_suggestion(message)
     return (
-        f"[{filename}:{line}:{column}] Waduh, error cuk! {message}\n"
-        f" > {snippet}\n{pointer}"
+        f"[{filename}] Baris {line}, kolom {column}: Kesalahan sintaks: {message}\n"
+        f"  {shown}\n{pointer}\n"
+        f"Saran: {suggestion}"
     )
 
 
@@ -59,16 +84,26 @@ class Parser:
 
     def fail(self, message):
         if message.startswith("token tidak sesuai"):
-            message = "sintaks lu typo cuk, tokennya gak cocok (" + message + ")"
+            message = message.replace("token tidak sesuai", "token tidak cocok", 1)
         elif message.startswith("harus ada baris baru"):
-            message = "kasih baris baru dulu cuk biar parser gak mumet"
+            message = "Pernyataan berikut harus dimulai pada baris baru."
         raise ParserError(format_diagnostic(
             self.source, self.filename, self.tok.line, self.tok.column, message
         ))
 
     def need(self, value=None, kind=None):
         if not self.at(value, kind):
-            self.fail(f"token tidak sesuai; ditemukan {self.tok.value!r}")
+            if value is not None:
+                expected = repr(value)
+            elif kind == "IDENT":
+                expected = "identifier/nama"
+            elif kind is not None:
+                expected = kind
+            else:
+                expected = "nilai yang valid"
+            self.fail(
+                f"mengharapkan {expected}, tetapi menemukan {self.tok.value!r}"
+            )
         return self.take()
 
     def skip_lines(self):
@@ -296,7 +331,7 @@ class Parser:
             self.need("}")
             left = node("Dict", t.line, items=items)
         else:
-            message = f"ekspresi tidak valid: {t.value!r}; sintaks lu typo cuk"
+            message = f"ekspresi tidak valid: {t.value!r}"
             raise ParserError(format_diagnostic(
                 self.source, self.filename, t.line, t.column, message
             ))
@@ -338,5 +373,5 @@ def parse(source, filename="<string>"):
         line, column, message = _lexer_location(str(exc))
         raise ParserError(format_diagnostic(
             source, filename, line, column,
-            "karakter sumber lu gak valid cuk: " + message
+            "karakter sumber tidak dikenali: " + message
         )) from exc

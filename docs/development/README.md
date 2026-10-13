@@ -52,3 +52,10 @@ git status --short
 ```
 
 Do not commit generated binaries, caches, coverage reports, package build output, credentials, or local backups. Keep changes focused, and never delete historical/experimental files solely because they are not part of the current priority.
+
+## Repository governance
+
+The source tree cannot enforce GitHub branch protection by itself. The repository owner must enable protection/ruleset settings for `main`: block force-push and deletion, require pull requests, and require the latest results for Python 3.11/3.12, native GCC/Clang, and `pvm-security-regression` before merging. Verify these settings from GitHub repository settings; an empty ruleset list or an unprotected branch is not an enforcement mechanism.
+
+Do not close PVM security issue #75 merely because application-level path tests pass. The JavaScript backend disables file opcodes; the generated Python backend gates file operations and uses POSIX descriptor-relative no-follow operations when available. Neither is a general-purpose OS sandbox. Independent review is still required before any claim that untrusted bytecode can be executed safely.
+

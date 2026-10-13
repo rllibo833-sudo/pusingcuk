@@ -55,7 +55,7 @@ python pusingcuk_new.py --check program.cuk
 
 The `.cuk` extension is Pusingcuk's canonical source-file identity for new programs. The distinctive identity comes from its Indonesian-readable syntax and tested language rules—not the suffix alone. Existing `.pusingcuk` files remain supported for compatibility.
 
-The Python package/release version is `0.7.1` (`pyproject.toml`, `Makefile`); the language contract version is `0.4-dev` (`lexer.py`, `SPEC.md`). These identifiers have different purposes. Use `make version` and `make language-version` to inspect them.
+Metadata paket pada `main` adalah `0.7.2` (`pyproject.toml`, `Makefile`, `library/kosakata.json`, dan fallback runtime native); kontrak bahasa tetap `0.4-dev` (`lexer.py`, `SPEC.md`). Tag/artefak rilis `v0.7.1` berasal dari snapshot yang lebih lama daripada `main`, jadi jangan menyamakan artefak tag itu dengan build dari `main`. Gunakan `make version` dan `make language-version` untuk memeriksa keduanya.
 
 After installing the CLI, run `pusingcuk script.cuk` directly. Executable scripts can start with `#!/usr/bin/env pusingcuk` and use `chmod +x script.cuk`; the CLI must be installed and on `PATH`.
 
@@ -63,6 +63,8 @@ For Linux desktop MIME registration, install `pusingcuk.xml` into `~/.local/shar
 
 
 ## Menjalankan skrip .cuk
+
+Mulai dari [indeks contoh](examples/README.md), termasuk kalkulator dasar yang memakai keyword inti `njir` dan `kampret`.
 
 Gunakan CLI Python dari direktori repositori:
 
@@ -93,7 +95,7 @@ The native runtime and its limits are documented in the [native runtime guide](d
 
 ## Documentation map
 
-- **Start and learn:** [Beginner guide](docs/PEMULA.md) · [Termux quick start](docs/termux/README.md)
+- **Start and learn:** [Beginner guide](docs/PEMULA.md) · [Termux quick start](docs/termux/README.md) · [Examples index](examples/README.md)
 - **Language reference and dictionary:** [Language reference index](docs/language/README.md) · [Built-in catalogue](docs/language/BUILTINS.md) · [Syntax specification](SPEC.md) · [English dictionary](docs/DICTIONARY.md) · [Kamus Indonesia](docs/KAMUS_PUSINGCUK.md)
 - **Consistency and runtime support:** [Semantic contract](docs/SEMANTIC_CONTRACT.md) · [Compatibility matrix](docs/COMPATIBILITY.md) · [Conformance fixtures](docs/CONFORMANCE_FIXTURES.md)
 - **Development:** [Contributor guide](CONTRIBUTING.md) · [Development and test gates](docs/development/README.md) · [Repository map](docs/REPO_STRUCTURE.md)

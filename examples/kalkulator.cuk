@@ -1,0 +1,40 @@
+#!/usr/bin/env pusingcuk
+# Kalkulator dasar: memakai keyword resmi SPEC.md, bukan alias baru.
+jancuk
+coba
+    tanya teks_pertama = "Angka pertama: "
+    lah angka_pertama = bilangan(teks_pertama)
+    tanya operasi = "Operasi (+, -, *, /): "
+    tanya teks_kedua = "Angka kedua: "
+    lah angka_kedua = bilangan(teks_kedua)
+
+    njir operasi == "+"
+        lah hasil = angka_pertama + angka_kedua
+        hedeh "Hasil: " + teks(hasil)
+    kampret
+        njir operasi == "-"
+            lah hasil = angka_pertama - angka_kedua
+            hedeh "Hasil: " + teks(hasil)
+        kampret
+            njir operasi == "*"
+                lah hasil = angka_pertama * angka_kedua
+                hedeh "Hasil: " + teks(hasil)
+            kampret
+                njir operasi == "/"
+                    njir angka_kedua == 0
+                        hedeh "Kesalahan: pembagian dengan nol tidak diperbolehkan."
+                    kampret
+                        lah hasil = angka_pertama / angka_kedua
+                        hedeh "Hasil: " + teks(hasil)
+                    selesai njir
+                kampret
+                    hedeh "Operasi tidak dikenal. Gunakan +, -, * atau /."
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+ketangkep kesalahan
+    hedeh "Input tidak valid: " + kesalahan
+    hedeh "Masukkan bilangan yang valid dan pilih +, -, * atau /."
+selesai coba
+selesai jancuk

@@ -66,7 +66,7 @@ Compiler/transpiler lain dan PVM tetap eksperimental. Keduanya tidak mengubah se
 ## Error dan portabilitas
 
 - Kesalahan sintaks mengembalikan exit code `2`; kesalahan runtime `1`; sukses `0`. Kesalahan CLI untuk berkas yang tidak ditemukan mengembalikan `3` pada kedua CLI yang dipelihara.
-- Diagnostik program gagal ditulis ke stderr dengan kelas `syntax_error` atau `runtime_error` dan nomor baris bila tersedia. Detail pesan dan kolom boleh lebih kaya pada satu runtime, tetapi kelas, kode keluar, stdout, dan nomor baris yang dilaporkan fixture wajib sama.
+- Diagnostik program gagal ditulis ke stderr dengan kelas `syntax_error` atau `runtime_error` dan nomor baris bila tersedia. Detail pesan dan kolom boleh lebih kaya pada satu runtime, tetapi kelas, kode keluar, stdout, dan nomor baris yang dilaporkan fixture wajib sama. CLI interpreter referensi juga menyajikan nama berkas, kolom, potongan sumber, penunjuk caret, dan saran koreksi yang sopan. Detail tersebut memperbaiki pengalaman pengembang, tetapi tidak mengubah kategori error lintas-runtime. Keyword dan alias harus tetap mengikuti `SPEC.md` serta registry kosakata yang ada; perbaikan diagnostik tidak menambahkan ejaan bahasa baru.
 - Manifest tidak mendukung kode keluar berbeda per runtime untuk fixture yang sama. Perbedaan yang tersisa harus ditandai sebagai `unsupported`, bukan disamarkan sebagai pass.
 - Unsupported bukan pass.
 - File, jaringan, database, proses, browser, dan FFI adalah kapabilitas platform, bukan efek samping tersembunyi dari bahasa inti.

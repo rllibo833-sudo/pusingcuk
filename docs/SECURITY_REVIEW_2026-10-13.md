@@ -1,10 +1,10 @@
 # Security review — 2026-10-13
 
-Scope: repository source and workflow review at the offline-adapter work branch. This is a source-level engineering review, not a penetration test, account audit, or security certification.
+Scope: historical source and workflow review of the pre-hardening baseline (2026-10-13). The PVM findings below are the original issue statement; current mitigations and limits are documented in `SECURITY.md` and `docs/PVM_SPEC.md`. This is not a penetration test, account audit, or security certification.
 
 **Required warning:** Eksekusi PusingCuk tidak ter-sandbox OS. Jangan jalankan kode tidak terpercaya. Compilation, bytecode validation, loopback binding, and timeouts do not provide operating-system isolation.
 
-## Changes in this branch
+## Relevant controls in the reviewed main snapshot
 
 - Added a static local module resolver with explicit exports, project-root path checks, cycle detection, and source/module/depth limits for compiler CLI targets.
 - Added a SQLite adapter that confines its database file to a workspace and denies ATTACH/DETACH, PRAGMA, virtual-table operations, and selected file/extension functions.
@@ -14,11 +14,11 @@ Scope: repository source and workflow review at the offline-adapter work branch.
 
 ## Findings that remain
 
-### High — PVM file access is not a sandbox
+### High — PVM file access requires explicit controls
 
-PVM v1 includes file open/read/delete opcodes. The current design does not reliably confine those paths to a project directory or use an OS sandbox. A malicious PVM program can potentially read or delete files that the current operating-system user can access. Do not run bytecode or programs from untrusted sources on a device with valuable files or credentials. This was already documented in SECURITY.md and associated with existing issue #75; this review does not create a duplicate issue.
+The original baseline did not gate PVM file operations or confine filesystem access reliably. The remediation now disables file opcodes in the JavaScript backend and requires the generated Python runtime to receive `--allow-file-io`; the enabled Python implementation uses a pinned root descriptor plus POSIX descriptor-relative no-follow operations. Negative tests cover default denial, absolute/traversal paths, symlink components, deletion, and current-working-directory changes.
 
-Required before claiming support for untrusted programs: remove file opcodes from untrusted execution, or enforce explicit capabilities and OS-level filesystem isolation, including symlink/traversal tests.
+This is a source-level mitigation, not independent proof that PVM is a safe sandbox. Do not run untrusted bytecode. Keep issue #75 open until a reviewer has examined the final changes and remaining OS-boundary requirements.
 
 ### High — native execution is not isolated
 
@@ -40,4 +40,4 @@ The reviewed tracked tree contained no obvious committed Python cache directorie
 
 ## Verification
 
-The GitHub Actions test workflow completed successfully for the branch commit listed in the execution report. CI success proves only the behavior covered by the tests; it does not close the findings above or guarantee that Pusingcuk is immune to attacks.
+The GitHub Actions test workflow completed successfully for the baseline snapshot documented by this report. Subsequent hardening requires its own CI result and independent review. CI success proves only the behavior covered by tests; it does not certify that Pusingcuk is immune to attacks.

@@ -5,31 +5,114 @@ import pathlib
 import re
 import sys
 
-SAFE_RUNTIME = """import ast, pathlib, sys, json
+SAFE_RUNTIME = """import ast, pathlib, sys, json, os, stat, errno
 v = {}
 __opened = None
+# Pin the project root to an open directory descriptor at process startup.
+# Never re-resolve the root through the mutable current working directory.
 __pvm_root = pathlib.Path.cwd().resolve()
+__PVM_SECURE_FS = (
+    os.name == "posix"
+    and all(hasattr(os, flag) for flag in ("O_NOFOLLOW", "O_DIRECTORY"))
+    and os.open in getattr(os, "supports_dir_fd", set())
+    and os.unlink in getattr(os, "supports_dir_fd", set())
+    and os.stat in getattr(os, "supports_dir_fd", set())
+    and os.stat in getattr(os, "supports_follow_symlinks", set())
+)
+__pvm_file_io_enabled = "--allow-file-io" in sys.argv[1:]
+__pvm_root_fd = None
+if __PVM_SECURE_FS:
+    try:
+        __pvm_root_fd = os.open(
+            str(__pvm_root), os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+        )
+    except OSError:
+        __pvm_root_fd = None
 
-def __safe_path(value):
-    if not isinstance(value, str) or not value:
+
+def __file_parts(value):
+    if not __pvm_file_io_enabled:
+        raise PermissionError(
+            "operasi berkas PVM dinonaktifkan; hanya untuk bytecode tepercaya, "
+            "aktifkan eksplisit dengan --allow-file-io"
+        )
+    if not __PVM_SECURE_FS or __pvm_root_fd is None:
+        raise PermissionError(
+            "operasi berkas PVM memerlukan dukungan POSIX openat/O_NOFOLLOW"
+        )
+    if not isinstance(value, str) or not value or chr(0) in value:
         raise ValueError("path harus berupa teks relatif non-kosong")
-    raw = pathlib.Path(value)
     windows = pathlib.PureWindowsPath(value)
-    if raw.is_absolute() or windows.is_absolute() or windows.drive:
+    if pathlib.Path(value).is_absolute() or windows.is_absolute() or windows.drive:
         raise ValueError("path absolut tidak diizinkan")
-    if ".." in value.replace("\\\\", "/").split("/"):
+    normalized = value.replace(chr(92), "/")
+    raw_parts = normalized.split("/")
+    if any(part == ".." for part in raw_parts):
         raise ValueError("path traversal tidak diizinkan")
-    parts = tuple(part for part in raw.parts if part not in ("", "."))
+    parts = tuple(part for part in raw_parts if part not in ("", "."))
     if not parts:
         raise ValueError("path harus menunjuk ke berkas di dalam project root")
-    current = __pvm_root
-    for part in parts:
-        current = current / part
-        if current.is_symlink():
-            raise ValueError("symlink tidak diizinkan untuk operasi berkas")
-        current.resolve(strict=False).relative_to(__pvm_root)
-    return current.resolve(strict=False)
+    return parts
 
+
+def __open_parent(parts):
+    fd = os.dup(__pvm_root_fd)
+    try:
+        for component in parts[:-1]:
+            next_fd = os.open(
+                component,
+                os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                dir_fd=fd,
+            )
+            os.close(fd)
+            fd = next_fd
+        return fd, parts[-1]
+    except OSError as exc:
+        os.close(fd)
+        raise PermissionError(
+            "komponen direktori tidak aman atau merupakan symlink"
+        ) from exc
+
+
+def __open_beneath(value, flags, mode=0o600):
+    parts = __file_parts(value)
+    parent_fd, leaf = __open_parent(parts)
+    try:
+        try:
+            return os.open(
+                leaf, flags | os.O_NOFOLLOW, mode, dir_fd=parent_fd
+            )
+        except OSError as exc:
+            if exc.errno in (errno.ELOOP, errno.ENOTDIR):
+                raise PermissionError(
+                    "symlink atau tipe berkas yang tidak aman ditolak"
+                ) from exc
+            raise
+    finally:
+        os.close(parent_fd)
+
+
+def __read_beneath(value):
+    fd = __open_beneath(value, os.O_RDONLY)
+    with os.fdopen(fd, "r", encoding="utf-8") as stream:
+        return stream.read()
+
+
+def __unlink_beneath(value):
+    parts = __file_parts(value)
+    parent_fd, leaf = __open_parent(parts)
+    try:
+        try:
+            entry = os.stat(leaf, dir_fd=parent_fd, follow_symlinks=False)
+        except FileNotFoundError:
+            return
+        if stat.S_ISLNK(entry.st_mode):
+            raise PermissionError("symlink tidak diizinkan untuk penghapusan")
+        # unlinkat-style deletion remains anchored to the already-open parent
+        # directory; a concurrent chdir or ancestor rename cannot redirect it.
+        os.unlink(leaf, dir_fd=parent_fd)
+    finally:
+        os.close(parent_fd)
 
 def __offline_data(value):
     text = str(value)
@@ -234,15 +317,15 @@ def compile_pvm(records):
         elif opcode == 9:
             emit("return " + val(arg or "None"))
         elif opcode == 10:
-            emit("__opened = open(__safe_path(" + val(arg) + "), 'a+', encoding='utf-8')")
+            emit("__opened = os.fdopen(__open_beneath(" + val(arg) + ", os.O_RDWR | os.O_CREAT | os.O_APPEND), 'a+', encoding='utf-8')")
         elif opcode == 11:
             match = re.match(r"^([A-Za-z_]\w*)\s+(?:dari|from)\s+(.+)$", arg)
             if match:
-                emit("v[" + repr(match.group(1)) + "] = __safe_path(" + val(match.group(2)) + ").read_text(encoding='utf-8')")
+                emit("v[" + repr(match.group(1)) + "] = __read_beneath(" + val(match.group(2)) + ")")
             else:
-                emit("print(__safe_path(" + val(arg) + ").read_text(encoding='utf-8'))")
+                emit("print(__read_beneath(" + val(arg) + "))")
         elif opcode == 12:
-            emit("__safe_path(" + val(arg) + ").unlink(missing_ok=True)")
+            emit("__unlink_beneath(" + val(arg) + ")")
         elif opcode == 13:
             if arg in ("njir", "mumet", "untuk", "for") and blocks:
                 indent = max(1, indent - 1)

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "language": "Pusingcuk",
   "language_version": "0.4-dev",
-  "description": "Glosarium kosakata kanonis, alias resmi, operator, dan status runtime Pusingcuk.",
+  "description": "Glosarium keyword, alias resmi yang sudah disetujui, operator, dan status runtime Pusingcuk 0.4-dev. Perubahan kosakata wajib mengikuti SPEC.md dan fixture konformansi; registry ini tidak mengusulkan alias baru.",
   "source_of_truth": [
     "../SPEC.md",
     "../docs/KOSAKATA_GENZ.md",
@@ -496,5 +496,5 @@
     "level4": "Modules, try/catch/finally, jam/waktu and tanggal are supported by the Python reference interpreter only.",
     "level5": "HTTP GET/POST, parsing dan serialisasi JSON, serta warna ANSI tersedia di interpreter referensi Python saja. Permintaan jaringan memakai timeout 10 detik dan mengembalikan salah saat gagal."
   },
-  "package_version": "0.7.1"
+  "package_version": "0.7.2"
 }
