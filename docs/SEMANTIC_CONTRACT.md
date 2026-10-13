@@ -10,6 +10,21 @@ Status: baseline engineering untuk perilaku yang harus dipatuhi front-end, inter
 - Interpreter referensi dan runtime native harus menghasilkan hasil sama untuk fixture yang menandai keduanya required.
 - Backend baru tidak boleh mengubah perilaku tampak pengguna tanpa perubahan spesifikasi dan fixture yang disengaja.
 
+## Baseline yang dipelihara saat ini
+
+Interpreter Python modular adalah implementasi referensi. Runtime native C adalah implementasi kedua yang dijaga agar cocok pada subset yang tercantum sebagai wajib di `tests/conformance/manifest.json`. Fixture yang menyatakan `reference: required` dan `native: required` harus menghasilkan perilaku yang sama untuk exit code, stdout, dan kelas error sesuai kontrak fixture.
+
+Untuk perubahan bahasa, ikuti satu jalur:
+1. Tetapkan maksud perilaku di `SPEC.md` dan kontrak ini.
+2. Perbarui lexer Python dan runtime C untuk fitur yang memang diklaim didukung pada keduanya.
+3. Perbarui `library/kosakata.json` atau `library/builtin_contract.json` jika metadata terkait berubah.
+4. Tambahkan kasus sukses dan kegagalan pada tes; gunakan fixture konformansi untuk perilaku yang harus sama di Python dan C.
+5. Jalankan unit test Python, `make test-native`, dan `python tools/conformance.py`; CI harus lulus sebelum kompatibilitas diklaim.
+
+Alias yang tercantum di bagian alias resmi `SPEC.md` adalah bagian dari permukaan bahasa. Perubahan pada alias harus disinkronkan pada lexer Python, pemetaan token runtime C, registry kosakata, dan fixture. Alias untuk kapabilitas platform yang belum tersedia di C harus tetap ditandai sesuai dukungan runtime, tidak disamarkan menjadi dukungan penuh.
+
+Compiler/transpiler lain dan PVM tetap eksperimental. Keduanya tidak mengubah semantik acuan, dan hasilnya tidak dihitung sebagai baseline Python/C.
+
 ## Evaluasi dan nilai
 
 - Ekspresi mengikuti precedence dalam SPEC.md dan operand dievaluasi kiri ke kanan.
