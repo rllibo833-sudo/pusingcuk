@@ -249,8 +249,7 @@
         "reference": "required",
         "native": "required"
       }
-    }
-    ,
+    },
     {
       "id": "core.cuk-source-extension",
       "source": "canonical_extension.cuk",
@@ -263,7 +262,7 @@
       ],
       "expected": {
         "exit_code": 0,
-        "stdout": "42\\n",
+        "stdout": "42\n",
         "stderr_class": null
       },
       "runtimes": {
