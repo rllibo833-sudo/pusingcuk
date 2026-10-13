@@ -269,6 +269,27 @@
         "reference": "required",
         "native": "required"
       }
+    },
+    {
+      "id": "syntax.alias-keywords-extended",
+      "source": "alias_keywords_extended.cuk",
+      "profile": "core",
+      "requires": [
+        "keyword-aliases",
+        "variables",
+        "boolean",
+        "conditionals",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "42\n42\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
     }
   ]
 }
