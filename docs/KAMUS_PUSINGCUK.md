@@ -60,10 +60,10 @@ selesai njir
 selesai jancuk
 ```
 
-Simpan sebagai `halo.pusingcuk`, lalu dari folder utama repo jalankan:
+Simpan sebagai `halo.cuk`, lalu dari folder utama repo jalankan:
 
 ```sh
-python pusingcuk_new.py halo.pusingcuk
+python pusingcuk_new.py halo.cuk
 ```
 
 Kalau memakai runtime native Termux, ikuti dulu langkah instalasi di `docs/PEMULA.md`. Runtime native harus dibangun lebih dulu.
