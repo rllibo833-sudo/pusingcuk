@@ -28,13 +28,10 @@
         "syntax-diagnostics"
       ],
       "expected": {
-        "exit_code": 1,
+        "exit_code": 2,
         "stdout": "",
-        "stderr_class": "error",
-        "exit_code_by_runtime": {
-          "reference": 2,
-          "native": 1
-        }
+        "stderr_class": "syntax_error",
+        "source_line": 2
       },
       "runtimes": {
         "reference": "required",
@@ -71,7 +68,8 @@
       "expected": {
         "exit_code": 1,
         "stdout": "",
-        "stderr_class": "error"
+        "stderr_class": "runtime_error",
+        "source_line": 5
       },
       "runtimes": {
         "reference": "required",
@@ -199,13 +197,10 @@
         "syntax-diagnostics"
       ],
       "expected": {
-        "exit_code": 1,
+        "exit_code": 2,
         "stdout": "",
-        "stderr_class": "error",
-        "exit_code_by_runtime": {
-          "reference": 2,
-          "native": 1
-        }
+        "stderr_class": "syntax_error",
+        "source_line": 2
       },
       "runtimes": {
         "reference": "required",
@@ -289,6 +284,125 @@
       "runtimes": {
         "reference": "required",
         "native": "required"
+      }
+    },
+    {
+      "id": "core.builtins-native-length-range",
+      "source": "builtins_native.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "length",
+        "range",
+        "loops"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "3\n3\n3\n2\n4\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.range-zero-step",
+      "source": "range_zero_step.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "range",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.undefined-variable",
+      "source": "undefined_variable.cuk",
+      "profile": "core",
+      "requires": [
+        "variables",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "reference.builtins-standard-library",
+      "source": "builtins_reference.cuk",
+      "profile": "reference",
+      "requires": [
+        "builtins",
+        "type-conversion",
+        "math",
+        "statistics"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "okelah\n42\n1.5\ntidak\n2\n2\n5\n2\n3.0\n2\n3\n8.0\n0.0\n1.0\n2\n2.5\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "unsupported"
+      }
+    },
+    {
+      "id": "reference.builtins-domain-error",
+      "source": "builtin_domain_error.cuk",
+      "profile": "reference",
+      "requires": [
+        "builtins",
+        "numeric-domain-errors",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "unsupported"
+      }
+    },
+    {
+      "id": "reference.builtins-arity-error",
+      "source": "builtin_arity_error.cuk",
+      "profile": "reference",
+      "requires": [
+        "builtins",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "unsupported"
       }
     }
   ]

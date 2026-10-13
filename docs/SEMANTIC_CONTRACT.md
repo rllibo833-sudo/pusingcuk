@@ -30,8 +30,9 @@ Compiler/transpiler lain dan PVM tetap eksperimental. Keduanya tidak mengubah se
 - Ekspresi mengikuti precedence dalam SPEC.md dan operand dievaluasi kiri ke kanan.
 - dan / atau menggunakan short-circuit: operand kanan tidak dievaluasi jika hasil sudah ditentukan.
 - Boolean benar dan salah adalah tipe berbeda dari angka. Kesetaraan benar == 1 menghasilkan tidak.
-- Output boolean memakai okelah dan tidak, bukan True/False.
-- Builtin statistik eksperimental `rata_rata` dan `median` menerima tepat satu daftar nonkosong yang hanya berisi angka finite; boolean dan tipe lain ditolak. Implementasi yang diuji ada pada backend JS/Python dan HTML, bukan VM/native C.
+- Output boolean memakai `okelah` dan `tidak`, bukan `True`/`False`. Built-in `teks` juga menggunakan ejaan bahasa Pusingcuk untuk boolean.
+- Kontrak built-in disimpan di `library/builtin_contract.json`, diuji oleh `tests/test_builtin_contract.py`, dan didokumentasikan di `docs/language/BUILTINS.md`. Interpreter referensi mendukung 18 built-in yang terdaftar; native C saat ini hanya mengklaim `panjang` dan `rentang`. Transpiler/VM memiliki subset tersendiri.
+- Built-in statistik `rata_rata` dan `median` menerima tepat satu daftar nonkosong berisi angka finite; boolean dan tipe lain ditolak.
 - Urutan output dan mutasi koleksi adalah perilaku teramati yang tidak boleh berubah karena optimisasi.
 - Pembagian dengan nol, overflow, angka non-finite, dan diagnostik spesifik harus memiliki fixture sebelum dianggap stabil lintas backend.
 
@@ -55,8 +56,9 @@ Compiler/transpiler lain dan PVM tetap eksperimental. Keduanya tidak mengubah se
 
 ## Error dan portabilitas
 
-- Program gagal harus menghasilkan exit code bukan nol dan diagnostik ke stderr. Teks penuh menjadi kontrak hanya jika fixture menguncinya.
-- Fixture membandingkan exit code, stdout, dan kelas error, bukan path absolut atau detail internal yang tidak stabil.
+- Kesalahan sintaks mengembalikan exit code `2`; kesalahan runtime `1`; sukses `0`. Kesalahan CLI untuk berkas yang tidak ditemukan mengembalikan `3` pada kedua CLI yang dipelihara.
+- Diagnostik program gagal ditulis ke stderr dengan kelas `syntax_error` atau `runtime_error` dan nomor baris bila tersedia. Detail pesan dan kolom boleh lebih kaya pada satu runtime, tetapi kelas, kode keluar, stdout, dan nomor baris yang dilaporkan fixture wajib sama.
+- Manifest tidak mendukung kode keluar berbeda per runtime untuk fixture yang sama. Perbedaan yang tersisa harus ditandai sebagai `unsupported`, bukan disamarkan sebagai pass.
 - Unsupported bukan pass.
 - File, jaringan, database, proses, browser, dan FFI adalah kapabilitas platform, bukan efek samping tersembunyi dari bahasa inti.
 - Runtime native tidak otomatis menjadi sandbox.

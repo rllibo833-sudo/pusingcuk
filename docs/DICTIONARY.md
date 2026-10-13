@@ -56,7 +56,7 @@ A declaration creates a new variable; assignment updates an existing one. Redecl
 
 ## 4. Built-in functions
 
-The repository contains more than one implementation path. A function existing in the standard-library registry does not mean every runtime or compiler target supports it yet.
+The complete and test-checked list of 18 built-ins, argument counts, and per-target support is in the [built-in catalogue](language/BUILTINS.md). The examples below are a learner-friendly subset; an entry in a registry does not mean every target supports it.
 
 | Function | Purpose | Example |
 |---|---|---|
@@ -75,7 +75,7 @@ The repository contains more than one implementation path. A function existing i
 | `desimal(value)` | Converts a value to a decimal number in the standard-library registry | Check target support first |
 | `logika(value)` | Converts a value to a boolean in the standard-library registry | Check target support first |
 
-The new statistics helpers are currently available in the experimental JavaScript, Python, and HTML compiler targets only; VM/native C support is not claimed, and this is not full Python `statistics` compatibility. For exact implementation status, see [`IMPORT_PYTHON.md`](IMPORT_PYTHON.md), [`compiler-type-system-and-stdlib.md`](compiler-type-system-and-stdlib.md), [`COMPILER_TARGETS.md`](COMPILER_TARGETS.md), and [`NATIVE_RUNTIME.md`](NATIVE_RUNTIME.md).
+The reference interpreter and experimental JavaScript, Python, and HTML targets currently implement `rata_rata` and `median`; VM/native C support is not claimed. This is a small Pusingcuk API, not full Python `statistics` compatibility. For exact implementation status, see [`IMPORT_PYTHON.md`](IMPORT_PYTHON.md), [`compiler-type-system-and-stdlib.md`](compiler-type-system-and-stdlib.md), [`COMPILER_TARGETS.md`](COMPILER_TARGETS.md), and [`NATIVE_RUNTIME.md`](NATIVE_RUNTIME.md).
 
 ## 5. A complete small program
 

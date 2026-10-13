@@ -36,7 +36,7 @@ Regional vocabulary packs, localized aliases, or configurable slang profiles are
 
 ## 4. Source files and language ergonomics
 
-New Pusingcuk source files use the short `.cuk` extension, analogous to Python's `.py`. The older `.pusingcuk` extension remains accepted for existing projects and modules; it is a compatibility path, not a competing language format. Examples, editor tooling, and new tutorials should prefer `.cuk`. Extension support alone does not imply runtime feature parity: interpreter, native, and compiler targets must still pass the same conformance fixtures for each feature they claim.
+New Pusingcuk source files use the canonical `.cuk` extension. The older `.pusingcuk` extension remains a compatibility path for existing projects, not a competing format. The extension is the public file identity; the language's distinctive identity must come from its Indonesian-readable syntax, explicit semantics, documented built-ins, and predictable diagnostics—not from the suffix alone. Examples, editor tooling, and tutorials should prefer `.cuk`. File-extension support never implies feature parity: runtimes must pass the same conformance fixtures for each feature they claim.
 
 ## 5. Design principles
 

@@ -1,22 +1,24 @@
 # Kontrak Fixture Konformansi Pusingcuk
 
-Status: harness otomatis tersedia melalui python tools/conformance.py. Manifest aktif dan fixture konformansi dijalankan oleh CI; setiap backend wajib menggunakan hasil yang sama untuk fitur yang menyatakan required.
+Harness konformansi aktif ada di `tools/conformance.py` dan dijalankan oleh CI. Manifest membandingkan perilaku yang terlihat pengguna pada interpreter referensi Python dan runtime native C. Fixture kanonis baru memakai ekstensi `.cuk`; contoh lama berekstensi `.pusingcuk` tetap boleh digunakan untuk kompatibilitas.
 
 ## Tujuan
 
-Fixture adalah program kecil dengan hasil yang diharapkan dan metadata tentang fitur yang diuji. Fixture menjadi penghubung antara spesifikasi, interpreter referensi, runtime native, dan backend compiler berikutnya.
+Fixture mengikat empat sumber: spesifikasi bahasa, implementasi, dokumentasi, serta perilaku yang dapat diulang. Sebuah fitur hanya boleh diklaim lintas-runtime jika manifest menandainya `required` pada kedua runtime dan hasilnya lulus pada keduanya.
 
-## Struktur yang dituju
+## Bentuk manifest
 
-Fixture sumber disimpan sebagai `.pusingcuk`. Metadata sebaiknya dipisahkan ke manifest yang mudah dibaca mesin, misalnya JSON. Contoh rancangan:
+Manifest aktif berada di `tests/conformance/manifest.json`. Setiap fixture mendefinisikan ID unik, sumber relatif di direktori fixture, profil, fitur yang diperlukan, hasil yang diharapkan, dan status runtime.
+
+Contoh kasus positif:
 
 ```json
 {
   "schema_version": 1,
-  "id": "core.function.add",
-  "source": "functions_add.pusingcuk",
+  "id": "core.cuk-source-extension",
+  "source": "canonical_extension.cuk",
   "profile": "core",
-  "requires": ["functions", "integer-arithmetic"],
+  "requires": ["source-extension", "variables", "arithmetic", "output"],
   "expected": {
     "exit_code": 0,
     "stdout": "42\n",
@@ -24,67 +26,75 @@ Fixture sumber disimpan sebagai `.pusingcuk`. Metadata sebaiknya dipisahkan ke m
   },
   "runtimes": {
     "reference": "required",
-    "native": "required",
-    "wasm": "optional"
+    "native": "required"
   }
 }
 ```
 
-Manifest aktif berada di `tests/conformance/manifest.json`. Harness memvalidasi versi schema, ID unik, field yang diizinkan, exit code, kelas error, status runtime, dan path fixture; ia tidak menjalankan perintah dari metadata.
+Fixture negatif menambahkan `stderr_class` dan `source_line`. Metadata tidak dapat memilih perintah shell, executable, atau environment.
 
-## Aturan metadata
+## Kontrak error
 
-- `schema_version` versi format manifest; `id` unik dan stabil.
-- `source` harus berupa path relatif dalam direktori fixture; path traversal harus ditolak.
-- `profile` menunjukkan profil fitur yang diuji.
-- `requires` mencantumkan fitur yang benar-benar dipakai.
-- `expected.exit_code` wajib untuk kasus sukses maupun gagal.
-- `stdout` dan kelas error ditulis eksplisit; stderr penuh boleh diuji untuk kasus yang memang stabil, tetapi jangan membuat seluruh suite rapuh terhadap variasi path.
-- Status runtime harus dibedakan: `required`, `optional`, atau `unsupported`. Unsupported tidak dihitung lulus sebagai konformansi; laporan harus menyebut fitur belum didukung.
-- Fixture negatif harus mengharapkan kegagalan yang sesuai, bukan menerima semua error sebagai hasil benar.
-- Metadata tidak boleh mengeksekusi perintah shell atau mengubah environment runner.
+Program sumber menggunakan kode keluar yang sama pada Python referensi dan native C:
 
-## Kategori awal
+| Keadaan | Exit code | Kelas stderr |
+|---|---:|---|
+| Sukses | `0` | Tidak ada |
+| Kesalahan runtime | `1` | `runtime_error` |
+| Kesalahan sintaks | `2` | `syntax_error` |
+| Berkas sumber tidak ditemukan pada CLI | `3` | Diagnostik CLI, di luar manifest sumber |
 
-1. Lexing/parsing: kata kunci, alias slang, komentar, string dan error sintaks.
-2. Nilai/ekspresi: angka, teks, boolean, equality, truthiness, operator dan overflow.
-3. Scope/fungsi: parameter, jumlah argumen, return, rekursi, nama tidak dikenal.
-4. Koleksi: list/kamus, key identity, indeks, mutasi, batas kapasitas.
-5. Control flow: kondisi, loop, iterasi, batas eksekusi.
-6. CLI: exit code, stdout/stderr, file tidak ditemukan, opsi tidak dikenal.
-7. Platform/capability: fitur file, jaringan, browser, atau FFI hanya diuji pada runtime yang menyatakan capability tersebut.
-8. Compiler: source map, diagnostik compile-time, target output dan runtime hasil kompilasi.
+Kesalahan sintaks dan runtime ditulis ke stderr dengan nomor baris bila tersedia. Harness membandingkan kelas error dan nomor baris, bukan kalimat lengkap atau kolom yang belum menjadi kontrak bersama. Pesan Python boleh menyertakan kolom tambahan; perbedaan tersebut tidak boleh mengubah kelas maupun exit code.
 
-## Perbandingan runtime
+Manifest tidak mengizinkan `exit_code_by_runtime`. Bila suatu runtime belum mengimplementasikan fitur, tandai `unsupported`; jangan menetapkan hasil yang berbeda pada fixture sama dan menyebutnya konformansi.
 
-Harness membandingkan perilaku yang terlihat pengguna, bukan representasi memori internal. Minimal bandingkan:
-- kode keluar;
-- stdout byte-for-byte untuk output yang dikontrak;
-- kelas error dan lokasi sumber untuk kasus gagal;
-- tidak ada crash, hang, atau output parsial yang tidak diharapkan.
+## Aturan metadata dan keamanan
 
-Jika error message memang menjadi kontrak publik, uji pesan yang distabilkan. Selain itu, uji kelas error dan lokasi agar refactor internal tidak mematahkan tes yang tidak relevan.
+- `schema_version` menetapkan versi format manifest; `id` wajib unik dan stabil.
+- `source` harus berupa path relatif yang menyelesaikan lokasi di dalam `tests/conformance/`; absolute path dan traversal ditolak.
+- `profile` mengelompokkan cakupan fitur, sementara `requires` mencantumkan seluruh fitur yang benar-benar digunakan.
+- `expected.exit_code` dan `expected.stdout` selalu eksplisit.
+- Fixture error harus menentukan kelas error yang dikenal dan nomor baris sumber yang diharapkan.
+- Status runtime dibatasi pada `required`, `optional`, atau `unsupported`. Unsupported tidak dihitung sebagai PASS.
+- Harness memakai timeout, direktori root yang ditetapkan, dan daftar command yang dibangun di kode; manifest tidak boleh menjalankan perintah arbitrar.
+- Jangan menjalankan fixture tak tepercaya dengan token, kredensial, atau hak akses penting.
 
-## Keamanan dan determinisme
+## Cakupan yang dijaga
 
-- Jangan menjalankan fixture yang tidak dipercaya dengan kredensial atau hak istimewa.
-- Tetapkan timeout, batas output, dan batas resource untuk setiap runner.
-- Jalankan dari direktori sementara bila fixture menghasilkan file.
-- Jangan mengizinkan manifest memilih executable atau shell command arbitrer.
-- Pastikan test runner membersihkan artefak lokal dan tidak commit hasil build.
+1. Sintaks, alias resmi, komentar, string, ekstensi `.cuk`, dan error parsing.
+2. Nilai, operator, precedence, boolean, short-circuit, dan aritmetika.
+3. Fungsi, scope, return, jumlah argumen, nama belum dikenal, dan rekursi.
+4. List, kamus, identitas kunci, indeks, mutasi, dan batas kapasitas.
+5. Kondisi, loop, iterasi rentang, dan batas eksekusi.
+6. Built-in: kasus sukses, aritas salah, domain numerik, serta status dukungan per target.
+7. CLI: kelas error, nomor baris, kode keluar, output dan input standar.
+8. File, jaringan, browser, FFI, dan kapabilitas platform hanya diuji pada target yang secara eksplisit mendukungnya.
 
-## Gerbang sebelum implementasi dianggap siap
+## Sumber kebenaran built-in
 
-1. [x] Manifest schema terdokumentasi dan divalidasi.
-2. [x] Harness menampilkan PASS/FAIL/UNSUPPORTED terpisah.
-3. [x] Satu fixture sukses dan satu fixture gagal dijalankan pada runtime wajib saat ini (reference dan native).
-4. [x] CI menjalankan suite di job native GCC dan Clang.
-5. [ ] Tambahkan cakupan fixture dan jalankan untuk setiap backend baru sebelum backend dianggap konforman.
-6. [ ] Perluas kelas diagnostik error setelah kontrak error publik distabilkan.
+Nama, aritas, deskripsi, dan dukungan target harus sejalan di:
+
+- `library/builtin_contract.json` — metadata kanonis.
+- `library/stdlib.py` dan implementasi runtime yang memanggilnya.
+- `docs/language/BUILTINS.md` — tabel dokumentasi yang diverifikasi oleh tes.
+- `tests/test_builtin_contract.py` — perilaku built-in serta pemeriksaan metadata/dokumen.
+- `tests/conformance/manifest.json` — perilaku bahasa yang diklaim lintas runtime.
+
+Setiap status `supported` harus memiliki pengujian yang sesuai. Keberadaan fungsi dalam registry internal saja tidak cukup untuk mengklaim dukungan interpreter, native, atau backend.
+
+## Perintah pengujian
+
+```sh
+python -m unittest discover -s tests -v
+make test-native
+python tools/conformance.py
+```
 
 ## Hubungan dengan dokumen lain
 
-- [Spesifikasi bahasa](../SPEC.md) mendefinisikan semantik yang harus diikuti.
-- [Kontrak kompatibilitas](COMPATIBILITY.md) mendefinisikan klaim portabilitas.
-- [Arsitektur compiler dan interoperabilitas](COMPILER_INTEROP.md) menjelaskan pipeline IR/backend/FFI.
-- [Runtime native](NATIVE_RUNTIME.md) mencatat subset native yang benar-benar diuji.
+- [Spesifikasi bahasa](../SPEC.md) menetapkan syntax dan semantik.
+- [Kontrak semantik](SEMANTIC_CONTRACT.md) menetapkan invariant yang diuji.
+- [Kompatibilitas](COMPATIBILITY.md) membatasi klaim portable.
+- [Katalog built-in](language/BUILTINS.md) menjelaskan fungsi dan status per target.
+- [Runtime native](NATIVE_RUNTIME.md) mencatat kemampuan C yang sudah teruji.
+- [Contributing](../CONTRIBUTING.md) menentukan gerbang perubahan dan review.

@@ -76,7 +76,7 @@ Boolean: benar, salah
 Daftar ditulis menggunakan tanda kurung siku, misalnya `[10, 20, 30]`.
 Kamus ditulis dengan kurung kurawal dan pasangan kunci-nilai, misalnya `{"nama": "Budi", "umur": 20}`. Kunci teks, angka, dan boolean merupakan jenis kunci berbeda; khususnya, kunci `benar` dan kunci angka `1` tidak sama. Operator kesetaraan juga tidak menyamakan boolean dengan angka.
 Indeks daftar dan teks dimulai dari 0. Daftar dapat dibaca dan diubah melalui indeks. Nilai kamus dapat dibaca dan diubah melalui kunci.
-Fungsi `panjang(nilai)` menerima daftar, teks, kamus, atau rentang dan mengembalikan jumlah elemen, code point UTF-8, entri, atau nilai dalam rentang. Target compiler JavaScript, Python, dan HTML juga menyediakan builtin statistik eksperimental `rata_rata(daftar)` dan `median(daftar)`, dari pemetaan allow-list importer Python `statistics.mean` dan `statistics.median`. Keduanya menerima satu daftar nonkosong berisi angka finite dan menolak boolean. Ini bukan kompatibilitas penuh modul Python `statistics`; VM dan runtime native C belum mendukungnya.
+`panjang(nilai)` menghitung elemen teks, daftar, kamus, atau rentang. `rentang(akhir)`, `rentang(mulai, akhir)`, dan `rentang(mulai, akhir, langkah)` membuat urutan bilangan bulat dengan batas akhir eksklusif; langkah tidak boleh nol. Interpreter referensi Python juga menyediakan built-in `teks`, `bilangan`, `desimal`, `logika`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `akar`, `bawah`, `atas`, `pangkat`, `sinus`, `kosinus`, `rata_rata`, dan `median`. `teks(benar)` menghasilkan `okelah`; `teks(salah)` menghasilkan `tidak`. Detail argumen dan dukungan per target harus mengikuti [katalog built-in](docs/language/BUILTINS.md).
 Kunci kamus native dibatasi pada teks, angka, dan boolean. Assignment ke kunci baru menambahkan entri, sedangkan assignment ke kunci yang sudah ada memperbarui nilainya. Kamus kosong bernilai salah dan kamus berisi entri bernilai benar dalam kondisi; perulangan `untuk` menghasilkan kunci kamus. Kunci yang tidak didukung, kunci yang tidak ditemukan, dan indeks di luar batas menghasilkan kesalahan.
 
 ## 9. Perulangan untuk
@@ -114,7 +114,7 @@ Baris yang setelah spasi awalnya dimulai dengan # dianggap komentar.
 
 ## 12. Penanganan kesalahan
 
-Interpreter melaporkan kesalahan dengan nomor baris jika tersedia.
+Kesalahan sumber dibedakan menjadi **kesalahan sintaks** dan **kesalahan runtime**. Keduanya ditulis ke stderr dan menyertakan nomor baris jika tersedia. Interpreter referensi dan runtime native C menggunakan kode keluar yang sama untuk program: `0` berhasil, `1` kesalahan runtime, dan `2` kesalahan sintaks. CLI Python menggunakan kode `3` untuk berkas sumber yang tidak ditemukan; runtime native menyamakan kode itu untuk kasus yang sama. Pesan internal boleh berbeda, tetapi kelas error dan baris sumber pada fixture lintas-runtime harus sama.
 
 ## 13. Arah compiler dan portabilitas
 

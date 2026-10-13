@@ -57,3 +57,8 @@ local.properties
 *.pfx
 secrets.json
 credentials.json
+
+# Generated diagnostics/test outputs from local native and CLI checks
+pusingcuk-*.out
+pusingcuk-*.expected
+pusingcuk-*.actual

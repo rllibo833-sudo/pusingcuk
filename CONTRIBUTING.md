@@ -41,7 +41,7 @@ make test-native
 python tools/conformance.py
 ```
 
-The maintained CI baseline tests Python 3.11/3.12 and native C with GCC/Clang. A cross-runtime feature must have a fixture that requires both `reference` and `native`; tests that mark a runtime unsupported do not prove parity.
+The maintained CI baseline tests Python 3.11/3.12 and native C with GCC/Clang. A cross-runtime feature must have a fixture that requires both `reference` and `native`; tests that mark a runtime unsupported do not prove parity. The contract for language-source errors is exit code `2` for syntax and `1` for runtime failures; the source-absent CLI case uses `3`.
 
 Compiler/PVM prototypes and Android Studio APK development are intentionally outside the baseline. They remain available through manual workflows and should only be changed with explicit scope and relevant checks. Physical Termux testing is needed for claims about actual Android devices; Ubuntu CI alone is not sufficient.
 
@@ -49,7 +49,9 @@ Compiler/PVM prototypes and Android Studio APK development are intentionally out
 
 - [ ] The change has a clear purpose and stays within scope.
 - [ ] Success cases and relevant failure cases have tests.
-- [ ] `SPEC.md`, tests, and documentation agree with the implementation.
+- [ ] `SPEC.md`, the semantic contract, built-in metadata, tests, and documentation agree with the implementation.
+- [ ] Built-in changes update `library/builtin_contract.json`, `docs/language/BUILTINS.md`, runtime support states, and executable tests together.
+- [ ] Error fixtures compare syntax/runtime class, shared exit code, and source line; do not add per-runtime exit-code overrides to hide a mismatch.
 - [ ] Runtime parity is claimed only when the same conformance fixtures pass.
 - [ ] Platform claims match the tested compatibility matrix.
 - [ ] No secrets, personal data, caches, binaries, or backups are included.

@@ -12,7 +12,7 @@ This page is the map for the complete human-readable language reference. Use it 
 | What does a term mean in everyday Indonesian? | [Kamus Pusingcuk](../KAMUS_PUSINGCUK.md) |
 | What is the cultural context of slang and aliases? | [Slang/alias guide](../KOSAKATA_GENZ.md) and [language style guide](../GAYA_BAHASA.md) |
 | Which keywords and aliases are recorded as machine-readable metadata? | [`library/kosakata.json`](../../library/kosakata.json) |
-| Which built-ins, argument counts, and target support states are recorded? | [`library/builtin_contract.json`](../../library/builtin_contract.json) |
+| How do I use a built-in, and which target supports it? | [Complete built-in catalogue](BUILTINS.md) and [`library/builtin_contract.json`](../../library/builtin_contract.json) |
 | Which runtime has actually been tested for a feature? | [Compatibility matrix](../COMPATIBILITY.md), [native runtime guide](../NATIVE_RUNTIME.md), and [conformance fixtures](../CONFORMANCE_FIXTURES.md) |
 | How do I start from zero? | [Beginner guide](../PEMULA.md) and [Termux guide](../termux/README.md) |
 
@@ -28,7 +28,7 @@ The language specification is the normative description of syntax and intended b
 
 ## Source extension
 
-Use `.cuk` for new programs. The historical `.pusingcuk` extension remains accepted for compatibility. File extension compatibility does not imply that every feature within the file works on every runtime.
+Use `.cuk` for new programs. The historical `.pusingcuk` extension remains accepted for compatibility. `.cuk` is the public source-file identity; canonical Indonesian syntax and a tested semantic contract provide the language's behavior. File extension compatibility does not imply that every feature within the file works on every runtime.
 
 ## Rules for changing language vocabulary
 

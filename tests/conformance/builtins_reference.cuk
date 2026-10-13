@@ -1,0 +1,18 @@
+jancuk
+hedeh teks(benar)
+hedeh bilangan("42")
+hedeh desimal("1.5")
+hedeh logika(0)
+hedeh mutlak(-2)
+hedeh minimum(2, 5)
+hedeh maksimum(2, 5)
+hedeh bulatkan(2.5)
+hedeh akar(9)
+hedeh bawah(2.9)
+hedeh atas(2.1)
+hedeh pangkat(2, 3)
+hedeh sinus(0)
+hedeh kosinus(0)
+hedeh rata_rata([1, 2, 3])
+hedeh median([1, 2, 3, 4])
+selesai jancuk

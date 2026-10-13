@@ -13,6 +13,7 @@ Use this index to choose the right document. The current engineering baseline is
 ## Language specification and dictionaries
 
 - [Complete language-reference map](language/README.md) — where to find keywords, aliases, built-ins, and language rules.
+- [Built-in catalogue](language/BUILTINS.md) — full list of built-ins, argument counts, and support states for every target.
 - [Language specification](../SPEC.md) — canonical syntax and intended behavior.
 - [English technical dictionary](DICTIONARY.md) — shared terms for developers and reviewers.
 - [Kamus Pusingcuk (Indonesian)](KAMUS_PUSINGCUK.md) — plain-language explanations.
@@ -24,7 +25,7 @@ Use this index to choose the right document. The current engineering baseline is
 
 - [Semantic contract](SEMANTIC_CONTRACT.md) — rules that implementations must follow.
 - [Compatibility matrix](COMPATIBILITY.md) — which features are verified on which runtime.
-- [Conformance fixtures](CONFORMANCE_FIXTURES.md) — how Python and native C behavior is compared.
+- [Conformance fixtures](CONFORMANCE_FIXTURES.md) — how Python and native C behavior is compared, including common error classes, exit codes, and source lines.
 - [Native C runtime](NATIVE_RUNTIME.md) — supported subset, limits, and build instructions.
 - [Native Termux setup](NATIVE_TERMUX.md) — source build and installation details.
 - [Android distribution/verification](ANDROID_DISTRIBUTION.md) — separates cross-build, emulator smoke test, and physical Termux validation.
