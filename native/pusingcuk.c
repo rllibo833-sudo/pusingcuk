@@ -1,5 +1,6 @@
 
 #include <ctype.h>
+#include <errno.h>
 #include <math.h>
 #include <limits.h>
 #include <stdio.h>
@@ -898,7 +899,14 @@ int main(int argc,char **argv) {
         return 2;
     }
     FILE *f=fopen(argv[1],"r");
-    if(!f) { perror("Kesalahan membuka berkas"); return 2; }
+    if(!f) {
+        if (errno == ENOENT) {
+            fprintf(stderr, "Kesalahan: berkas tidak ditemukan: %s\\n", argv[1]);
+            return 3;
+        }
+        fprintf(stderr, "Kesalahan membaca berkas: %s: %s\\n", argv[1], strerror(errno));
+        return 1;
+    }
     char buf[4096];
     while(fgets(buf,sizeof buf,f)) {
         if(program_count>=MAX_LINES) {
@@ -909,7 +917,7 @@ int main(int argc,char **argv) {
         if(!program_lines[program_count]) { fclose(f); return 2; }
         memcpy(program_lines[program_count++],buf,n+1);
     }
-    if(ferror(f)) { perror("Gagal membaca program"); fclose(f); return 2; }
+    if(ferror(f)) { perror("Kesalahan membaca program"); fclose(f); return 1; }
     fclose(f);
     if (register_top_level_functions()) run_range(0,program_count);
     int result=syntax_err?2:(err?1:0);
