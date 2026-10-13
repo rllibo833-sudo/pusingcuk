@@ -6,7 +6,7 @@ Dokumen ini menetapkan sasaran kompatibilitas, bukan klaim bahwa seluruh sasaran
 
 Pusingcuk harus mudah dimulai oleh pemula, tetap dapat dipakai untuk proyek serius, dan tidak mengunci pengguna pada satu sistem operasi atau satu implementasi runtime.
 
-1. **Sumber yang portabel.** Berkas program menggunakan UTF-8 dan ekstensi `.pusingcuk`. Program yang hanya memakai fitur bahasa inti dan API standar yang terdokumentasi seharusnya tidak bergantung pada lokasi instalasi atau OS tertentu.
+1. **Sumber yang portabel.** Berkas program menggunakan UTF-8 dan ekstensi kanonis `.cuk`, seperti `.py` untuk Python. Ekstensi `.pusingcuk` tetap diterima sebagai ekstensi kompatibilitas. Program yang hanya memakai fitur bahasa inti dan API standar yang terdokumentasi seharusnya tidak bergantung pada lokasi instalasi atau OS tertentu.
 2. **Kontrak bahasa yang stabil.** Sintaks, nilai, operator, aturan scope, perilaku error, dan semantik built-in ditentukan oleh spesifikasi dan tes konformansi, bukan oleh kebetulan implementasi.
 3. **Runtime yang dapat dipilih.** Interpreter referensi Python membantu pengembangan; runtime native C memungkinkan eksekusi tanpa Python setelah dibangun. Fitur hanya portabel lintas runtime jika kedua implementasi telah lulus tes yang sama.
 4. **CLI yang konsisten.** Perintah menjalankan program harus memberi kode keluar nol saat berhasil, kode bukan nol saat gagal, pesan error ke stderr, dan tidak mencetak diagnostik internal saat mode normal. Perilaku CLI yang belum seragam perlu diperbaiki sebelum dinyatakan sebagai kontrak stabil.
