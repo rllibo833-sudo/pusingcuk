@@ -1,0 +1,7 @@
+#!/usr/bin/env pusingcuk
+# Program Contoh PusingCuk dengan ekstensi .cuk
+# Memperlihatkan input interaktif sederhana.
+jancuk
+tanya nama = "Nama kamu: "
+hedeh "Halo, " + nama + "!"
+selesai jancuk

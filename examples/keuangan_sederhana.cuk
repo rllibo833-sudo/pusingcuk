@@ -1,0 +1,46 @@
+#!/usr/bin/env pusingcuk
+# Ringkasan keuangan interaktif; file output relatif terhadap project root.
+jancuk
+tanya nama = "Nama pencatat: "
+tanya pemasukan_teks = "Pemasukan bulanan (angka): "
+tanya pengeluaran_teks = "Pengeluaran bulanan (angka): "
+
+lah pemasukan = bilangan(pemasukan_teks)
+lah pengeluaran = bilangan(pengeluaran_teks)
+
+fungsi hitung_sisa(pemasukan, pengeluaran)
+    balek pemasukan - pengeluaran
+selesai fungsi
+
+lah sisa = hitung_sisa(pemasukan, pengeluaran)
+hedeh "=== Ringkasan Keuangan ==="
+hedeh "Nama: " + nama
+hedeh "Pemasukan: " + teks(pemasukan)
+hedeh "Pengeluaran: " + teks(pengeluaran)
+hedeh "Sisa: " + teks(sisa)
+
+lah nomor = 1
+mumet nomor <= 2
+    hedeh "Hitung catatan ke-" + teks(nomor)
+    nomor = nomor + 1
+selesai mumet
+
+njir sisa >= 0
+    hedeh "Status: anggaran aman"
+kampret
+    hedeh "Status: defisit"
+selesai njir
+
+tanya pilihan_simpan = "Simpan ringkasan ke berkas? (ya/tidak): "
+njir pilihan_simpan == "ya"
+    lah catatan = "Nama: " + nama + "\nPemasukan: " + teks(pemasukan) + "\nPengeluaran: " + teks(pengeluaran) + "\nSisa: " + teks(sisa) + "\n"
+    lah berhasil = tulis("keuangan_sederhana.txt", catatan)
+    njir berhasil
+        hedeh "Catatan tersimpan: keuangan_sederhana.txt"
+    kampret
+        hedeh "Gagal menyimpan catatan."
+    selesai njir
+kampret
+    hedeh "Catatan tidak disimpan."
+selesai njir
+selesai jancuk

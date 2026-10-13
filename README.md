@@ -61,6 +61,19 @@ After installing the CLI, run `pusingcuk script.cuk` directly. Executable script
 
 For Linux desktop MIME registration, install `pusingcuk.xml` into `~/.local/share/mime/packages/` and run `update-mime-database ~/.local/share/mime`. MIME registration is a desktop/Linux facility; Termux shell execution uses the shebang and `PATH`.
 
+
+## Menjalankan skrip .cuk
+
+Gunakan CLI Python dari direktori repositori:
+
+```sh
+pusingcuk examples/halo_dunia.cuk
+# atau jalankan langsung setelah CLI terpasang dan ada di PATH:
+./examples/halo_dunia.cuk
+```
+
+Contoh keuangan meminta pemasukan dan pengeluaran, lalu menyimpan catatan relatif `keuangan_sederhana.txt` di direktori project. Operasi berkas interpreter dibatasi ke project root; jangan jalankan program yang tidak dipercaya.
+
 ## Two maintained execution paths
 
 | Path | What it is | Important limit |
