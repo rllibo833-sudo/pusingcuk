@@ -191,7 +191,7 @@ Katalog dokumentasi lengkap ada di [docs/README.md](docs/README.md). Reviewer te
 
 Baru mulai? Pilih satu task kecil—gak harus langsung jadi ahli. Bahasa Indonesia dan English welcome; pemula, Gen Z/Gen Alpha, dan kontributor internasional boleh ikut.
 
-- [Kalkulator pemula: contoh `contoh/kalkulator.pusingcuk` dengan `tanya` + `jika` (#78)](https://github.com/rllibo833-sudo/pusingcuk/issues/78)
+- [Kalkulator pemula: contoh `examples/kalkulator.pusingcuk` dengan `tanya` + `jika` (#78)](https://github.com/rllibo833-sudo/pusingcuk/issues/78)
 - [Bikin pesan error parser lebih ramah Gen Z / Gen Alpha di `parser.py` (#79)](https://github.com/rllibo833-sudo/pusingcuk/issues/79)
 - [Desain logo sederhana untuk Pusingcuk (#80)](https://github.com/rllibo833-sudo/pusingcuk/issues/80)
 

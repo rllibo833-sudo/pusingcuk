@@ -1,5 +1,6 @@
 name: "Good first issue: contoh kalkulator"
 description: "Tambahkan contoh kalkulator pemula memakai tanya dan jika."
+labels: ["good first issue"]
 title: "[Good First Issue] Tambahkan contoh kalkulator dengan tanya + jika"
 body:
   - type: markdown

@@ -1,5 +1,6 @@
 name: "Good first issue: desain logo Pusingcuk"
 description: "Usulkan logo Pusingcuk yang sederhana, orisinal, dan mudah dibaca."
+labels: ["good first issue"]
 title: "[Good First Issue] Design a simple Pusingcuk logo"
 body:
   - type: markdown

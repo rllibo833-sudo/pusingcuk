@@ -1,5 +1,6 @@
 name: "Good first issue: Gen Z / Gen Alpha parser errors"
 description: "Bikin pesan error parser.py lebih ramah tanpa mengorbankan kejelasan."
+labels: ["good first issue"]
 title: "[Good First Issue] Gen Z / Gen Alpha-friendly parser error messages"
 body:
   - type: markdown
