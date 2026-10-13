@@ -36,6 +36,6 @@ chmod 755 "$OUTPUT_DIR/pusingcuk-native-android-arm64" "$OUTPUT_DIR/pusingcuk-na
 command -v file >/dev/null 2>&1 && file "$OUTPUT_DIR"/pusingcuk-native-android-*
 readelf -h "$OUTPUT_DIR/pusingcuk-native-android-arm64" | grep -q "Machine:.*AArch64"
 readelf -h "$OUTPUT_DIR/pusingcuk-native-android-x86_64" | grep -Eq "Machine:.*(Advanced Micro Devices X86-64|X86-64)"
-"$OUTPUT_DIR/pusingcuk-native-android-arm64" --version
-"$OUTPUT_DIR/pusingcuk-native-android-x86_64" --version
+strings "$OUTPUT_DIR/pusingcuk-native-android-arm64" | grep -Fq "Pusingcuk native 0.7.1-android"
+strings "$OUTPUT_DIR/pusingcuk-native-android-x86_64" | grep -Fq "Pusingcuk native 0.7.1-android"
 sha256sum "$OUTPUT_DIR"/pusingcuk-native-android-*
