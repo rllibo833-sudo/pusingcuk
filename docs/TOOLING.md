@@ -1,5 +1,17 @@
 # Tooling dan Alur Pengembangan Pusingcuk
 
+## Cara menjalankan seperti Python
+
+Ekstensi kanonis untuk source baru adalah `.cuk`; `.pusingcuk` tetap didukung. Di environment Python, pasang CLI sekali:
+
+```sh
+python -m pip install .
+pusingcuk --check halo.cuk
+pusingcuk halo.cuk
+```
+
+`pusingcuk --check` memvalidasi sintaks tanpa menjalankan program. `pusingcuk` adalah interpreter referensi Python. Untuk runtime mandiri tanpa Python di Termux, gunakan `pusingcuk-native program.cuk` setelah instalasi native; kedua runtime punya subset fitur berbeda.
+
 ## Yang tersedia sekarang
 
 | Kebutuhan | Perintah atau berkas | Batas |
