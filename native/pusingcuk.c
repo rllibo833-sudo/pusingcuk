@@ -28,7 +28,7 @@ static Dict *allocated_dicts[MAX_LIST_ALLOCATIONS];
 static size_t allocated_dict_count;
 typedef struct { char name[128]; Val v; } Var;
 static Var vars[NV];
-static int nvars, err, line_no;
+static int nvars, err, syntax_err, line_no;
 /* Parse skipped logical operands without performing runtime effects. */
 static int suppress_eval;
 static const char *p;
@@ -43,11 +43,14 @@ static Val call_user_function(const char *name, Val *args, int argc);
 
 static void fail(const char *msg) {
     if (suppress_eval) return;
-    if (!err) fprintf(stderr, "Kesalahan baris %d: %s\n", line_no, msg);
+    if (!err) fprintf(stderr, "Kesalahan runtime: Baris %d: %s\n", line_no, msg);
     err = 1;
 }
 static void syntax_fail(const char *msg) {
-    if (!err) fprintf(stderr, "Kesalahan baris %d: %s\n", line_no, msg);
+    if (!err) {
+        fprintf(stderr, "Kesalahan sintaks: Baris %d: %s\n", line_no, msg);
+        syntax_err = 1;
+    }
     err = 1;
 }
 static Val num(double x) { Val v={0}; v.t=NUM; v.n=x; return v; }
@@ -909,7 +912,7 @@ int main(int argc,char **argv) {
     if(ferror(f)) { perror("Gagal membaca program"); fclose(f); return 2; }
     fclose(f);
     if (register_top_level_functions()) run_range(0,program_count);
-    int result=err?1:0;
+    int result=syntax_err?2:(err?1:0);
     for(int i=0;i<program_count;i++) free(program_lines[i]);
     for(size_t i=0;i<allocated_list_count;i++) {
         free(allocated_lists[i]->items);
