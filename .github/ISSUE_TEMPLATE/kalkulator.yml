@@ -1,0 +1,27 @@
+name: "Good first issue: contoh kalkulator"
+description: "Tambahkan contoh kalkulator pemula memakai tanya dan jika."
+title: "[Good First Issue] Tambahkan contoh kalkulator dengan tanya + jika"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tambahkan `contoh/kalkulator.pusingcuk` yang ramah pemula. Cek `SPEC.md` untuk sintaks yang benar dan pastikan `jika` memang didukung oleh jalur interpreter yang dituju.
+  - type: textarea
+    id: plan
+    attributes:
+      label: Rencana singkat
+      description: Bagaimana contoh akan meminta input, menghitung, dan menangani input yang tidak valid?
+      placeholder: "Minta dua angka dengan tanya, lalu pilih operasi..."
+    validations:
+      required: true
+  - type: checkboxes
+    id: done
+    attributes:
+      label: Kriteria selesai
+      options:
+        - label: Contoh mengikuti sintaks aktual di SPEC.md.
+          required: true
+        - label: Input dan operator tidak valid ditangani dengan pesan ramah.
+          required: true
+        - label: Perintah untuk menjalankan contoh didokumentasikan.
+          required: true

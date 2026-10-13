@@ -1,0 +1,33 @@
+name: "Good first issue: Gen Z / Gen Alpha parser errors"
+description: "Bikin pesan error parser.py lebih ramah tanpa mengorbankan kejelasan."
+title: "[Good First Issue] Gen Z / Gen Alpha-friendly parser error messages"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tujuannya membuat error di `parser.py` lebih mudah dipahami oleh pemula Indonesia maupun internasional. Slang boleh, tapi jangan menghina pengguna atau mengaburkan penyebab teknis.
+  - type: textarea
+    id: current-errors
+    attributes:
+      label: Error yang ingin diperbaiki
+      description: Sertakan contoh input dan pesan error saat ini jika sudah ditemukan.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Usulan pesan baru
+      description: Tulis versi yang ramah dan langkah konkret untuk memperbaikinya.
+    validations:
+      required: true
+  - type: checkboxes
+    id: done
+    attributes:
+      label: Kriteria selesai
+      options:
+        - label: Pesan tetap menjelaskan penyebab dan lokasi error.
+          required: true
+        - label: Ada saran perbaikan yang berguna.
+          required: true
+        - label: Tes regresi ditambah atau diperbarui.
+          required: true

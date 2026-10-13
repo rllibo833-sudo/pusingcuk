@@ -1,0 +1,33 @@
+name: "Good first issue: desain logo Pusingcuk"
+description: "Usulkan logo Pusingcuk yang sederhana, orisinal, dan mudah dibaca."
+title: "[Good First Issue] Design a simple Pusingcuk logo"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Buat logo sederhana yang cocok untuk README, GitHub social preview, dan ukuran kecil. SVG lebih disukai.
+  - type: textarea
+    id: concept
+    attributes:
+      label: Konsep logo
+      description: Jelaskan bentuk, ide, dan hubungan konsep dengan Pusingcuk.
+    validations:
+      required: true
+  - type: textarea
+    id: preview
+    attributes:
+      label: Sketsa atau tautan preview
+      description: Lampirkan sketsa, SVG awal, atau tautan gambar jika ada.
+    validations:
+      required: false
+  - type: checkboxes
+    id: done
+    attributes:
+      label: Kriteria selesai
+      options:
+        - label: Logo tetap terbaca pada ukuran kecil dan latar terang/gelap.
+          required: true
+        - label: Aset orisinal atau lisensinya didokumentasikan.
+          required: true
+        - label: File sumber dan catatan penggunaan disertakan.
+          required: true

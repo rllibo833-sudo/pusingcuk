@@ -187,6 +187,16 @@ Katalog dokumentasi lengkap ada di [docs/README.md](docs/README.md). Reviewer te
 - [Kebijakan keamanan](SECURITY.md)
 - [Kode etik komunitas](CODE_OF_CONDUCT.md)
 
+## Cara Kontribusi 10 Menit
+
+Baru mulai? Pilih satu task kecil—gak harus langsung jadi ahli. Bahasa Indonesia dan English welcome; pemula, Gen Z/Gen Alpha, dan kontributor internasional boleh ikut.
+
+- [Kalkulator pemula: contoh `contoh/kalkulator.pusingcuk` dengan `tanya` + `jika` (#78)](https://github.com/rllibo833-sudo/pusingcuk/issues/78)
+- [Bikin pesan error parser lebih ramah Gen Z / Gen Alpha di `parser.py` (#79)](https://github.com/rllibo833-sudo/pusingcuk/issues/79)
+- [Desain logo sederhana untuk Pusingcuk (#80)](https://github.com/rllibo833-sudo/pusingcuk/issues/80)
+
+Pilih satu, baca acceptance criteria, lalu tinggalkan komentar kalau mau mengerjakannya. Lihat juga [Good First Issues](https://github.com/rllibo833-sudo/pusingcuk/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) dan [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Kontribusi dan kontak proyek
 
 Pusingcuk terbuka buat pemula maupun developer berpengalaman. Lu gak harus langsung jago coding untuk bantu: dokumentasi, terjemahan, contoh, bug report yang bisa direproduksi, dan masukan desain juga berguna. Baca [CONTRIBUTING.md](CONTRIBUTING.md), jelaskan masalahnya, sertakan contoh kecil kalau bisa, dan tambahkan tes untuk perubahan perilaku. Kontribusi harus mempertahankan operasi offline dan menjelaskan dukungan Android secara jujur.
