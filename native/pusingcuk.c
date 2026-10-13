@@ -565,7 +565,7 @@ static int block_end(int start,const char *kind,int *middle) {
         if(!strcmp(kind,"njir") && depth==0 && split<0 &&
            line_word(i,"kampret")) split=i;
     }
-    line_no=start+1; fail("blok tidak ditutup dengan benar"); return -1;
+    line_no=program_count > 0 ? program_count : start + 1; syntax_fail("blok tidak ditutup dengan benar"); return -1;
 }
 static int register_function(int header, int end) {
     const char *saved_p = p;
@@ -575,7 +575,7 @@ static int register_function(int header, int end) {
     if (!word("fungsi")) { p = saved_p; line_no = saved_line; return 0; }
     char name[128] = {0};
     if (!identifier(name, sizeof name) || !take("(")) {
-        fail("deklarasi fungsi harus berbentuk fungsi nama(parameter)");
+        syntax_fail("deklarasi fungsi harus berbentuk fungsi nama(parameter)");
         p = saved_p; line_no = saved_line; return 0;
     }
     if (!strcmp(name, "panjang") || !strcmp(name, "rentang")) {
@@ -600,7 +600,7 @@ static int register_function(int header, int end) {
             }
             char param[128] = {0};
             if (!identifier(param, sizeof param)) {
-                fail("nama parameter fungsi diharapkan");
+                syntax_fail("nama parameter fungsi diharapkan");
                 p = saved_p; line_no = saved_line; return 0;
             }
             for (int j = 0; j < fn.param_count; j++) {
@@ -612,13 +612,13 @@ static int register_function(int header, int end) {
             snprintf(fn.params[fn.param_count++], sizeof fn.params[0], "%s", param);
             if (take(")")) break;
             if (!take(",")) {
-                fail("koma atau ')' diharapkan dalam parameter fungsi");
+                syntax_fail("koma atau ')' diharapkan dalam parameter fungsi");
                 p = saved_p; line_no = saved_line; return 0;
             }
         }
     }
     if (!endline()) {
-        fail("karakter tambahan setelah deklarasi fungsi");
+        syntax_fail("karakter tambahan setelah deklarasi fungsi");
         p = saved_p; line_no = saved_line; return 0;
     }
     fn.first_line = header + 1;
@@ -643,11 +643,11 @@ static int run_range(int first,int last) {
         line_no=i+1; p=program_lines[i]; ws();
         if(endline()) continue;
         if(word("jancuk")) continue;
-        if(word("selesai")) { if(word("jancuk") && first==0 && i==last-1) continue; fail("penutup blok tidak sesuai"); break; }
+        if(word("selesai")) { if(word("jancuk") && first==0 && i==last-1) continue; syntax_fail("penutup blok tidak sesuai"); break; }
 
         if(word("njir")) {
             Val c=expr();
-            if(!endline()) fail("karakter tambahan pada kondisi njir");
+            if(!endline()) syntax_fail("karakter tambahan pada kondisi njir");
             int mid=-1, end=block_end(i,"njir",&mid);
             if(end<0) break;
             if(!err) {
@@ -656,13 +656,13 @@ static int run_range(int first,int last) {
             }
             i=end;
         } else if(word("kampret")) {
-            fail("kampret tanpa njir");
+            syntax_fail("kampret tanpa njir");
         } else if(word("untuk")) {
             char name[128] = {0};
-            if (!identifier(name, sizeof name)) { fail("nama variabel perulangan diharapkan"); break; }
-            if (!word("dalam")) { fail("kata 'dalam' diharapkan setelah nama perulangan"); break; }
+            if (!identifier(name, sizeof name)) { syntax_fail("nama variabel perulangan diharapkan"); break; }
+            if (!word("dalam")) { syntax_fail("kata 'dalam' diharapkan setelah nama perulangan"); break; }
             Val iterable = expr();
-            if (!endline()) fail("karakter tambahan setelah koleksi perulangan");
+            if (!endline()) syntax_fail("karakter tambahan setelah koleksi perulangan");
             int mid=-1, end=block_end(i,"untuk",&mid);
             if (end<0) break;
             if (!err && iterable.t == LIST && iterable.list) {
@@ -716,7 +716,7 @@ static int run_range(int first,int last) {
         } else if(word("balek")) {
             if(call_depth <= 0) { fail("balek hanya boleh di dalam fungsi"); break; }
             Val v=expr();
-            if(!endline()) fail("karakter tambahan setelah nilai balek");
+            if(!endline()) syntax_fail("karakter tambahan setelah nilai balek");
             if(!err) { return_value=v; returning=1; }
         } else if(word("mumet")) {
             int mid=-1, end=block_end(i,"mumet",&mid);
@@ -725,7 +725,7 @@ static int run_range(int first,int last) {
             while(!err && !returning) {
                 line_no=i+1; p=program_lines[i]; ws(); word("mumet");
                 Val c=expr();
-                if(!endline()) fail("karakter tambahan pada kondisi mumet");
+                if(!endline()) syntax_fail("karakter tambahan pada kondisi mumet");
                 if(err || !truth(c)) break;
                 if(++iter>MAX_ITER) {
                     fail("batas 10000 iterasi mumet terlampaui"); break;
@@ -735,19 +735,19 @@ static int run_range(int first,int last) {
             i=end;
         } else if(word("lah")) {
             char name[128]={0};
-            if(!identifier(name,sizeof name)) fail("nama variabel diharapkan");
+            if(!identifier(name,sizeof name)) syntax_fail("nama variabel diharapkan");
             if(!err && hasvar(name)) fail("variabel sudah dibuat");
-            if(!take("=")) fail("tanda '=' diharapkan");
+            if(!take("=")) syntax_fail("tanda '=' diharapkan");
             Val v=expr();
-            if(!endline()) fail("karakter tambahan setelah ekspresi");
+            if(!endline()) syntax_fail("karakter tambahan setelah ekspresi");
             if(!err) setvar(name,v);
         } else if(word("tanya")) {
             char name[128]={0};
-            if(!identifier(name,sizeof name)) fail("nama variabel input diharapkan");
+            if(!identifier(name,sizeof name)) syntax_fail("nama variabel input diharapkan");
             if(!err && hasvar(name)) fail("variabel input sudah dibuat");
-            if(!take("=")) fail("tanda '=' diharapkan setelah nama input");
+            if(!take("=")) syntax_fail("tanda '=' diharapkan setelah nama input");
             Val prompt=expr();
-            if(!endline()) fail("karakter tambahan setelah prompt input");
+            if(!endline()) syntax_fail("karakter tambahan setelah prompt input");
             if(!err && prompt.t!=STR) fail("prompt tanya harus berupa teks");
             if(!err) {
                 char input[SZ];
@@ -770,21 +770,21 @@ static int run_range(int first,int last) {
             }
         } else if(word("hedeh")) {
             Val v=expr();
-            if(!endline()) fail("karakter tambahan setelah ekspresi");
+            if(!endline()) syntax_fail("karakter tambahan setelah ekspresi");
             if(!err) printval(v);
         } else {
             char name[128]={0};
-            if(!identifier(name,sizeof name)) fail("pernyataan belum didukung");
+            if(!identifier(name,sizeof name)) syntax_fail("pernyataan belum didukung");
             else {
                 int indexed=0; Val idx=num(0);
                 if(take("[")) {
                     indexed=1; idx=expr();
-                    if(!take("]")) fail("kurung siku tutup ']' diharapkan");
+                    if(!take("]")) syntax_fail("kurung siku tutup ']' diharapkan");
                 }
-                if(!take("=")) fail("tanda '=' diharapkan");
+                if(!take("=")) syntax_fail("tanda '=' diharapkan");
                 else {
                     Val v=expr();
-                    if(!endline()) fail("karakter tambahan setelah ekspresi");
+                    if(!endline()) syntax_fail("karakter tambahan setelah ekspresi");
                     if(!hasvar(name)) fail("variabel belum dibuat");
                     if(!err) for(int k=0;k<nvars;k++)
                         if(!strcmp(vars[k].name,name)) {
