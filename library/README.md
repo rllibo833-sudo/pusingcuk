@@ -5,7 +5,7 @@ This directory contains runnable examples, runtime metadata, built-in registries
 - [`kosakata.json`](kosakata.json): keyword and alias glossary, meanings, and support-status metadata.
 - [`conditional_logic.pusingcuk`](conditional_logic.pusingcuk): comparisons, booleans, short-circuit logic, and conditionals.
 - [`loops_functions_genz.pusingcuk`](loops_functions_genz.pusingcuk): loops, recursive functions, and newer slang aliases. Run it with the modular interpreter because its text output is not supported by the experimental C source backend subset.
-- [`stdlib.py`](stdlib.py): an internal builtin registry for conversions, shared numeric helpers, and math helpers (`akar`, `bawah`, `atas`, `pangkat`, `sinus`, `kosinus`), and statistics helpers (`rata_rata`, `median`). Registry presence alone does not imply every runtime supports a builtin: the six math helpers currently work in the JS/Python compiler backends, and HTML uses the JS backend; VM/native C support is not yet claimed.
+- [`stdlib.py`](stdlib.py): the implementation registry for built-ins declared in [`builtin_contract.json`](builtin_contract.json). The Python reference interpreter now dispatches all 18 contract built-ins through this registry. JS/Python transpilers and HTML support a smaller documented subset, the VM supports six, and native C currently claims only `panjang` and `rentang`. See the [full built-in catalogue](../docs/language/BUILTINS.md); registry presence alone does not prove every target supports a built-in.
 
 ## Run examples with the Python interpreter
 
