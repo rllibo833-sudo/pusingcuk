@@ -103,5 +103,72 @@ class BuiltinContractTests(unittest.TestCase):
             translate("import requests\n")
 
 
+
+    def test_all_reference_builtins_execute_with_language_semantics(self):
+        examples = {
+            "panjang": (("cuk",), 3),
+            "teks": ((True,), "okelah"),
+            "bilangan": (("42",), 42),
+            "desimal": (("1.5",), 1.5),
+            "logika": ((0,), False),
+            "rentang": ((1, 4), [1, 2, 3]),
+            "mutlak": ((-2,), 2),
+            "minimum": ((2, 5), 2),
+            "maksimum": ((2, 5), 5),
+            "bulatkan": ((2.5,), 2),
+            "akar": ((9,), 3.0),
+            "bawah": ((2.9,), 2),
+            "atas": ((2.1,), 3),
+            "pangkat": ((2, 3), 8.0),
+            "sinus": ((0,), 0.0),
+            "kosinus": ((0,), 1.0),
+            "rata_rata": (([1, 2, 3],), 2),
+            "median": (([1, 2, 3, 4],), 2.5),
+        }
+        self.assertEqual(set(examples), set(BUILTIN_NAMES))
+        for name, (args, expected) in examples.items():
+            with self.subTest(builtin=name):
+                self.assertEqual(call_builtin(name, *args), expected)
+                with self.assertRaises(TypeError):
+                    call_builtin(name)
+                with self.assertRaises(TypeError):
+                    call_builtin(name, *args, None)
+
+    def test_native_c_support_status_matches_implemented_builtin_surface(self):
+        native_supported = {"panjang", "rentang"}
+        for name, entry in BUILTIN_BY_NAME.items():
+            with self.subTest(builtin=name):
+                expected = "supported" if name in native_supported else "unsupported"
+                self.assertEqual(entry["backends"]["native_c"]["status"], expected)
+
+    def test_human_builtin_catalog_matches_canonical_contract(self):
+        from pathlib import Path
+
+        root = Path(__file__).resolve().parents[1]
+        doc = (root / "docs" / "language" / "BUILTINS.md").read_text(encoding="utf-8")
+        rows = [line for line in doc.splitlines() if line.startswith("| `")]
+        parsed = {}
+        targets = ("reference", "native_c", "js", "python", "html", "vm")
+        for row in rows:
+            cells = [cell.strip() for cell in row.strip("|").split("|")]
+            if len(cells) != 9:
+                continue
+            name = cells[0].strip("`")
+            parsed[name] = {
+                "arity": cells[1],
+                "description": cells[2],
+                "statuses": dict(zip(targets, cells[3:9])),
+            }
+        self.assertEqual(set(parsed), set(BUILTIN_BY_NAME))
+        for name, entry in BUILTIN_BY_NAME.items():
+            with self.subTest(builtin=name):
+                arity = str(entry["min_args"]) if entry["min_args"] == entry["max_args"] else f'{entry["min_args"]}–{entry["max_args"]}'
+                self.assertEqual(parsed[name]["arity"], arity)
+                self.assertEqual(parsed[name]["description"], entry["description"])
+                self.assertEqual(
+                    parsed[name]["statuses"],
+                    {target: entry["backends"][target]["status"] for target in targets},
+                )
+
 if __name__ == "__main__":
     unittest.main()
