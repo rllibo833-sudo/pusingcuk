@@ -104,12 +104,18 @@ jobs:
           set -euo pipefail
           NDK_BIN="$ANDROID_HOME/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin"
           ANDROID_VERSION="${PUSINGCUK_RELEASE_TAG#v}-android"
-          mkdir -p dist/android
-          VERSION_DEFINE="-DPUSINGCUK_VERSION=\"${ANDROID_VERSION}\""
-          "$NDK_BIN/aarch64-linux-android24-clang" -std=c11 -O2 -Wall -Wextra -Werror \
-            "$VERSION_DEFINE" \
-            native/pusingcuk.c -lm -o dist/android/pusingcuk-native-android-arm64
-          chmod 755 dist/android/pusingcuk-native-android-arm64
+          if [[ -f scripts/build-android.sh ]]; then
+            PUSINGCUK_VERSION="$ANDROID_VERSION" bash scripts/build-android.sh dist/android
+          else
+            # Recovery path for historical tags predating the shared build script.
+            mkdir -p dist/android
+            VERSION_DEFINE="-DPUSINGCUK_VERSION=\"${ANDROID_VERSION}\""
+            "$NDK_BIN/aarch64-linux-android24-clang" -std=c11 -O2 -Wall -Wextra -Werror \
+              "$VERSION_DEFINE" \
+              native/pusingcuk.c -lm -o dist/android/pusingcuk-native-android-arm64
+            chmod 755 dist/android/pusingcuk-native-android-arm64
+          fi
+          test -s dist/android/pusingcuk-native-android-arm64
           file dist/android/pusingcuk-native-android-arm64
           readelf -h dist/android/pusingcuk-native-android-arm64 | grep -q 'Machine:.*AArch64'
           strings dist/android/pusingcuk-native-android-arm64 | grep -Fq "$ANDROID_VERSION"
