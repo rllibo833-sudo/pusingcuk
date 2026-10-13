@@ -27,7 +27,7 @@ Dokumen ini menjelaskan fungsi direktori dan file utama agar kontributor baru da
 | `ast_nodes.py` | Definisi node AST yang digunakan pipeline modular. |
 | `evaluator.py` | Mengevaluasi AST dan menjalankan operasi bahasa. |
 | `interpreter.py` | Implementasi interpreter historis/modular; periksa jalur CLI yang digunakan sebelum mengubahnya. |
-| `pusingcuk_new.py` | Entry point pipeline interpreter modular yang didokumentasikan. |
+| `pusingcuk_new.py` | Entry point pipeline interpreter modular; mendukung `--check` untuk validasi sintaks tanpa mengeksekusi program. Berkas baru memakai `.cuk`, sedangkan `.pusingcuk` tetap kompatibel. |
 | `terminal.py` | Terminal interaktif untuk belajar dan menjalankan program. |
 | `compiler_ir.py` | Representasi intermediate yang digunakan pipeline compiler tertentu. |
 | `compiler/` | CLI compiler, IR, sistem tipe, bytecode/VM, dan backend C, JavaScript, serta Python. |
@@ -69,7 +69,7 @@ Saat mengubah perilaku bahasa, tambahkan atau perbarui fixture konformansi bila 
 - `tools/termux_dashboard.sh`: dashboard/shortcut untuk alur kerja Termux.
 - `site/` dan `web/`: aset antarmuka web dan contoh situs. Periksa konfigurasi publikasi sebelum menghapus atau memindahkan file.
 - `scripts/`: skrip setup, build, atau pengembangan.
-- `halo.pusingcuk`: contoh program di root.
+- `halo.cuk`: contoh kanonis program di root; `halo.pusingcuk` dipertahankan sebagai contoh lama yang kompatibel.
 
 ## Cross-language and integration status
 
