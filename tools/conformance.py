@@ -114,7 +114,7 @@ def classify_stderr(returncode, stderr):
 
 def source_line_from_stderr(stderr):
     """Return the reported source line when present, ignoring wording and columns."""
-    match = re.search(r"\\bBaris\\s+(\\d+)\\b", stderr, flags=re.IGNORECASE)
+    match = re.search(r"\bBaris\s+(\d+)\b", stderr, flags=re.IGNORECASE)
     return int(match.group(1)) if match else None
 
 
