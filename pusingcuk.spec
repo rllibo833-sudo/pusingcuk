@@ -2,6 +2,7 @@
 
 import os
 
+from PyInstaller.building.datastruct import Tree
 from PyInstaller.utils.hooks import collect_submodules
 
 hiddenimports = [
@@ -14,7 +15,7 @@ hiddenimports = [
 ]
 hiddenimports += collect_submodules("tools")
 
-datas = [("examples", "examples")] if os.path.isdir("examples") else []
+datas = Tree("examples", prefix="examples") if os.path.isdir("examples") else []
 
 a = Analysis(
     ["pusingcuk_new.py"],
