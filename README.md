@@ -7,7 +7,7 @@
 
 Pusingcuk is an experimental programming language with Indonesian-friendly keywords and local slang aliases. It aims to make coding approachable while building a testable interpreter, native C runtime, and experimental compiler backends.
 
-> **Project status:** experimental, version 0.4-dev. Runtime and compiler support varies by feature. Pusingcuk is **not a security sandbox**; jangan jalanin program gak jelas di perangkat yang nyimpen data penting.
+> **Project status:** experimental. Language specification: `0.4-dev`; implementation/release line: `0.7.1`. Runtime and compiler support varies by feature. Pusingcuk is **not a security sandbox**; jangan jalanin program gak jelas di perangkat yang nyimpen data penting.
 
 ## Kenapa Pusingcuk?
 
@@ -60,7 +60,7 @@ bash scripts/install-termux.sh
 pusingcuk-native examples/native/rekap_anggaran.pusingcuk
 ```
 
-**Penting soal binary Release:** asset `pusingcuk` pada [GitHub Releases](https://github.com/rllibo833-sudo/pusingcuk/releases) dibangun di Ubuntu x86-64 sebagai executable PyInstaller untuk Linux. Itu **bukan** binary Android/Termux ARM64. Untuk Termux AArch64, build runtime native dari source memakai `bash scripts/install-termux.sh` seperti contoh di atas. Runtime native memiliki subset fitur berbeda dari interpreter Python; lihat [matriks runtime](docs/NATIVE_RUNTIME.md).
+**Penting soal binary Release:** asset `pusingcuk` pada [GitHub Releases](https://github.com/rllibo833-sudo/pusingcuk/releases) dibangun di Ubuntu x86-64 sebagai executable PyInstaller untuk Linux. Itu **bukan** binary Android/Termux ARM64. Untuk Termux AArch64, build runtime native dari source memakai `bash scripts/install-termux.sh` seperti contoh di atas. Runtime native memiliki subset fitur berbeda dari interpreter Python; lihat [matriks runtime](docs/NATIVE_RUNTIME.md). CI Android membangun binary NDK ARM64 dan menguji runtime native pada emulator Android x86-64. Pengujian langsung pada perangkat Termux ARM64 tetap merupakan pemeriksaan platform terpisah; panduannya ada di [distribusi Android](docs/ANDROID_DISTRIBUTION.md).
 
 ## Contoh kode pertama
 
@@ -70,10 +70,11 @@ hedeh "Hello, world!"
 selesai jancuk
 ```
 
-Run kode yang disimpan sebagai `program.pusingcuk`:
+Validasi sintaks tanpa menjalankan program, lalu eksekusi file `.cuk`:
 
 ```sh
-python pusingcuk_new.py program.pusingcuk
+python pusingcuk_new.py --check program.cuk
+python pusingcuk_new.py program.cuk
 ```
 
 ## Examples buat dicoba
