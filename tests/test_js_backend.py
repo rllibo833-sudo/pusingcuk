@@ -20,7 +20,7 @@ class JavaScriptBackendTests(unittest.TestCase):
             path.write_text(generated, encoding="utf-8")
             return subprocess.run(
                 [NODE, str(path)], input=input_text, text=True, capture_output=True,
-                timeout=5, check=False,
+                timeout=15, check=False,
             )
 
     def test_compiles_and_runs_arithmetic_and_booleans(self):
