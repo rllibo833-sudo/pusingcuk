@@ -15,7 +15,7 @@ native:
 	$(CC) $(CFLAGS) -DPUSINGCUK_VERSION='"$(VERSION)"' native/pusingcuk.c $(LDLIBS) -o "$(NATIVE_BIN)"
 
 run-native: native
-	@test -n "$(FILE)" || (echo "Gunakan: make run-native FILE=program.pusingcuk" >&2; exit 2)
+	@test -n "$(FILE)" || (echo "Gunakan: make run-native FILE=program.cuk" >&2; exit 2)
 	"$(NATIVE_BIN)" "$(FILE)"
 
 install: native
