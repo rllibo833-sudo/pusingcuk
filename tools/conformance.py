@@ -113,8 +113,11 @@ def classify_stderr(returncode, stderr):
 
 
 def source_line_from_stderr(stderr):
-    """Return the reported source line when present, ignoring wording and columns."""
+    """Return source line across C's and Python's diagnostic location formats."""
     match = re.search(r"\bBaris\s+(\d+)\b", stderr, flags=re.IGNORECASE)
+    if match is None:
+        # Python parser locations use [filename:line:column].
+        match = re.search(r"\[[^\]\n]*:(\d+):\d+\]", stderr)
     return int(match.group(1)) if match else None
 
 
