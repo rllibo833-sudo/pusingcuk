@@ -51,6 +51,7 @@ Compiler/PVM prototypes and Android Studio APK development are intentionally out
 - [ ] Success cases and relevant failure cases have tests.
 - [ ] `SPEC.md`, the semantic contract, built-in metadata, tests, and documentation agree with the implementation.
 - [ ] Built-in changes update `library/builtin_contract.json`, `docs/language/BUILTINS.md`, runtime support states, and executable tests together.
+- [ ] A new native built-in has parity fixtures for normal values, wrong arity, invalid types, and domain/boundary failures when applicable; do not mark it `supported` based on compilation alone.
 - [ ] Error fixtures compare syntax/runtime class, shared exit code, and source line; do not add per-runtime exit-code overrides to hide a mismatch.
 - [ ] Runtime parity is claimed only when the same conformance fixtures pass.
 - [ ] Platform claims match the tested compatibility matrix.
