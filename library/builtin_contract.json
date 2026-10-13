@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "contract_version": "0.1.0",
+  "contract_version": "0.2.0",
   "language_version": "0.4-dev",
   "description": "Canonical metadata contract for Pusingcuk builtins, Python import allow-lists, arity and target capabilities. Implementation code remains in the relevant runtime.",
   "targets": [
@@ -19,7 +19,7 @@
       ],
       "min_args": 1,
       "max_args": 1,
-      "description": "Jumlah item pada teks, daftar, atau kamus.",
+      "description": "Jumlah elemen pada teks, daftar, kamus, atau rentang yang didukung runtime.",
       "implementation": "length",
       "backends": {
         "js": {
@@ -38,7 +38,7 @@
           "status": "supported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "supported"
         },
         "reference": {
           "status": "supported"
@@ -68,7 +68,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -98,7 +98,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -128,7 +128,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -158,7 +158,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -193,7 +193,7 @@
           "status": "supported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "supported"
         },
         "reference": {
           "status": "supported"
@@ -226,7 +226,7 @@
           "status": "supported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -260,7 +260,7 @@
           "status": "supported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -294,7 +294,7 @@
           "status": "supported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -327,7 +327,7 @@
           "status": "supported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -360,7 +360,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -393,7 +393,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -426,7 +426,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -460,7 +460,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -493,7 +493,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -526,7 +526,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -559,7 +559,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
@@ -592,7 +592,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "not-claimed"
+          "status": "unsupported"
         },
         "reference": {
           "status": "supported"
