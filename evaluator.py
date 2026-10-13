@@ -312,7 +312,8 @@ class Evaluator:
                     # inside a module are relative to that module's own source file.
                     if raw_path.is_absolute() or ".." in raw_path.parts:
                         return False
-                    if raw_path.suffix != ".pusingcuk":
+                    # .cuk is canonical; keep .pusingcuk imports compatible.
+                    if raw_path.suffix not in {".cuk", ".pusingcuk"}:
                         return False
                     if self._module_depth >= MAX_MODULE_DEPTH:
                         return False
