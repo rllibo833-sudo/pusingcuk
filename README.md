@@ -148,7 +148,7 @@ Cek konformansi lintas runtime:
 python tools/conformance.py
 ```
 
-Interpreter referensi adalah jalur Python modular yang dijalankan dengan `python pusingcuk_new.py program.pusingcuk` (`lexer.py`, `parser.py`, dan `evaluator.py`); semantiknya wajib mengikuti `SPEC.md`. `interpreter.py` adalah implementasi legacy yang terpisah. Runtime native C, compiler Python/JavaScript, dan PVM masih eksperimental, dapat mendukung subset yang lebih kecil, dan bukan sumber otoritatif semantik bahasa. Sintaks dan alias slang dibekukan; penambahan keyword atau alias butuh persetujuan Founder. Lihat [matriks kompatibilitas](docs/COMPATIBILITY.md), [catatan native runtime](docs/NATIVE_RUNTIME.md), dan [target compiler](docs/COMPILER_TARGETS.md).
+Interpreter referensi adalah jalur Python modular yang dijalankan dengan `python pusingcuk_new.py program.cuk` (`lexer.py`, `parser.py`, dan `evaluator.py`); semantiknya wajib mengikuti `SPEC.md`. `interpreter.py` adalah implementasi legacy yang terpisah. Runtime native C, compiler Python/JavaScript, dan PVM masih eksperimental, dapat mendukung subset yang lebih kecil, dan bukan sumber otoritatif semantik bahasa. Sintaks dan alias slang dibekukan; penambahan keyword atau alias butuh persetujuan Founder. Lihat [matriks kompatibilitas](docs/COMPATIBILITY.md), [catatan native runtime](docs/NATIVE_RUNTIME.md), dan [target compiler](docs/COMPILER_TARGETS.md).
 
 ## Offline-first policy
 
