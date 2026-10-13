@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-android-apk:
+  android-apk:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 25
