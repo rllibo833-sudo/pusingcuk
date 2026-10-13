@@ -30,11 +30,14 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install --no-deps .
-          pusingcuk --check halo.cuk
-          output="$(pusingcuk halo.cuk)"
+          cp halo.cuk "$RUNNER_TEMP/halo.cuk"
+          cd "$RUNNER_TEMP"
+          pusingcuk --check "$RUNNER_TEMP/halo.cuk"
+          output="$(pusingcuk "$RUNNER_TEMP/halo.cuk")"
           printf '%s\n' "$output"
           grep -Fqx 'Halo, Dunia' <<< "$output"
           grep -Fqx '42' <<< "$output"
+          python -c "from library.builtin_contract import BUILTIN_CONTRACT; assert BUILTIN_CONTRACT['schema_version'] == 1"
       - name: Build executable
         run: pyinstaller --log-level DEBUG --noconfirm --clean pusingcuk.spec
       - name: Verify executable
