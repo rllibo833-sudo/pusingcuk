@@ -26,6 +26,15 @@ jobs:
           else
             python -m pip install pyinstaller==6.11.1
           fi
+      - name: Verify installable Python CLI
+        run: |
+          set -euo pipefail
+          python -m pip install --no-deps .
+          pusingcuk --check halo.cuk
+          output="$(pusingcuk halo.cuk)"
+          printf '%s\n' "$output"
+          grep -Fqx 'Halo, Dunia' <<< "$output"
+          grep -Fqx '42' <<< "$output"
       - name: Build executable
         run: pyinstaller --log-level DEBUG --noconfirm --clean pusingcuk.spec
       - name: Verify executable
