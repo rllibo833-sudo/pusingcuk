@@ -31,13 +31,14 @@ Compiler/transpiler lain dan PVM tetap eksperimental. Keduanya tidak mengubah se
 - dan / atau menggunakan short-circuit: operand kanan tidak dievaluasi jika hasil sudah ditentukan.
 - Boolean benar dan salah adalah tipe berbeda dari angka. Kesetaraan benar == 1 menghasilkan tidak.
 - Output boolean memakai `okelah` dan `tidak`, bukan `True`/`False`. Built-in `teks` juga menggunakan ejaan bahasa Pusingcuk untuk boolean.
-- Kontrak built-in disimpan di `library/builtin_contract.json`, diuji oleh `tests/test_builtin_contract.py`, dan didokumentasikan di `docs/language/BUILTINS.md`. Interpreter referensi mendukung 18 built-in terdaftar; native C memiliki fixture untuk sepuluh: `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, dan `pangkat`. Transpiler/VM memiliki subset tersendiri.
-- Built-in statistik `rata_rata` dan `median` menerima tepat satu daftar nonkosong berisi angka finite; boolean dan tipe lain ditolak.
+- Kontrak built-in disimpan di `library/builtin_contract.json`, diuji oleh `tests/test_builtin_contract.py`, dan didokumentasikan di `docs/language/BUILTINS.md`. Interpreter referensi mendukung 18 built-in terdaftar; native C memiliki fixture untuk 14: `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`, `sinus`, `kosinus`, `rata_rata`, dan `median`. Transpiler/VM memiliki subset tersendiri.
+- `sinus` dan `kosinus` menerima satu angka finite non-boolean dalam radian; semua input finite punya domain matematis valid, hasil non-finite ditolak, dan hasil integral dalam rentang aman dinormalisasi sebagai integer.
+- `rata_rata` dan `median` menerima satu daftar tidak kosong yang berisi angka finite non-boolean dalam rentang aman `±(2^53 - 1)`; daftar kosong, boolean, tipe lain, aritas salah, dan angka di luar rentang ditolak. Median memakai nilai tengah terurut untuk panjang ganjil dan rata-rata dua nilai tengah untuk panjang genap.
 - Urutan output dan mutasi koleksi adalah perilaku teramati yang tidak boleh berubah karena optimisasi.
 - Pembagian dengan nol harus gagal sebagai `runtime_error` pada baris sumber operasi; pembagian lantai negatif mengikuti floor matematika (`-7 // 3` menjadi `-3`) dan modulo memakai aturan `a - floor(a / b) * b` (`-7 % 3` menjadi `2`).
 - Built-in numerik hanya menerima angka finite; boolean bukan angka. `akar(x)` mensyaratkan `x >= 0`; `pangkat(a, b)` menolak `a < 0` dengan `b` bukan integer serta `a == 0` dengan `b < 0`.
 - Hasil non-finite, termasuk overflow `pangkat(10, 1000)`, menjadi `runtime_error`, bukan `inf`, `NaN`, atau output parsial. Hasil matematika integral dalam rentang aman `±(2^53 - 1)` direpresentasikan sebagai integer; hasil non-integral dicetak dengan representasi desimal terpendek yang round-trip ke nilai binary64.
-- `bulatkan` menggunakan ties-to-even. Native C untuk `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, dan `pangkat` hanya diklaim setelah fixture positif serta kasus aritas, tipe, domain, dan hasil non-finite yang relevan lulus.
+- `bulatkan` menggunakan ties-to-even. Native C untuk `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`, `sinus`, `kosinus`, `rata_rata`, dan `median` hanya diklaim setelah fixture positif serta kasus aritas, tipe, domain/rentang, dan hasil numerik yang relevan lulus.
 
 ## Kontrol dan fungsi
 

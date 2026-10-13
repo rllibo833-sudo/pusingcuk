@@ -130,12 +130,12 @@ def _pow(a: Any, b: Any) -> int | float:
     return _canonical_math_result("pangkat", result)
 
 
-def _sin(value: Any) -> float:
-    return _math_result("sinus", math.sin(_numeric("sinus", value)))
+def _sin(value: Any) -> int | float:
+    return _canonical_math_result("sinus", math.sin(_numeric("sinus", value)))
 
 
-def _cos(value: Any) -> float:
-    return _math_result("kosinus", math.cos(_numeric("kosinus", value)))
+def _cos(value: Any) -> int | float:
+    return _canonical_math_result("kosinus", math.cos(_numeric("kosinus", value)))
 
 
 def _stat_values(name: str, value: Any) -> list[int | float]:
@@ -143,8 +143,8 @@ def _stat_values(name: str, value: Any) -> list[int | float]:
         raise TypeError(name + "() membutuhkan daftar angka yang tidak kosong")
     values = [_numeric(name, item) for item in value]
     if any(
-        (isinstance(item, int) and abs(item) > 9007199254740991)
-        or (isinstance(item, float) and item.is_integer() and abs(item) > 9007199254740991)
+        (isinstance(item, int) and abs(item) > _MAX_SAFE_INTEGER)
+        or (isinstance(item, float) and item.is_integer() and abs(item) > _MAX_SAFE_INTEGER)
         for item in values
     ):
         raise ValueError(name + "() menolak integer di luar rentang aman lintas target")

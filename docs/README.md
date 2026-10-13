@@ -1,6 +1,6 @@
 # Pusingcuk Documentation Index
 
-Use this index to choose the right document. The current engineering baseline is the **Python reference interpreter + native C runtime**. Shared fixtures now cover numerical edge cases, collection boundaries, function scope, and consistent runtime diagnostics, including `akar` and `pangkat` in native C. Compiler and Android app prototypes remain documented, but they are not part of the baseline compatibility promise.
+Use this index to choose the right document. The current engineering baseline is the **Python reference interpreter + native C runtime**. Shared fixtures now cover numerical edge cases, collection boundaries, function scope, and consistent runtime diagnostics, including `akar`, `pangkat`, `sinus`, `kosinus`, `rata_rata`, and `median` in native C. Compiler and Android app prototypes remain documented, but they are not part of the baseline compatibility promise.
 
 ## Start here
 

@@ -52,6 +52,8 @@ Compiler/PVM prototypes and Android Studio APK development are intentionally out
 - [ ] `SPEC.md`, the semantic contract, built-in metadata, tests, and documentation agree with the implementation.
 - [ ] Built-in changes update `library/builtin_contract.json`, `docs/language/BUILTINS.md`, runtime support states, and executable tests together.
 - [ ] A new native built-in has parity fixtures for normal and fractional results, wrong arity, invalid types, domain failures, and overflow/non-finite results when applicable; assert Python/C stdout and source-line error parity.
+- [ ] Trigonometric built-ins specify radians, finite/non-boolean arguments, canonical integral results, and representative fractional outputs.
+- [ ] Statistical built-ins cover empty lists, booleans/non-numeric elements, odd/even median, negative values, and the shared safe-integer boundary in Python and C.
 - [ ] Numeric built-ins define accepted types, edge/domain rules, and canonical formatting of integral versus fractional results in both `SPEC.md` and `docs/SEMANTIC_CONTRACT.md`.
 - [ ] Error fixtures compare syntax/runtime class, shared exit code, and source line; do not add per-runtime exit-code overrides to hide a mismatch.
 - [ ] Runtime parity is claimed only when the same conformance fixtures pass.

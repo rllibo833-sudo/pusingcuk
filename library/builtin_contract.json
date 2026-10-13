@@ -474,7 +474,7 @@
       ],
       "min_args": 1,
       "max_args": 1,
-      "description": "Sinus sudut dalam radian.",
+      "description": "Sinus sudut finite dalam radian; hasil integral aman dinormalisasi dan hasil non-finite ditolak.",
       "implementation": "sin",
       "backends": {
         "js": {
@@ -493,7 +493,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "reference": {
           "status": "supported"
@@ -507,7 +507,7 @@
       ],
       "min_args": 1,
       "max_args": 1,
-      "description": "Kosinus sudut dalam radian.",
+      "description": "Kosinus sudut finite dalam radian; hasil integral aman dinormalisasi dan hasil non-finite ditolak.",
       "implementation": "cos",
       "backends": {
         "js": {
@@ -526,7 +526,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "reference": {
           "status": "supported"
@@ -540,7 +540,7 @@
       ],
       "min_args": 1,
       "max_args": 1,
-      "description": "Rata-rata aritmetika daftar angka finite yang tidak kosong.",
+      "description": "Rata-rata aritmetika daftar nonkosong angka finite non-boolean dalam rentang aman lintas target.",
       "implementation": "mean",
       "backends": {
         "js": {
@@ -559,7 +559,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "reference": {
           "status": "supported"
@@ -573,7 +573,7 @@
       ],
       "min_args": 1,
       "max_args": 1,
-      "description": "Median daftar angka finite yang tidak kosong.",
+      "description": "Median daftar nonkosong angka finite non-boolean dalam rentang aman lintas target.",
       "implementation": "median",
       "backends": {
         "js": {
@@ -592,7 +592,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "reference": {
           "status": "supported"

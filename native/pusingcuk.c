@@ -258,7 +258,8 @@ static int is_builtin_name(const char *name) {
 
 static int is_native_numeric_builtin(const char *name) {
     static const char *const names[] = {
-        "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat"
+        "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat",
+        "sinus", "kosinus", "rata_rata", "median"
     };
     for (size_t i = 0; i < sizeof names / sizeof names[0]; i++)
         if (!strcmp(name, names[i])) return 1;
@@ -282,6 +283,55 @@ static Val call_native_numeric_builtin(const char *name, Val *args, int argc, in
         fail("jumlah argumen built-in numerik tidak sesuai kontrak");
         return num(0);
     }
+    if (!strcmp(name, "rata_rata") || !strcmp(name, "median")) {
+        const int is_mean = !strcmp(name, "rata_rata");
+        Val input = args[0];
+        if (input.t != LIST || !input.list || input.list->len == 0) {
+            fail(is_mean
+                ? "rata_rata() membutuhkan daftar angka finite yang tidak kosong"
+                : "median() membutuhkan daftar angka finite yang tidak kosong");
+            return num(0);
+        }
+        double values[MAX_LIST_ITEMS];
+        size_t count = input.list->len;
+        for (size_t i = 0; i < count; i++) {
+            Val item = input.list->items[i];
+            if (item.t != NUM || !isfinite(item.n)) {
+                fail(is_mean
+                    ? "rata_rata() hanya menerima angka finite; boolean bukan angka"
+                    : "median() hanya menerima angka finite; boolean bukan angka");
+                return num(0);
+            }
+            if (fabs(item.n) > 9007199254740991.0) {
+                fail(is_mean
+                    ? "rata_rata() menolak angka di luar rentang aman lintas target"
+                    : "median() menolak angka di luar rentang aman lintas target");
+                return num(0);
+            }
+            values[i] = item.n;
+        }
+        if (is_mean) {
+            double mean = 0.0;
+            for (size_t i = 0; i < count; i++)
+                mean += values[i] / (double)count;
+            return checked_num(mean, "rata_rata() menghasilkan angka non-finite");
+        }
+        for (size_t i = 1; i < count; i++) {
+            double value = values[i];
+            size_t j = i;
+            while (j > 0 && values[j - 1] > value) {
+                values[j] = values[j - 1];
+                j--;
+            }
+            values[j] = value;
+        }
+        if (count % 2 == 1)
+            return checked_num(values[count / 2], "median() menghasilkan angka non-finite");
+        return checked_num(
+            values[count / 2 - 1] / 2.0 + values[count / 2] / 2.0,
+            "median() menghasilkan angka non-finite");
+    }
+
     for (int i = 0; i < argc; i++) {
         if (args[i].t != NUM || !isfinite(args[i].n)) {
             fail("built-in numerik membutuhkan argumen angka finite; boolean bukan angka");
@@ -289,6 +339,10 @@ static Val call_native_numeric_builtin(const char *name, Val *args, int argc, in
         }
     }
 
+    if (!strcmp(name, "sinus"))
+        return checked_num(sin(args[0].n), "sinus() menghasilkan angka non-finite");
+    if (!strcmp(name, "kosinus"))
+        return checked_num(cos(args[0].n), "kosinus() menghasilkan angka non-finite");
     if (!strcmp(name, "mutlak"))
         return checked_num(fabs(args[0].n), "mutlak() menghasilkan angka tidak valid");
     if (!strcmp(name, "minimum"))

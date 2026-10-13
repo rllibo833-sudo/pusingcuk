@@ -29,10 +29,10 @@ Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python m
 | `bawah` | 1 | Pembulatan ke bawah menuju integer. | supported | supported | supported | supported | supported | unsupported |
 | `atas` | 1 | Pembulatan ke atas menuju integer. | supported | supported | supported | supported | supported | unsupported |
 | `pangkat` | 2 | Pangkat dua angka finite; domain tidak valid dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | unsupported |
-| `sinus` | 1 | Sinus sudut dalam radian. | supported | unsupported | supported | supported | supported | unsupported |
-| `kosinus` | 1 | Kosinus sudut dalam radian. | supported | unsupported | supported | supported | supported | unsupported |
-| `rata_rata` | 1 | Rata-rata aritmetika daftar angka finite yang tidak kosong. | supported | unsupported | supported | supported | supported | unsupported |
-| `median` | 1 | Median daftar angka finite yang tidak kosong. | supported | unsupported | supported | supported | supported | unsupported |
+| `sinus` | 1 | Sinus sudut finite dalam radian; hasil integral aman dinormalisasi dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | unsupported |
+| `kosinus` | 1 | Kosinus sudut finite dalam radian; hasil integral aman dinormalisasi dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | unsupported |
+| `rata_rata` | 1 | Rata-rata aritmetika daftar nonkosong angka finite non-boolean dalam rentang aman lintas target. | supported | supported | supported | supported | supported | unsupported |
+| `median` | 1 | Median daftar nonkosong angka finite non-boolean dalam rentang aman lintas target. | supported | supported | supported | supported | supported | unsupported |
 
 ## Contoh penggunaan
 

@@ -357,7 +357,7 @@
       ],
       "expected": {
         "exit_code": 0,
-        "stdout": "okelah\n42\n1.5\ntidak\n2\n2\n5\n2\n3\n2\n3\n8\n0.0\n1.0\n2\n2.5\n",
+        "stdout": "okelah\n42\n1.5\ntidak\n2\n2\n5\n2\n3\n2\n3\n8\n0\n1\n2\n2.5\n",
         "stderr_class": null
       },
       "runtimes": {
@@ -750,6 +750,260 @@
       "requires": [
         "builtins",
         "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "builtins.native-trigonometry-and-statistics",
+      "source": "builtins_trig_statistics.cuk",
+      "requires": [
+        "builtins",
+        "trigonometry",
+        "statistics",
+        "finite-numbers",
+        "numeric-format"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "0\n1\n0.479425538604203\n0.8775825618903728\n3\n-0.5\n2\n6\n1.5\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.sinus-wrong-arity",
+      "source": "sinus_wrong_arity.cuk",
+      "requires": [
+        "builtins",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.kosinus-wrong-arity",
+      "source": "kosinus_wrong_arity.cuk",
+      "requires": [
+        "builtins",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.sinus-rejects-boolean",
+      "source": "sinus_boolean.cuk",
+      "requires": [
+        "builtins",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.kosinus-rejects-boolean",
+      "source": "kosinus_boolean.cuk",
+      "requires": [
+        "builtins",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.rata-rata-empty-list",
+      "source": "mean_empty.cuk",
+      "requires": [
+        "builtins",
+        "statistics",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.median-empty-list",
+      "source": "median_empty.cuk",
+      "requires": [
+        "builtins",
+        "statistics",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.rata-rata-rejects-boolean",
+      "source": "mean_boolean.cuk",
+      "requires": [
+        "builtins",
+        "statistics",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.median-rejects-boolean",
+      "source": "median_boolean.cuk",
+      "requires": [
+        "builtins",
+        "statistics",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.rata-rata-wrong-arity",
+      "source": "mean_wrong_arity.cuk",
+      "requires": [
+        "builtins",
+        "statistics",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.median-wrong-arity",
+      "source": "median_wrong_arity.cuk",
+      "requires": [
+        "builtins",
+        "statistics",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.rata-rata-unsafe-integer",
+      "source": "mean_unsafe_integer.cuk",
+      "requires": [
+        "builtins",
+        "statistics",
+        "numeric-range",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.median-unsafe-integer",
+      "source": "median_unsafe_integer.cuk",
+      "requires": [
+        "builtins",
+        "statistics",
+        "numeric-range",
         "runtime-diagnostics"
       ],
       "expected": {

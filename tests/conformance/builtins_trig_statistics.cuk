@@ -1,0 +1,11 @@
+jancuk
+hedeh sinus(0)
+hedeh kosinus(0)
+hedeh sinus(0.5)
+hedeh kosinus(0.5)
+hedeh rata_rata([1, 2, 6])
+hedeh rata_rata([-2, 1])
+hedeh median([1, 2, 9])
+hedeh median([1, 4, 8, 9])
+hedeh median([-3, -1, 4, 8])
+selesai jancuk

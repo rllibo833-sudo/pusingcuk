@@ -155,8 +155,46 @@ class BuiltinContractTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     call_builtin(name, *args)
 
+    def test_trigonometry_and_statistics_numeric_contract(self):
+        self.assertIs(type(call_builtin("sinus", 0)), int)
+        self.assertIs(type(call_builtin("kosinus", 0)), int)
+        self.assertEqual(call_builtin("sinus", 0), 0)
+        self.assertEqual(call_builtin("kosinus", 0), 1)
+        self.assertAlmostEqual(call_builtin("sinus", 0.5), 0.479425538604203)
+        self.assertAlmostEqual(call_builtin("kosinus", 0.5), 0.8775825618903728)
+        self.assertEqual(call_builtin("rata_rata", [1, 2, 6]), 3)
+        self.assertEqual(call_builtin("rata_rata", [-2, 1]), -0.5)
+        self.assertEqual(call_builtin("median", [1, 2, 9]), 2)
+        self.assertEqual(call_builtin("median", [1, 4, 8, 9]), 6)
+        self.assertEqual(call_builtin("median", [-3, -1, 4, 8]), 1.5)
+
+        for name in ("sinus", "kosinus"):
+            with self.subTest(builtin=name):
+                for invalid in (True, "0", float("inf")):
+                    with self.assertRaises(TypeError):
+                        call_builtin(name, invalid)
+        for name in ("rata_rata", "median"):
+            with self.subTest(builtin=name):
+                for invalid in ([], [1, True], [1, "2"], [1, float("inf")]):
+                    with self.assertRaises(TypeError):
+                        call_builtin(name, invalid)
+                with self.assertRaises(ValueError):
+                    call_builtin(name, [9007199254740992])
+        for name, args in (
+            ("sinus", ()), ("sinus", (0, 1)),
+            ("kosinus", ()), ("kosinus", (0, 1)),
+            ("rata_rata", ()), ("rata_rata", ([1], [2])),
+            ("median", ()), ("median", ([1], [2])),
+        ):
+            with self.subTest(builtin=name, args=args):
+                with self.assertRaises(TypeError):
+                    call_builtin(name, *args)
+
     def test_native_c_support_status_matches_implemented_builtin_surface(self):
-        native_supported = {"panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan", "bawah", "atas", "akar", "pangkat"}
+        native_supported = {
+            "panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan",
+            "bawah", "atas", "akar", "pangkat", "sinus", "kosinus", "rata_rata", "median",
+        }
         for name, entry in BUILTIN_BY_NAME.items():
             with self.subTest(builtin=name):
                 expected = "supported" if name in native_supported else "unsupported"

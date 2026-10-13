@@ -23,7 +23,7 @@ Pusingcuk harus mudah dimulai oleh pemula, tetap dapat dipakai untuk proyek seri
 | Android melalui Termux | Ada skrip instalasi dan panduan | Pengujian perangkat fisik masih perlu dilakukan |
 | Windows / macOS | Belum menjadi target native yang terverifikasi | Jangan menjanjikan kompatibilitas native sebelum ada CI dan tes platform |
 | Interpreter Python | Unit test berjalan pada Python 3.11 dan 3.12 di CI; 18 built-in kontrak tersedia di interpreter referensi | Ini jalur referensi pengembangan, bukan runtime mandiri |
-| Runtime native C | Subset yang diuji tercatat di [panduan runtime native](NATIVE_RUNTIME.md); sepuluh built-in memiliki fixture (`panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`) | Built-in di luar daftar ini belum diklaim tersedia pada native C |
+| Runtime native C | Subset yang diuji tercatat di [panduan runtime native](NATIVE_RUNTIME.md); 14 built-in memiliki fixture (`panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`, `sinus`, `kosinus`, `rata_rata`, `median`) | Built-in konversi (`teks`, `bilangan`, `desimal`, `logika`) belum tersedia pada native C |
 | Modul dan paket | Belum tersedia penuh pada native | Impor modul bukan kontrak portabel saat ini |
 | UTF-8 | Berkas sumber dibaca sebagai teks UTF-8 pada CLI Python; native menangani sebagian operasi UTF-8 | Validasi UTF-8 penuh, normalisasi, dan semantik Unicode lintas runtime belum dijamin |
 | File, jaringan, database | Belum ada pustaka standar lintas runtime yang lengkap | Gunakan hanya API yang secara eksplisit tersedia pada runtime target |
@@ -88,7 +88,7 @@ The experimental Python importer uses explicit allow-lists, not arbitrary host i
 | `statistics.mean` | `rata_rata` | JS, Python, HTML | One non-empty list of finite numbers; not full `statistics` semantics |
 | `statistics.median` | `median` | JS, Python, HTML | One non-empty list of finite numbers; not full `statistics` semantics |
 
-VM and native C support for the new statistics helpers is not claimed. Unsupported imports such as `statistics.variance`, wildcard imports, and other modules are rejected instead of being silently passed through. HTML uses the JavaScript backend, so its helper implementation and tests share that runtime. See [Python importer limits](IMPORT_PYTHON.md) and [standard-library registry](compiler-type-system-and-stdlib.md).
+VM support for trig/statistics helpers is not claimed; native C support is claimed only for the four functions covered by the shared conformance fixtures. Unsupported imports such as `statistics.variance`, wildcard imports, and other modules are rejected instead of being silently passed through. HTML uses the JavaScript backend, so its helper implementation and tests share that runtime. See [Python importer limits](IMPORT_PYTHON.md) and [standard-library registry](compiler-type-system-and-stdlib.md).
 
 
 ## Shared builtin contract
