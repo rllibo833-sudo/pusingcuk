@@ -98,17 +98,20 @@ jobs:
 
       - name: Build Android ARM64 native executable
         shell: bash
+        env:
+          PUSINGCUK_RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
         run: |
           set -euo pipefail
           NDK_BIN="$ANDROID_HOME/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          ANDROID_VERSION="${PUSINGCUK_RELEASE_TAG#v}-android"
           mkdir -p dist/android
           "$NDK_BIN/aarch64-linux-android24-clang" -std=c11 -O2 -Wall -Wextra -Werror \
-            -DPUSINGCUK_VERSION='"0.7.1-android"' \
+            -DPUSINGCUK_VERSION=\\"${ANDROID_VERSION}\\" \
             native/pusingcuk.c -lm -o dist/android/pusingcuk-native-android-arm64
           chmod 755 dist/android/pusingcuk-native-android-arm64
           file dist/android/pusingcuk-native-android-arm64
           readelf -h dist/android/pusingcuk-native-android-arm64 | grep -q 'Machine:.*AArch64'
-          strings dist/android/pusingcuk-native-android-arm64 | grep -Fq '0.7.1-android'
+          strings dist/android/pusingcuk-native-android-arm64 | grep -Fq "$ANDROID_VERSION"
           sha256sum dist/android/pusingcuk-native-android-arm64
 
       - name: Publish GitHub Release
