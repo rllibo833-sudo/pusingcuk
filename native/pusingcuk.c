@@ -901,10 +901,10 @@ int main(int argc,char **argv) {
     FILE *f=fopen(argv[1],"r");
     if(!f) {
         if (errno == ENOENT) {
-            fprintf(stderr, "Kesalahan: berkas tidak ditemukan: %s\\n", argv[1]);
+            fprintf(stderr, "Kesalahan: berkas tidak ditemukan: %s\n", argv[1]);
             return 3;
         }
-        fprintf(stderr, "Kesalahan membaca berkas: %s: %s\\n", argv[1], strerror(errno));
+        fprintf(stderr, "Kesalahan membaca berkas: %s: %s\n", argv[1], strerror(errno));
         return 1;
     }
     char buf[4096];
