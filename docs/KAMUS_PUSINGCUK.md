@@ -70,6 +70,8 @@ Kalau memakai runtime native Termux, ikuti dulu langkah instalasi di `docs/PEMUL
 
 ## 4. Fungsi bawaan
 
+Daftar lengkap 18 built-in, aturan argumen, serta runtime yang mendukungnya tersedia di [katalog built-in](language/BUILTINS.md). Tabel di bawah adalah ringkasan untuk belajar; fitur tidak otomatis tersedia pada semua runtime.
+
 | Fungsi | Gunanya |
 |---|---|
 | `panjang(nilai)` | Menghitung jumlah karakter/item sesuai jenis nilai dan runtime |
@@ -87,7 +89,7 @@ Kalau memakai runtime native Termux, ikuti dulu langkah instalasi di `docs/PEMUL
 | `desimal(nilai)` | Mengubah nilai menjadi angka desimal pada registry pustaka standar; cek dukungan target |
 | `logika(nilai)` | Mengubah nilai menjadi benar/salah pada registry pustaka standar; cek dukungan target |
 
-**Catatan penting:** `rata_rata` dan `median` saat ini hanya tersedia pada target compiler JavaScript, Python, dan HTML; belum pada VM atau runtime C. Ini bukan dukungan penuh modul Python `statistics`. Fungsi yang ada di satu file belum tentu otomatis jalan di semua jalur Pusingcuk. Interpreter Python, runtime C, dan compiler target punya kemampuan yang berbeda. Jangan anggap sama sebelum tesnya membuktikan.
+**Catatan penting:** `rata_rata` dan `median` tersedia pada interpreter referensi dan target compiler JavaScript, Python, dan HTML; belum pada VM atau runtime C. Ini bukan dukungan penuh modul Python `statistics`. Fungsi yang ada di satu file belum tentu otomatis jalan di semua jalur Pusingcuk. Interpreter Python, runtime C, dan compiler target punya kemampuan yang berbeda. Jangan anggap sama sebelum tesnya membuktikan.
 
 ## 5. Kamus istilah teknis
 
