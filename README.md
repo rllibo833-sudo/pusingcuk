@@ -60,6 +60,8 @@ bash scripts/install-termux.sh
 pusingcuk-native examples/native/rekap_anggaran.pusingcuk
 ```
 
+**Penting soal binary Release:** asset `pusingcuk` pada [GitHub Releases](https://github.com/rllibo833-sudo/pusingcuk/releases) dibangun di Ubuntu x86-64 sebagai executable PyInstaller untuk Linux. Itu **bukan** binary Android/Termux ARM64. Untuk Termux AArch64, build runtime native dari source memakai `bash scripts/install-termux.sh` seperti contoh di atas. Runtime native memiliki subset fitur berbeda dari interpreter Python; lihat [matriks runtime](docs/NATIVE_RUNTIME.md).
+
 ## Contoh kode pertama
 
 ```pusingcuk
