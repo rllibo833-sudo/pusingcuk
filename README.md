@@ -38,7 +38,7 @@ python pusingcuk_new.py program.cuk
 python pusingcuk_new.py --check program.cuk
 ```
 
-The `.cuk` extension is canonical for new programs. Existing `.pusingcuk` files remain supported for compatibility.
+The `.cuk` extension is Pusingcuk's canonical source-file identity for new programs. The distinctive identity comes from its Indonesian-readable syntax and tested language rules—not the suffix alone. Existing `.pusingcuk` files remain supported for compatibility.
 
 ## Two maintained execution paths
 
@@ -60,7 +60,7 @@ The native runtime and its limits are documented in the [native runtime guide](d
 ## Documentation map
 
 - **Start and learn:** [Beginner guide](docs/PEMULA.md) · [Termux quick start](docs/termux/README.md)
-- **Language reference and dictionary:** [Language reference index](docs/language/README.md) · [Syntax specification](SPEC.md) · [English dictionary](docs/DICTIONARY.md) · [Kamus Indonesia](docs/KAMUS_PUSINGCUK.md)
+- **Language reference and dictionary:** [Language reference index](docs/language/README.md) · [Built-in catalogue](docs/language/BUILTINS.md) · [Syntax specification](SPEC.md) · [English dictionary](docs/DICTIONARY.md) · [Kamus Indonesia](docs/KAMUS_PUSINGCUK.md)
 - **Consistency and runtime support:** [Semantic contract](docs/SEMANTIC_CONTRACT.md) · [Compatibility matrix](docs/COMPATIBILITY.md) · [Conformance fixtures](docs/CONFORMANCE_FIXTURES.md)
 - **Development:** [Contributor guide](CONTRIBUTING.md) · [Development and test gates](docs/development/README.md) · [Repository map](docs/REPO_STRUCTURE.md)
 - **Security:** [Security policy](SECURITY.md) · [Security review guide](docs/security/README.md)
