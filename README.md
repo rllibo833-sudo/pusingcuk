@@ -27,7 +27,17 @@ cd pusingcuk
 python pusingcuk_new.py halo.cuk
 ```
 
-Ekstensi sumber kanonis untuk program baru adalah `.cuk`, seperti `.py` di Python. Ekstensi `.pusingcuk` tetap didukung untuk menjaga program lama tetap berjalan. Belum punya Termux? Install Python dan Git dulu. Interpreter Python memakai standard library; gak perlu API key atau paket Python pihak ketiga.
+Ekstensi sumber kanonis untuk program baru adalah `.cuk`, seperti `.py` di Python. Ekstensi `.pusingcuk` tetap didukung untuk menjaga program lama tetap berjalan.
+
+Setelah clone repo, kamu juga bisa memasang perintah CLI Python agar pemakaian sehari-hari lebih mirip menjalankan tool bahasa:
+
+```sh
+python -m pip install .
+pusingcuk --check halo.cuk
+pusingcuk halo.cuk
+```
+
+`pusingcuk --check` memvalidasi sintaks tanpa mengeksekusi kode. Perintah Python ini adalah interpreter referensi; untuk executable native tanpa Python di Termux gunakan `pusingcuk-native`. Interpreter core memakai standard library dan tidak membutuhkan API key atau paket Python pihak ketiga saat runtime.
 
 ### Pilihan jalanin di Android
 
