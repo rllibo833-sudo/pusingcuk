@@ -104,6 +104,13 @@ static int word(const char *s) {
         {"gitu", "selesai"},
         {"inthiseco", "jancuk"},
         {"janggal", "bukan"},
+        {"gas", "jancuk"},
+        {"spill", "hedeh"},
+        {"bestie", "lah"},
+        {"valid", "benar"},
+        {"zonk", "salah"},
+        {"skip", "kampret"},
+        {"kelar", "selesai"},
     };
     ws();
     size_t n = strlen(s);
@@ -301,8 +308,8 @@ static Val primary(void) {
             p++;
         }
         name[n]=0;
-        if (!strcmp(name,"benar")) return boolean(1);
-        if (!strcmp(name,"salah")) return boolean(0);
+        if (!strcmp(name,"benar") || !strcmp(name,"valid")) return boolean(1);
+        if (!strcmp(name,"salah") || !strcmp(name,"zonk")) return boolean(0);
         if (take("(")) {
             Val args[MAX_PARAMS]; int argc = 0;
             if (!take(")")) {

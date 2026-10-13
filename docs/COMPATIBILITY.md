@@ -1,6 +1,8 @@
 # Kompatibilitas Pusingcuk
 
-Dokumen ini menetapkan sasaran kompatibilitas, bukan klaim bahwa seluruh sasaran sudah tercapai. Pusingcuk masih eksperimental dan dua runtime yang ada belum sepenuhnya setara.
+Dokumen ini menetapkan batas kompatibilitas yang boleh diklaim, bukan janji bahwa semua sasaran sudah tercapai. Pusingcuk masih eksperimental dan runtime Python serta C belum setara untuk semua fitur.
+
+**Baseline yang dipelihara:** Python modular adalah referensi; runtime native C adalah implementasi kedua untuk subset yang diuji. Sebuah perilaku disebut lintas-runtime hanya jika fixture yang sama berstatus `required` pada `reference` dan `native` serta lulus di CI. Fitur Python-only tetap valid sebagai kemampuan referensi, tetapi tidak otomatis tersedia pada C. Compiler/transpiler lain dan PVM ditunda dari jalur kompatibilitas utama.
 
 ## Sasaran desain
 

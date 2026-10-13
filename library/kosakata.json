@@ -178,7 +178,7 @@
       "category": "program-structure",
       "meaning": "Alias Gen Z/Gen Alpha untuk memulai program.",
       "aliases": [],
-      "native_runtime": "pending-native-support",
+      "native_runtime": "tested",
       "c_backend": "supported",
       "alias_of": "jancuk"
     },
@@ -187,7 +187,7 @@
       "category": "output",
       "meaning": "Alias slang untuk menampilkan nilai.",
       "aliases": [],
-      "native_runtime": "pending-native-support",
+      "native_runtime": "tested",
       "c_backend": "integer-and-boolean-subset",
       "alias_of": "hedeh"
     },
@@ -196,7 +196,7 @@
       "category": "variables",
       "meaning": "Alias santai untuk mendeklarasikan variabel baru.",
       "aliases": [],
-      "native_runtime": "pending-native-support",
+      "native_runtime": "tested",
       "c_backend": "supported",
       "alias_of": "lah"
     },
@@ -205,7 +205,7 @@
       "category": "boolean",
       "meaning": "Alias slang untuk nilai benar.",
       "aliases": [],
-      "native_runtime": "pending-native-support",
+      "native_runtime": "tested",
       "c_backend": "supported",
       "alias_of": "benar"
     },
@@ -214,7 +214,7 @@
       "category": "boolean",
       "meaning": "Alias slang untuk nilai salah.",
       "aliases": [],
-      "native_runtime": "pending-native-support",
+      "native_runtime": "tested",
       "c_backend": "supported",
       "alias_of": "salah"
     },
@@ -223,7 +223,7 @@
       "category": "control-flow",
       "meaning": "Alias slang untuk cabang alternatif kondisi.",
       "aliases": [],
-      "native_runtime": "pending-native-support",
+      "native_runtime": "tested",
       "c_backend": "supported",
       "alias_of": "kampret"
     },
@@ -232,7 +232,7 @@
       "category": "program-structure",
       "meaning": "Alias slang untuk penanda penutup blok; tetap diikuti nama blok.",
       "aliases": [],
-      "native_runtime": "pending-native-support",
+      "native_runtime": "tested",
       "c_backend": "supported",
       "alias_of": "selesai"
     },

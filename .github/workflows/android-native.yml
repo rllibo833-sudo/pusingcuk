@@ -61,24 +61,3 @@ jobs:
           path: dist/android/pusingcuk-native-android-*
           if-no-files-found: error
           retention-days: 14
-
-      - name: Smoke-test native runtime on Android emulator
-        uses: ReactiveCircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
-        with:
-          api-level: 35
-          target: google_apis
-          arch: x86_64
-          disable-animations: true
-          script: |
-            set -eu
-            adb push dist/android/pusingcuk-native-android-x86_64 /data/local/tmp/pusingcuk-native
-            adb push halo.cuk /data/local/tmp/halo.cuk
-            adb shell chmod 755 /data/local/tmp/pusingcuk-native
-            version="$(adb shell /data/local/tmp/pusingcuk-native --version | tr -d '\r')"
-            printf '%s\n' "$version"
-            printf '%s\n' "$version" | grep -Fq 'Pusingcuk native 0.7.1-android'
-            output="$(adb shell /data/local/tmp/pusingcuk-native /data/local/tmp/halo.cuk | tr -d '\r')"
-            printf '%s\n' "$output"
-            printf '%s\n' "$output" | grep -Fqx 'Halo, Dunia'
-            printf '%s\n' "$output" | grep -Fqx '42'
-

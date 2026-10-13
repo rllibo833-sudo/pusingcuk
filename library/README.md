@@ -1,6 +1,6 @@
 # Pusingcuk Examples and Vocabulary Registry
 
-This directory contains runnable examples and a machine-readable vocabulary registry. It is not yet a package manager or a general-purpose importable standard library.
+This directory contains runnable examples, runtime metadata, built-in registries, and the machine-readable vocabulary registry. It is **not** the complete learner-facing dictionary, a package manager, or a general-purpose importable standard library. For the human-readable language glossary, start at [the language-reference map](../docs/language/README.md).
 
 - [`kosakata.json`](kosakata.json): keyword and alias glossary, meanings, and support-status metadata.
 - [`conditional_logic.pusingcuk`](conditional_logic.pusingcuk): comparisons, booleans, short-circuit logic, and conditionals.

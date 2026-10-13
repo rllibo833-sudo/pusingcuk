@@ -1,0 +1,14 @@
+gas
+bestie angka = 42
+bestie aktif = valid
+njir aktif
+    spill angka
+skip
+    spill 0
+kelar njir
+njir janggal zonk
+    jir angka
+adooh
+    jir 0
+kelar njir
+kelar gas

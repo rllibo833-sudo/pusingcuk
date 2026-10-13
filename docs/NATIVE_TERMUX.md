@@ -50,7 +50,7 @@ nano programku.cuk
 pusingcuk-native programku.cuk
 ```
 
-Berkas `.pusingcuk` tetap bisa dijalankan demi kompatibilitas. Skrip `scripts/build-android.sh` dipakai CI untuk membangun binary Android dari NDK; CI juga menjalankan smoke test runtime pada Android emulator. Itu belum menggantikan pengujian Termux ARM64 pada perangkat fisik.
+Berkas `.pusingcuk` tetap bisa dijalankan demi kompatibilitas. Skrip `scripts/build-android.sh` dipakai workflow CI untuk memeriksa cross-build runtime Android NDK. Uji eksekusi emulator tersedia sebagai workflow manual [Android emulator smoke test](../.github/workflows/android-emulator-smoke.yml). Keduanya belum menggantikan pengujian Termux ARM64 pada perangkat fisik.
 
 ## 4. Tes sebelum mengembangkan
 
