@@ -43,12 +43,14 @@ pusingcuk-native examples/native/rekap_anggaran.pusingcuk
 
 Contoh tersebut menggunakan kamus untuk menyimpan kategori pengeluaran, mengiterasi kunci, menghitung total, dan menampilkan sisa anggaran. Nilai contoh bisa kamu ubah langsung di file.
 
-Untuk membuat program baru:
+Untuk membuat program baru, gunakan ekstensi kanonis `.cuk`:
 
 ```sh
-nano programku.pusingcuk
-pusingcuk-native programku.pusingcuk
+nano programku.cuk
+pusingcuk-native programku.cuk
 ```
+
+Berkas `.pusingcuk` tetap bisa dijalankan demi kompatibilitas. Skrip `scripts/build-android.sh` dipakai CI untuk membangun binary Android dari NDK; CI juga menjalankan smoke test runtime pada Android emulator. Itu belum menggantikan pengujian Termux ARM64 pada perangkat fisik.
 
 ## 4. Tes sebelum mengembangkan
 
