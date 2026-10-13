@@ -104,6 +104,13 @@ static int word(const char *s) {
         {"gitu", "selesai"},
         {"inthiseco", "jancuk"},
         {"janggal", "bukan"},
+        {"gas", "jancuk"},
+        {"spill", "hedeh"},
+        {"bestie", "lah"},
+        {"valid", "benar"},
+        {"zonk", "salah"},
+        {"skip", "kampret"},
+        {"kelar", "selesai"},
     };
     ws();
     size_t n = strlen(s);
