@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -17,7 +18,7 @@ from library.builtin_contract import BUILTIN_CONTRACT  # validates metadata befo
 FIXTURES = ROOT / "tests" / "conformance"
 MANIFEST = FIXTURES / "manifest.json"
 ALLOWED_RUNTIME_STATES = {"required", "optional", "unsupported"}
-ALLOWED_EXPECTED_KEYS = {"exit_code", "exit_code_by_runtime", "stdout", "stderr_class", "stdin"}
+ALLOWED_EXPECTED_KEYS = {"exit_code", "stdout", "stderr_class", "stdin", "source_line"}
 ALLOWED_FIXTURE_KEYS = {"id", "source", "profile", "requires", "expected", "runtimes"}
 
 
@@ -61,23 +62,29 @@ def load_manifest():
             raise ManifestError(f"{fixture_id}: expected tidak valid")
         if not isinstance(expected.get("exit_code"), int) or isinstance(expected.get("exit_code"), bool):
             raise ManifestError(f"{fixture_id}: expected.exit_code harus integer")
-        exit_code_by_runtime = expected.get("exit_code_by_runtime", {})
-        if not isinstance(exit_code_by_runtime, dict):
-            raise ManifestError(f"{fixture_id}: exit_code_by_runtime harus berupa objek")
-        for runtime_name, runtime_code in exit_code_by_runtime.items():
-            if runtime_name not in {"reference", "native"}:
-                raise ManifestError(f"{fixture_id}: runtime exit code tidak dikenal: {runtime_name}")
-            if not isinstance(runtime_code, int) or isinstance(runtime_code, bool):
-                raise ManifestError(f"{fixture_id}: exit code untuk {runtime_name} harus integer")
         if not isinstance(expected.get("stdout"), str):
             raise ManifestError(f"{fixture_id}: expected.stdout harus teks")
         stderr_class = expected.get("stderr_class")
-        if stderr_class not in (None, "error"):
-            raise ManifestError(f"{fixture_id}: stderr_class hanya boleh null atau 'error'")
-        if stderr_class is None and expected["exit_code"] != 0:
-            raise ManifestError(f"{fixture_id}: kasus gagal wajib menetapkan stderr_class")
-        if stderr_class == "error" and expected["exit_code"] == 0:
-            raise ManifestError(f"{fixture_id}: kasus sukses tidak boleh mengharapkan error")
+        if stderr_class not in (None, "syntax_error", "runtime_error"):
+            raise ManifestError(
+                f"{fixture_id}: stderr_class harus null, 'syntax_error', atau 'runtime_error'"
+            )
+        if stderr_class is None:
+            if expected["exit_code"] != 0:
+                raise ManifestError(f"{fixture_id}: kasus gagal wajib menetapkan stderr_class")
+            if "source_line" in expected:
+                raise ManifestError(f"{fixture_id}: kasus sukses tidak boleh memiliki source_line")
+        else:
+            expected_code = 2 if stderr_class == "syntax_error" else 1
+            if expected["exit_code"] != expected_code:
+                raise ManifestError(
+                    f"{fixture_id}: {stderr_class} harus memakai exit code {expected_code}"
+                )
+            if expected.get("stdout") != "":
+                raise ManifestError(f"{fixture_id}: fixture error harus mengharapkan stdout kosong")
+            source_line = expected.get("source_line")
+            if not isinstance(source_line, int) or isinstance(source_line, bool) or source_line < 1:
+                raise ManifestError(f"{fixture_id}: fixture error wajib menetapkan source_line positif")
         if not isinstance(expected.get("stdin", ""), str):
             raise ManifestError(f"{fixture_id}: expected.stdin harus teks")
 
@@ -94,9 +101,21 @@ def load_manifest():
 
 
 def classify_stderr(returncode, stderr):
-    if returncode != 0 and stderr.strip():
-        return "error"
-    return None
+    """Classify stable public error categories instead of matching full messages."""
+    text = stderr.lstrip()
+    if returncode == 0:
+        return None if not text else "error"
+    if text.startswith("Kesalahan sintaks:"):
+        return "syntax_error"
+    if text.startswith("Kesalahan runtime:"):
+        return "runtime_error"
+    return "error"
+
+
+def source_line_from_stderr(stderr):
+    """Return the reported source line when present, ignoring wording and columns."""
+    match = re.search(r"\\bBaris\\s+(\\d+)\\b", stderr, flags=re.IGNORECASE)
+    return int(match.group(1)) if match else None
 
 
 def run_command(command, stdin_text):
@@ -184,13 +203,15 @@ def main():
                     continue
 
                 actual_class = classify_stderr(result.returncode, result.stderr)
-                expected_exit_code = expected.get("exit_code_by_runtime", {}).get(
-                    runtime, expected["exit_code"]
-                )
+                expected_exit_code = expected["exit_code"]
                 matches = (
                     result.returncode == expected_exit_code
                     and result.stdout == expected["stdout"]
                     and actual_class == expected.get("stderr_class")
+                    and (
+                        expected.get("source_line") is None
+                        or source_line_from_stderr(result.stderr) == expected["source_line"]
+                    )
                 )
                 if matches:
                     states["PASS"] += 1
@@ -201,6 +222,11 @@ def main():
                     print(f"  exit: expected={expected_exit_code} actual={result.returncode}")
                     print(f"  stdout expected={expected['stdout']!r} actual={result.stdout!r}")
                     print(f"  stderr_class expected={expected.get('stderr_class')!r} actual={actual_class!r}")
+                    if expected.get("source_line") is not None:
+                        print(
+                            "  source_line expected="
+                            f"{expected['source_line']} actual={source_line_from_stderr(result.stderr)!r}"
+                        )
                     if result.stderr:
                         print(f"  stderr={result.stderr.strip()!r}")
 
