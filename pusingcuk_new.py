@@ -5,18 +5,20 @@ import sys
 from pathlib import Path
 
 from evaluator import run
-from parser import ParserError
+from parser import ParserError, parse as parse_source
 
 
 def main():
     parser = argparse.ArgumentParser(
         description="Jalankan program Pusingcuk."
     )
-    parser.add_argument("--fmt", action="store_true", help="Rapikan indentasi berkas Pusingcuk")
-    parser.add_argument("file", nargs="?", help="Berkas sumber Pusingcuk")
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--fmt", action="store_true", help="Rapikan indentasi berkas sumber")
+    modes.add_argument("--check", action="store_true", help="Periksa sintaks tanpa menjalankan program")
+    parser.add_argument("file", nargs="?", help="Berkas sumber .cuk (atau .pusingcuk untuk kompatibilitas)")
     args = parser.parse_args()
     if not args.file:
-        parser.error("berkas sumber wajib diisi")
+        parser.error("berkas sumber wajib diisi (gunakan --help untuk petunjuk)")
     path = Path(args.file)
 
     if args.fmt:
@@ -44,6 +46,15 @@ def main():
     except (OSError, UnicodeError) as exc:
         print(f"Kesalahan membaca berkas: {exc}", file=sys.stderr)
         return 1
+
+    if args.check:
+        try:
+            parse_source(source, filename=str(path))
+        except ParserError as exc:
+            print(f"Kesalahan sintaks: {exc}", file=sys.stderr)
+            return 2
+        print(f"OK: sintaks valid — {path}")
+        return 0
 
     try:
         run(source, source_path=path)
