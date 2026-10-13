@@ -70,7 +70,7 @@ Kalau memakai runtime native Termux, ikuti dulu langkah instalasi di `docs/PEMUL
 
 ## 4. Fungsi bawaan
 
-Daftar lengkap 18 built-in, aturan argumen, serta runtime yang mendukungnya tersedia di [katalog built-in](language/BUILTINS.md). Tabel di bawah adalah ringkasan untuk belajar; fitur tidak otomatis tersedia pada semua runtime.
+Daftar lengkap 18 built-in, aturan argumen, serta runtime yang mendukungnya tersedia di [katalog built-in](language/BUILTINS.md). Runtime C saat ini menguji delapan built-in (`panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`); sisanya belum diklaim di native. Tabel di bawah adalah ringkasan untuk belajar; fitur tidak otomatis tersedia pada semua runtime.
 
 | Fungsi | Gunanya |
 |---|---|
