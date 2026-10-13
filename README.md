@@ -24,10 +24,10 @@ Di Termux atau terminal yang punya Python 3.11/3.12:
 ```sh
 git clone https://github.com/rllibo833-sudo/pusingcuk.git
 cd pusingcuk
-python pusingcuk_new.py examples/modular.pusingcuk
+python pusingcuk_new.py halo.cuk
 ```
 
-Belum punya Termux? Install Python dan Git dulu. Contoh di atas memakai file contoh modul yang memang tersedia di repo. Interpreter Python memakai standard library; gak perlu API key atau paket Python pihak ketiga.
+Ekstensi sumber kanonis untuk program baru adalah `.cuk`, seperti `.py` di Python. Ekstensi `.pusingcuk` tetap didukung untuk menjaga program lama tetap berjalan. Belum punya Termux? Install Python dan Git dulu. Interpreter Python memakai standard library; gak perlu API key atau paket Python pihak ketiga.
 
 ### Pilihan jalanin di Android
 
@@ -38,7 +38,7 @@ pkg update
 pkg install python git
 git clone https://github.com/rllibo833-sudo/pusingcuk.git
 cd pusingcuk
-python pusingcuk_new.py examples/modular.pusingcuk
+python pusingcuk_new.py halo.cuk
 ```
 
 **Pydroid 3**
