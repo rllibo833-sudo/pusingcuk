@@ -258,7 +258,7 @@ static int is_builtin_name(const char *name) {
 
 static int is_native_numeric_builtin(const char *name) {
     static const char *const names[] = {
-        "mutlak", "minimum", "maksimum", "bulatkan", "bawah", "atas"
+        "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat"
     };
     for (size_t i = 0; i < sizeof names / sizeof names[0]; i++)
         if (!strcmp(name, names[i])) return 1;
@@ -277,7 +277,7 @@ static Val call_native_numeric_builtin(const char *name, Val *args, int argc, in
     *handled = is_native_numeric_builtin(name);
     if (!*handled) return num(0);
 
-    int expected = (!strcmp(name, "minimum") || !strcmp(name, "maksimum")) ? 2 : 1;
+    int expected = (!strcmp(name, "minimum") || !strcmp(name, "maksimum") || !strcmp(name, "pangkat")) ? 2 : 1;
     if (argc != expected) {
         fail("jumlah argumen built-in numerik tidak sesuai kontrak");
         return num(0);
@@ -301,6 +301,23 @@ static Val call_native_numeric_builtin(const char *name, Val *args, int argc, in
         return checked_num(floor(args[0].n), "bawah() menghasilkan angka tidak valid");
     if (!strcmp(name, "atas"))
         return checked_num(ceil(args[0].n), "atas() menghasilkan angka tidak valid");
+    if (!strcmp(name, "akar")) {
+        if (args[0].n < 0.0) {
+            fail("akar() domain tidak valid: angka harus non-negatif");
+            return num(0);
+        }
+        return checked_num(sqrt(args[0].n), "akar() menghasilkan angka non-finite");
+    }
+    if (!strcmp(name, "pangkat")) {
+        double base = args[0].n;
+        double exponent = args[1].n;
+        if ((base < 0.0 && trunc(exponent) != exponent) ||
+            (base == 0.0 && exponent < 0.0)) {
+            fail("pangkat() domain tidak valid");
+            return num(0);
+        }
+        return checked_num(pow(base, exponent), "pangkat() menghasilkan angka non-finite");
+    }
     return num(0);
 }
 
@@ -586,6 +603,21 @@ static int setvar(const char *name, Val v) {
     snprintf(vars[nvars].name,sizeof vars[nvars].name,"%s",name);
     vars[nvars++].v=v; return 1;
 }
+static void format_number(double value, char *output, size_t output_size) {
+    char candidate[64];
+    for (int precision = 1; precision <= 17; precision++) {
+        int written = snprintf(candidate, sizeof candidate, "%.*g", precision, value);
+        if (written < 0 || (size_t)written >= sizeof candidate) continue;
+        char *end = NULL;
+        double parsed = strtod(candidate, &end);
+        if (end && *end == '\0' && parsed == value) {
+            snprintf(output, output_size, "%s", candidate);
+            return;
+        }
+    }
+    snprintf(output, output_size, "%.17g", value);
+}
+
 static void printval(Val v) {
     if(v.t==NIL) puts("tidak ada");
     else if(v.t==BOOL) puts(v.b?"okelah":"tidak");
@@ -593,8 +625,12 @@ static void printval(Val v) {
     else if(v.t==LIST) printf("[list: %zu]\n", v.list ? v.list->len : 0);
     else if(v.t==DICT) printf("[kamus: %zu]\n", v.dict ? v.dict->len : 0);
     else if(v.t==RANGE) printf("[rentang: %.0f]\n", range_length(v));
-    else if(isfinite(v.n) && v.n >= -9223372036854775808.0 && v.n < 9223372036854775808.0 && v.n==trunc(v.n)) printf("%lld\n",(long long)v.n);
-    else printf("%.10g\n",v.n);
+    else if(isfinite(v.n) && fabs(v.n) <= 9007199254740991.0 && v.n==trunc(v.n)) printf("%lld\n",(long long)v.n);
+    else {
+        char formatted[64];
+        format_number(v.n, formatted, sizeof formatted);
+        puts(formatted);
+    }
 }
 
 #define MAX_LINES 20000

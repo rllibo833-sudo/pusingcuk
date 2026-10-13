@@ -357,7 +357,7 @@
       ],
       "expected": {
         "exit_code": 0,
-        "stdout": "okelah\n42\n1.5\ntidak\n2\n2\n5\n2\n3.0\n2\n3\n8.0\n0.0\n1.0\n2\n2.5\n",
+        "stdout": "okelah\n42\n1.5\ntidak\n2\n2\n5\n2\n3\n2\n3\n8\n0.0\n1.0\n2\n2.5\n",
         "stderr_class": null
       },
       "runtimes": {
@@ -577,6 +577,186 @@
         "exit_code": 0,
         "stdout": "7\n7\n",
         "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "builtins.native-square-root-and-power",
+      "source": "builtins_sqrt_power.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "math",
+        "finite-results",
+        "numeric-format"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "3\n1.4142135623730951\n8\n0.5\n-8\n1.4142135623730951\n0.1\n3\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.sqrt-negative-domain",
+      "source": "sqrt_negative.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-domain-errors",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.power-negative-fractional-domain",
+      "source": "power_negative_fractional.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-domain-errors",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.power-zero-negative-exponent",
+      "source": "power_zero_negative.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-domain-errors",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.power-nonfinite-result",
+      "source": "power_nonfinite.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-overflow",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.sqrt-wrong-arity",
+      "source": "sqrt_wrong_arity.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.power-wrong-arity",
+      "source": "power_wrong_arity.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.sqrt-rejects-boolean",
+      "source": "sqrt_boolean.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.power-rejects-boolean",
+      "source": "power_boolean.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
       },
       "runtimes": {
         "reference": "required",

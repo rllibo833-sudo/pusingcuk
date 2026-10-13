@@ -341,7 +341,7 @@
       ],
       "min_args": 1,
       "max_args": 1,
-      "description": "Akar kuadrat angka non-negatif.",
+      "description": "Akar kuadrat angka finite non-negatif; hasil bulat dalam rentang aman dikembalikan sebagai integer.",
       "implementation": "sqrt",
       "backends": {
         "js": {
@@ -360,7 +360,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "reference": {
           "status": "supported"
@@ -441,7 +441,7 @@
       ],
       "min_args": 2,
       "max_args": 2,
-      "description": "Pangkat numerik dengan hasil finite.",
+      "description": "Pangkat dua angka finite; domain tidak valid dan hasil non-finite ditolak.",
       "implementation": "pow",
       "backends": {
         "js": {
@@ -460,7 +460,7 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "reference": {
           "status": "supported"

@@ -56,7 +56,7 @@ A declaration creates a new variable; assignment updates an existing one. Redecl
 
 ## 4. Built-in functions
 
-The complete and test-checked list of 18 built-ins, argument counts, and per-target support is in the [built-in catalogue](language/BUILTINS.md). The native C runtime currently has fixtures for eight (`panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, and `atas`); the remaining entries stay unsupported there. The examples below are a learner-friendly subset; an entry in a registry does not mean every target supports it.
+The complete and test-checked list of 18 built-ins, argument counts, and per-target support is in the [built-in catalogue](language/BUILTINS.md). The native C runtime currently has fixtures for ten (`panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, and `pangkat`); the remaining entries stay unsupported there. The examples below are a learner-friendly subset; an entry in a registry does not mean every target supports it.
 
 | Function | Purpose | Example |
 |---|---|---|
@@ -68,6 +68,8 @@ The complete and test-checked list of 18 built-ins, argument counts, and per-tar
 | `minimum(a, b)` | Smaller of two numbers | `minimum(3, 9)` |
 | `maksimum(a, b)` | Larger of two numbers | `maksimum(3, 9)` |
 | `bulatkan(number)` | Rounds a finite number using the documented ties-to-even rule | `bulatkan(2.5)` |
+| `akar(number)` | Square root of a finite, non-negative number; exact safe integers are normalized | `akar(9)` |
+| `pangkat(base, exponent)` | Finite power; rejects invalid domains and non-finite results | `pangkat(2, -1)` |
 | `rata_rata(list)` | Arithmetic mean of a non-empty list of finite numbers | `rata_rata([1, 2, 6])` |
 | `median(list)` | Median of a non-empty list of finite numbers | `median([1, 4, 8])` |
 | `teks(value)` | Converts a value to text in the standard-library registry | Check target support first |

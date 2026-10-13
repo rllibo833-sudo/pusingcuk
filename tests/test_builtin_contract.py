@@ -116,10 +116,10 @@ class BuiltinContractTests(unittest.TestCase):
             "minimum": ((2, 5), 2),
             "maksimum": ((2, 5), 5),
             "bulatkan": ((2.5,), 2),
-            "akar": ((9,), 3.0),
+            "akar": ((9,), 3),
             "bawah": ((2.9,), 2),
             "atas": ((2.1,), 3),
-            "pangkat": ((2, 3), 8.0),
+            "pangkat": ((2, 3), 8),
             "sinus": ((0,), 0.0),
             "kosinus": ((0,), 1.0),
             "rata_rata": (([1, 2, 3],), 2),
@@ -134,8 +134,29 @@ class BuiltinContractTests(unittest.TestCase):
                 with self.assertRaises(TypeError):
                     call_builtin(name, *args, None)
 
+
+    def test_square_root_and_power_numeric_contract(self):
+        self.assertIs(type(call_builtin("akar", 9)), int)
+        self.assertIs(type(call_builtin("pangkat", 2, 3)), int)
+        self.assertEqual(call_builtin("pangkat", 2, -1), 0.5)
+        self.assertAlmostEqual(call_builtin("akar", 2), 2 ** 0.5)
+        self.assertAlmostEqual(call_builtin("pangkat", 2, 0.5), 2 ** 0.5)
+        with self.assertRaises(TypeError):
+            call_builtin("akar", True)
+        with self.assertRaises(TypeError):
+            call_builtin("pangkat", 2, False)
+        for name, args in (
+            ("akar", (-1,)),
+            ("pangkat", (-2, 0.5)),
+            ("pangkat", (0, -1)),
+            ("pangkat", (10, 1000)),
+        ):
+            with self.subTest(builtin=name, args=args):
+                with self.assertRaises(ValueError):
+                    call_builtin(name, *args)
+
     def test_native_c_support_status_matches_implemented_builtin_surface(self):
-        native_supported = {"panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan", "bawah", "atas"}
+        native_supported = {"panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan", "bawah", "atas", "akar", "pangkat"}
         for name, entry in BUILTIN_BY_NAME.items():
             with self.subTest(builtin=name):
                 expected = "supported" if name in native_supported else "unsupported"

@@ -25,10 +25,10 @@ Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python m
 | `minimum` | 2 | Nilai terkecil dari dua angka finite. | supported | supported | supported | supported | supported | supported |
 | `maksimum` | 2 | Nilai terbesar dari dua angka finite. | supported | supported | supported | supported | supported | supported |
 | `bulatkan` | 1 | Pembulatan ties-to-even ke bilangan terdekat. | supported | supported | supported | supported | supported | supported |
-| `akar` | 1 | Akar kuadrat angka non-negatif. | supported | unsupported | supported | supported | supported | unsupported |
+| `akar` | 1 | Akar kuadrat angka finite non-negatif; hasil bulat dalam rentang aman dikembalikan sebagai integer. | supported | supported | supported | supported | supported | unsupported |
 | `bawah` | 1 | Pembulatan ke bawah menuju integer. | supported | supported | supported | supported | supported | unsupported |
 | `atas` | 1 | Pembulatan ke atas menuju integer. | supported | supported | supported | supported | supported | unsupported |
-| `pangkat` | 2 | Pangkat numerik dengan hasil finite. | supported | unsupported | supported | supported | supported | unsupported |
+| `pangkat` | 2 | Pangkat dua angka finite; domain tidak valid dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | unsupported |
 | `sinus` | 1 | Sinus sudut dalam radian. | supported | unsupported | supported | supported | supported | unsupported |
 | `kosinus` | 1 | Kosinus sudut dalam radian. | supported | unsupported | supported | supported | supported | unsupported |
 | `rata_rata` | 1 | Rata-rata aritmetika daftar angka finite yang tidak kosong. | supported | unsupported | supported | supported | supported | unsupported |

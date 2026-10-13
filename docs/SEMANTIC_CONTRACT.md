@@ -31,12 +31,13 @@ Compiler/transpiler lain dan PVM tetap eksperimental. Keduanya tidak mengubah se
 - dan / atau menggunakan short-circuit: operand kanan tidak dievaluasi jika hasil sudah ditentukan.
 - Boolean benar dan salah adalah tipe berbeda dari angka. Kesetaraan benar == 1 menghasilkan tidak.
 - Output boolean memakai `okelah` dan `tidak`, bukan `True`/`False`. Built-in `teks` juga menggunakan ejaan bahasa Pusingcuk untuk boolean.
-- Kontrak built-in disimpan di `library/builtin_contract.json`, diuji oleh `tests/test_builtin_contract.py`, dan didokumentasikan di `docs/language/BUILTINS.md`. Interpreter referensi mendukung 18 built-in terdaftar; native C memiliki fixture untuk delapan: `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, dan `atas`. Transpiler/VM memiliki subset tersendiri.
+- Kontrak built-in disimpan di `library/builtin_contract.json`, diuji oleh `tests/test_builtin_contract.py`, dan didokumentasikan di `docs/language/BUILTINS.md`. Interpreter referensi mendukung 18 built-in terdaftar; native C memiliki fixture untuk sepuluh: `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, dan `pangkat`. Transpiler/VM memiliki subset tersendiri.
 - Built-in statistik `rata_rata` dan `median` menerima tepat satu daftar nonkosong berisi angka finite; boolean dan tipe lain ditolak.
 - Urutan output dan mutasi koleksi adalah perilaku teramati yang tidak boleh berubah karena optimisasi.
 - Pembagian dengan nol harus gagal sebagai `runtime_error` pada baris sumber operasi; pembagian lantai negatif mengikuti floor matematika (`-7 // 3` menjadi `-3`) dan modulo memakai aturan `a - floor(a / b) * b` (`-7 % 3` menjadi `2`).
-- Overflow dan angka non-finite harus memiliki fixture khusus sebelum dianggap stabil lintas backend.
-- `bulatkan` menggunakan ties-to-even; input boolean bukan angka untuk built-in numerik. Native C mendukung `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, dan `atas` hanya setelah fixture positif, aritas salah, serta penolakan boolean lulus.
+- Built-in numerik hanya menerima angka finite; boolean bukan angka. `akar(x)` mensyaratkan `x >= 0`; `pangkat(a, b)` menolak `a < 0` dengan `b` bukan integer serta `a == 0` dengan `b < 0`.
+- Hasil non-finite, termasuk overflow `pangkat(10, 1000)`, menjadi `runtime_error`, bukan `inf`, `NaN`, atau output parsial. Hasil matematika integral dalam rentang aman `±(2^53 - 1)` direpresentasikan sebagai integer; hasil non-integral dicetak dengan representasi desimal terpendek yang round-trip ke nilai binary64.
+- `bulatkan` menggunakan ties-to-even. Native C untuk `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, dan `pangkat` hanya diklaim setelah fixture positif serta kasus aritas, tipe, domain, dan hasil non-finite yang relevan lulus.
 
 ## Kontrol dan fungsi
 

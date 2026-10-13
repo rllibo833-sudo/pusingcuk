@@ -15,7 +15,7 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 | Indeks teks berdasarkan code point UTF-8 | Teruji untuk teks UTF-8 valid |
 | Kondisi `njir` / `adooh` dan loop `mumet` | Teruji |
 | `untuk` pada list, teks, kamus (menghasilkan kunci), dan `rentang()` | Teruji |
-| Built-in `panjang()`, `rentang()`, `mutlak()`, `minimum()`, `maksimum()`, `bulatkan()`, `bawah()`, dan `atas()` | Teruji melalui fixture sukses, aritas salah, dan penolakan boolean pada fungsi numerik |
+| Built-in `panjang()`, `rentang()`, `mutlak()`, `minimum()`, `maksimum()`, `bulatkan()`, `bawah()`, `atas()`, `akar()`, dan `pangkat()` | Teruji melalui fixture sukses, tipe/aritas salah, domain error, dan hasil non-finite |
 | `tanya nama = "Prompt"` dari stdin | Teruji melalui pipe dan CLI |
 | Literal kamus, kunci teks/angka/boolean, baca/ubah/tambah kunci | Teruji |
 | Batas kamus 256 entri dan penolakan entri ke-257 | Fixture native mengharapkan error |
@@ -24,7 +24,7 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 | Fungsi buatan pengguna (`fungsi`, parameter, `balek`, rekursi) | Teruji oleh CI GCC/Clang di Ubuntu; perangkat Termux nyata belum diverifikasi |
 | Sistem modul | Belum tersedia di native |
 
-Fixture konformansi `.cuk` kini menguji aritmetika lantai/modulo negatif, built-in numerik ties-to-even dan pembulatan batas, pembagian nol, aritas/tipe built-in salah, indeks list di luar batas, kunci kamus yang hilang, isolasi scope fungsi, dan mutasi koleksi melalui parameter. Fixture kapasitas koleksi ada di `tests/native/list_overflow.pusingcuk` dan `tests/native/dictionary_overflow.pusingcuk`; keduanya memastikan penambahan melewati 256 item/entri ditolak. Fixture kamus sukses berada di `tests/native/dictionaries.pusingcuk`; kasus kunci tidak valid dan kunci hilang masing-masing ada di `tests/native/dictionary_invalid_key.pusingcuk` dan `tests/native/dictionary_missing_key.pusingcuk`. Fixture fungsi dan rekursi ada di `tests/native/functions.pusingcuk`; jumlah argumen yang salah diuji di `tests/native/function_wrong_arity.pusingcuk`. Semuanya dijalankan oleh `make test-native`.
+Fixture konformansi `.cuk` kini menguji aritmetika lantai/modulo negatif, ties-to-even, akar kuadrat dan pangkat dengan hasil bulat maupun pecahan, domain matematis tidak valid, overflow/non-finite, aritas/tipe built-in salah, pembagian nol, indeks list di luar batas, kunci kamus yang hilang, isolasi scope fungsi, dan mutasi koleksi melalui parameter. Fixture kapasitas koleksi ada di `tests/native/list_overflow.pusingcuk` dan `tests/native/dictionary_overflow.pusingcuk`; keduanya memastikan penambahan melewati 256 item/entri ditolak. Fixture kamus sukses berada di `tests/native/dictionaries.pusingcuk`; kasus kunci tidak valid dan kunci hilang masing-masing ada di `tests/native/dictionary_invalid_key.pusingcuk` dan `tests/native/dictionary_missing_key.pusingcuk`. Fixture fungsi dan rekursi ada di `tests/native/functions.pusingcuk`; jumlah argumen yang salah diuji di `tests/native/function_wrong_arity.pusingcuk`. Semuanya dijalankan oleh `make test-native`.
 
 ## Contoh aplikasi native
 

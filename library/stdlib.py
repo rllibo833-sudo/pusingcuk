@@ -57,6 +57,17 @@ def _math_result(name: str, value: float) -> float:
     return value
 
 
+_MAX_SAFE_INTEGER = 9007199254740991
+
+
+def _canonical_math_result(name: str, value: float) -> int | float:
+    """Normalize integral math results to a common safe integer representation."""
+    value = _math_result(name, value)
+    if value.is_integer() and abs(value) <= _MAX_SAFE_INTEGER:
+        return int(value)
+    return value
+
+
 def _range(*args: Any) -> list[int]:
     if not 1 <= len(args) <= 3 or any(not isinstance(x, int) or isinstance(x, bool) for x in args):
         raise TypeError("rentang() membutuhkan 1-3 bilangan bulat")
@@ -84,11 +95,15 @@ def _round(value: Any) -> int:
     return round(_numeric("bulatkan", value))
 
 
-def _sqrt(value: Any) -> float:
+def _sqrt(value: Any) -> int | float:
     value = _numeric("akar", value)
     if value < 0:
-        raise ValueError("akar() membutuhkan angka non-negatif")
-    return _math_result("akar", math.sqrt(value))
+        raise ValueError("akar() domain tidak valid: angka harus non-negatif")
+    try:
+        result = math.sqrt(value)
+    except OverflowError as exc:
+        raise ValueError("akar() menghasilkan angka non-finite") from exc
+    return _canonical_math_result("akar", result)
 
 
 def _floor(value: Any) -> int:
@@ -99,8 +114,20 @@ def _ceil(value: Any) -> int:
     return math.ceil(_numeric("atas", value))
 
 
-def _pow(a: Any, b: Any) -> float:
-    return _math_result("pangkat", math.pow(_numeric("pangkat", a), _numeric("pangkat", b)))
+def _pow(a: Any, b: Any) -> int | float:
+    base = _numeric("pangkat", a)
+    exponent = _numeric("pangkat", b)
+    if base < 0 and not isinstance(exponent, int) and not exponent.is_integer():
+        raise ValueError("pangkat() domain tidak valid")
+    if base == 0 and exponent < 0:
+        raise ValueError("pangkat() domain tidak valid")
+    try:
+        result = math.pow(base, exponent)
+    except ValueError as exc:
+        raise ValueError("pangkat() domain tidak valid") from exc
+    except OverflowError as exc:
+        raise ValueError("pangkat() menghasilkan angka non-finite") from exc
+    return _canonical_math_result("pangkat", result)
 
 
 def _sin(value: Any) -> float:
@@ -125,10 +152,7 @@ def _stat_values(name: str, value: Any) -> list[int | float]:
 
 
 def _stat_result(name: str, value: float) -> int | float:
-    value = _math_result(name, value)
-    if value.is_integer() and abs(value) <= 9007199254740991:
-        return int(value)
-    return value
+    return _canonical_math_result(name, value)
 
 
 def _mean(value: Any) -> int | float:

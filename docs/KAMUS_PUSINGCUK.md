@@ -70,7 +70,7 @@ Kalau memakai runtime native Termux, ikuti dulu langkah instalasi di `docs/PEMUL
 
 ## 4. Fungsi bawaan
 
-Daftar lengkap 18 built-in, aturan argumen, serta runtime yang mendukungnya tersedia di [katalog built-in](language/BUILTINS.md). Runtime C saat ini menguji delapan built-in (`panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`); sisanya belum diklaim di native. Tabel di bawah adalah ringkasan untuk belajar; fitur tidak otomatis tersedia pada semua runtime.
+Daftar lengkap 18 built-in, aturan argumen, serta runtime yang mendukungnya tersedia di [katalog built-in](language/BUILTINS.md). Runtime C saat ini menguji sepuluh built-in (`panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`); sisanya belum diklaim di native. Tabel di bawah adalah ringkasan untuk belajar; fitur tidak otomatis tersedia pada semua runtime.
 
 | Fungsi | Gunanya |
 |---|---|
@@ -81,7 +81,9 @@ Daftar lengkap 18 built-in, aturan argumen, serta runtime yang mendukungnya ters
 | `mutlak(angka)` | Menghilangkan tanda minus dari nilai angka |
 | `minimum(a, b)` | Memilih angka yang lebih kecil |
 | `maksimum(a, b)` | Memilih angka yang lebih besar |
-| `bulatkan(angka)` | Membulatkan angka dengan aturan yang didokumentasikan |
+| `bulatkan(angka)` | Membulatkan angka dengan aturan ties-to-even yang didokumentasikan |
+| `akar(angka)` | Menghitung akar kuadrat; angka negatif ditolak |
+| `pangkat(basis, eksponen)` | Menghitung pangkat; domain invalid dan hasil tak hingga ditolak |
 | `rata_rata(daftar)` | Menghitung rata-rata daftar angka finite yang tidak kosong pada target compiler JS/Python/HTML | `rata_rata([1, 2, 6])` |
 | `median(daftar)` | Menghitung median daftar angka finite yang tidak kosong pada target compiler JS/Python/HTML | `median([1, 4, 8])` |
 | `teks(nilai)` | Mengubah nilai menjadi teks pada registry pustaka standar; cek dukungan target |
