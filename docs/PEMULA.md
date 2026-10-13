@@ -1,6 +1,6 @@
 # Pusingcuk dari Nol
 
-Yuk mulai dari program kecil, lalu naik pelan-pelan ke fungsi dan proyek mini. Panduan ini mengutamakan executable native supaya kamu bisa menjalankan program tanpa Python setelah Pusingcuk dibangun. Runtime native masih berkembang dan hanya mendukung fitur yang tercantum di [matriks kemampuan](NATIVE_RUNTIME.md).
+Yuk mulai dari program kecil, lalu naik pelan-pelan ke fungsi dan proyek mini. Panduan ini memakai ekstensi kanonis `.cuk` untuk program baru dan mengutamakan executable native supaya kamu bisa menjalankan program tanpa Python setelah Pusingcuk dibangun. Berkas `.pusingcuk` lama tetap didukung. Runtime native masih berkembang dan hanya mendukung fitur yang tercantum di [matriks kemampuan](NATIVE_RUNTIME.md).
 
 Gaya dokumentasi mengikuti [Panduan Gaya Bahasa](GAYA_BAHASA.md): santai, jelas, dan tidak mengorbankan ketepatan teknis.
 
@@ -47,7 +47,7 @@ make test-native
 Buat file baru:
 
 ```sh
-nano halo.pusingcuk
+nano halo.cuk
 ```
 
 Isi dengan kode ini:
@@ -62,7 +62,7 @@ selesai jancuk
 Simpan di nano dengan **Ctrl+O**, tekan **Enter**, lalu keluar dengan **Ctrl+X**. Jalankan:
 
 ```sh
-pusingcuk-native halo.pusingcuk
+pusingcuk-native halo.cuk
 ```
 
 Hasilnya:
@@ -91,10 +91,10 @@ hedeh tambah(20, 22)
 selesai jancuk
 ```
 
-Simpan sebagai `fungsi.pusingcuk`, lalu jalankan:
+Simpan sebagai `fungsi.cuk`, lalu jalankan:
 
 ```sh
-pusingcuk-native fungsi.pusingcuk
+pusingcuk-native fungsi.cuk
 ```
 
 Hasil yang diharapkan adalah `42`.
