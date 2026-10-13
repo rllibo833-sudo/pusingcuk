@@ -1,5 +1,7 @@
 # Spesifikasi Sintaks Pusingcuk v0.4-dev
 
+> Konvensi berkas: gunakan ekstensi `.cuk` untuk program baru, setara peran `.py` di Python. Ekstensi `.pusingcuk` tetap diterima oleh interpreter, runtime native, dan compiler yang relevan demi kompatibilitas. Ekstensi tidak menentukan fitur runtime; fitur harus tetap diverifikasi melalui tes konformansi.
+
 ## 1. Struktur program
 
 Setiap program dimulai dengan:
