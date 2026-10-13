@@ -250,5 +250,26 @@
         "native": "required"
       }
     }
+    ,
+    {
+      "id": "core.cuk-source-extension",
+      "source": "canonical_extension.cuk",
+      "profile": "core",
+      "requires": [
+        "source-extension",
+        "variables",
+        "arithmetic",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "42\\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    }
   ]
 }
