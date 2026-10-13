@@ -5,7 +5,7 @@ This directory contains runnable examples, runtime metadata, built-in registries
 - [`kosakata.json`](kosakata.json): keyword and alias glossary, meanings, and support-status metadata.
 - [`conditional_logic.pusingcuk`](conditional_logic.pusingcuk): comparisons, booleans, short-circuit logic, and conditionals.
 - [`loops_functions_genz.pusingcuk`](loops_functions_genz.pusingcuk): loops, recursive functions, and newer slang aliases. Run it with the modular interpreter because its text output is not supported by the experimental C source backend subset.
-- [`stdlib.py`](stdlib.py): the implementation registry for built-ins declared in [`builtin_contract.json`](builtin_contract.json). The Python reference interpreter now dispatches all 18 contract built-ins through this registry. JS/Python transpilers and HTML support a smaller documented subset, the VM supports six, and native C has fixture-backed support for 14 built-ins. See the [full built-in catalogue](../docs/language/BUILTINS.md); registry presence alone does not prove every target supports a built-in.
+- [`stdlib.py`](stdlib.py): the implementation registry for built-ins declared in [`builtin_contract.json`](builtin_contract.json). The Python reference interpreter dispatches all 19 contract built-ins through this registry. JS/Python transpilers and HTML support a smaller documented subset, the VM supports six, and native C has fixture-backed support for 15 built-ins. See the [full built-in catalogue](../docs/language/BUILTINS.md); registry presence alone does not prove every target supports a built-in.
 
 ## Run examples with the Python interpreter
 
@@ -51,7 +51,7 @@ The glossary is a practical index, not a replacement for `SPEC.md`, the semantic
 
 ## Explicit Python statistics subset
 
-The Python importer maps only `statistics.mean` to `rata_rata` and `statistics.median` to `median`. Both accept a non-empty list of finite, non-boolean numbers within the shared safe-integer range; native C parity is covered by conformance fixtures. This is a deliberately small Pusingcuk API, not full Python `statistics` compatibility. Other statistics functions, wildcard imports, and VM support are not claimed.
+The Python importer maps the built-in `sum` to `jumlah`, and maps `statistics.mean` to `rata_rata` and `statistics.median` to `median`. The statistics functions accept a non-empty list of finite, non-boolean numbers within the shared safe-integer range; native C parity is covered by conformance fixtures. The `jumlah` builtin also accepts an empty list (sum is zero) but rejects unsafe integer inputs or integral results. This is a deliberately small Pusingcuk API, not full Python `statistics` compatibility. Other statistics functions, wildcard imports, and VM support are not claimed.
 
 
 ## Builtin contract: one metadata source

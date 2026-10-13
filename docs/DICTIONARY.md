@@ -56,7 +56,7 @@ A declaration creates a new variable; assignment updates an existing one. Redecl
 
 ## 4. Built-in functions
 
-The complete and test-checked list of 18 built-ins, argument counts, and per-target support is in the [built-in catalogue](language/BUILTINS.md). The native C runtime has fixture-backed support for fourteen built-ins, including `akar`, `pangkat`, `sinus`, `kosinus`, `rata_rata`, and `median`; the four value-conversion built-ins remain unsupported there. The examples below are a learner-friendly subset; an entry in a registry does not mean every target supports it.
+The complete and test-checked list of 19 built-ins, argument counts, and per-target support is in the [built-in catalogue](language/BUILTINS.md). The native C runtime has fixture-backed support for fifteen built-ins, including `jumlah`, `rata_rata`, `median`, `sinus`, and `kosinus`; the four value-conversion built-ins remain unsupported there. The examples below are a learner-friendly subset; an entry in a registry does not mean every target supports it.
 
 | Function | Purpose | Example |
 |---|---|---|
@@ -74,12 +74,13 @@ The complete and test-checked list of 18 built-ins, argument counts, and per-tar
 | `kosinus(radian)` | Cosine in radians; finite non-boolean input | `kosinus(0.5)` |
 | `rata_rata(list)` | Arithmetic mean of a non-empty list of finite numbers | `rata_rata([1, 2, 6])` |
 | `median(list)` | Median of a non-empty list of finite numbers | `median([1, 4, 8])` |
+| `jumlah(list)` | Sums finite non-boolean numbers; an empty list returns zero | `jumlah([1, 2, 6])` |
 | `teks(value)` | Converts a value to text in the standard-library registry | Check target support first |
 | `bilangan(value)` | Converts a value to an integer in the standard-library registry | Check target support first |
 | `desimal(value)` | Converts a value to a decimal number in the standard-library registry | Check target support first |
 | `logika(value)` | Converts a value to a boolean in the standard-library registry | Check target support first |
 
-The reference interpreter and experimental JavaScript, Python, and HTML targets implement `rata_rata` and `median`; native C now implements both with the shared finite-number, non-empty-list, non-boolean, and safe-integer contract. VM support is not claimed. This is a small Pusingcuk API, not full Python `statistics` compatibility. For exact implementation status, see [`IMPORT_PYTHON.md`](IMPORT_PYTHON.md), [`compiler-type-system-and-stdlib.md`](compiler-type-system-and-stdlib.md), [`COMPILER_TARGETS.md`](COMPILER_TARGETS.md), and [`NATIVE_RUNTIME.md`](NATIVE_RUNTIME.md).
+The reference interpreter and experimental JavaScript, Python, and HTML targets implement `rata_rata` and `median`; native C implements those two plus `jumlah`, whose empty-list, finite-value, and safe-integer result rules are tested. VM support is not claimed. VM support is not claimed. This is a small Pusingcuk API, not full Python `statistics` compatibility. For exact implementation status, see [`IMPORT_PYTHON.md`](IMPORT_PYTHON.md), [`compiler-type-system-and-stdlib.md`](compiler-type-system-and-stdlib.md), [`COMPILER_TARGETS.md`](COMPILER_TARGETS.md), and [`NATIVE_RUNTIME.md`](NATIVE_RUNTIME.md).
 
 ## 5. A complete small program
 

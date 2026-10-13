@@ -1016,6 +1016,141 @@
         "reference": "required",
         "native": "required"
       }
+    },
+    {
+      "id": "builtins.native-statistics-and-sum-boundaries",
+      "source": "statistics_sum_boundaries.cuk",
+      "requires": [
+        "builtins",
+        "statistics",
+        "sum",
+        "safe-integer-range",
+        "numeric-format"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "0\n9\n0.6000000000000001\n0\n9007199254740991\n0\n9007199254740991\n0.2\n9007199254740991\n0\n5\n0\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.jumlah-wrong-arity",
+      "source": "sum_wrong_arity.cuk",
+      "requires": [
+        "builtins",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.jumlah-rejects-boolean",
+      "source": "sum_boolean.cuk",
+      "requires": [
+        "builtins",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.jumlah-rejects-unsafe-input",
+      "source": "sum_unsafe_input.cuk",
+      "requires": [
+        "builtins",
+        "numeric-range",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.jumlah-result-outside-safe-range",
+      "source": "sum_unsafe_result.cuk",
+      "requires": [
+        "builtins",
+        "numeric-range",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.jumlah-rejects-non-list",
+      "source": "sum_non_list.cuk",
+      "requires": [
+        "builtins",
+        "collection-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.jumlah-intermediate-safe-range",
+      "source": "sum_intermediate_unsafe.cuk",
+      "requires": [
+        "builtins",
+        "numeric-range",
+        "ordered-accumulation",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
     }
   ]
 }

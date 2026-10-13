@@ -66,7 +66,7 @@ Manifest tidak mengizinkan `exit_code_by_runtime`. Bila suatu runtime belum meng
 3. Fungsi dan scope: return, aritas, nama belum dikenal, scope lokal tidak bocor, alias koleksi, dan rekursi.
 4. List/kamus: identitas kunci, mutasi termasuk melalui parameter, indeks di luar batas, kunci hilang, dan batas kapasitas.
 5. Kondisi, loop, iterasi rentang, dan batas eksekusi.
-6. Built-in: hasil numerik, ties-to-even, akar kuadrat/pangkat, sinus/kosinus dalam radian, rata-rata, median ganjil/genap, aritas salah, boolean sebagai tipe invalid, domain negatif/nol, overflow, daftar kosong, rentang angka aman, hasil non-finite, dan status dukungan target.
+6. Built-in: hasil numerik, ties-to-even, akar kuadrat/pangkat, sinus/kosinus dalam radian, jumlah/rata-rata/median, cancellation, hasil pecahan, sampel duplikat, median ganjil/genap, daftar kosong, aritas salah, boolean/tipe koleksi invalid, batas integer aman inklusif/eksklusif, akumulasi di luar rentang aman, overflow/non-finite, dan status dukungan target.
 7. CLI: kelas error, nomor baris, kode keluar, output dan input standar.
 8. File, jaringan, browser, FFI, dan kapabilitas platform hanya diuji pada target yang secara eksplisit mendukungnya.
 

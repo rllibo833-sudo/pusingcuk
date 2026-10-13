@@ -2,7 +2,7 @@
 
 Halaman ini adalah katalog built-in yang dipakai bersama oleh dokumentasi dan pengujian. Jumlah argumen, deskripsi ringkas, dan status setiap target diambil dari `library/builtin_contract.json`; tes memeriksa agar tabel ini tidak menyimpang dari metadata.
 
-Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python mentah. Misalnya, `teks(benar)` menghasilkan `okelah` dan `teks(salah)` menghasilkan `tidak`, bukan ejaan boolean dari bahasa host. Angka statistik menerima daftar angka finite yang tidak kosong; nilai boolean tidak dianggap sebagai angka.
+Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python mentah. Misalnya, `teks(benar)` menghasilkan `okelah` dan `teks(salah)` menghasilkan `tidak`, bukan ejaan boolean dari bahasa host. Statistik `rata_rata` dan `median` menerima daftar angka finite non-boolean yang tidak kosong; `jumlah` menerima daftar termasuk daftar kosong yang menghasilkan nol. Nilai integer di luar rentang aman dan hasil non-finite ditolak.
 
 ## Status target
 
@@ -31,6 +31,7 @@ Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python m
 | `pangkat` | 2 | Pangkat dua angka finite; domain tidak valid dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | unsupported |
 | `sinus` | 1 | Sinus sudut finite dalam radian; hasil integral aman dinormalisasi dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | unsupported |
 | `kosinus` | 1 | Kosinus sudut finite dalam radian; hasil integral aman dinormalisasi dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | unsupported |
+| `jumlah` | 1 | Jumlah berurutan angka finite non-boolean dalam daftar; daftar kosong bernilai nol dan setiap hasil integral antara/akhir dibatasi rentang aman lintas target. | supported | supported | unsupported | unsupported | unsupported | unsupported |
 | `rata_rata` | 1 | Rata-rata aritmetika daftar nonkosong angka finite non-boolean dalam rentang aman lintas target. | supported | supported | supported | supported | supported | unsupported |
 | `median` | 1 | Median daftar nonkosong angka finite non-boolean dalam rentang aman lintas target. | supported | supported | supported | supported | supported | unsupported |
 
@@ -42,6 +43,7 @@ hedeh teks(benar)
 hedeh bilangan("42")
 hedeh panjang("Pusingcuk")
 hedeh mutlak(-8)
+hedeh jumlah([1, 2, 6])
 hedeh rata_rata([1, 2, 6])
 hedeh median([1, 4, 8])
 selesai jancuk
@@ -68,8 +70,9 @@ selesai jancuk
 - Jumlah argumen di luar rentang yang tercantum harus gagal sebagai error runtime.
 - Built-in numerik menolak boolean dan tipe bukan angka kecuali deskripsi secara eksplisit menyatakan konversi.
 - `akar` menolak angka negatif; `rentang` menolak langkah nol.
-- `rata_rata` dan `median` memerlukan daftar tidak kosong yang hanya berisi angka finite.
-- Runtime native C kini mengklaim delapan built-in: `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, dan `atas`. Setiap klaim didukung oleh fixture sukses dan kasus kegagalan aritas/tipe. Built-in lainnya tetap tidak didukung sampai kontrak numerik, implementasi, dan fixture-nya selaras.
+- `jumlah` menerima satu daftar angka finite non-boolean; daftar kosong bernilai nol. Input integer-valued dan hasil penjumlahan integral dibatasi pada rentang aman `±(2^53 - 1)`.
+- `rata_rata` dan `median` memerlukan daftar tidak kosong berisi angka finite non-boolean dalam rentang aman. Fixture mengunci batas inklusif, cancellation, angka negatif, nilai duplikat, hasil pecahan, aritas, tipe, dan rentang invalid.
+- Native C mendukung 15 built-in dengan fixture lintas-runtime; built-in konversi tetap belum tersedia pada C.
 - Kehadiran nama dalam registry tidak dengan sendirinya membuktikan dukungan. Status per target dalam tabel dan tes executable adalah acuan.
 
 Lihat [kontrak semantik](../SEMANTIC_CONTRACT.md), [matriks kompatibilitas](../COMPATIBILITY.md), [registry metadata](../../library/builtin_contract.json), dan [kontrak fixture](../CONFORMANCE_FIXTURES.md) untuk detail lebih lanjut.

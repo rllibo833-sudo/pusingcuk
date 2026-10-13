@@ -1,6 +1,6 @@
 # Pusingcuk Documentation Index
 
-Use this index to choose the right document. The current engineering baseline is the **Python reference interpreter + native C runtime**. Shared fixtures now cover numerical edge cases, collection boundaries, function scope, and consistent runtime diagnostics, including `akar`, `pangkat`, `sinus`, `kosinus`, `rata_rata`, and `median` in native C. Compiler and Android app prototypes remain documented, but they are not part of the baseline compatibility promise.
+Use this index to choose the right document. The current engineering baseline is the **Python reference interpreter + native C runtime**. Shared fixtures now cover numerical edge cases, collection boundaries, function scope, and consistent runtime diagnostics, including `akar`, `pangkat`, `sinus`, `kosinus`, `jumlah`, `rata_rata`, and `median` in native C. Compiler and Android app prototypes remain documented, but they are not part of the baseline compatibility promise.
 
 ## Start here
 
@@ -8,6 +8,7 @@ Use this index to choose the right document. The current engineering baseline is
 - [Termux guide](termux/README.md) — run Pusingcuk on an Android phone without needing a desktop.
 - [Project vision](VISION.md) — goals, community values, and current engineering priorities.
 - [Repository structure](REPO_STRUCTURE.md) — where code, tests, tools, and documents live.
+- [Legacy source-extension example](../examples/compat/README.md) — why `.pusingcuk` stays supported while new projects use `.cuk`.
 - [Contributor guide](../CONTRIBUTING.md) — changes, tests, and review expectations.
 
 ## Language specification and dictionaries

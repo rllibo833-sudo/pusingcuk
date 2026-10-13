@@ -62,6 +62,7 @@ Indeks lengkap tersedia di [docs/README.md](README.md).
 - `archive/legacy/`: kode lama untuk referensi, bukan titik mulai yang disarankan.
 - `site/` dan `web/`: aset web; periksa workflow publikasi sebelum memindahkan/menghapus.
 - `halo.cuk`: contoh kanonis ringkas untuk memverifikasi CLI.
+- `examples/compat/halo.pusingcuk`: contoh legacy terpisah untuk memastikan ekstensi kompatibilitas tetap terdokumentasi tanpa memenuhi root repo.
 
 ## Alur kerja GitHub Actions
 

@@ -101,7 +101,7 @@ For this phase, priority is given to:
 2. Expanding and maintaining the shared Python/C conformance suite.
 3. Keeping the CLI, Termux instructions, packaging, and developer tests reliable.
 4. Keeping security and runtime limitations visible.
-5. Expanding numerical and collection contracts through matching Python/C fixtures before declaring support. `sinus`/`kosinus` require finite radian inputs and canonical results; `rata_rata`/`median` require non-empty numeric lists, reject booleans and values outside the shared safe-integer range, and cover arity/type/boundary errors.
+5. Expanding numerical and collection contracts through matching Python/C fixtures before declaring support. Statistical fixtures must cover cancellation, negative values, duplicated samples, fractional outputs, safe-integer boundaries, empty and malformed collections, and invalid numeric types. `jumlah` is the next core aggregate because summation underlies common numeric programs; it defines empty-list, finite-value, overflow, and canonical-result behavior before broader library growth.
 
 Transpiler backends, PVM work, and Android Studio APK development are deferred. Their source and design documents are retained as experiments, but they are not part of the supported baseline. A native executable build for Termux is distinct from building an Android application. CI cross-compilation is not a substitute for testing on a physical Termux device.
 

@@ -157,11 +157,13 @@ def _stat_result(name: str, value: float) -> int | float:
 
 def _mean(value: Any) -> int | float:
     values = _stat_values("rata_rata", value)
-    try:
-        count = len(values)
-        return _stat_result("rata_rata", sum(item / count for item in values))
-    except OverflowError as exc:
-        raise ValueError("rata_rata() menghasilkan angka di luar rentang finite") from exc
+    count = len(values)
+    # Explicit ordered accumulation keeps behavior stable across Python releases
+    # and matches the native C runtime instead of depending on host sum() policy.
+    total = 0.0
+    for item in values:
+        total += item / count
+    return _stat_result("rata_rata", total)
 
 
 def _median(value: Any) -> int | float:
@@ -174,6 +176,34 @@ def _median(value: Any) -> int | float:
         return _stat_result("median", float(result))
     return _stat_result("median", values[middle - 1] / 2 + values[middle] / 2)
 
+
+
+def _sum(value: Any) -> int | float:
+    """Sum a list with shared finite-number and safe-integral-result rules."""
+    if not isinstance(value, list):
+        raise TypeError("jumlah() membutuhkan daftar angka finite")
+    total = 0.0
+    for item in value:
+        item = _numeric("jumlah", item)
+        if (
+            (isinstance(item, int) and abs(item) > _MAX_SAFE_INTEGER)
+            or (
+                isinstance(item, float)
+                and item.is_integer()
+                and abs(item) > _MAX_SAFE_INTEGER
+            )
+        ):
+            raise ValueError("jumlah() menolak angka di luar rentang aman lintas target")
+        total += float(item)
+        if not math.isfinite(total):
+            raise ValueError("jumlah() menghasilkan angka non-finite")
+        if total.is_integer() and abs(total) > _MAX_SAFE_INTEGER:
+            raise ValueError("jumlah() menghasilkan integer di luar rentang aman lintas target")
+    if total.is_integer():
+        if abs(total) > _MAX_SAFE_INTEGER:
+            raise ValueError("jumlah() menghasilkan integer di luar rentang aman lintas target")
+        return int(total)
+    return total
 
 _IMPLEMENTATIONS: dict[str, Callable[..., Any]] = {
     "length": len,
@@ -194,6 +224,7 @@ _IMPLEMENTATIONS: dict[str, Callable[..., Any]] = {
     "cos": _cos,
     "mean": _mean,
     "median": _median,
+    "sum": _sum,
 }
 
 _missing = {entry["implementation"] for entry in BUILTIN_BY_NAME.values()} - set(_IMPLEMENTATIONS)

@@ -1,0 +1,14 @@
+jancuk
+hedeh jumlah([])
+hedeh jumlah([1, 2, 6])
+hedeh jumlah([0.1, 0.2, 0.3])
+hedeh jumlah([-8, 3, 5])
+hedeh jumlah([9007199254740991, 0])
+hedeh rata_rata([9007199254740991, -9007199254740991])
+hedeh rata_rata([9007199254740991])
+hedeh rata_rata([0.1, 0.2, 0.3])
+hedeh median([9007199254740991, 9007199254740991])
+hedeh median([-9007199254740991, 9007199254740991])
+hedeh median([5, 5, 5, 5])
+hedeh median([-0.5, 0.5])
+selesai jancuk

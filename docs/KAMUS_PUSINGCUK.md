@@ -70,7 +70,7 @@ Kalau memakai runtime native Termux, ikuti dulu langkah instalasi di `docs/PEMUL
 
 ## 4. Fungsi bawaan
 
-Daftar lengkap 18 built-in, aturan argumen, serta runtime yang mendukungnya tersedia di [katalog built-in](language/BUILTINS.md). Runtime C kini menguji 14 built-in: sepuluh fungsi numerik/inti sebelumnya ditambah `sinus`, `kosinus`, `rata_rata`, dan `median`. Empat fungsi konversi tetap belum diklaim di native. Tabel di bawah adalah ringkasan untuk belajar; fitur tidak otomatis tersedia pada semua runtime.
+Daftar lengkap 19 built-in, aturan argumen, serta runtime yang mendukungnya tersedia di [katalog built-in](language/BUILTINS.md). Runtime C kini menguji 15 built-in: inti sebelumnya ditambah `sinus`, `kosinus`, `jumlah`, `rata_rata`, dan `median`. Empat fungsi konversi tetap belum diklaim di native. Tabel di bawah adalah ringkasan untuk belajar; fitur tidak otomatis tersedia pada semua runtime.
 
 | Fungsi | Gunanya |
 |---|---|
@@ -88,12 +88,13 @@ Daftar lengkap 18 built-in, aturan argumen, serta runtime yang mendukungnya ters
 | `kosinus(radian)` | Menghitung kosinus sudut dalam radian; input harus angka finite non-boolean |
 | `rata_rata(daftar)` | Menghitung rata-rata daftar angka finite non-boolean yang tidak kosong dan berada di rentang integer aman |
 | `median(daftar)` | Menghitung median daftar angka finite non-boolean yang tidak kosong dan berada di rentang integer aman |
+| `jumlah(daftar)` | Menjumlahkan angka finite non-boolean; daftar kosong menghasilkan nol dan hasil integer dibatasi rentang aman |
 | `teks(nilai)` | Mengubah nilai menjadi teks pada registry pustaka standar; cek dukungan target |
 | `bilangan(nilai)` | Mengubah nilai menjadi integer pada registry pustaka standar; cek dukungan target |
 | `desimal(nilai)` | Mengubah nilai menjadi angka desimal pada registry pustaka standar; cek dukungan target |
 | `logika(nilai)` | Mengubah nilai menjadi benar/salah pada registry pustaka standar; cek dukungan target |
 
-**Catatan penting:** `rata_rata` dan `median` kini memiliki fixture lintas-runtime untuk interpreter referensi dan runtime C, serta tersedia pada target compiler JavaScript, Python, dan HTML; VM belum mengklaim dukungan. Ini bukan dukungan penuh modul Python `statistics`. Fungsi yang ada di satu file belum tentu otomatis jalan di semua jalur Pusingcuk. Interpreter Python, runtime C, dan compiler target punya kemampuan yang berbeda. Jangan anggap sama sebelum tesnya membuktikan.
+**Catatan penting:** `rata_rata` dan `median` memiliki fixture lintas-runtime pada interpreter referensi dan runtime C, serta implementasi target compiler JavaScript, Python, dan HTML; VM belum mengklaim dukungan. `jumlah` didukung pada interpreter referensi dan native C, termasuk perilaku daftar kosong, nilai tak valid, dan batas hasil integer aman. Ini bukan dukungan penuh modul Python `statistics`. Fungsi yang ada di satu file belum tentu otomatis jalan di semua jalur Pusingcuk. Interpreter Python, runtime C, dan compiler target punya kemampuan yang berbeda. Jangan anggap sama sebelum tesnya membuktikan.
 
 ## 5. Kamus istilah teknis
 

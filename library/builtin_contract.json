@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "contract_version": "0.2.0",
+  "contract_version": "0.3.0",
   "language_version": "0.4-dev",
   "description": "Canonical metadata contract for Pusingcuk builtins, Python import allow-lists, arity and target capabilities. Implementation code remains in the relevant runtime.",
   "targets": [
@@ -534,6 +534,36 @@
       }
     },
     {
+      "name": "jumlah",
+      "parameters": [
+        "daftar"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Jumlah berurutan angka finite non-boolean dalam daftar; daftar kosong bernilai nol dan setiap hasil integral antara/akhir dibatasi rentang aman lintas target.",
+      "implementation": "sum",
+      "backends": {
+        "js": {
+          "status": "unsupported"
+        },
+        "python": {
+          "status": "unsupported"
+        },
+        "html": {
+          "status": "unsupported"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "supported"
+        },
+        "reference": {
+          "status": "supported"
+        }
+      }
+    },
+    {
       "name": "rata_rata",
       "parameters": [
         "daftar"
@@ -624,6 +654,10 @@
     {
       "source": "max",
       "target": "maksimum"
+    },
+    {
+      "source": "sum",
+      "target": "jumlah"
     }
   ],
   "python_modules": {

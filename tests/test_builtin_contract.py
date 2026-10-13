@@ -55,6 +55,22 @@ class BuiltinContractTests(unittest.TestCase):
             self.assertEqual(runtime.max_args, spec["max_args"], name)
         self.assertEqual(call_builtin("rata_rata", [1, 2, 6]), 3)
         self.assertEqual(call_builtin("median", [1, 2, 3, 4]), 2.5)
+        self.assertEqual(call_builtin("jumlah", []), 0)
+        self.assertEqual(call_builtin("jumlah", [1, 2, 6]), 9)
+        self.assertEqual(call_builtin("jumlah", [-8, 3, 5]), 0)
+        self.assertEqual(call_builtin("jumlah", [9007199254740991, 0]), 9007199254740991)
+        self.assertEqual(call_builtin("jumlah", [-9007199254740991, 9007199254740991]), 0)
+        self.assertEqual(call_builtin("jumlah", [0.1, 0.2, 0.3]), 0.6000000000000001)
+        with self.assertRaises(TypeError):
+            call_builtin("jumlah", [1, True])
+        with self.assertRaises(TypeError):
+            call_builtin("jumlah", [1, float("nan")])
+        with self.assertRaises(ValueError):
+            call_builtin("jumlah", [9007199254740992])
+        with self.assertRaises(ValueError):
+            call_builtin("jumlah", [9007199254740991, 1])
+        with self.assertRaises(ValueError):
+            call_builtin("jumlah", [9007199254740991, 1, -1])
         with self.assertRaisesRegex(TypeError, "argumen"):
             call_builtin("median")
         with self.assertRaisesRegex(TypeError, "argumen"):
@@ -74,9 +90,11 @@ class BuiltinContractTests(unittest.TestCase):
             "from statistics import mean as average\n"
             "print(stats.mean([1, 2, 6]))\n"
             "print(average([2, 4]))\n"
+            "print(sum([1, 2, 6]))\n"
         )
         self.assertIn("rata_rata([1, 2, 6])", translated)
         self.assertIn("rata_rata([2, 4])", translated)
+        self.assertIn("jumlah([1, 2, 6])", translated)
 
     def test_backend_dispatch_and_helpers_match_contract(self):
         js_source = __import__("inspect").getsource(js_backend)
@@ -124,6 +142,7 @@ class BuiltinContractTests(unittest.TestCase):
             "kosinus": ((0,), 1.0),
             "rata_rata": (([1, 2, 3],), 2),
             "median": (([1, 2, 3, 4],), 2.5),
+            "jumlah": (([1, 2, 6],), 9),
         }
         self.assertEqual(set(examples), set(BUILTIN_NAMES))
         for name, (args, expected) in examples.items():
@@ -167,6 +186,13 @@ class BuiltinContractTests(unittest.TestCase):
         self.assertEqual(call_builtin("median", [1, 2, 9]), 2)
         self.assertEqual(call_builtin("median", [1, 4, 8, 9]), 6)
         self.assertEqual(call_builtin("median", [-3, -1, 4, 8]), 1.5)
+        self.assertEqual(call_builtin("rata_rata", [9007199254740991]), 9007199254740991)
+        self.assertEqual(call_builtin("rata_rata", [-9007199254740991, 9007199254740991]), 0)
+        self.assertEqual(call_builtin("rata_rata", [0.1, 0.2, 0.3]), 0.2)
+        self.assertEqual(call_builtin("median", [9007199254740991, 9007199254740991]), 9007199254740991)
+        self.assertEqual(call_builtin("median", [-9007199254740991, 9007199254740991]), 0)
+        self.assertEqual(call_builtin("median", [5, 5, 5, 5]), 5)
+        self.assertEqual(call_builtin("median", [-0.5, 0.5]), 0)
 
         for name in ("sinus", "kosinus"):
             with self.subTest(builtin=name):
@@ -193,7 +219,7 @@ class BuiltinContractTests(unittest.TestCase):
     def test_native_c_support_status_matches_implemented_builtin_surface(self):
         native_supported = {
             "panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan",
-            "bawah", "atas", "akar", "pangkat", "sinus", "kosinus", "rata_rata", "median",
+            "bawah", "atas", "akar", "pangkat", "sinus", "kosinus", "jumlah", "rata_rata", "median",
         }
         for name, entry in BUILTIN_BY_NAME.items():
             with self.subTest(builtin=name):

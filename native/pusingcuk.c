@@ -249,7 +249,7 @@ static int is_builtin_name(const char *name) {
     static const char *const names[] = {
         "panjang", "teks", "bilangan", "desimal", "logika", "rentang",
         "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah",
-        "atas", "pangkat", "sinus", "kosinus", "rata_rata", "median"
+        "atas", "pangkat", "sinus", "kosinus", "jumlah", "rata_rata", "median"
     };
     for (size_t i = 0; i < sizeof names / sizeof names[0]; i++)
         if (!strcmp(name, names[i])) return 1;
@@ -259,7 +259,7 @@ static int is_builtin_name(const char *name) {
 static int is_native_numeric_builtin(const char *name) {
     static const char *const names[] = {
         "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat",
-        "sinus", "kosinus", "rata_rata", "median"
+        "sinus", "kosinus", "jumlah", "rata_rata", "median"
     };
     for (size_t i = 0; i < sizeof names / sizeof names[0]; i++)
         if (!strcmp(name, names[i])) return 1;
@@ -283,13 +283,14 @@ static Val call_native_numeric_builtin(const char *name, Val *args, int argc, in
         fail("jumlah argumen built-in numerik tidak sesuai kontrak");
         return num(0);
     }
-    if (!strcmp(name, "rata_rata") || !strcmp(name, "median")) {
+    if (!strcmp(name, "jumlah") || !strcmp(name, "rata_rata") || !strcmp(name, "median")) {
+        const int is_sum = !strcmp(name, "jumlah");
         const int is_mean = !strcmp(name, "rata_rata");
         Val input = args[0];
-        if (input.t != LIST || !input.list || input.list->len == 0) {
-            fail(is_mean
-                ? "rata_rata() membutuhkan daftar angka finite yang tidak kosong"
-                : "median() membutuhkan daftar angka finite yang tidak kosong");
+        if (input.t != LIST || !input.list || (!is_sum && input.list->len == 0)) {
+            if (is_sum) fail("jumlah() membutuhkan daftar angka finite");
+            else if (is_mean) fail("rata_rata() membutuhkan daftar angka finite yang tidak kosong");
+            else fail("median() membutuhkan daftar angka finite yang tidak kosong");
             return num(0);
         }
         double values[MAX_LIST_ITEMS];
@@ -297,18 +298,33 @@ static Val call_native_numeric_builtin(const char *name, Val *args, int argc, in
         for (size_t i = 0; i < count; i++) {
             Val item = input.list->items[i];
             if (item.t != NUM || !isfinite(item.n)) {
-                fail(is_mean
-                    ? "rata_rata() hanya menerima angka finite; boolean bukan angka"
-                    : "median() hanya menerima angka finite; boolean bukan angka");
+                if (is_sum) fail("jumlah() hanya menerima angka finite; boolean bukan angka");
+                else if (is_mean) fail("rata_rata() hanya menerima angka finite; boolean bukan angka");
+                else fail("median() hanya menerima angka finite; boolean bukan angka");
                 return num(0);
             }
             if (fabs(item.n) > 9007199254740991.0) {
-                fail(is_mean
-                    ? "rata_rata() menolak angka di luar rentang aman lintas target"
-                    : "median() menolak angka di luar rentang aman lintas target");
+                if (is_sum) fail("jumlah() menolak angka di luar rentang aman lintas target");
+                else if (is_mean) fail("rata_rata() menolak angka di luar rentang aman lintas target");
+                else fail("median() menolak angka di luar rentang aman lintas target");
                 return num(0);
             }
             values[i] = item.n;
+        }
+        if (is_sum) {
+            double total = 0.0;
+            for (size_t i = 0; i < count; i++) {
+                total += values[i];
+                if (!isfinite(total)) {
+                    fail("jumlah() menghasilkan angka non-finite");
+                    return num(0);
+                }
+                if (total == trunc(total) && fabs(total) > 9007199254740991.0) {
+                    fail("jumlah() menghasilkan integer di luar rentang aman lintas target");
+                    return num(0);
+                }
+            }
+            return num(total);
         }
         if (is_mean) {
             double mean = 0.0;

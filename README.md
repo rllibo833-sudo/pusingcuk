@@ -45,7 +45,7 @@ The `.cuk` extension is Pusingcuk's canonical source-file identity for new progr
 | Path | What it is | Important limit |
 |---|---|---|
 | Python reference | The modular interpreter launched by `pusingcuk_new.py`; reference for language behavior | Requires Python; host file/network capabilities are not a sandbox |
-| Native C | A standalone C11 runtime built with GCC or Clang; no Python needed at runtime | Fourteen built-ins are verified, including trigonometry and statistics, alongside arithmetic, collection, scope, numeric-domain, and error fixtures; the native module system is not available |
+| Native C | A standalone C11 runtime built with GCC or Clang; no Python needed at runtime | Fifteen built-ins are verified, including trigonometry, summation, and statistics, alongside arithmetic, collection, scope, numeric-domain, and error fixtures; the native module system is not available |
 
 For the native C runtime on Termux:
 
