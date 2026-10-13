@@ -58,6 +58,26 @@ class Level4ModuleTests(unittest.TestCase):
         self.assertIs(env["a"]["b"]["a"], False)
         self.assertEqual(self.evaluator()._module_loading_stack, set())
 
+    def test_angkut_accepts_cuk_canonical_extension(self):
+        write_module(self.root, "lib/child.cuk", 'lah marker = "canonical-cuk"')
+        env = self.evaluator().run_module(source(
+            'lah mod = angkut("lib/child.cuk")'
+        ))
+        self.assertIsInstance(env["mod"], PusingDict)
+        self.assertEqual(env["mod"]["marker"], "canonical-cuk")
+
+    def test_angkut_supports_mixed_extensions_for_nested_modules(self):
+        write_module(
+            self.root,
+            "lib/parent.cuk",
+            'lah child = angkut("child.pusingcuk")',
+        )
+        write_module(self.root, "lib/child.pusingcuk", 'lah marker = "legacy-child"')
+        env = self.evaluator().run_module(source(
+            'lah mod = angkut("lib/parent.cuk")'
+        ))
+        self.assertEqual(env["mod"]["child"]["marker"], "legacy-child")
+
     def test_angkut_cache_returns_same_object(self):
         write_module(self.root, "cached.pusingcuk", 'lah value = 7')
         env = self.evaluator().run_module(source(
