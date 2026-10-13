@@ -21,13 +21,13 @@ Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python m
 | `desimal` | 1 | Konversi nilai menjadi bilangan desimal. | supported | unsupported | unsupported | unsupported | unsupported | unsupported |
 | `logika` | 1 | Konversi nilai menjadi benar/salah. | supported | unsupported | unsupported | unsupported | unsupported | unsupported |
 | `rentang` | 1–3 | Rentang bilangan bulat dengan batas akhir eksklusif. | supported | supported | supported | supported | supported | supported |
-| `mutlak` | 1 | Nilai absolut angka finite. | supported | unsupported | supported | supported | supported | supported |
-| `minimum` | 2 | Nilai terkecil dari dua angka finite. | supported | unsupported | supported | supported | supported | supported |
-| `maksimum` | 2 | Nilai terbesar dari dua angka finite. | supported | unsupported | supported | supported | supported | supported |
-| `bulatkan` | 1 | Pembulatan ties-to-even ke bilangan terdekat. | supported | unsupported | supported | supported | supported | supported |
+| `mutlak` | 1 | Nilai absolut angka finite. | supported | supported | supported | supported | supported | supported |
+| `minimum` | 2 | Nilai terkecil dari dua angka finite. | supported | supported | supported | supported | supported | supported |
+| `maksimum` | 2 | Nilai terbesar dari dua angka finite. | supported | supported | supported | supported | supported | supported |
+| `bulatkan` | 1 | Pembulatan ties-to-even ke bilangan terdekat. | supported | supported | supported | supported | supported | supported |
 | `akar` | 1 | Akar kuadrat angka non-negatif. | supported | unsupported | supported | supported | supported | unsupported |
-| `bawah` | 1 | Pembulatan ke bawah menuju integer. | supported | unsupported | supported | supported | supported | unsupported |
-| `atas` | 1 | Pembulatan ke atas menuju integer. | supported | unsupported | supported | supported | supported | unsupported |
+| `bawah` | 1 | Pembulatan ke bawah menuju integer. | supported | supported | supported | supported | supported | unsupported |
+| `atas` | 1 | Pembulatan ke atas menuju integer. | supported | supported | supported | supported | supported | unsupported |
 | `pangkat` | 2 | Pangkat numerik dengan hasil finite. | supported | unsupported | supported | supported | supported | unsupported |
 | `sinus` | 1 | Sinus sudut dalam radian. | supported | unsupported | supported | supported | supported | unsupported |
 | `kosinus` | 1 | Kosinus sudut dalam radian. | supported | unsupported | supported | supported | supported | unsupported |
@@ -69,7 +69,7 @@ selesai jancuk
 - Built-in numerik menolak boolean dan tipe bukan angka kecuali deskripsi secara eksplisit menyatakan konversi.
 - `akar` menolak angka negatif; `rentang` menolak langkah nol.
 - `rata_rata` dan `median` memerlukan daftar tidak kosong yang hanya berisi angka finite.
-- Runtime C native saat ini mengklaim built-in `panjang` dan `rentang` saja. Built-in lain tidak dijanjikan di C sampai implementasi dan fixture konformansi ditambahkan.
+- Runtime native C kini mengklaim delapan built-in: `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, dan `atas`. Setiap klaim didukung oleh fixture sukses dan kasus kegagalan aritas/tipe. Built-in lainnya tetap tidak didukung sampai kontrak numerik, implementasi, dan fixture-nya selaras.
 - Kehadiran nama dalam registry tidak dengan sendirinya membuktikan dukungan. Status per target dalam tabel dan tes executable adalah acuan.
 
 Lihat [kontrak semantik](../SEMANTIC_CONTRACT.md), [matriks kompatibilitas](../COMPATIBILITY.md), [registry metadata](../../library/builtin_contract.json), dan [kontrak fixture](../CONFORMANCE_FIXTURES.md) untuk detail lebih lanjut.
