@@ -1,8 +1,10 @@
 """Explicit, offline-first source-module expansion for Pusingcuk compiler targets.
 
-Syntax:
-    pakai "lib/angka.pusingcuk" sebagai angka
+Syntax for new projects:
+    pakai "lib/angka.cuk" sebagai angka
     ekspor fungsi tambah
+
+Legacy .pusingcuk modules remain supported for compatibility.
 
 Imports are static, project-root confined, and never fetched from the network.
 This source expander is not a sandbox.
