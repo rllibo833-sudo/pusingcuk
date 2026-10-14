@@ -17,7 +17,7 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 | Indeks teks berdasarkan code point UTF-8 | Teruji untuk teks UTF-8 valid |
 | Kondisi `njir` / `adooh` dan loop `mumet` | Teruji |
 | `untuk` pada list, teks, kamus (menghasilkan kunci), dan `rentang()` | Teruji |
-| Built-in `panjang()`, `rentang()`, `mutlak()`, `minimum()`, `maksimum()`, `bulatkan()`, `bawah()`, `atas()`, `akar()`, `pangkat()`, `sinus()`, `kosinus()`, `jumlah()`, `rata_rata()`, dan `median()` | Teruji melalui fixture sukses, tipe/aritas salah, batas integer aman, daftar kosong, dan hasil numerik |
+| 21 built-in terkontrak: `panjang`, `teks`, `bilangan`, `desimal`, `logika`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`, `logaritma`, `log10`, `sinus`, `kosinus`, `jumlah`, `rata_rata`, `median` | Teruji melalui fixture native; konversi menerima subset tipe skalar yang didefinisikan di `SPEC.md`. `teks()` native menolak koleksi agar tidak mengklaim kesetaraan format yang belum ada |
 | `tanya nama = "Prompt"` dari stdin | Teruji melalui pipe dan CLI |
 | Literal kamus, kunci teks/angka/boolean, baca/ubah/tambah kunci | Teruji |
 | Batas kamus 256 entri dan penolakan entri ke-257 | Fixture native mengharapkan error |
@@ -29,6 +29,8 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 Fixture konformansi `.cuk` kini menguji aritmetika lantai/modulo negatif, ties-to-even, akar kuadrat dan pangkat, sinus/kosinus dalam radian, penjumlahan termasuk daftar kosong dan hasil di luar rentang aman, rata-rata dan median untuk daftar singleton/ganjil/genap, cancellation, nilai duplikat, hasil bulat maupun pecahan, domain tidak valid, overflow/non-finite, aritas/tipe built-in salah, daftar kosong, rentang angka aman, pembagian nol, indeks list di luar batas, kunci kamus yang hilang, isolasi scope fungsi, dan mutasi koleksi melalui parameter. Fixture kapasitas koleksi ada di `tests/native/list_overflow.pusingcuk` dan `tests/native/dictionary_overflow.pusingcuk`; keduanya memastikan penambahan melewati 256 item/entri ditolak. Fixture kamus sukses berada di `tests/native/dictionaries.pusingcuk`; kasus kunci tidak valid dan kunci hilang masing-masing ada di `tests/native/dictionary_invalid_key.pusingcuk` dan `tests/native/dictionary_missing_key.pusingcuk`. Fixture fungsi dan rekursi ada di `tests/native/functions.pusingcuk`; jumlah argumen yang salah diuji di `tests/native/function_wrong_arity.pusingcuk`. Semuanya dijalankan oleh `make test-native`.
 
 ## Contoh aplikasi native
+
+Aturan deterministik CORE yang menerima dua baris input numerik tersedia di [`examples/core/anggaran_threshold_service.cuk`](../examples/core/anggaran_threshold_service.cuk). `make test-native` menguji input nol, batas tepat, nilai di atas batas, dan nilai negatif. Contoh ini menunjukkan input dari stdin plus validasi bisnis; program tetap bukan sandbox dan hanya cocok dieksekusi sebagai artefak terdaftar dalam runner terisolasi.
 
 Contoh rekap anggaran yang memakai fungsi buatan, kamus, iterasi kunci, dan perhitungan total tersedia di `examples/native/rekap_anggaran.pusingcuk`. Panduan pemasangan executable pada Termux tersedia di [NATIVE_TERMUX.md](NATIVE_TERMUX.md). Skrip validasi integrasi pada perangkat fisik adalah [`scripts/test-termux-device.sh`](../scripts/test-termux-device.sh); hasil Ubuntu CI atau cross-build Android tidak menggantikannya.
 
