@@ -30,6 +30,8 @@ The source links are provenance for the transfer, not ongoing runtime dependenci
 
 Project: `Kawasan-mesjid-1000ha`, ref `lnpzgrodwnhthcwudebk`, region `ap-southeast-2`, status `ACTIVE_HEALTHY`.
 
+Last read-only verification: `2026-10-14T21:56:18Z` (2026-10-15 05:56:18, Asia/Makassar); **54 applied migration-history rows**.
+
 ### Schedules
 
 | Job | Schedule | Observed state | Disposition |
@@ -56,7 +58,7 @@ The following were still reported ACTIVE during the same inspection; the job sta
 
 ### Read-only data counts
 
-Observed by read-only SQL inspection: 16 configured AI-agent rows; 4 `ai_tasks` rows (1 each queued, completed, failed, and cancelled); 34,031 `ai_activity` rows; 1 Auth user; 0 Storage objects; 0 client-service inquiries; 0 revenue opportunities; 0 revenue orders; 0 API orders.
+Observed by read-only SQL inspection at `2026-10-14T21:56:18Z`: 54 applied migration-history rows; 16 configured AI-agent rows; 4 `ai_tasks` rows (1 each queued, completed, failed, and cancelled); 34,031 `ai_activity` rows; 1 Auth user; 0 Storage objects; 0 client-service inquiries; 0 revenue opportunities; 0 revenue orders; 0 API orders.
 
 These are counts only. They do not include a row-by-row export, establish the business meaning of every activity record, or prove that no external caller exists.
 
@@ -86,10 +88,17 @@ The most recent log query during this audit found no Gemini/provider-name matche
 
 The two source repositories themselves have **not** been deleted or archived. No Issue or Pull Request was opened. Deletion of source repositories is separate from permanent deletion of the Supabase database/project.
 
+## ChatGPT-linked Supabase organizations and free-first disposition
+
+- Connection `Primary` points to organization `Pusingcuk`, whose plan is `free`; it currently has **no Supabase project**.
+- Connection `Supabase` points to organization `Kawasan-masjid-1000ha`, whose plan is `free`; it owns the existing project `lnpzgrodwnhthcwudebk`.
+- Both organizations are connected to ChatGPT, but those connections do not merge projects or databases. **No new project was created** during this continuation.
+- To protect the free-first priority, do not create or upgrade a project as part of this migration without a separate decision. PusingCuk remains the code/knowledge destination; the existing project still contains CORE operational tables and must not be treated as a PusingCuk-owned database by implication.
+
 ## Supabase shutdown and permanent data deletion — separate gate
 
-The reversible pause request for project `lnpzgrodwnhthcwudebk` was accepted; the last positive status returned was `PAUSING`. A final `PAUSED` state could not be re-read via the connected tool after the transition started. Treat the pause as requested, not independently verified complete. The project/database was not deleted and its data remains subject to the provider's state.
+The owner resumed the project after the previous pause attempt. The latest live check reports `ACTIVE_HEALTHY`; the project is **not currently paused and has not been deleted**. Both known cron jobs remain inactive, but the ten listed Edge Functions remain `ACTIVE`. Their endpoints can still be invoked independently of the inactive schedules; do not assume the project is shut down.
 
-Before **permanently deleting Supabase data/project**, preserve or explicitly decide to discard the operational records. A private database export and a successful restore rehearsal in a separate environment have not been produced by this migration. Current inspected counts were 34,031 `ai_activity` rows, 4 `ai_tasks`, 16 agent-configuration rows, one Auth user, and no Storage objects, service inquiries, revenue opportunities, revenue orders, or API orders. These counts are a snapshot, not a backup.
+A private database export and a successful restore rehearsal in a separate environment have **not** been produced by this migration. Before permanently deleting or retiring this project, preserve or explicitly decide to discard the 34,031 `ai_activity` rows, 4 `ai_tasks`, 16 AI-agent configuration rows, one Auth user, and the schema/migration history. The 0 Storage objects do not substitute for a database backup. Counts are not a backup.
 
-The ten Edge Functions were reported ACTIVE in the inventory before the pause request. If the project is restored, do not re-enable any worker or public endpoint until the intended lifecycle is decided. Provider-origin Gemini key revocation also has not been independently verified here; the owner reported deleting the current Supabase/GitHub copies. Do not commit or export secret values.
+Provider-origin Gemini key revocation has not been independently verified here; the owner reported deleting the current Supabase/GitHub copies. Do not commit or export secret values. No schema/data changes were made during this read-only verification.
