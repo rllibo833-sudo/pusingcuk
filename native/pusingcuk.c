@@ -39,6 +39,7 @@ typedef struct { char name[128]; char params[MAX_PARAMS][128]; int param_count; 
 static Function functions[MAX_FUNCTIONS];
 static int function_count, call_depth, returning;
 static Val return_value;
+static void format_number(double value, char *output, size_t output_size);
 static int run_range(int first, int last);
 static Val call_user_function(const char *name, Val *args, int argc);
 
@@ -272,6 +273,79 @@ static double round_ties_even(double value) {
     if (fraction < 0.5) return lower;
     if (fraction > 0.5) return lower + 1.0;
     return fmod(fabs(lower), 2.0) == 0.0 ? lower : lower + 1.0;
+}
+
+static int is_native_conversion_builtin(const char *name) {
+    return !strcmp(name, "teks") || !strcmp(name, "bilangan") ||
+        !strcmp(name, "desimal") || !strcmp(name, "logika");
+}
+
+static Val call_native_conversion_builtin(const char *name, Val *args, int argc, int *handled) {
+    *handled = is_native_conversion_builtin(name);
+    if (!*handled) return num(0);
+    if (argc != 1) {
+        fail("built-in konversi membutuhkan tepat satu argumen");
+        return num(0);
+    }
+
+    Val value = args[0];
+    if (!strcmp(name, "logika")) return boolean(truth(value));
+
+    if (!strcmp(name, "teks")) {
+        if (value.t == STR) return value;
+        if (value.t == BOOL) return string(value.b ? "okelah" : "tidak");
+        if (value.t == NIL) return string("None");
+        if (value.t == NUM && isfinite(value.n)) {
+            char formatted[64];
+            format_number(value.n, formatted, sizeof formatted);
+            return string(formatted);
+        }
+        fail("teks() pada runtime native menerima teks, angka finite, boolean, atau None");
+        return string("");
+    }
+
+    if (!strcmp(name, "bilangan")) {
+        if (value.t == NUM && isfinite(value.n)) {
+            double converted = trunc(value.n);
+            if (fabs(converted) > 9007199254740991.0) {
+                fail("bilangan() menolak integer di luar rentang aman lintas target");
+                return num(0);
+            }
+            return num(converted);
+        }
+        if (value.t != STR) {
+            fail("bilangan() membutuhkan teks integer atau angka non-boolean");
+            return num(0);
+        }
+        errno = 0;
+        char *end = NULL;
+        long long parsed = strtoll(value.s, &end, 10);
+        while (end && isspace((unsigned char)*end)) end++;
+        if (end == value.s || !end || *end != '\0' || errno == ERANGE ||
+            parsed > 9007199254740991LL || parsed < -9007199254740991LL) {
+            fail("bilangan() menerima teks integer dalam rentang aman lintas target");
+            return num(0);
+        }
+        return num((double)parsed);
+    }
+
+    if (!strcmp(name, "desimal")) {
+        if (value.t == NUM && isfinite(value.n)) return value;
+        if (value.t != STR) {
+            fail("desimal() membutuhkan teks angka atau angka non-boolean");
+            return num(0);
+        }
+        errno = 0;
+        char *end = NULL;
+        double parsed = strtod(value.s, &end);
+        while (end && isspace((unsigned char)*end)) end++;
+        if (end == value.s || !end || *end != '\0' || errno == ERANGE || !isfinite(parsed)) {
+            fail("desimal() menerima teks angka finite");
+            return num(0);
+        }
+        return num(parsed);
+    }
+    return num(0);
 }
 
 static Val call_native_numeric_builtin(const char *name, Val *args, int argc, int *handled) {
@@ -517,6 +591,9 @@ static Val primary(void) {
                 if (step == 0) { fail("langkah rentang() tidak boleh nol"); return num(0); }
                 return rangeval(start, end, step);
             }
+            int conversion_handled = 0;
+            Val conversion_result = call_native_conversion_builtin(name, args, argc, &conversion_handled);
+            if (conversion_handled) return conversion_result;
             int builtin_handled = 0;
             Val builtin_result = call_native_numeric_builtin(name, args, argc, &builtin_handled);
             if (builtin_handled) return builtin_result;
