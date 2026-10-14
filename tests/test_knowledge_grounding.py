@@ -3,9 +3,10 @@ from __future__ import annotations
 
 import copy
 import unittest
+from pathlib import Path
 
 from library.knowledge_grounding import (
-    KnowledgeIndexError, append_citations, format_citations, rank_knowledge,
+    KnowledgeIndexError, append_citations, format_citations, load_index, rank_knowledge,
     validate_index, validate_source,
 )
 
@@ -40,6 +41,21 @@ class KnowledgeGroundingTests(unittest.TestCase):
     def test_all_fourteen_curated_sources_validate(self):
         index = {"schema_version": "pusingcuk.knowledge-index.v1", "documents": self.documents}
         self.assertEqual(len(validate_index(index)), 14)
+
+    def test_real_curated_index_contains_fourteen_pinned_sources(self):
+        index_path = Path(__file__).resolve().parents[1] / "library" / "knowledge_index.json"
+        documents = load_index(index_path)
+        self.assertEqual(len(documents), 14)
+        self.assertEqual(len({doc["id"] for doc in documents}), 14)
+
+    def test_real_index_indonesian_query_finds_local_first_decision(self):
+        index_path = Path(__file__).resolve().parents[1] / "library" / "knowledge_index.json"
+        documents = load_index(index_path)
+        results = rank_knowledge(documents, "model lokal ollama tanpa biaya api", limit=3)
+        self.assertTrue(results)
+        self.assertEqual(results[0]["id"], "local-first-ai-decision")
+        self.assertEqual(results[0]["source_commit"], "38ad3035af7e7eaba8a332656ab6155dcc313c72")
+        self.assertEqual(results[0]["source_path"], "docs/LOCAL_FIRST_PUSINGCUK_AI.md")
 
     def test_indonesian_query_ranks_relevant_title_first(self):
         results = rank_knowledge(self.documents, "bagaimana validasi sitasi sumber", limit=3)
