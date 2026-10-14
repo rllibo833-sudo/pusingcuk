@@ -207,8 +207,8 @@ jobs:
 
           const runnerSource = fs.readFileSync("tools/core-rule-runner.mjs", "utf8");
           const runnerPin = runnerSource.match(/PINNED_COMMIT = "([0-9a-f]{40})"/)?.[1];
-          const thresholdHash = runnerSource.match(/"budget\\.threshold\\.v1", \\{\\s*sha256: "([0-9a-f]{64})"/)?.[1];
-          const sufficiencyHash = runnerSource.match(/"budget\\.sufficiency\\.v1", \\{\\s*sha256: "([0-9a-f]{64})"/)?.[1];
+          const thresholdHash = runnerSource.match(/"budget[.]threshold[.]v1", \{\s*sha256: "([0-9a-f]{64})"/)?.[1];
+          const sufficiencyHash = runnerSource.match(/"budget[.]sufficiency[.]v1", \{\s*sha256: "([0-9a-f]{64})"/)?.[1];
           assert.match(runnerPin || "", /^[0-9a-f]{40}$/, "Runner must pin an immutable PusingCuk runtime commit.");
           assert.match(thresholdHash || "", /^[0-9a-f]{64}$/, "Threshold rule must have a pinned SHA-256.");
           assert.match(sufficiencyHash || "", /^[0-9a-f]{64}$/, "Sufficiency rule must have a pinned SHA-256.");
