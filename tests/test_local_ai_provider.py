@@ -103,6 +103,24 @@ class LocalAIProviderTests(unittest.TestCase):
         self.assertEqual(turn["tool_calls"][0]["name"], "knowledge_search")
         self.assertEqual(turn["tool_calls"][0]["arguments"], {"query": "ollama lokal"})
 
+    def test_gemini_signature_metadata_is_not_sent_to_ollama(self):
+        history = self.messages + [
+            {"role": "assistant", "content": "", "tool_calls": [{
+                "id": "call-1", "type": "function",
+                "function": {"name": "knowledge_search", "arguments": {"query": "pusingcuk"}},
+                "thought_signature": "opaque-signature-test",
+            }]},
+            {"role": "tool", "tool_name": "knowledge_search", "content": "{}"},
+        ]
+        body = json.dumps({"message": {"content": "Sumber ditemukan."}}).encode()
+        with patch("library.local_ai_provider.build_opener") as builder:
+            builder.return_value.open.return_value = FakeResponse(body)
+            self.provider.generate_turn(history)
+        payload = json.loads(builder.return_value.open.call_args.args[0].data.decode())
+        outbound_call = payload["messages"][1]["tool_calls"][0]
+        self.assertNotIn("thought_signature", outbound_call)
+        self.assertEqual(outbound_call["function"]["name"], "knowledge_search")
+
     def test_tool_history_message_is_validated(self):
         history = self.messages + [
             {"role": "assistant", "content": "", "tool_calls": [{"id": "call-1", "type": "function", "function": {"name": "knowledge_search", "arguments": {"query": "ollama lokal"}}}]},

@@ -145,7 +145,20 @@ class OllamaChatProvider:
             raise LocalAIProviderError("AI_CONTEXT_TOO_LARGE")
         if tools is not None and (not isinstance(tools, list) or len(tools) > 8):
             raise LocalAIProviderError("AI_TOOLS_INVALID")
-        payload_data: dict[str, Any] = {"model": self.model, "messages": clean, "stream": False}
+        # Gemini-specific thought signatures are internal history metadata, not Ollama API fields.
+        # Keep the original history intact for orchestration but strip provider-foreign keys on egress.
+        provider_messages = []
+        for item in clean:
+            if "tool_calls" not in item:
+                provider_messages.append(item)
+                continue
+            outbound = dict(item)
+            outbound["tool_calls"] = [
+                {key: value for key, value in call.items() if key != "thought_signature"}
+                for call in item["tool_calls"]
+            ]
+            provider_messages.append(outbound)
+        payload_data: dict[str, Any] = {"model": self.model, "messages": provider_messages, "stream": False}
         if tools:
             payload_data["tools"] = tools
         payload = json.dumps(payload_data, ensure_ascii=False).encode("utf-8")
