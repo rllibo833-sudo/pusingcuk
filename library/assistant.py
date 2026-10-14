@@ -83,6 +83,8 @@ class PusingCukAssistant:
                         messages, system_prompt=system_prompt, tools=self.tool_registry.definitions,
                     )
                     calls = turn["tool_calls"]
+                    if not isinstance(calls, list) or len(calls) > 2:
+                        raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
                     if not calls:
                         answer = turn["content"]
                         break

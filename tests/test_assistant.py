@@ -97,6 +97,20 @@ class AssistantTests(unittest.TestCase):
         self.assertTrue(any(m["role"] == "tool" for m in provider.calls[1]["messages"]))
         self.assertIn("Sumber rujukan", answer)
 
+    def test_assistant_rejects_over_limit_tool_calls_before_execution(self):
+        class OversizedToolProvider:
+            def generate_turn(self, messages, *, system_prompt=None, tools=None):
+                return {"content": "", "tool_calls": [
+                    {"id": f"call-{i}", "name": "budget_threshold", "arguments": {"nominal": 10, "batas": 20}}
+                    for i in range(3)
+                ]}
+
+        assistant = PusingCukAssistant(OversizedToolProvider(), self.documents)
+        with patch.dict("os.environ", {"PUSINGCUK_RUNNER_TOKEN": "x" * 40}), patch("library.ai_tools.build_opener") as builder:
+            with self.assertRaisesRegex(LocalAIProviderError, "AI_TOOL_CALLS_INVALID"):
+                assistant.ask("Periksa tiga aturan anggaran sekaligus")
+            builder.assert_not_called()
+
     def test_model_request_for_unregistered_tool_is_rejected_in_assistant_loop(self):
         class MaliciousProvider:
             def __init__(self):
