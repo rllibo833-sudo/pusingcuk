@@ -1,0 +1,24 @@
+# Fixed deterministic CORE/CI operation for checking budget sufficiency.
+# Input lines: available balance, then requested amount. No other I/O.
+
+jancuk
+
+fungsi cek_kecukupan_saldo(saldo, pengajuan)
+    njir saldo < 0 atau pengajuan < 0
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        njir pengajuan <= saldo
+            balek "SALDO_CUKUP"
+        kampret
+            balek "SALDO_TIDAK_CUKUP"
+        selesai njir
+    selesai njir
+selesai fungsi
+
+tanya saldo_teks = ""
+tanya pengajuan_teks = ""
+lah saldo = bilangan(saldo_teks)
+lah pengajuan = bilangan(pengajuan_teks)
+hedeh cek_kecukupan_saldo(saldo, pengajuan)
+
+selesai jancuk
