@@ -122,7 +122,7 @@ jobs:
             assert.ok(runnerSource.includes(isolationFlag), "Sandbox isolation flag missing: " + isolationFlag);
           }
           assert.match(runnerSource, /PUSINGCUK_SANDBOX_IMAGE/);
-          assert.match(runnerSource, /sha256:\\[0-9a-f\\]\{64\}/);
+          assert.ok(runnerSource.includes("/^sha256:[0-9a-f]{64}$/"));
 
           const url = "http://127.0.0.1:8787/v1/execute";
           const token = process.env.PUSINGCUK_RUNNER_TOKEN;
