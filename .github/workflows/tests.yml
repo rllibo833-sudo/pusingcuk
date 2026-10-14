@@ -197,7 +197,7 @@ jobs:
           assert.equal(cap.body.error, "CAPABILITY_DENIED");
           console.log("PASS: local runner authenticates requests and executes only the pinned rule.");
           NODE
-      - name: Verifikasi manifest sinkronisasi empat repo
+      - name: Verifikasi pin runtime dan aturan .cuk lokal
         run: |
           set -euo pipefail
           node --input-type=module <<'NODE'
@@ -205,26 +205,22 @@ jobs:
           import crypto from "node:crypto";
           import fs from "node:fs";
 
-          const lock = JSON.parse(fs.readFileSync("integration/system-lock.json", "utf8"));
-          assert.equal(lock.schema_version, "founder-system.sync.v1");
           const runnerSource = fs.readFileSync("tools/core-rule-runner.mjs", "utf8");
           const runnerPin = runnerSource.match(/PINNED_COMMIT = "([0-9a-f]{40})"/)?.[1];
-          const thresholdHash = runnerSource.match(/"budget\.threshold\.v1", \{\s*sha256: "([0-9a-f]{64})"/)?.[1];
-          const sufficiencyHash = runnerSource.match(/"budget\.sufficiency\.v1", \{\s*sha256: "([0-9a-f]{64})"/)?.[1];
-          const expectedCommit = lock.component_pins.pusingcuk_runtime_commit;
-          const expectedHash = lock.component_pins.pusingcuk_rule_sha256;
-          assert.equal(runnerPin, expectedCommit, "Local runner pin must match the shared four-repository lock.");
-          assert.equal(thresholdHash, expectedHash, "Threshold rule hash must match the shared lock.");
-          assert.equal(sufficiencyHash, lock.component_pins.pusingcuk_sufficiency_rule_sha256, "Sufficiency rule hash must match the shared lock.");
+          const thresholdHash = runnerSource.match(/"budget\\.threshold\\.v1", \\{\\s*sha256: "([0-9a-f]{64})"/)?.[1];
+          const sufficiencyHash = runnerSource.match(/"budget\\.sufficiency\\.v1", \\{\\s*sha256: "([0-9a-f]{64})"/)?.[1];
+          assert.match(runnerPin || "", /^[0-9a-f]{40}$/, "Runner must pin an immutable PusingCuk runtime commit.");
+          assert.match(thresholdHash || "", /^[0-9a-f]{64}$/, "Threshold rule must have a pinned SHA-256.");
+          assert.match(sufficiencyHash || "", /^[0-9a-f]{64}$/, "Sufficiency rule must have a pinned SHA-256.");
           const actualHash = crypto.createHash("sha256")
             .update(fs.readFileSync("examples/core/anggaran_threshold_service.cuk"))
             .digest("hex");
-          assert.equal(actualHash, expectedHash, "Canonical threshold .cuk rule must match its pinned SHA-256.");
+          assert.equal(actualHash, thresholdHash, "Canonical threshold .cuk rule must match the runner's pinned SHA-256.");
           const sufficiencyActualHash = crypto.createHash("sha256")
             .update(fs.readFileSync("examples/core/anggaran_sufficiency_service.cuk"))
             .digest("hex");
-          assert.equal(sufficiencyActualHash, sufficiencyHash, "Canonical sufficiency .cuk rule must match its pinned SHA-256.");
-          console.log("PASS: shared lock, runner runtime pin, and both registered rule hashes agree.");
+          assert.equal(sufficiencyActualHash, sufficiencyHash, "Canonical sufficiency .cuk rule must match the runner's pinned SHA-256.");
+          console.log("PASS: PusingCuk runtime pin and registered .cuk rule hashes agree without a cross-repository lock.");
           NODE
       - name: Uji pembatasan file PVM dan kesetaraan backend
         run: bash tests/test_all.sh
