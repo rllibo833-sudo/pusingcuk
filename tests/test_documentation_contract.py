@@ -88,7 +88,7 @@ class DocumentationContractTests(unittest.TestCase):
         ledger = (root / "docs/AI_ENGINE_MIGRATION_LEDGER.md").read_text(encoding="utf-8")
         status = (root / "docs/PROJECT_STATUS_AND_ROADMAP.md").read_text(encoding="utf-8")
         self.assertIn("20-case exact-top-1 retrieval benchmark", readiness)
-        self.assertIn("20-source index", readiness)
+        self.assertIn("20 curated source records", readiness)
         self.assertNotIn("16-case exact-top-1 retrieval benchmark", readiness)
         self.assertNotIn("16 source records", ledger)
         self.assertIn("20 dokumen sumber terkurasi", status)
