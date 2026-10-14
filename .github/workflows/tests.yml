@@ -157,5 +157,28 @@ jobs:
           assert.equal(cap.body.error, "CAPABILITY_DENIED");
           console.log("PASS: local runner authenticates requests and executes only the pinned rule.");
           NODE
+      - name: Verifikasi manifest sinkronisasi empat repo
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import assert from "node:assert/strict";
+          import crypto from "node:crypto";
+          import fs from "node:fs";
+
+          const lock = JSON.parse(fs.readFileSync("integration/system-lock.json", "utf8"));
+          assert.equal(lock.schema_version, "founder-system.sync.v1");
+          const runnerSource = fs.readFileSync("tools/core-rule-runner.mjs", "utf8");
+          const runnerPin = runnerSource.match(/PINNED_COMMIT = "([0-9a-f]{40})"/)?.[1];
+          const runnerHash = runnerSource.match(/PROGRAM_SHA256 = "([0-9a-f]{64})"/)?.[1];
+          const expectedCommit = lock.component_pins.pusingcuk_runtime_commit;
+          const expectedHash = lock.component_pins.pusingcuk_rule_sha256;
+          assert.equal(runnerPin, expectedCommit, "Local runner pin must match the shared four-repository lock.");
+          assert.equal(runnerHash, expectedHash, "Local runner program hash must match the shared four-repository lock.");
+          const actualHash = crypto.createHash("sha256")
+            .update(fs.readFileSync("examples/core/anggaran_threshold_service.cuk"))
+            .digest("hex");
+          assert.equal(actualHash, expectedHash, "Canonical .cuk rule must match its pinned SHA-256.");
+          console.log("PASS: shared lock, runner runtime pin, and canonical .cuk hash agree.");
+          NODE
       - name: Uji pembatasan file PVM dan kesetaraan backend
         run: bash tests/test_all.sh
