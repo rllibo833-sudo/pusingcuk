@@ -39,6 +39,9 @@ function pinnedSourceRoot() {
     if (runGit(root, ["rev-parse", "HEAD"]) !== PINNED_COMMIT) {
       throw new Error("PUSINGCUK_SOURCE_ROOT must be checked out at the pinned runtime commit.");
     }
+    if (runGit(root, ["status", "--porcelain"])) {
+      throw new Error("PUSINGCUK_SOURCE_ROOT must have a clean worktree before building the pinned runtime.");
+    }
     return root;
   }
 
