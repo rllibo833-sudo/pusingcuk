@@ -74,22 +74,22 @@ The most recent log query during this audit found no Gemini/provider-name matche
 - The active PusingCuk AI index will reference only the three new destination-owned documents; old repository indexes are not copied into runtime retrieval.
 - Detailed Founder-OS raw memory, the entire CORE SQL/backend, payment handlers, and Supabase rows are not treated as model training data. They are excluded or slated for retirement, not represented as migrated implementation.
 
-## Remaining exit gate
+## GitHub repository deletion readiness
 
-**The selected knowledge migration is complete; repository/cloud deletion readiness is not yet proven.** Before deleting the source repositories or pausing/deleting the Supabase project, record the following operational outcomes:
+**READY for deleting the Founder-OS and CORE GitHub repositories from the selected-scope migration and PusingCuk dependency standpoint.** Verified state at PusingCuk HEAD `e54fc10668b0fe09d4bb315949438abbb7ad618f`:
 
-1. Export the required Supabase schema and data using an approved private backup path; exclude secrets and do not commit user/operational records to this public repository.
-2. Restore that export to a separate environment and validate required relationships and counts.
-3. Confirm and explicitly retire all ten deployed Edge Functions and any direct callers/webhooks; both cron jobs already being inactive does not retire those functions.
-4. Reconcile the live database migration-history/source discrepancy documented by CORE; do not force-mark migrations applied to make counts match.
-5. Verify there are no GitHub workflows, other repositories, webhooks, or operator runbooks that must deploy or fetch CORE/Founder-OS.
-6. Retain this transfer manifest and the immutable source SHAs, then complete the owner's deletion decision.
+- PusingCuk's active knowledge index has 20 records, all owned by `rllibo833-sudo/pusingcuk`; it does not load either external repository's knowledge index at runtime.
+- Decision/evidence governance, local-model and registered-rule safety, conceptual masterplan/economic gates, and the transfer manifest have source-owned PusingCuk copies. Their external links are historical provenance, not runtime dependencies.
+- The 20-case Indonesian retrieval regression and the Python/native/PVM suites passed; both PusingCuk CI workflows succeeded for this HEAD.
+- Six non-essential CORE scheduled/manual workflows, including the manual Gemini review workflow and the scheduled Issue gateway, have been removed. CORE's remaining workflows are quality CI, manual/fail-closed Supabase deployment, and release.
+- The unselected raw Founder-OS memory, complete CORE web/backend/payment system, and historical operational rows were deliberately excluded rather than falsely represented as migrated into the AI knowledge corpus.
 
-No repository, table, user, secret, Edge Function, or Supabase project was deleted by this migration.
+The two source repositories themselves have **not** been deleted or archived. No Issue or Pull Request was opened. Deletion of source repositories is separate from permanent deletion of the Supabase database/project.
 
+## Supabase shutdown and permanent data deletion — separate gate
 
-## Follow-on changes after the initial live snapshot
+The reversible pause request for project `lnpzgrodwnhthcwudebk` was accepted; the last positive status returned was `PAUSING`. A final `PAUSED` state could not be re-read via the connected tool after the transition started. Treat the pause as requested, not independently verified complete. The project/database was not deleted and its data remains subject to the provider's state.
 
-- Five scheduled Founder automation workflows and the manual Gemini assistant workflow (six workflows total) were removed from CORE `main` in commit [`4cc9a04fbedb6540f227c2cae84def26abc5b19d`](https://github.com/rllibo833-sudo/kawasan-masjid-core/commit/4cc9a04fbedb6540f227c2cae84def26abc5b19d). CORE retains only quality CI, manual/fail-closed Supabase deployment, and release workflow. A follow-up commit aligns the stale static queue-auth assertion with the implementation's configured-secret set.
-- A reversible Supabase pause request was accepted for project `lnpzgrodwnhthcwudebk`; the last successful project status observed immediately after the request was `PAUSING`. A final `PAUSED` state could not be re-read through the connected tool after the transition started. Treat production pause as requested, not verified complete.
-- The selected transfer is not yet a verified complete repository-deletion gate: a private database export and separate-environment restore rehearsal have not been produced or proven by this work.
+Before **permanently deleting Supabase data/project**, preserve or explicitly decide to discard the operational records. A private database export and a successful restore rehearsal in a separate environment have not been produced by this migration. Current inspected counts were 34,031 `ai_activity` rows, 4 `ai_tasks`, 16 agent-configuration rows, one Auth user, and no Storage objects, service inquiries, revenue opportunities, revenue orders, or API orders. These counts are a snapshot, not a backup.
+
+The ten Edge Functions were reported ACTIVE in the inventory before the pause request. If the project is restored, do not re-enable any worker or public endpoint until the intended lifecycle is decided. Provider-origin Gemini key revocation also has not been independently verified here; the owner reported deleting the current Supabase/GitHub copies. Do not commit or export secret values.
