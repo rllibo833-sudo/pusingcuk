@@ -21,7 +21,7 @@ format_citations() and append_citations() accept only validated source records. 
 
 ## Local model adapter
 
-library/local_ai_provider.py provides a no-paid-key Ollama-compatible chat adapter for a model running on the same device. It defaults to loopback-only HTTP, disables environment-configured proxies, bounds conversation length and response size, applies a timeout, and emits stable errors without returning endpoint details. It does not yet orchestrate tools or persist memory. A local model and Ollama runtime must be installed separately.
+library/local_ai_provider.py provides a no-paid-key Ollama-compatible chat adapter for a model running on the same device. It defaults to loopback-only HTTP, disables environment-configured proxies, bounds conversation length and response size, applies a timeout, and emits stable errors without returning endpoint details. The provider adapter itself performs bounded model I/O only. Tool authorization and orchestration live in `library/assistant.py` and `library/ai_tools.py`; optional user-initiated project notes live in `library/local_memory.py`. Chat transcripts are not automatically persisted. A local model and Ollama runtime must be installed separately.
 
 ## Tool calling boundary
 
