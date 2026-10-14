@@ -47,10 +47,14 @@
     "repository_freeze": "Not approved until migration parity, auth/data/audit preservation, backups, restore and rollback are verified."
   },
   "verification_status": {
-    "last_known_green_core_run": "https://github.com/rllibo833-sudo/kawasan-masjid-core/actions/runs/38520061903",
-    "last_known_green_core_run_scope": "Earlier CI proof on a static-output native .cuk rule and Core Quality Gate; it does not verify the newest runtime conversion, local runner, retrieval, URL routing, or Ollama commits.",
-    "current_main_push_runs": "Not independently confirmed in this session. The current main CI workflows include local-runner, contract, URL routing, and synchronization checks; do not report them green until Actions completes successfully.",
-    "production_deployments": "No Supabase production deployment or database migration was performed by this integration work."
+    "last_known_green_core_run": "https://github.com/rllibo833-sudo/kawasan-masjid-core/actions/runs/38525685951",
+    "last_known_green_core_run_scope": "Core Quality Gate passed on main commit 9779fab55bd1eb64d654313b2e7767cccc5bb57d: type-check, system/security/AI contracts, E2E boundary tests, production build, and registered PusingCuk rule proof. This verifies CI source paths, not production deployment.",
+    "current_main_push_runs": "Confirmed on 2026-10-14: CORE Quality Gate, PusingCuk Tes Pusingcuk and PyInstaller, plus PUBLIC validation and GitHub Pages deployment passed. Founder-OS had no Actions workflow result in the checked run list. Ollama inference was not smoke-tested against a live local model in this session; the provider remains opt-in via local configuration.",
+    "production_deployments": "No Supabase production Edge Function deployment or database migration was performed. The PusingCuk HTTP runner is local-only and not OS-sandboxed; do not expose it to the public internet.",
+    "last_known_green_pusingcuk_run": "https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38525678192",
+    "last_known_green_pusingcuk_run_scope": "Tes Pusingcuk passed on main commit dc7ba57685de0e2b7e7b5a4bf6f9d265b5a4e1ab across Python 3.11/3.12, GCC, Clang and PVM security regression; PyInstaller build test also passed.",
+    "last_known_green_public_validation_run": "https://github.com/rllibo833-sudo/kawasan-masjid-public/actions/runs/38525243847",
+    "last_known_green_public_deployment_run": "https://github.com/rllibo833-sudo/kawasan-masjid-public/actions/runs/38525242631"
   },
   "freeze_gates": [
     "All required CORE operations are replaced and behavior/security parity tests pass.",
