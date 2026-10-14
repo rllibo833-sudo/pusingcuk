@@ -114,7 +114,7 @@ class KnowledgeGroundingTests(unittest.TestCase):
         self.assertEqual(document["source_repository"], "rllibo833-sudo/pusingcuk")
         self.assertEqual(document["source_commit"], "fb5d9570388ec434ad4cd3cb9e9bc0846aface93")
         self.assertEqual(document["path"], "docs/knowledge/KAWASAN_MASJID_MASTERPLAN_AND_OPERATING_MODEL.md")
-        self.assertEqual(document["url"], f"https://github.com/rllibo833-sudo/pusingcuk/blob/{parent}/docs/knowledge/KAWASAN_MASJID_MASTERPLAN_AND_OPERATING_MODEL.md")
+        self.assertEqual(document["url"], "https://github.com/rllibo833-sudo/pusingcuk/blob/fb5d9570388ec434ad4cd3cb9e9bc0846aface93/docs/knowledge/KAWASAN_MASJID_MASTERPLAN_AND_OPERATING_MODEL.md")
         self.assertIn("conceptual-masterplan", document["claim_status"])
 
     def test_indonesian_retrieval_benchmark_top_one(self):
