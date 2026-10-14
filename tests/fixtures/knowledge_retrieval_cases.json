@@ -30,42 +30,42 @@
     {
       "id": "query-06",
       "query": "cara model Ollama lokal tanpa biaya API",
-      "expected_top_id": "local-first-ai-decision"
+      "expected_top_id": "pusingcuk-local-ai-provider"
     },
     {
       "id": "query-07",
       "query": "adapter provider timeout respons tool calling model",
-      "expected_top_id": "core-provider-adapter-reference"
+      "expected_top_id": "pusingcuk-gemini-provider"
     },
     {
       "id": "query-08",
       "query": "cari dokumen knowledge retrieval ranking metadata",
-      "expected_top_id": "core-lexical-retrieval-reference"
+      "expected_top_id": "pusingcuk-knowledge-grounding"
     },
     {
       "id": "query-09",
       "query": "validasi sitasi URL commit path provenance",
-      "expected_top_id": "core-citation-validation-reference"
+      "expected_top_id": "pusingcuk-assistant-citations"
     },
     {
       "id": "query-10",
       "query": "memori keputusan percakapan recovery",
-      "expected_top_id": "core-founder-memory-architecture"
+      "expected_top_id": "pusingcuk-local-memory"
     },
     {
       "id": "query-11",
       "query": "batas kepemilikan repositori sinkronisasi source of truth",
-      "expected_top_id": "canonical-repository-boundaries"
+      "expected_top_id": "pusingcuk-ai-grounding-policy"
     },
     {
       "id": "query-12",
       "query": "indeks terkurasi dokumen primer public safe",
-      "expected_top_id": "founder-os-knowledge-index-policy"
+      "expected_top_id": "pusingcuk-curated-index"
     },
     {
       "id": "query-13",
       "query": "backend otorisasi bukti status deployment",
-      "expected_top_id": "core-system-contract"
+      "expected_top_id": "pusingcuk-runtime-contract"
     },
     {
       "id": "query-14",

@@ -9,9 +9,9 @@ This module provides deterministic lexical retrieval and provenance-checked cita
 
 ## Index and source policy
 
-library/knowledge_index.json contains 14 independently authored summaries with immutable GitHub source links. Each entry binds repository, commit SHA, and path; the reader rejects mismatches, duplicate IDs, private visibility, malformed URLs, and indexes above 100 records.
+library/knowledge_index.json contains 14 independently authored summaries sourced only from the PusingCuk repository. Each entry binds this repository, commit SHA, and path; the reader rejects mismatches, duplicate IDs, private visibility, malformed URLs, and indexes above 100 records. Founder-OS and CORE are not runtime or knowledge-index dependencies.
 
-Only a small, reviewed subset of primary documents should be added. The summaries are local to PusingCuk; source URLs preserve provenance and are not a runtime dependency. Do not automatically index the full Founder OS, CORE, or public website repository.
+Only a small, reviewed subset of primary documents should be added. The summaries are local to PusingCuk; source URLs preserve provenance and are not a runtime dependency. Do not automatically index any repository; keep the index limited to reviewed PusingCuk sources.
 
 ## Retrieval and citations
 
@@ -54,7 +54,7 @@ Type `/reset` to clear session memory or `/keluar` to exit. The local model runt
 
 ## Retrieval evaluation
 
-The 14-case Indonesian retrieval benchmark is stored in tests/fixtures/knowledge_retrieval_cases.json and asserted by the test suite. It currently targets top-1 exact source IDs for a small curated query set; it is a regression baseline, not evidence of general semantic-search quality.
+The 14-case Indonesian retrieval benchmark is stored in tests/fixtures/knowledge_retrieval_cases.json and asserted by the test suite. It currently targets top-1 exact source IDs for a small curated query set over PusingCuk sources; it is a regression baseline, not evidence of general semantic-search quality.
 
 
 ## Local project memory
@@ -64,6 +64,6 @@ The assistant can load a small local project-memory file at the user's home dire
 
 ## Optional Gemini API provider
 
-`library/gemini_ai_provider.py` implements the public Gemini GenerateContent REST contract independently of CORE. The default remains local Ollama; Gemini is an explicit opt-in via `pusingcuk-ai --provider gemini` and `GEMINI_API_KEY`. The key is sent in the HTTPS `x-goog-api-key` header, never embedded in the URL or stored in the repository. Request/response sizes, model identifiers, tool declarations, tool-call count, timeout, and error messages are bounded. API availability and quota depend on the user's Google AI account.
+`library/gemini_ai_provider.py` implements the public Gemini GenerateContent REST contract independently of external application backends. The default remains local Ollama; Gemini is an explicit opt-in via `pusingcuk-ai --provider gemini` and `GEMINI_API_KEY`. The key is sent in the HTTPS `x-goog-api-key` header, never embedded in the URL or stored in the repository. Request/response sizes, model identifiers, tool declarations, tool-call count, timeout, and error messages are bounded. API availability and quota depend on the user's Google AI account.
 
 The adapter follows the public [Gemini GenerateContent API](https://ai.google.dev/api/generate-content) and [function-calling contract](https://ai.google.dev/gemini-api/docs/function-calling). It is an optional inference provider, not a runtime dependency and not evidence of production deployment.

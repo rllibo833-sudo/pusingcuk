@@ -54,9 +54,9 @@ class KnowledgeGroundingTests(unittest.TestCase):
         documents = load_index(index_path)
         results = rank_knowledge(documents, "model lokal ollama tanpa biaya api", limit=3)
         self.assertTrue(results)
-        self.assertEqual(results[0]["id"], "local-first-ai-decision")
-        self.assertEqual(results[0]["source_commit"], "38ad3035af7e7eaba8a332656ab6155dcc313c72")
-        self.assertEqual(results[0]["source_path"], "docs/LOCAL_FIRST_PUSINGCUK_AI.md")
+        self.assertEqual(results[0]["id"], "pusingcuk-local-ai-provider")
+        self.assertEqual(results[0]["source_commit"], "9e40ef150e2d3dbee9156e8774a859b428de3e38")
+        self.assertEqual(results[0]["source_path"], "library/local_ai_provider.py")
 
     def test_indonesian_retrieval_benchmark_top_one(self):
         root = Path(__file__).resolve().parents[1]
