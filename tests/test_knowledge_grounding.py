@@ -62,6 +62,23 @@ class KnowledgeGroundingTests(unittest.TestCase):
         self.assertIn("pusingcuk-ai-migration-ledger", {doc["id"] for doc in documents})
         self.assertIn("pusingcuk-local-ai-service", {doc["id"] for doc in documents})
 
+    def test_changed_primary_docs_pin_the_reviewed_snapshot(self):
+        index_path = Path(__file__).resolve().parents[1] / "library" / "knowledge_index.json"
+        documents = {doc["id"]: doc for doc in load_index(index_path)}
+        snapshot = "f035f2e514e0d407baea30f4bdfec4c9fa661a59"
+        for doc_id in (
+            "pusingcuk-project-overview",
+            "pusingcuk-ai-grounding-policy",
+            "pusingcuk-ai-migration-ledger",
+        ):
+            with self.subTest(doc_id=doc_id):
+                document = documents[doc_id]
+                self.assertEqual(document["source_commit"], snapshot)
+                self.assertEqual(
+                    document["url"],
+                    f"https://github.com/rllibo833-sudo/pusingcuk/blob/{snapshot}/{document['path']}",
+                )
+
     def test_real_index_indonesian_query_finds_local_first_decision(self):
         index_path = Path(__file__).resolve().parents[1] / "library" / "knowledge_index.json"
         documents = load_index(index_path)
