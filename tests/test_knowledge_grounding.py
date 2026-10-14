@@ -43,11 +43,11 @@ class KnowledgeGroundingTests(unittest.TestCase):
         index = {"schema_version": "pusingcuk.knowledge-index.v1", "documents": self.documents}
         self.assertEqual(len(validate_index(index)), 14)
 
-    def test_real_curated_index_contains_sixteen_locally_owned_sources(self):
+    def test_real_curated_index_contains_nineteen_locally_owned_sources(self):
         index_path = Path(__file__).resolve().parents[1] / "library" / "knowledge_index.json"
         documents = load_index(index_path)
-        self.assertEqual(len(documents), 16)
-        self.assertEqual(len({doc["id"] for doc in documents}), 16)
+        self.assertEqual(len(documents), 19)
+        self.assertEqual(len({doc["id"] for doc in documents}), 19)
         # All runtime retrieval records are locally owned. Each URL must match its
         # exact immutable source commit/path; the index's own citation deliberately
         # points to the earlier 14-record local-only normalization snapshot.
@@ -61,6 +61,7 @@ class KnowledgeGroundingTests(unittest.TestCase):
         self.assertEqual(curated_index["source_commit"], "983304b16f4f41e51e4569bccd34d6c32815a447")
         self.assertIn("pusingcuk-ai-migration-ledger", {doc["id"] for doc in documents})
         self.assertIn("pusingcuk-local-ai-service", {doc["id"] for doc in documents})
+        self.assertTrue({"pusingcuk-founder-authority-evidence", "pusingcuk-local-provider-rule-safety", "pusingcuk-core-retirement-manifest"}.issubset({doc["id"] for doc in documents}))
 
     def test_changed_primary_docs_pin_the_reviewed_snapshot(self):
         index_path = Path(__file__).resolve().parents[1] / "library" / "knowledge_index.json"
@@ -88,11 +89,28 @@ class KnowledgeGroundingTests(unittest.TestCase):
         self.assertEqual(results[0]["source_commit"], "733d4328a8d4433b1633e8d3bba9601786c2e08a")
         self.assertEqual(results[0]["source_path"], "library/local_ai_provider.py")
 
+    def test_founder_core_transfer_sources_are_pinned_to_pusingcuk_snapshot(self):
+        root = Path(__file__).resolve().parents[1]
+        documents = {doc["id"]: doc for doc in load_index(root / "library" / "knowledge_index.json")}
+        snapshot = "1db8eb5cbd35fd05cec982ff7db90a1ea31b5e11"
+        paths = {
+            "pusingcuk-founder-authority-evidence": "docs/ai/DECISION_AUTHORITY_AND_EVIDENCE.md",
+            "pusingcuk-local-provider-rule-safety": "docs/ai/LOCAL_MODEL_AND_RULE_SAFETY.md",
+            "pusingcuk-core-retirement-manifest": "docs/migration/FOUNDER_OS_CORE_RETIREMENT_MANIFEST.md",
+        }
+        for doc_id, path in paths.items():
+            with self.subTest(doc_id=doc_id):
+                document = documents[doc_id]
+                self.assertEqual(document["source_repository"], "rllibo833-sudo/pusingcuk")
+                self.assertEqual(document["source_commit"], snapshot)
+                self.assertEqual(document["path"], path)
+                self.assertEqual(document["url"], f"https://github.com/rllibo833-sudo/pusingcuk/blob/{snapshot}/{path}")
+
     def test_indonesian_retrieval_benchmark_top_one(self):
         root = Path(__file__).resolve().parents[1]
         documents = load_index(root / "library" / "knowledge_index.json")
         cases = json.loads((root / "tests" / "fixtures" / "knowledge_retrieval_cases.json").read_text(encoding="utf-8"))["cases"]
-        self.assertEqual(len(cases), 16)
+        self.assertEqual(len(cases), 19)
         correct = 0
         for case in cases:
             with self.subTest(case=case["id"]):
@@ -101,7 +119,7 @@ class KnowledgeGroundingTests(unittest.TestCase):
                 if results[0]["id"] == case["expected_top_id"]:
                     correct += 1
                 self.assertEqual(results[0]["id"], case["expected_top_id"])
-        self.assertEqual(correct, 16)
+        self.assertEqual(correct, 19)
 
     def test_indonesian_query_ranks_relevant_title_first(self):
         results = rank_knowledge(self.documents, "bagaimana validasi sitasi sumber", limit=3)

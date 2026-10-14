@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "description": "Benchmark deterministik 16 kasus untuk kueri bahasa Indonesia terhadap indeks pengetahuan terkurasi PusingCuk.",
+  "description": "Benchmark deterministik 19 kasus untuk kueri bahasa Indonesia terhadap indeks pengetahuan terkurasi PusingCuk, termasuk tiga paket migrasi Founder-OS/CORE.",
   "cases": [
     {
       "id": "query-01",
@@ -81,6 +81,21 @@
       "id": "query-16",
       "query": "Founder-OS CORE knowledge migration safeguards backup restore",
       "expected_top_id": "pusingcuk-ai-migration-ledger"
+    },
+    {
+      "id": "query-17",
+      "query": "keputusan Founder Gate LANJUTKAN DITOLAK bukti no proof no claim",
+      "expected_top_id": "pusingcuk-founder-authority-evidence"
+    },
+    {
+      "id": "query-18",
+      "query": "Gemini API key secret cron retry kuota 401 404 cooldown",
+      "expected_top_id": "pusingcuk-local-provider-rule-safety"
+    },
+    {
+      "id": "query-19",
+      "query": "inventaris Supabase job 8 job 10 Edge Function backup restore penghapusan repo",
+      "expected_top_id": "pusingcuk-core-retirement-manifest"
     }
   ]
 }

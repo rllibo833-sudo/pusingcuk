@@ -451,6 +451,115 @@
       ],
       "summary": "Adapter HTTP eksperimental untuk klien lokal. Memerlukan bearer token kuat, hanya bind IPv4 loopback, membatasi payload/sesi/konkurensi, dan menyimpan konteks hanya di memori proses. Bukan endpoint publik atau autentikasi per pengguna.",
       "excerpt": "GET /healthz hanya menunjukkan liveness proses; POST /v1/chat memerlukan skema JSON tepat. Hosting memerlukan TLS, autentikasi per pengguna, abuse controls, observability dan isolasi eksekusi."
+    },
+    {
+      "id": "pusingcuk-founder-authority-evidence",
+      "title": "Otoritas keputusan dan standar bukti manusia",
+      "path": "docs/ai/DECISION_AUTHORITY_AND_EVIDENCE.md",
+      "url": "https://github.com/rllibo833-sudo/pusingcuk/blob/1db8eb5cbd35fd05cec982ff7db90a1ea31b5e11/docs/ai/DECISION_AUTHORITY_AND_EVIDENCE.md",
+      "source_repository": "rllibo833-sudo/pusingcuk",
+      "source_commit": "1db8eb5cbd35fd05cec982ff7db90a1ea31b5e11",
+      "authority": "PUSINGCUK_POLICY",
+      "evidence_type": "governance-contract",
+      "claim_status": "adopted-policy-not-production-approval-proof",
+      "visibility": "public-safe",
+      "topics": [
+        "otoritas manusia",
+        "keputusan Founder",
+        "bukti",
+        "No Proof No Claim",
+        "klaim terverifikasi",
+        "review manusia",
+        "SaaS strategy"
+      ],
+      "keywords": [
+        "LANJUTKAN",
+        "DITOLAK",
+        "PERLU RISET LEBIH LANJUT",
+        "Founder Gate",
+        "rencana bukan bukti",
+        "status produksi",
+        "pelanggan revenue"
+      ],
+      "summary": "Asisten boleh meneliti dan merekomendasikan, tetapi keputusan penting tetap memerlukan manusia yang berwenang. LANJUTKAN, DITOLAK, dan PERLU RISET LEBIH LANJUT menjaga alur review eksplisit; klaim tidak boleh melebihi bukti aktual.",
+      "excerpt": "No Proof No Claim: bedakan rencana, kode, hasil CI, eksekusi lokal, deployment, dan hasil nyata. Sitasi menunjukkan asal sumber, bukan otomatis kebenaran. Jangan menyimpulkan pengguna, pelanggan, partner, pendapatan, atau model terlatih dari file dan rencana."
+    },
+    {
+      "id": "pusingcuk-local-provider-rule-safety",
+      "title": "Keamanan provider AI dan aturan terdaftar",
+      "path": "docs/ai/LOCAL_MODEL_AND_RULE_SAFETY.md",
+      "url": "https://github.com/rllibo833-sudo/pusingcuk/blob/1db8eb5cbd35fd05cec982ff7db90a1ea31b5e11/docs/ai/LOCAL_MODEL_AND_RULE_SAFETY.md",
+      "source_repository": "rllibo833-sudo/pusingcuk",
+      "source_commit": "1db8eb5cbd35fd05cec982ff7db90a1ea31b5e11",
+      "authority": "PUSINGCUK_POLICY",
+      "evidence_type": "ai-runtime-security-contract",
+      "claim_status": "policy-for-experimental-local-assistant-not-production-certification",
+      "visibility": "public-safe",
+      "topics": [
+        "provider lokal",
+        "Ollama",
+        "Gemini",
+        "secret",
+        "API key",
+        "cron",
+        "retry",
+        "cooldown",
+        "401",
+        "404",
+        "ToolRegistry",
+        "kapabilitas",
+        "sandbox"
+      ],
+      "keywords": [
+        "Gemini API key secret cron retry kuota model lokal Ollama",
+        "401",
+        "403",
+        "404",
+        "capability allowlist",
+        "hash sha256",
+        "input schema",
+        "fail closed",
+        "provider requests",
+        "bounded retry"
+      ],
+      "summary": "Model lokal/eksternal terpisah dari bahasa dan runtime PusingCuk. Model hanya boleh meminta tool yang terdaftar dengan skema, batas input, hash, dan kapabilitas eksplisit; key tidak boleh masuk repo, indeks, prompt, atau log.",
+      "excerpt": "Hentikan scheduler saat provider terus gagal; error autentikasi 401/403 atau endpoint/model 404 tidak boleh di-retry tanpa batas. Kuota memerlukan cooldown. Hash dan allowlist bukan OS sandbox; source arbitrer tidak boleh dieksekusi."
+    },
+    {
+      "id": "pusingcuk-core-retirement-manifest",
+      "title": "Manifest operasional Supabase dan penghapusan repo",
+      "path": "docs/migration/FOUNDER_OS_CORE_RETIREMENT_MANIFEST.md",
+      "url": "https://github.com/rllibo833-sudo/pusingcuk/blob/1db8eb5cbd35fd05cec982ff7db90a1ea31b5e11/docs/migration/FOUNDER_OS_CORE_RETIREMENT_MANIFEST.md",
+      "source_repository": "rllibo833-sudo/pusingcuk",
+      "source_commit": "1db8eb5cbd35fd05cec982ff7db90a1ea31b5e11",
+      "authority": "PUSINGCUK_MIGRATION",
+      "evidence_type": "retirement-inventory",
+      "claim_status": "read-only-live-inventory-not-backup-or-retirement-proof",
+      "visibility": "public-safe",
+      "topics": [
+        "Supabase",
+        "Edge Function",
+        "cron",
+        "backup",
+        "restore",
+        "penghapusan repo",
+        "Founder-OS",
+        "CORE",
+        "status operasional"
+      ],
+      "keywords": [
+        "inventaris Supabase cron job 8 job 10 Edge Function ACTIVE_HEALTHY restore",
+        "ai-queue-worker",
+        "ai-execute",
+        "ai_activity",
+        "payment webhook",
+        "API order",
+        "Auth user",
+        "backup restore",
+        "caller"
+      ],
+      "summary": "Memuat pemetaan aset Founder-OS/CORE ke PusingCuk, snapshot live Supabase, status job 8 dan 10, sepuluh Edge Function yang masih ACTIVE, serta gerbang penutupan. Menonaktifkan cron tidak mematikan endpoint dan tidak membuktikan backup sudah bisa dipulihkan.",
+      "excerpt": "Pada pemeriksaan 2026-10-15, dua cron yang diketahui tidak aktif; sepuluh Edge Function tetap ACTIVE. Audit ini hanya menghitung data, bukan mengekspor atau memulihkan database. Setiap endpoint, caller, webhook, dan data wajib punya keputusan migrate/retire dan bukti."
     }
   ]
 }
