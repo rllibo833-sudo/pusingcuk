@@ -41,15 +41,17 @@ The same Python command works on Linux and other systems with Python 3.11 or 3.1
 
 PusingCuk sekarang memiliki MVP asisten lokal yang menggabungkan Ollama, indeks pengetahuan terkurasi, memori percakapan sementara, sitasi sumber tervalidasi, dan dua tool yang diizinkan. Ini belum setara dengan Gemini dan bukan layanan web produksi.
 
-Di mesin yang mendukung Ollama, siapkan model dan jalankan CLI:
+Untuk jalur lokal tanpa API key, siapkan Ollama dan jalankan CLI:
 
 ```sh
 ollama pull qwen3:4b
 python -m pip install .
-pusingcuk-ai --model qwen3:4b
+pusingcuk-ai --provider ollama --model qwen3:4b
 ```
 
-Ollama harus berjalan di perangkat yang sama dan mendengarkan di loopback port 11434. Tidak diperlukan API key berbayar, tetapi model memerlukan ruang penyimpanan dan RAM. Ketik `/reset` untuk menghapus konteks sesi atau `/keluar` untuk berhenti. Riwayat chat tidak disimpan ke disk. Catatan proyek yang ingin dipertahankan harus disimpan secara eksplisit dengan `/ingat <catatan>`, dilihat melalui `/memori [kueri]`, dan dihapus dengan `/hapus-memori <id>`. Catatan tersimpan berada di file lokal pengguna, dibatasi jumlah/ukuran, dan pola kredensial umum ditolak.
+Ollama harus berjalan di perangkat yang sama dan mendengarkan di loopback port 11434. Tidak diperlukan API key, tetapi model memerlukan ruang penyimpanan dan RAM.
+
+Sebagai opsi provider terpisah, PusingCuk juga menyediakan adapter independen untuk Gemini GenerateContent API. Atur `GEMINI_API_KEY` di environment (jangan simpan kunci di repository), lalu jalankan `pusingcuk-ai --provider gemini`. Model default adalah `gemini-3.8-flash` dan dapat diganti dengan `--model`. Pemakaian API tunduk pada ketersediaan model, kuota, dan ketentuan akun Google. Kunci dikirim melalui header HTTPS, tidak ditulis ke URL atau log. Provider ini opsional dan memakai layanan eksternal; bukan jalur model lokal tanpa biaya. Ketik `/reset` untuk menghapus konteks sesi atau `/keluar` untuk berhenti. Riwayat chat tidak disimpan ke disk. Catatan proyek yang ingin dipertahankan harus disimpan secara eksplisit dengan `/ingat <catatan>`, dilihat melalui `/memori [kueri]`, dan dihapus dengan `/hapus-memori <id>`. Catatan tersimpan berada di file lokal pengguna, dibatasi jumlah/ukuran, dan pola kredensial umum ditolak.
 
 Tool yang tersedia hanya pencarian dokumen read-only dan aturan anggaran terdaftar melalui runner Docker lokal yang dilindungi token. Tanpa runner tersebut, tool anggaran gagal dengan aman. Model tidak dapat mengirim source code arbitrer untuk dieksekusi. Jangan mengekspos runner ke internet.
 
