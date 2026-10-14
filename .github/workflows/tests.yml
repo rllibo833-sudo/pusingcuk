@@ -115,6 +115,14 @@ jobs:
           node --input-type=module <<'NODE' || { cat "$RUNNER_TEMP/pusingcuk-runner.log"; exit 1; }
           import assert from "node:assert/strict";
           import { randomUUID } from "node:crypto";
+          import fs from "node:fs";
+
+          const runnerSource = fs.readFileSync("tools/core-rule-runner.mjs", "utf8");
+          for (const isolationFlag of ["--network=none", "--memory=64m", "--memory-swap=64m", "--cpus=0.5", "--pids-limit=16", "--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--ulimit"]) {
+            assert.ok(runnerSource.includes(isolationFlag), "Sandbox isolation flag missing: " + isolationFlag);
+          }
+          assert.match(runnerSource, /PUSINGCUK_SANDBOX_IMAGE/);
+          assert.match(runnerSource, /sha256:\\[0-9a-f\\]\{64\}/);
 
           const url = "http://127.0.0.1:8787/v1/execute";
           const token = process.env.PUSINGCUK_RUNNER_TOKEN;
@@ -169,6 +177,12 @@ jobs:
             assert.equal(result.body.result, expected);
             assert.equal(result.body.source_commit, "411c532454028d2d5e733373d085050eca1d402a");
           }
+          const badHash = await call({ ...base, request_id: randomUUID(), program_sha256: "0".repeat(64), input: { nominal: 1, batas: 1 } });
+          assert.equal(badHash.status, 400);
+          assert.equal(badHash.body.error, "ARTIFACT_HASH_MISMATCH");
+          const tooSlow = await call({ ...base, request_id: randomUUID(), limits: { ...base.limits, timeout_ms: 3001 }, input: { nominal: 1, batas: 1 } });
+          assert.equal(tooSlow.status, 400);
+          assert.equal(tooSlow.body.error, "RESOURCE_LIMIT");
           const noAuth = await call({ ...base, request_id: randomUUID(), input: { nominal: 1, batas: 1 } }, "");
           assert.equal(noAuth.status, 401);
           const unknown = await call({ ...base, request_id: randomUUID(), program_id: "anything", input: { nominal: 1, batas: 1 } });
