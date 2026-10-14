@@ -22,33 +22,13 @@ fungsi status_keluaran(jawaban)
 selesai fungsi
 
 # Data ini adalah deklarasi, bukan keyword bahasa baru.
-lah prompt_definisi = {
-    "id": "assistant.answer.v1",
-    "system": "Jawab hanya dari konteks yang diberikan dan tandai ketidakpastian.",
-    "context_label": "Konteks: ",
-    "question_label": "Pertanyaan: ",
-    "max_context_chars": 8000
-}
+lah prompt_definisi = {"id": "assistant.answer.v1", "system": "Jawab hanya dari konteks yang diberikan dan tandai ketidakpastian.", "context_label": "Konteks: ", "question_label": "Pertanyaan: ", "max_context_chars": 8000}
 
-lah rule_definisi = {
-    "id": "assistant.output-review.v1",
-    "entrypoint": "status_keluaran",
-    "input_fields": ["jawaban"],
-    "input_type": "string",
-    "max_input_chars": 4000,
-    "capabilities": []
-}
+lah rule_definisi = {"id": "assistant.output-review.v1", "entrypoint": "status_keluaran", "input_fields": ["jawaban"], "input_type": "string", "max_input_chars": 4000, "capabilities": []}
 
 # Handler harus sudah terdaftar di library/ai_tools.py; deklarasi .cuk
 # tidak membuat izin atau mengeksekusi tool secara otomatis.
-lah tool_knowledge_search = {
-    "id": "knowledge_search",
-    "handler": "host:knowledge_search",
-    "input_fields": ["query", "limit"],
-    "capabilities": ["knowledge:read"],
-    "max_query_chars": 300,
-    "max_results": 3
-}
+lah tool_knowledge_search = {"id": "knowledge_search", "handler": "host:knowledge_search", "input_fields": ["query", "limit"], "capabilities": ["knowledge:read"], "max_query_chars": 300, "max_results": 3}
 
 hedeh status_keluaran("Jawaban berbasis sumber.")
 hedeh susun_prompt("Kontrak runtime lokal.", "Apa batas tool?")
