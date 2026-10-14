@@ -114,3 +114,7 @@ test-native: native test-cli
 	@$(NATIVE_BIN) tests/native/string_concat_limit.pusingcuk > $(CURDIR)/pusingcuk-string-limit.out
 	@wc -c < $(CURDIR)/pusingcuk-string-limit.out | grep -qx '1024'
 	@rm -f $(CURDIR)/pusingcuk-string-limit.out
+
+	@actual="$$($(NATIVE_BIN) examples/core/anggaran_threshold.cuk)"; \
+	 expected="$$(printf 'DALAM_BATAS\nDALAM_BATAS\nPERLU_PERSETUJUAN\nINPUT_TIDAK_VALID\nINPUT_TIDAK_VALID')"; \
+	 test "$$actual" = "$$expected"
