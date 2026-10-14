@@ -1,0 +1,10 @@
+jancuk
+hedeh teks(42)
+hedeh teks(benar)
+hedeh teks(salah)
+hedeh bilangan("42")
+hedeh bilangan(-3.9)
+hedeh desimal("2.5")
+hedeh logika("")
+hedeh logika("false")
+selesai jancuk
