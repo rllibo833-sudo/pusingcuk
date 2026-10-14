@@ -1,0 +1,25 @@
+# Deterministic acceptance fixture for budget sufficiency.
+# Covers success, exact boundary, over-budget and invalid inputs.
+
+jancuk
+
+fungsi cek_kecukupan_saldo(saldo, pengajuan)
+    njir saldo < 0 atau pengajuan < 0
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        njir pengajuan <= saldo
+            balek "SALDO_CUKUP"
+        kampret
+            balek "SALDO_TIDAK_CUKUP"
+        selesai njir
+    selesai njir
+selesai fungsi
+
+hedeh cek_kecukupan_saldo(750000, 500000)
+hedeh cek_kecukupan_saldo(500000, 500000)
+hedeh cek_kecukupan_saldo(500000, 500001)
+hedeh cek_kecukupan_saldo(0, 0)
+hedeh cek_kecukupan_saldo(-1, 100)
+hedeh cek_kecukupan_saldo(100, -1)
+
+selesai jancuk
