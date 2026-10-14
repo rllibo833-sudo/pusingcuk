@@ -61,6 +61,6 @@ This ledger records why a pattern is being adopted, how it is rewritten for Pusi
 ## Explicit non-goals
 
 - This migration does not train a language model or transfer model weights.
-- It does not make PusingCuk, native C, PVM or transpiled output a general-purpose security sandbox.
+- PusingCuk, native C, PVM and transpiled outputs are not a general-purpose security sandbox; never run untrusted code without independently reviewed OS-level isolation.
 - It does not make CORE or Founder-OS safe to delete today.
 - It does not claim hosted availability, real users, uptime, answer accuracy or a successful external outcome.
