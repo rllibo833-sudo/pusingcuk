@@ -285,6 +285,8 @@ const server = createServer(async (req, res) => {
       source_commit: program.source_commit,
       runtime_version: runtime.version,
       runtime_build_sha: program.source_commit,
+      sandbox: "docker-isolated",
+      sandbox_image: sandboxImage,
       status: result.status,
       ...(result.status === "succeeded" ? { result: result.result } : { diagnostics: result.diagnostics }),
       elapsed_ms: result.elapsed_ms,
