@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 from pathlib import Path
 from typing import Any
 
+from library.ai_tools import ToolRegistry
 from library.knowledge_grounding import append_citations, load_index, rank_knowledge
 from library.local_ai_provider import LocalAIProviderError, OllamaChatProvider
 
@@ -20,11 +22,12 @@ Jangan meminta atau membocorkan rahasia. Jangan menjalankan atau menyarankan eks
 class PusingCukAssistant:
     """In-process conversation memory; no transcript is persisted to disk."""
 
-    def __init__(self, provider: Any, documents: list[dict[str, Any]], *, retrieval_limit: int = 3):
+    def __init__(self, provider: Any, documents: list[dict[str, Any]], *, retrieval_limit: int = 3, tool_registry: ToolRegistry | None = None):
         self.provider = provider
         self.documents = documents
         self.by_id = {document["id"]: document for document in documents}
         self.retrieval_limit = retrieval_limit
+        self.tool_registry = tool_registry or ToolRegistry(documents)
         self.history: list[dict[str, str]] = []
 
     def reset(self) -> None:
@@ -60,8 +63,44 @@ class PusingCukAssistant:
         else:
             system_prompt += "\n\nTidak ada sumber proyek yang cocok dengan kueri ini. Jangan membuat klaim khusus proyek seolah telah diverifikasi."
         messages = self._bounded_history() + [{"role": "user", "content": query}]
+        used_source_ids: list[str] = []
+        for item in retrieved:
+            if item["id"] in self.by_id and item["id"] not in used_source_ids:
+                used_source_ids.append(item["id"])
         try:
-            answer = self.provider.generate(messages, system_prompt=system_prompt)
+            if hasattr(self.provider, "generate_turn"):
+                answer = ""
+                for round_index in range(4):
+                    turn = self.provider.generate_turn(
+                        messages, system_prompt=system_prompt, tools=self.tool_registry.definitions,
+                    )
+                    calls = turn["tool_calls"]
+                    if not calls:
+                        answer = turn["content"]
+                        break
+                    if round_index == 3:
+                        answer = turn["content"] or "Batas pemanggilan tool tercapai; hasil tambahan tidak dijalankan."
+                        break
+                    messages.append({
+                        "role": "assistant", "content": turn["content"],
+                        "tool_calls": [{
+                            "id": call["id"], "type": "function",
+                            "function": {"name": call["name"], "arguments": call["arguments"]},
+                        } for call in calls],
+                    })
+                    for call in calls:
+                        result = self.tool_registry.execute(call["name"], call["arguments"])
+                        if call["name"] == "knowledge_search" and result.get("ok") is True:
+                            for item in result.get("results", []):
+                                doc_id = item.get("id")
+                                if doc_id in self.by_id and doc_id not in used_source_ids:
+                                    used_source_ids.append(doc_id)
+                        messages.append({
+                            "role": "tool", "tool_name": call["name"],
+                            "content": json.dumps(result, ensure_ascii=False)[:4_000],
+                        })
+            else:
+                answer = self.provider.generate(messages, system_prompt=system_prompt)
         except LocalAIProviderError:
             raise
         except Exception:
@@ -69,7 +108,7 @@ class PusingCukAssistant:
         if not isinstance(answer, str) or not answer.strip():
             raise LocalAIProviderError("AI_EMPTY_ANSWER")
         answer = answer.strip()[:8_000]
-        sources = [self.by_id[item["id"]] for item in retrieved if item["id"] in self.by_id]
+        sources = [self.by_id[doc_id] for doc_id in used_source_ids]
         grounded_answer = append_citations(answer, sources)
         self.history.extend([
             {"role": "user", "content": query},

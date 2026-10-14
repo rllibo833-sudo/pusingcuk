@@ -1,7 +1,10 @@
-"""Regression tests for PusingCuk's local-first RAG chat orchestration."""
+"""Regression tests for PusingCuk's local-first RAG and tool orchestration."""
+import json
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
+from library.ai_tools import ToolRegistry, _THRESHOLD_SHA256
 from library.assistant import PusingCukAssistant
 from library.knowledge_grounding import load_index
 from library.local_ai_provider import LocalAIProviderError
@@ -58,6 +61,72 @@ class AssistantTests(unittest.TestCase):
         with self.assertRaisesRegex(LocalAIProviderError, "AI_TIMEOUT"):
             assistant.ask("Apa itu PusingCuk?")
         self.assertEqual(assistant.history, [])
+
+    def test_tool_call_executes_only_allowlisted_knowledge_search(self):
+        class ToolProvider:
+            def __init__(self):
+                self.calls = []
+            def generate_turn(self, messages, *, system_prompt=None, tools=None):
+                self.calls.append({"messages": messages, "tools": tools})
+                if len(self.calls) == 1:
+                    return {"content": "", "tool_calls": [{"id": "call-1", "name": "knowledge_search", "arguments": {"query": "ollama lokal", "limit": 2}}]}
+                return {"content": "Arah yang ditemukan mengutamakan model lokal.", "tool_calls": []}
+        provider = ToolProvider()
+        assistant = PusingCukAssistant(provider, self.documents)
+        answer = assistant.ask("zebra xylophone nebula")
+        self.assertEqual(len(provider.calls), 2)
+        self.assertTrue(any(m["role"] == "tool" for m in provider.calls[1]["messages"]))
+        self.assertIn("Sumber rujukan", answer)
+
+    def test_tool_registry_rejects_unregistered_names_and_invalid_rule_input(self):
+        registry = ToolRegistry(self.documents)
+        self.assertEqual(registry.execute("run_shell", {"command": "id"})["error"], "TOOL_NOT_ALLOWLISTED")
+        self.assertEqual(registry.execute("budget_threshold", {"nominal": True, "batas": 100})["error"], "RULE_INPUT_INVALID")
+
+    def test_budget_rule_fails_closed_without_runner_token(self):
+        registry = ToolRegistry(self.documents)
+        with patch.dict("os.environ", {}, clear=True):
+            result = registry.execute("budget_threshold", {"nominal": 10, "batas": 20})
+        self.assertEqual(result, {"ok": False, "error": "RULE_RUNNER_NOT_CONFIGURED"})
+
+    def test_budget_rule_sends_only_fixed_registered_request_to_runner(self):
+        class FakeResponse:
+            status = 200
+            def __enter__(self): return self
+            def __exit__(self, *_args): return False
+            def read(self, _limit=-1):
+                return json.dumps({
+                    "status": "succeeded", "program_id": "budget.threshold.v1",
+                    "program_sha256": _THRESHOLD_SHA256, "result": "DALAM_BATAS",
+                    "source_commit": "e367f45b0a35ccb8fdb91424099b8046b346d77d",
+                    "runtime_build_sha": "e367f45b0a35ccb8fdb91424099b8046b346d77d", "elapsed_ms": 3,
+                }).encode()
+        registry = ToolRegistry(self.documents)
+        with patch.dict("os.environ", {"PUSINGCUK_RUNNER_TOKEN": "x" * 40}), patch("library.ai_tools.build_opener") as builder:
+            builder.return_value.open.return_value = FakeResponse()
+            result = registry.execute("budget_threshold", {"nominal": 100, "batas": 200})
+        self.assertEqual(result["result"], "DALAM_BATAS")
+        request = builder.return_value.open.call_args.args[0]
+        payload = json.loads(request.data.decode())
+        self.assertEqual(payload["program_id"], "budget.threshold.v1")
+        self.assertEqual(payload["input"], {"nominal": 100, "batas": 200})
+        self.assertNotIn("x" * 40, request.data.decode())
+
+    def test_budget_rule_rejects_unpinned_runner_evidence(self):
+        class FakeResponse:
+            status = 200
+            def __enter__(self): return self
+            def __exit__(self, *_args): return False
+            def read(self, _limit=-1):
+                return json.dumps({
+                    "status": "succeeded", "program_id": "budget.threshold.v1",
+                    "program_sha256": "0" * 64, "result": "DALAM_BATAS",
+                }).encode()
+        registry = ToolRegistry(self.documents)
+        with patch.dict("os.environ", {"PUSINGCUK_RUNNER_TOKEN": "x" * 40}), patch("library.ai_tools.build_opener") as builder:
+            builder.return_value.open.return_value = FakeResponse()
+            result = registry.execute("budget_threshold", {"nominal": 100, "batas": 200})
+        self.assertEqual(result, {"ok": False, "error": "RULE_EVIDENCE_INVALID"})
 
 
 if __name__ == "__main__":

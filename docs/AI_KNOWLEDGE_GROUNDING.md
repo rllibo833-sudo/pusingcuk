@@ -23,6 +23,10 @@ format_citations() and append_citations() accept only validated source records. 
 
 library/local_ai_provider.py provides a no-paid-key Ollama-compatible chat adapter for a model running on the same device. It defaults to loopback-only HTTP, disables environment-configured proxies, bounds conversation length and response size, applies a timeout, and emits stable errors without returning endpoint details. It does not yet orchestrate tools or persist memory. A local model and Ollama runtime must be installed separately.
 
+## Tool calling boundary
+
+The Ollama adapter parses a bounded set of structured tool calls. The assistant executes only names in its registry and validates each argument object. Knowledge search is read-only. The budget rule requires a locally configured bearer token and the existing Docker-isolated runner; if the runner is unavailable, the tool fails closed. The model never receives the token and cannot submit source code, commands, paths, or arbitrary capabilities.
+
 ## Security boundaries
 
 - Retrieved text is untrusted data, not system instructions or executable code.

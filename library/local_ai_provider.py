@@ -15,7 +15,7 @@ from urllib.request import ProxyHandler, Request, build_opener
 
 _DEFAULT_ENDPOINT = "http://127.0.0.1:11434/api/chat"
 _MODEL_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$")
-_ALLOWED_ROLES = {"system", "user", "assistant"}
+_ALLOWED_ROLES = {"system", "user", "assistant", "tool"}
 
 
 class LocalAIProviderError(RuntimeError):
@@ -45,7 +45,7 @@ def _is_loopback_endpoint(endpoint: str) -> bool:
         return False
 
 
-def validate_messages(messages: Iterable[dict[str, Any]]) -> list[dict[str, str]]:
+def validate_messages(messages: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
     """Validate and bound a chat history before it leaves the process."""
     if isinstance(messages, (str, bytes, dict)):
         raise LocalAIProviderError("AI_MESSAGES_INVALID")
@@ -55,18 +55,47 @@ def validate_messages(messages: Iterable[dict[str, Any]]) -> list[dict[str, str]
         raise LocalAIProviderError("AI_MESSAGES_INVALID") from exc
     if not incoming or len(incoming) > 20:
         raise LocalAIProviderError("AI_MESSAGE_COUNT_INVALID")
-    clean: list[dict[str, str]] = []
+    clean: list[dict[str, Any]] = []
     total = 0
     for message in incoming:
-        if not isinstance(message, dict) or set(message) - {"role", "content"}:
+        if not isinstance(message, dict):
             raise LocalAIProviderError("AI_MESSAGE_INVALID")
-        role, content = message.get("role"), message.get("content")
-        if role not in _ALLOWED_ROLES or not isinstance(content, str) or not content.strip():
+        role = message.get("role")
+        allowed_fields = {"role", "content", "tool_calls"} if role == "assistant" else ({"role", "content", "tool_name"} if role == "tool" else {"role", "content"})
+        if set(message) - allowed_fields:
+            raise LocalAIProviderError("AI_MESSAGE_INVALID")
+        content = message.get("content")
+        if role not in _ALLOWED_ROLES or not isinstance(content, str):
+            raise LocalAIProviderError("AI_MESSAGE_INVALID")
+        if role != "assistant" and not content.strip():
             raise LocalAIProviderError("AI_MESSAGE_INVALID")
         if len(content) > 12_000:
             raise LocalAIProviderError("AI_MESSAGE_TOO_LARGE")
+        item: dict[str, Any] = {"role": role, "content": content}
+        if role == "tool":
+            tool_name = message.get("tool_name")
+            if not isinstance(tool_name, str) or not re.fullmatch(r"[a-z][a-z0-9_]{0,63}", tool_name):
+                raise LocalAIProviderError("AI_TOOL_MESSAGE_INVALID")
+            item["tool_name"] = tool_name
+        if role == "assistant" and "tool_calls" in message:
+            calls = message["tool_calls"]
+            if not isinstance(calls, list) or len(calls) > 5:
+                raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
+            for call in calls:
+                if not isinstance(call, dict) or set(call) - {"id", "type", "function"}:
+                    raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
+                function = call.get("function")
+                if not isinstance(function, dict) or set(function) - {"name", "arguments"}:
+                    raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
+                if not isinstance(function.get("name"), str) or not re.fullmatch(r"[a-z][a-z0-9_]{0,63}", function["name"]):
+                    raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
+                if not isinstance(function.get("arguments"), dict):
+                    raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
+                if len(json.dumps(call, ensure_ascii=False)) > 4_000:
+                    raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
+            item["tool_calls"] = calls
         total += len(content)
-        clean.append({"role": role, "content": content})
+        clean.append(item)
     if total > 24_000:
         raise LocalAIProviderError("AI_CONTEXT_TOO_LARGE")
     if not any(item["role"] == "user" for item in clean):
@@ -95,7 +124,10 @@ class OllamaChatProvider:
         self.timeout_seconds = float(timeout_seconds)
         self.max_response_bytes = max_response_bytes
 
-    def generate(self, messages: Iterable[dict[str, Any]], *, system_prompt: str | None = None) -> str:
+    def generate_turn(
+        self, messages: Iterable[dict[str, Any]], *, system_prompt: str | None = None,
+        tools: list[dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
         clean = validate_messages(messages)
         if system_prompt is not None:
             if not isinstance(system_prompt, str) or len(system_prompt) > 8_000:
@@ -107,16 +139,17 @@ class OllamaChatProvider:
                     clean.insert(0, {"role": "system", "content": system_prompt.strip()})
         if len(clean) > 20 or sum(len(item["content"]) for item in clean) > 24_000:
             raise LocalAIProviderError("AI_CONTEXT_TOO_LARGE")
-        payload = json.dumps(
-            {"model": self.model, "messages": clean, "stream": False},
-            ensure_ascii=False,
-        ).encode("utf-8")
+        if tools is not None and (not isinstance(tools, list) or len(tools) > 8):
+            raise LocalAIProviderError("AI_TOOLS_INVALID")
+        payload_data: dict[str, Any] = {"model": self.model, "messages": clean, "stream": False}
+        if tools:
+            payload_data["tools"] = tools
+        payload = json.dumps(payload_data, ensure_ascii=False).encode("utf-8")
         request = Request(
             self.endpoint, data=payload,
             headers={"Content-Type": "application/json"}, method="POST",
         )
         try:
-            # Disable environment-configured HTTP proxies: this adapter is local-only.
             opener = build_opener(ProxyHandler({}))
             with opener.open(request, timeout=self.timeout_seconds) as response:
                 raw = response.read(self.max_response_bytes + 1)
@@ -138,6 +171,35 @@ class OllamaChatProvider:
             raise LocalAIProviderError("AI_RESPONSE_INVALID_JSON") from None
         message = data.get("message") if isinstance(data, dict) else None
         content = message.get("content") if isinstance(message, dict) else None
-        if not isinstance(content, str) or not content.strip():
+        raw_calls = message.get("tool_calls", []) if isinstance(message, dict) else []
+        if not isinstance(raw_calls, list) or len(raw_calls) > 5:
+            raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
+        calls = []
+        for index, call in enumerate(raw_calls):
+            function = call.get("function") if isinstance(call, dict) else None
+            name = function.get("name") if isinstance(function, dict) else None
+            arguments = function.get("arguments", {}) if isinstance(function, dict) else None
+            if not isinstance(name, str) or not re.fullmatch(r"[a-z][a-z0-9_]{0,63}", name):
+                raise LocalAIProviderError("AI_TOOL_CALL_INVALID")
+            if isinstance(arguments, str):
+                try:
+                    arguments = json.loads(arguments)
+                except json.JSONDecodeError:
+                    raise LocalAIProviderError("AI_TOOL_ARGUMENTS_INVALID") from None
+            if not isinstance(arguments, dict):
+                raise LocalAIProviderError("AI_TOOL_ARGUMENTS_INVALID")
+            call_id = call.get("id", f"tool-call-{index + 1}")
+            if not isinstance(call_id, str) or not call_id or len(call_id) > 100:
+                call_id = f"tool-call-{index + 1}"
+            calls.append({"id": call_id, "name": name, "arguments": arguments})
+        if not isinstance(content, str):
+            content = ""
+        if not content.strip() and not calls:
             raise LocalAIProviderError("AI_RESPONSE_CONTENT_MISSING")
-        return content.strip()
+        return {"content": content.strip(), "tool_calls": calls}
+
+    def generate(self, messages: Iterable[dict[str, Any]], *, system_prompt: str | None = None) -> str:
+        turn = self.generate_turn(messages, system_prompt=system_prompt)
+        if turn["tool_calls"]:
+            raise LocalAIProviderError("AI_TOOL_CALL_UNEXPECTED")
+        return turn["content"]

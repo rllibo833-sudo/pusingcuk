@@ -37,6 +37,22 @@ python pusingcuk_new.py halo.cuk
 
 The same Python command works on Linux and other systems with Python 3.11 or 3.12 installed. The optional `pusingcuk` CLI can be installed with `python -m pip install .`; see the [Termux guide](docs/termux/README.md) for setup details.
 
+## Asisten AI lokal (eksperimental)
+
+PusingCuk sekarang memiliki MVP asisten lokal yang menggabungkan Ollama, indeks pengetahuan terkurasi, memori percakapan sementara, sitasi sumber tervalidasi, dan dua tool yang diizinkan. Ini belum setara dengan Gemini dan bukan layanan web produksi.
+
+Di mesin yang mendukung Ollama, siapkan model dan jalankan CLI:
+
+```sh
+ollama pull qwen3:4b
+python -m pip install .
+pusingcuk-ai --model qwen3:4b
+```
+
+Ollama harus berjalan di perangkat yang sama dan mendengarkan di loopback port 11434. Tidak diperlukan API key berbayar, tetapi model memerlukan ruang penyimpanan dan RAM. Ketik `/reset` untuk menghapus konteks sesi atau `/keluar` untuk berhenti. Riwayat chat hanya ada di memori proses dan tidak disimpan ke disk.
+
+Tool yang tersedia hanya pencarian dokumen read-only dan aturan anggaran terdaftar melalui runner Docker lokal yang dilindungi token. Tanpa runner tersebut, tool anggaran gagal dengan aman. Model tidak dapat mengirim source code arbitrer untuk dieksekusi. Jangan mengekspos runner ke internet.
+
 ## First program
 
 ```cuk

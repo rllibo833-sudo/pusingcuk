@@ -94,6 +94,22 @@ class LocalAIProviderTests(unittest.TestCase):
                 self.provider.generate(self.messages)
         self.assertNotIn("sensitive", str(error.exception))
 
+    def test_generate_turn_parses_a_bounded_tool_call(self):
+        body = json.dumps({"message": {"content": "", "tool_calls": [{"id": "call-1", "function": {"name": "knowledge_search", "arguments": {"query": "ollama lokal"}}}]}}).encode()
+        with patch("library.local_ai_provider.build_opener") as builder:
+            builder.return_value.open.return_value = FakeResponse(body)
+            turn = self.provider.generate_turn(self.messages, tools=[{"type": "function", "function": {"name": "knowledge_search"}}])
+        self.assertEqual(turn["content"], "")
+        self.assertEqual(turn["tool_calls"][0]["name"], "knowledge_search")
+        self.assertEqual(turn["tool_calls"][0]["arguments"], {"query": "ollama lokal"})
+
+    def test_tool_history_message_is_validated(self):
+        history = self.messages + [
+            {"role": "assistant", "content": "", "tool_calls": [{"id": "call-1", "type": "function", "function": {"name": "knowledge_search", "arguments": {"query": "ollama lokal"}}}]},
+            {"role": "tool", "tool_name": "knowledge_search", "content": "{}"},
+        ]
+        self.assertEqual(validate_messages(history)[-1]["tool_name"], "knowledge_search")
+
 
 if __name__ == "__main__":
     unittest.main()
