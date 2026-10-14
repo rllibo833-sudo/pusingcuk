@@ -1,0 +1,56 @@
+{
+  "schema_version": "founder-system.sync.v1",
+  "sync_id": "local-first-pusingcuk-ai-2026-10-14",
+  "purpose": "Shared component pins and truthful readiness status for Founder-OS, CORE, PUBLIC, and PusingCuk.",
+  "authority_model": {
+    "Founder-OS": "Durable decisions, constraints, recovery context, curated knowledge index.",
+    "kawasan-masjid-core": "Runtime truth, authorization, operational data, AI orchestration, and evidence.",
+    "kawasan-masjid-public": "Public-safe web experience; never a second backend or private knowledge store.",
+    "pusingcuk": "Canonical language, specification, interpreter/native runtime, registered .cuk rules, and conformance."
+  },
+  "component_pins": {
+    "pusingcuk_runtime_commit": "23cc6b5b7d42ce5bc58babd37792a0ec32d117a8",
+    "pusingcuk_runtime_version": "Pusingcuk native 0.8.0.dev0",
+    "pusingcuk_language_contract": "0.5-dev",
+    "pusingcuk_rule_path": "examples/core/anggaran_threshold_service.cuk",
+    "pusingcuk_rule_sha256": "e79058b314d921a4b4353133b30a7a7b0da64d32785a39f66cb5ce356406067d",
+    "pusingcuk_local_runner_path": "tools/core-rule-runner.mjs",
+    "pusingcuk_local_runner_commit": "bbde0707b384e48f61c4ef2c27ac9ee0f7058022",
+    "pusingcuk_runner_ci_commit": "2c8773e7bc1a158ccfe97cb7fd81f318749b038e",
+    "founder_os_knowledge_index_path": "ai/knowledge-index.json",
+    "founder_os_knowledge_index_commit": "18f5078d62e07fc68ac5c81c179e1a4d31eadbe2",
+    "founder_os_local_first_decision_path": "docs/LOCAL_FIRST_PUSINGCUK_AI.md",
+    "founder_os_local_first_decision_commit": "d9a41ae35dcc08628c7ac1fc38b3ac52fb982792",
+    "core_ai_entrypoint_path": "supabase/functions/ai-execute/index.ts",
+    "core_ai_entrypoint_commit": "626ddf3d80930da4680048bd397590a393b1e41b",
+    "core_local_provider_commit": "ab2288091b1d292e0f4668fb8bc0d316cb300df9",
+    "core_knowledge_reader_commit": "8c85573d9a5bcabd6dbe8c41d66730754019919b",
+    "core_knowledge_ranker_commit": "4cb2481d7d6c912d1e65778db40b10913a066f05",
+    "core_registered_rule_gateway_commit": "d247847e31aeb74830522ae9344b04b84b15ece2",
+    "core_quality_workflow_commit": "3b67363b3c8f36e8b29a30cec2f595a4997ec850",
+    "core_contract_doc_commit": "d907618d2b944c37518d42cf561ee8c41db4a543",
+    "core_ai_contract_tests_commit": "e9068f701a1741b55af2b454be98743d233f2ce9",
+    "public_system_status_source_commit": "42fc9a4c12e1bc65dc60274fb4d6c2369f96b901"
+  },
+  "capabilities": {
+    "native_rule": "One deterministic registered .cuk rule; exact source hash and runtime commit are pinned.",
+    "founder_knowledge": "Bounded lexical ranking over a curated public-safe index; source links and index commit returned.",
+    "local_llm": "Ollama provider source; default model qwen3:4b; no hosted LLM API key required for local inference.",
+    "runner_boundary": "Authenticated local prototype; allowlist, strict input schema, timeout, output bound and capability denial.",
+    "model_training": "Not implemented; PusingCuk is a language/runtime, not a trained LLM.",
+    "production_runner": "Not deployed; local runner is not an OS sandbox and must not be internet-exposed.",
+    "repository_freeze": "Not approved until migration parity, auth/data/audit preservation, backups, restore and rollback are verified."
+  },
+  "verification_status": {
+    "last_known_green_core_run": "https://github.com/rllibo833-sudo/kawasan-masjid-core/actions/runs/38520061903",
+    "last_known_green_core_run_scope": "Earlier CI proof on a static-input native .cuk rule and Core Quality Gate; it does not verify the newest local runner/retrieval commits.",
+    "current_main_push_runs": "Not independently confirmed in this session. Do not treat the newly-added runner/service tests as green until GitHub Actions reports success.",
+    "production_deployments": "No Supabase production deployment or database migration was performed by this integration work."
+  },
+  "freeze_gates": [
+    "All required CORE operations are replaced and behavior/security parity tests pass.",
+    "Founder-OS decision history and recovery context are preserved with provenance.",
+    "All callers, Edge Functions, workflows, schedules and public contracts are inventoried.",
+    "Backup/restore, rollback and security review have been rehearsed and explicitly accepted by the Founder."
+  ]
+}
