@@ -38,9 +38,9 @@ class PusingCukAssistant:
     def _bounded_history(self) -> list[dict[str, str]]:
         chosen: list[dict[str, str]] = []
         total = 0
-        for item in reversed(self.history[-12:]):
-            content = item["content"][-3_000:]
-            if total + len(content) > 8_000:
+        for item in reversed(self.history[-6:]):
+            content = item["content"][-2_000:]
+            if total + len(content) > 4_000:
                 continue
             chosen.append({"role": item["role"], "content": content})
             total += len(content)
@@ -104,7 +104,7 @@ class PusingCukAssistant:
                                     used_source_ids.append(doc_id)
                         messages.append({
                             "role": "tool", "tool_name": call["name"],
-                            "content": json.dumps(result, ensure_ascii=False)[:4_000],
+                            "content": json.dumps(result, ensure_ascii=False)[:2_500],
                         })
             else:
                 answer = self.provider.generate(messages, system_prompt=system_prompt)

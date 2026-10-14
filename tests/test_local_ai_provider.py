@@ -110,6 +110,17 @@ class LocalAIProviderTests(unittest.TestCase):
         ]
         self.assertEqual(validate_messages(history)[-1]["tool_name"], "knowledge_search")
 
+    def test_more_than_two_tool_calls_are_rejected(self):
+        body = json.dumps({"message": {"content": "", "tool_calls": [
+            {"function": {"name": "knowledge_search", "arguments": {"query": "a"}}},
+            {"function": {"name": "knowledge_search", "arguments": {"query": "b"}}},
+            {"function": {"name": "knowledge_search", "arguments": {"query": "c"}}},
+        ]}}).encode()
+        with patch("library.local_ai_provider.build_opener") as builder:
+            builder.return_value.open.return_value = FakeResponse(body)
+            with self.assertRaisesRegex(LocalAIProviderError, "TOOL_CALLS_INVALID"):
+                self.provider.generate_turn(self.messages)
+
 
 if __name__ == "__main__":
     unittest.main()

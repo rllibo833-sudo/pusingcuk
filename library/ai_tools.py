@@ -67,7 +67,13 @@ class ToolRegistry:
                 return {"ok": False, "error": "KNOWLEDGE_QUERY_INVALID"}
             if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 3:
                 return {"ok": False, "error": "KNOWLEDGE_LIMIT_INVALID"}
-            results = rank_knowledge(self.documents, query, limit=limit)
+            ranked = rank_knowledge(self.documents, query, limit=limit)
+            results = [{
+                "id": item["id"], "title": item["title"], "summary": item["summary"][:300],
+                "source_path": item["source_path"], "source_url": item["source_url"],
+                "source_repository": item["source_repository"], "source_commit": item["source_commit"],
+                "authority": item["authority"], "claim_status": item["claim_status"],
+            } for item in ranked]
             return {"ok": True, "result_count": len(results), "results": results}
         if name == "budget_threshold":
             if set(arguments) != {"nominal", "batas"}:

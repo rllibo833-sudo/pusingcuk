@@ -79,7 +79,7 @@ def validate_messages(messages: Iterable[dict[str, Any]]) -> list[dict[str, Any]
             item["tool_name"] = tool_name
         if role == "assistant" and "tool_calls" in message:
             calls = message["tool_calls"]
-            if not isinstance(calls, list) or len(calls) > 5:
+            if not isinstance(calls, list) or len(calls) > 2:
                 raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
             for call in calls:
                 if not isinstance(call, dict) or set(call) - {"id", "type", "function"}:
@@ -172,7 +172,7 @@ class OllamaChatProvider:
         message = data.get("message") if isinstance(data, dict) else None
         content = message.get("content") if isinstance(message, dict) else None
         raw_calls = message.get("tool_calls", []) if isinstance(message, dict) else []
-        if not isinstance(raw_calls, list) or len(raw_calls) > 5:
+        if not isinstance(raw_calls, list) or len(raw_calls) > 2:
             raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
         calls = []
         for index, call in enumerate(raw_calls):

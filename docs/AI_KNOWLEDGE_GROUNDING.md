@@ -25,7 +25,7 @@ library/local_ai_provider.py provides a no-paid-key Ollama-compatible chat adapt
 
 ## Tool calling boundary
 
-The Ollama adapter parses a bounded set of structured tool calls. The assistant executes only names in its registry and validates each argument object. Knowledge search is read-only. The budget rule requires a locally configured bearer token and the existing Docker-isolated runner; if the runner is unavailable, the tool fails closed. The model never receives the token and cannot submit source code, commands, paths, or arbitrary capabilities.
+The Ollama adapter parses a bounded set of structured tool calls. The assistant executes only names in its registry, validates each argument object, and accepts at most two tool calls per model turn with a bounded number of follow-up rounds. Knowledge search is read-only. The budget rule requires a locally configured bearer token and the existing Docker-isolated runner; if the runner is unavailable, the tool fails closed. The model never receives the token and cannot submit source code, commands, paths, or arbitrary capabilities.
 
 ## Security boundaries
 
