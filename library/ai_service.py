@@ -127,7 +127,11 @@ class _Handler(BaseHTTPRequestHandler):
             return
 
         auth = self.headers.get_all("Authorization", [])
-        if len(auth) != 1 or not auth[0].startswith("Bearer ") or not hmac.compare_digest(auth[0][7:], self.server.token):
+        if (
+            len(auth) != 1
+            or not auth[0].startswith("Bearer ")
+            or not hmac.compare_digest(auth[0][7:].encode("utf-8"), self.server.token.encode("utf-8"))
+        ):
             self._json(401, {"error": "AI_SERVICE_UNAUTHORIZED", "request_id": request_id},
                        {"WWW-Authenticate": "Bearer"})
             return

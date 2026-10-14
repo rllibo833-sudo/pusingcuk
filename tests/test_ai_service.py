@@ -72,6 +72,12 @@ class AIServiceTests(unittest.TestCase):
         self.assertEqual(headers.get("Cache-Control"), "no-store")
         self.assertFalse(self.assistants)
 
+    def test_non_ascii_bearer_token_is_rejected_cleanly(self):
+        status, payload, _ = self.request(token="é" * 32)
+        self.assertEqual(status, 401)
+        self.assertEqual(payload["error"], "AI_SERVICE_UNAUTHORIZED")
+        self.assertFalse(self.assistants)
+
     def test_valid_chat_reuses_only_its_ephemeral_session(self):
         first_status, first, _ = self.request(payload={"session_id": "session_0123456789", "query": "pertama"})
         second_status, second, _ = self.request(payload={"session_id": "session_0123456789", "query": "kedua"})
