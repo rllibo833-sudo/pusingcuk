@@ -58,7 +58,13 @@ class GeminiGenerateContentProvider:
                     item = {"name": fn["name"], "args": fn["arguments"]}
                     if call.get("id"):
                         item["id"] = call["id"]
-                    parts.append({"functionCall": item})
+                    part = {"functionCall": item}
+                    signature = call.get("thought_signature")
+                    if signature is not None:
+                        if not isinstance(signature, str) or not signature or len(signature) > 16_000:
+                            raise LocalAIProviderError("AI_THOUGHT_SIGNATURE_INVALID")
+                        part["thoughtSignature"] = signature
+                    parts.append(part)
             append(target, parts)
         if not contents or not any(item["role"] == "user" for item in contents):
             raise LocalAIProviderError("AI_USER_MESSAGE_REQUIRED")
@@ -131,7 +137,13 @@ class GeminiGenerateContentProvider:
             call_id = call.get("id") or "gemini-tool-" + str(len(calls) + 1)
             if not isinstance(call_id, str) or len(call_id) > 100:
                 call_id = "gemini-tool-" + str(len(calls) + 1)
-            calls.append({"id": call_id, "name": name, "arguments": args})
+            signature = part.get("thoughtSignature")
+            if signature is not None and (not isinstance(signature, str) or not signature or len(signature) > 16_000):
+                raise LocalAIProviderError("AI_THOUGHT_SIGNATURE_INVALID")
+            parsed_call = {"id": call_id, "name": name, "arguments": args}
+            if signature is not None:
+                parsed_call["thought_signature"] = signature
+            calls.append(parsed_call)
             if len(calls) > 2:
                 raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
         answer = "\n".join(texts).strip()

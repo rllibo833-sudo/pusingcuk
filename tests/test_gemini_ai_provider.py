@@ -43,18 +43,19 @@ class GeminiProviderTests(unittest.TestCase):
         self.assertEqual(payload["systemInstruction"]["parts"][0]["text"], "Jawab jujur.")
 
     def test_function_call_schema_is_mapped(self):
-        body = json.dumps({"candidates": [{"content": {"parts": [{"functionCall": {"id": "call-1", "name": "knowledge_search", "args": {"query": "ollama lokal", "limit": 2}}}]}}]}).encode()
+        body = json.dumps({"candidates": [{"content": {"parts": [{"functionCall": {"id": "call-1", "name": "knowledge_search", "args": {"query": "ollama lokal", "limit": 2}}, "thoughtSignature": "opaque-signature-test"}]}}]}).encode()
         with patch("library.gemini_ai_provider.build_opener") as builder:
             builder.return_value.open.return_value = FakeResponse(body)
             turn = self.provider.generate_turn(self.messages, tools=[{"type": "function", "function": {"name": "knowledge_search", "description": "Cari dokumen", "parameters": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"], "additionalProperties": False}}}])
         self.assertEqual(turn["tool_calls"][0]["name"], "knowledge_search")
+        self.assertEqual(turn["tool_calls"][0]["thought_signature"], "opaque-signature-test")
         payload = json.loads(builder.return_value.open.call_args.args[0].data.decode())
         self.assertEqual(payload["tools"][0]["functionDeclarations"][0]["name"], "knowledge_search")
 
     def test_tool_history_maps_to_function_response(self):
         history = [
             {"role": "user", "content": "Cari sumber."},
-            {"role": "assistant", "content": "", "tool_calls": [{"id": "call-1", "type": "function", "function": {"name": "knowledge_search", "arguments": {"query": "pusingcuk"}}}]},
+            {"role": "assistant", "content": "", "tool_calls": [{"id": "call-1", "type": "function", "function": {"name": "knowledge_search", "arguments": {"query": "pusingcuk"}}, "thought_signature": "opaque-signature-test"}]},
             {"role": "tool", "tool_name": "knowledge_search", "content": '{"ok": true, "result_count": 1}'},
         ]
         body = json.dumps({"candidates": [{"content": {"parts": [{"text": "Sumber ditemukan."}]}}]}).encode()
@@ -65,6 +66,7 @@ class GeminiProviderTests(unittest.TestCase):
         payload = json.loads(builder.return_value.open.call_args.args[0].data.decode())
         self.assertEqual(payload["contents"][-1]["role"], "user")
         self.assertEqual(payload["contents"][-1]["parts"][0]["functionResponse"]["name"], "knowledge_search")
+        self.assertEqual(payload["contents"][1]["parts"][0]["thoughtSignature"], "opaque-signature-test")
 
     def test_invalid_configuration_is_rejected(self):
         with self.assertRaisesRegex(LocalAIProviderError, "API_KEY_INVALID"):

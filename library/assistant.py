@@ -96,6 +96,7 @@ class PusingCukAssistant:
                         "tool_calls": [{
                             "id": call["id"], "type": "function",
                             "function": {"name": call["name"], "arguments": call["arguments"]},
+                            **({"thought_signature": call["thought_signature"]} if call.get("thought_signature") else {}),
                         } for call in calls],
                     })
                     for call in calls:
