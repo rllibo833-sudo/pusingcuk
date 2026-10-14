@@ -27,7 +27,10 @@ def _to_int(value: Any) -> int:
 def _to_float(value: Any) -> float:
     if isinstance(value, bool):
         raise TypeError("bool tidak dapat dikonversi menjadi float")
-    return float(value)
+    converted = float(value)
+    if not math.isfinite(converted):
+        raise ValueError("desimal() membutuhkan angka finite")
+    return converted
 
 
 def _to_bool(value: Any) -> bool:
