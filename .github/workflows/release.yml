@@ -170,11 +170,14 @@ jobs:
           test -s dist/pusingcuk
           test -s dist/android/pusingcuk-native-android-arm64
           notes="$RELEASE_TAG - Linux x86-64 PyInstaller CLI plus Android ARM64 native CLI. The native runtime is a subset, not an OS sandbox; do not run untrusted programs."
-          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" dist/pusingcuk dist/android/pusingcuk-native-android-arm64 --clobber
+          # This job does not check out the repository, so pass the target repo explicitly.
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" dist/pusingcuk dist/android/pusingcuk-native-android-arm64 \
+              --repo "$GITHUB_REPOSITORY" --clobber
             # Preserve curated title and release notes when retrying an existing release; only replace assets.
           else
             gh release create "$RELEASE_TAG" dist/pusingcuk dist/android/pusingcuk-native-android-arm64 \
+              --repo "$GITHUB_REPOSITORY" \
               --title "$RELEASE_TAG" \
               --notes "$notes"
           fi
