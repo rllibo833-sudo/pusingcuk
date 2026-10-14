@@ -22,6 +22,8 @@ Pusingcuk is an experimental programming language built around Indonesian-friend
 > **Status:** experimental. Python defines the reference behavior; native C implements a tested subset. A feature is portable between them only when the same conformance fixture passes on both. Pusingcuk is not a security sandbox.
 >
 > **Security warning:** Eksekusi PusingCuk tidak ter-sandbox OS. Jangan jalankan kode tidak terpercaya. Execution runs with the current process's operating-system permissions; do not run untrusted code or bytecode.
+>
+> **Status & roadmap (15 Oct 2026):** lihat [audit status bahasa, AI dan Supabase](docs/PROJECT_STATUS_AND_ROADMAP.md). Bahasa `.cuk` dan aplikasi PusingCuk AI mempunyai tingkat kematangan berbeda. AI adalah aplikasi di atas Ollama atau Gemini, bukan foundation model yang dilatih sendiri. Supabase project PusingCuk saat ini belum menjadi koneksi runtime.
 
 ## Try Pusingcuk on Termux
 
@@ -120,10 +122,10 @@ The native runtime and its limits are documented in the [native runtime guide](d
 - **Start and learn:** [Beginner guide](docs/PEMULA.md) · [Termux quick start](docs/termux/README.md) · [Examples index](examples/README.md)
 - **Language reference and dictionary:** [Language reference index](docs/language/README.md) · [Built-in catalogue](docs/language/BUILTINS.md) · [Syntax specification](SPEC.md) · [English dictionary](docs/DICTIONARY.md) · [Kamus Indonesia](docs/KAMUS_PUSINGCUK.md)
 - **Consistency and runtime support:** [Semantic contract](docs/SEMANTIC_CONTRACT.md) · [Compatibility matrix](docs/COMPATIBILITY.md) · [Conformance fixtures](docs/CONFORMANCE_FIXTURES.md)
-- **AI Engine:** [Grounding contract](docs/AI_KNOWLEDGE_GROUNDING.md) · [Readiness gates](docs/AI_ENGINE_READINESS.md) · [Knowledge migration ledger](docs/AI_ENGINE_MIGRATION_LEDGER.md) · [Local HTTP service](docs/AI_LOCAL_SERVICE.md)
+- **AI Engine:** [Status & roadmap](docs/PROJECT_STATUS_AND_ROADMAP.md) · [Grounding contract](docs/AI_KNOWLEDGE_GROUNDING.md) · [Readiness gates](docs/AI_ENGINE_READINESS.md) · [Knowledge migration ledger](docs/AI_ENGINE_MIGRATION_LEDGER.md) · [Local HTTP service](docs/AI_LOCAL_SERVICE.md)
 - **Development:** [Contributor guide](CONTRIBUTING.md) · [Development and test gates](docs/development/README.md) · [Repository map](docs/REPO_STRUCTURE.md)
 - **Security:** [Security policy](SECURITY.md) · [Security review guide](docs/security/README.md)
-- **CORE integration:** [Tool contract and trust boundary](docs/integrations/CORE_TOOL_CONTRACT.md) · [Legacy compatibility runner (not used by assistant runtime)](tools/core-rule-runner.mjs)
+- **Registered-rule compatibility harness (historical naming):** [Tool contract and trust boundary](docs/integrations/CORE_TOOL_CONTRACT.md) · [Legacy runner used only by regression/security tests](tools/core-rule-runner.mjs). These are PusingCuk-owned test artifacts, not a live CORE repository or Supabase connection.
 - **Complete documentation index:** [docs/README.md](docs/README.md)
 
 ## Quality gates

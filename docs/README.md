@@ -6,6 +6,7 @@ Use this index to choose the right document. The current engineering baseline is
 
 ## Start here
 
+- [Status teknis dan roadmap](PROJECT_STATUS_AND_ROADMAP.md) — status audit bahasa, AI, CI, Supabase, serta urutan pengembangan.
 - [Beginner guide](PEMULA.md) — first program, syntax basics, and guided examples.
 - [Termux guide](termux/README.md) — run Pusingcuk on an Android phone without needing a desktop.
 - [Project vision](VISION.md) — goals, community values, and current engineering priorities.
@@ -30,6 +31,7 @@ Use this index to choose the right document. The current engineering baseline is
 - [Compatibility matrix](COMPATIBILITY.md) — which features are verified on which runtime.
 - [Conformance fixtures](CONFORMANCE_FIXTURES.md) — how Python and native C behavior is compared, including common error classes, exit codes, and source lines.
 - [Native C runtime](NATIVE_RUNTIME.md) — supported subset, limits, and build instructions.
+- [Status teknis dan roadmap](PROJECT_STATUS_AND_ROADMAP.md) — ringkasan source of truth untuk bahasa, AI, CI dan Supabase.
 - [AI Engine readiness gates](AI_ENGINE_READINESS.md) — local service boundary, production gates, and incremental knowledge migration.
 - [AI knowledge migration ledger](AI_ENGINE_MIGRATION_LEDGER.md) — rewritten, immutable-provenance concepts from Founder-OS and CORE.
 - [Local AI HTTP service](AI_LOCAL_SERVICE.md) — loopback-only endpoint, request contract, and security limits.
@@ -67,6 +69,10 @@ The documents below describe prototypes or possible future work. Read them only 
 - [Android Studio prototype](ANDROID_STUDIO.md)
 - [Local web workbench](WEB_WORKBENCH.md) and [Termux dashboard](TERMUX_DASHBOARD.md)
 - [Three-repository compiler roadmap](THREE_REPO_COMPILER_ROADMAP.md)
+
+## Integrations and data services
+
+- [Supabase project map](integrations/SUPABASE_PROJECTS.md) — proyek PusingCuk dan database legacy yang terpisah, status koneksi, kuota Free, dan batas keamanan.
 
 ## About the `library/` directory
 

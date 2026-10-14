@@ -62,12 +62,12 @@ This ledger records why a pattern is being adopted, how it is rewritten for Pusi
 
 - This migration does not train a language model or transfer model weights.
 - PusingCuk, native C, PVM and transpiled outputs are not a general-purpose security sandbox; never run untrusted code without independently reviewed OS-level isolation.
-- It does not make CORE or Founder-OS safe to delete today.
+- It is not a byte-for-byte copy or backup of either source repository and does not preserve every source file or Git object. The owner has decided those repos are no longer needed as active development dependencies for PusingCuk; source deletion remains separate from live Supabase service/data retirement.
 - It does not claim hosted availability, real users, uptime, answer accuracy or a successful external outcome.
 
 ## Asset disposition and retirement gates — 2026-10-15
 
-This is the current working disposition of old-repository assets. It is a migration record, not a claim that either source repository is already safe to delete.
+Owner disposition (2026-10-15): Founder-OS and CORE are no longer the intended development source of truth for PusingCuk; the owner intends to delete those GitHub repos. This ledger tracks selected knowledge/architecture transfer only. It is not a complete source archive, and deletion of GitHub repos does not retire Supabase resources or remove database records.
 
 | Source asset | Decision | Destination / proof | Exit condition |
 |---|---|---|---|
@@ -81,16 +81,17 @@ This is the current working disposition of old-repository assets. It is a migrat
 
 ### Current implementation evidence and limitations
 
-- PusingCuk owns a curated, public-safe knowledge index with 16 source records in `library/knowledge_index.json`; runtime retrieval does not crawl CORE or Founder-OS.
+- PusingCuk owns a curated, public-safe knowledge index with 20 source records in `library/knowledge_index.json`; runtime retrieval does not crawl CORE or Founder-OS.
 - The local-first assistant has Ollama and Gemini adapters, bounded in-process chat history, explicit local memory, validated citation handling, a loopback-only HTTP adapter, and a small allowlisted `ToolRegistry`. This is an application around a replaceable model provider, not a foundation model trained by PusingCuk.
-- Offline HTTP-to-rule E2E tests were added in `tests/test_ai_e2e.py` at commit `97482dc0aacc298f921a58e2654f5983ac1fadc4`; README's stale runner description was corrected at `c0592c3485455bb73f560a967534c4e6018181ca`. The connector does not currently expose push-triggered Actions run details here, so successful CI for those latest commits must not be inferred from the presence of the tests.
+- Offline HTTP-to-rule E2E tests are present in `tests/test_ai_e2e.py`. At the audit baseline `a5ad400102044c3e6c215afbe1adda184396ed12`, the main test workflow and package build workflow were both observed completed successfully: [core CI run](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38651560270) and [package build](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38651560334). These CI results verify the baseline commit, not every later commit automatically.
 - The current fixed-artifact Python reference executor is explicitly not an OS sandbox. Hash pinning, allowlisting, and bounded I/O are useful safeguards but do not provide OS-level isolation for arbitrary code.
 
-### Repository exit criteria
+### Repository and cloud-resource boundary
 
-**Founder-OS may be archived only after** the required decision/history export is complete, its integrity is checked, restoration is rehearsed, every in-scope unique record is mapped or intentionally excluded, and the owner accepts the preserved-history plan.
+The owner has chosen to remove Founder-OS and CORE as active development repositories because PusingCuk is the intended source of truth for the language and AI application. No issue or pull request is required for this decision, and this audit has not performed the GitHub repository deletion itself.
 
-**CORE may be archived only after** every deployed service and caller has an explicit disposition, required operational/audit/economic data is exported and restore-tested, payment/webhook/queue behavior is migrated or intentionally retired with tests, credentials are rotated/revoked where appropriate, and deployment/CI/operator paths no longer require CORE.
+The migration is deliberately not a full source backup: PusingCuk owns the current code, index and selected rewritten concepts, but does not contain every historical file/commit/workflow from those repositories. Supabase database rows are not a substitute for GitHub source history.
 
-Repository deletion is a separate, later decision. An archive must preserve the evidence and rollback point; deleting GitHub source does not itself retire deployed Supabase resources or erase their data.
+The live Kawasan/CORE Supabase project and its deployed functions/schedules are independent cloud resources. Deleting GitHub source will not automatically delete or disable them; their final disposition requires a separate owner decision. The PusingCuk Supabase project is a separate, currently clean project and the runtime has not connected to it. Never place privileged credentials in repository code or browser assets.
 
+This boundary documents the state of the migration; it does not override the owner's decision about deleting unused GitHub repositories.

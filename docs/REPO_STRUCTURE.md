@@ -1,6 +1,6 @@
 # Peta Repositori Pusingcuk
 
-Dokumen ini menunjukkan tempat yang tepat untuk memulai. Baseline yang aktif adalah **interpreter referensi Python + runtime native C**. Folder eksperimen tetap disimpan, tetapi bukan bukti bahwa fitur tersebut sudah stabil atau setara lintas runtime.
+Dokumen ini menunjukkan tempat yang tepat untuk memulai. Lihat [status teknis dan roadmap](PROJECT_STATUS_AND_ROADMAP.md) terlebih dahulu. Baseline yang aktif adalah **interpreter referensi Python + runtime native C**. Folder eksperimen tetap disimpan, tetapi bukan bukti bahwa fitur tersebut sudah stabil atau setara lintas runtime.
 
 ## Jalur pengguna
 
@@ -33,7 +33,7 @@ Dokumen ini menunjukkan tempat yang tepat untuk memulai. Baseline yang aktif ada
 
 ## AI Engine dan kontrak authoring .cuk
 
-Peta implementasi AI saat ini—semua lokasi berikut sudah ada kecuali contoh authoring baru yang ditandai:
+Peta implementasi AI yang sudah ada pada audit 2026-10-15:
 
 | Lokasi | Peran |
 |---|---|
@@ -46,7 +46,7 @@ Peta implementasi AI saat ini—semua lokasi berikut sudah ada kecuali contoh au
 | `library/ai_service.py` | Adapter HTTP lokal eksperimental, loopback-only |
 | `examples/ai/engine_contract.cuk` | **Contoh baru:** prompt, aturan deterministik, dan deklarasi binding tool memakai grammar yang sudah ada |
 
-Alur yang dipelihara tetap `lexer.py` → `parser.py` → `ast_nodes.py` → `evaluator.py`; native C tetap di `native/pusingcuk.c`. Jangan membuat parser, provider layer, atau indeks AI kedua untuk tujuan yang sama. Deklarasi tool dalam contoh .cuk adalah metadata; eksekusi tetap hanya melalui registry host yang mengizinkan tool secara eksplisit. Handler `budget_threshold` masih memakai kontrak runner lokal lama dan perlu dipisahkan pada tahap berikutnya sebelum mengklaim semua kemampuan AI sudah bebas dari adapter historis.
+Alur yang dipelihara tetap `lexer.py` → `parser.py` → `ast_nodes.py` → `evaluator.py`; native C tetap di `native/pusingcuk.c`. Jangan membuat parser, provider layer, atau indeks AI kedua untuk tujuan yang sama. Deklarasi tool dalam contoh `.cuk` adalah metadata; eksekusi tetap hanya melalui registry host yang mengizinkan tool secara eksplisit. Handler `budget_threshold` saat ini memakai internal `ToolRegistry` untuk menjalankan artefak `.cuk` tetap yang di-hash dan tidak lagi memanggil legacy HTTP runner. `tools/core-rule-runner.mjs` masih menjadi harness kompatibilitas/regresi yang diuji terpisah oleh CI, bukan koneksi runtime AI.
 
 ## Tes dan bukti kompatibilitas
 
@@ -61,6 +61,8 @@ Perilaku baru wajib disertai tes. Klaim kompatibilitas Python/C harus didukung f
 
 ## Peta dokumentasi
 
+- **Status utama:** `docs/PROJECT_STATUS_AND_ROADMAP.md`.
+- **AI dan Supabase:** `docs/AI_ENGINE_READINESS.md`, `docs/AI_ENGINE_MIGRATION_LEDGER.md`, `docs/AI_LOCAL_SERVICE.md`, `docs/integrations/SUPABASE_PROJECTS.md`.
 - **Bahasa dan kamus:** `docs/language/README.md`, `SPEC.md`, `docs/PEMULA.md`, `docs/DICTIONARY.md`, `docs/KAMUS_PUSINGCUK.md`, `docs/KOSAKATA_GENZ.md`.
 - **Semantik dan kompatibilitas:** `docs/SEMANTIC_CONTRACT.md`, `docs/COMPATIBILITY.md`, `docs/CONFORMANCE_FIXTURES.md`.
 - **Native C dan Termux:** `docs/NATIVE_RUNTIME.md`, `docs/NATIVE_TERMUX.md`, `docs/termux/README.md`.

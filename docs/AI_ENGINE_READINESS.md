@@ -48,7 +48,7 @@ A release must not skip gates or turn a prototype into a production claim just b
 
 ### Gate 1 — measurable answer quality and reliability
 
-- The current 16-case exact-top-1 retrieval benchmark is still a small regression baseline; expand it in small reviewed increments: ordinary Indonesian, colloquial wording/typos, ambiguous queries, questions outside the corpus, and security/policy questions.
+- The current 20-case exact-top-1 retrieval benchmark is still a small regression baseline; expand it in small reviewed increments: ordinary Indonesian, colloquial wording/typos, ambiguous queries, questions outside the corpus, and security/policy questions.
 - Record expected source IDs and whether a question is answerable. Measure retrieval top-1/top-3, unsupported-claim rate, citation precision, refusal behavior, and provider failure handling; publish the fixture set and result rather than saying "accurate" without evidence.
 - Add regressions for prompt injection inside retrieved documents, fabricated URLs, malformed/oversized provider responses, timeouts, quota/rate-limit responses, and repeated/invalid tool calls.
 - Model output is not proof that a requested tool ran. Tool outcomes must come from validated tool responses and their citations must retain the trusted source envelope.
@@ -114,19 +114,20 @@ Checklist penerimaan per aset:
 
 Migrasi pengetahuan ini **bukan pelatihan bobot model**. Fine-tuning adalah proyek terpisah setelah ada dataset legal/aman, benchmark, anggaran komputasi, dan bukti bahwa prompt, aturan, atau retrieval tidak cukup.
 
-## Conditions for retiring Founder OS and CORE
+## Source-repository deletion and cloud-resource boundary
 
-The public website is already a separate content site, but that does not establish that CORE's backend or data can be deleted safely. Before any repository is deleted (rather than merely archived), confirm all of the following:
+Source-repository deletion is an owner decision; it is separate from retirement of deployed services and from data deletion. The owner has decided that Founder-OS and CORE are no longer development repositories needed by PusingCuk and reports that the old connections/keys have been removed. This repository review does not execute those GitHub deletions or independently verify provider-side secret revocation.
 
-1. No production deployment workflow, edge function, scheduled job, client, webhook, CI job, or maintainer runbook needs the repository.
-2. Every required service has either been intentionally retired or moved with an owner and a tested rollback.
-3. Required data has a verified export/backup, restore test, retention decision, and deletion plan; secrets are rotated or revoked where appropriate.
-4. PusingCuk builds and tests with no runtime, index, or CI fetch dependency on Founder OS/CORE.
-5. Unique decisions and proof records have been migrated as reviewed summaries, not wholesale copied.
-6. The owner explicitly approves the final irreversible deletion after dependencies and retention are demonstrated.
+The transfer into PusingCuk is **selective**, not a byte-for-byte archive:
 
-Until these checks pass, prefer disabling retired endpoints explicitly and documenting remaining services over deleting repositories or stopping a shared backend project. Repository deletion does not itself delete separate cloud resources or data.
+1. The live AI index is PusingCuk-owned and does not crawl either external repository.
+2. The currently indexed source records and summaries preserve selected technical principles; they do not copy every source file, Git object, workflow run, issue, or historical decision.
+3. Supabase stores its own database records and deployed resources, not the GitHub source tree or its complete commit history.
+4. Deleting a GitHub repository does not automatically stop a Supabase Edge Function, cron job, webhook, external caller, or project. Those resources are managed separately.
+5. Keep the PusingCuk language baseline and its current regression harness intact. Files with historic `CORE` naming inside this repository are not proof of a live connection; they remain only where an explicit regression workflow still tests them.
+
+For PusingCuk development, the target state is no runtime/API-key/repository dependency on Founder-OS or CORE. If any legacy Supabase resource is later shut down, review its callers, required records, retention, export/restore, and external integrations independently of the GitHub repository deletion.
 
 ## Immediate acceptance target
 
-For this phase, the acceptance target is a provenance-clean 16-source index, a non-contradictory grounding contract, automated local-only source assertions, and a documented release/migration gate. This narrows the next implementation step to measurable tests instead of claiming that the Engine is already production-ready.
+Keep the 20-source curated index and 20-case Indonesian retrieval regression aligned by automated test. Maintain a non-contradictory grounding contract, run local-only source and tool assertions, and document release gates. This is evidence-based progress, not a claim that the AI Engine is production-ready.

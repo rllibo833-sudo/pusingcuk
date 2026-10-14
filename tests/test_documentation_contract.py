@@ -59,5 +59,41 @@ class DocumentationContractTests(unittest.TestCase):
         self.assertNotIn("/blob/main/", ledger)
 
 
+    def test_ai_index_benchmark_and_conformance_counts_stay_in_sync(self):
+        root = Path(__file__).resolve().parents[1]
+        index = json.loads((root / "library/knowledge_index.json").read_text(encoding="utf-8"))
+        benchmark = json.loads((root / "tests/fixtures/knowledge_retrieval_cases.json").read_text(encoding="utf-8"))
+        manifest = json.loads((root / "tests/conformance/manifest.json").read_text(encoding="utf-8"))
+        documents = index["documents"]
+        source_ids = {item["id"] for item in documents}
+        self.assertEqual(len(documents), 20)
+        self.assertEqual(len(source_ids), 20)
+        self.assertTrue(all(item["source_repository"] == "rllibo833-sudo/pusingcuk" for item in documents))
+        self.assertTrue(all(item["visibility"] == "public-safe" for item in documents))
+        self.assertTrue(all(len(item["source_commit"]) == 40 for item in documents))
+        self.assertEqual(len(benchmark["cases"]), 20)
+        self.assertTrue(all(case["expected_top_id"] in source_ids for case in benchmark["cases"]))
+
+        counts = {"reference:required": 0, "native:required": 0, "native:unsupported": 0}
+        for fixture in manifest["fixtures"]:
+            for runtime, status in fixture["runtimes"].items():
+                key = f"{runtime}:{status}"
+                counts[key] = counts.get(key, 0) + 1
+        self.assertEqual(len(manifest["fixtures"]), 64)
+        self.assertEqual(counts["reference:required"], 64)
+        self.assertEqual(counts["native:required"], 59)
+        self.assertEqual(counts["native:unsupported"], 5)
+
+        readiness = (root / "docs/AI_ENGINE_READINESS.md").read_text(encoding="utf-8")
+        ledger = (root / "docs/AI_ENGINE_MIGRATION_LEDGER.md").read_text(encoding="utf-8")
+        status = (root / "docs/PROJECT_STATUS_AND_ROADMAP.md").read_text(encoding="utf-8")
+        self.assertIn("20-case exact-top-1 retrieval benchmark", readiness)
+        self.assertIn("20-source index", readiness)
+        self.assertNotIn("16-case exact-top-1 retrieval benchmark", readiness)
+        self.assertNotIn("16 source records", ledger)
+        self.assertIn("20 dokumen sumber terkurasi", status)
+        self.assertIn("20 kasus benchmark", status)
+        self.assertIn("64 fixture", status)
+
 if __name__ == "__main__":
     unittest.main()
