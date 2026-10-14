@@ -88,28 +88,41 @@ The most recent log query during this audit found no Gemini/provider-name matche
 
 The two source repositories themselves have **not** been deleted or archived. No Issue or Pull Request was opened. Deletion of source repositories is separate from permanent deletion of the Supabase database/project.
 
-## ChatGPT-linked Supabase organizations and free-first disposition
+## Single Supabase database direction for PusingCuk
 
-- Connection `Primary` points to organization `Pusingcuk`, whose plan is `free`; it currently has **no Supabase project**.
-- Connection `Supabase` points to organization `Kawasan-masjid-1000ha`, whose plan is `free`; it owns the existing project `lnpzgrodwnhthcwudebk`.
-- Both organizations are connected to ChatGPT, but those connections do not merge projects or databases. **No new project was created** during this continuation.
-- To protect the free-first priority, do not create or upgrade a project as part of this migration without a separate decision. PusingCuk remains the code/knowledge destination; the existing project still contains CORE operational tables and must not be treated as a PusingCuk-owned database by implication.
+**Decision (2026-10-15): use the one existing project `lnpzgrodwnhthcwudebk` as the sole database project for the PusingCuk ecosystem; do not create a second project.** There is no second Supabase project to merge:
 
-## Supabase shutdown and permanent data deletion — separate gate
+- Connection `Primary` points to the Free organization `Pusingcuk`; it currently has **zero projects**.
+- Connection `Supabase` points to the Free organization `Kawasan-masjid-1000ha`; it contains the sole existing project `lnpzgrodwnhthcwudebk`.
+- The database remains in the Kawasan organization for now. The available ChatGPT connector does not expose a project-transfer operation, and ownership transfer is not required merely to designate the existing project as the single intended database.
+- No new project, schema, or table was created by this decision. Existing CORE tables and operational records are preserved, not represented as if already migrated to PusingCuk.
+- **The PusingCuk runtime is not yet connected to this database.** That requires a specific application use case and a correctly scoped authentication/data-access path. Never put the database password or service-role key in the public repository, a distributable CLI, or browser JavaScript. Do not point PusingCuk directly at old CORE tables without reviewing schema ownership and access policies.
+- Both organizations are on Free; this path avoids creating a new paid resource.
 
-A new reversible pause request was issued at the owner's request on 2026-10-15. Supabase accepted it (`success: true`); the latest follow-up status was `PAUSING`, **not yet confirmed `PAUSED`**. The project has not been deleted. Both known cron jobs were already inactive; ten Edge Functions were previously reported active. Once the pause finishes, the project's database/API-backed endpoints will be unavailable until it is restored.
+## Project restore and safety state
 
-A private database export and a successful restore rehearsal in a separate environment have **not** been produced by this migration. Before permanently deleting or retiring this project, preserve or explicitly decide to discard the 34,031 `ai_activity` rows, 4 `ai_tasks`, 16 AI-agent configuration rows, one Auth user, and the schema/migration history. The 0 Storage objects do not substitute for a database backup. Counts are not a backup.
+On 2026-10-15, a restore request for the sole existing project was accepted (`success: true`). The latest live status observed was `COMING_UP`, so it is **not yet confirmed `ACTIVE_HEALTHY`**. Wait until the provider reports healthy before any data/schema operations.
 
-Provider-origin Gemini key revocation has not been independently verified here; the owner reported deleting the current Supabase/GitHub copies. Do not commit or export secret values.
+The two inspected cron jobs remain inactive. Ten Edge Functions were reported deployed and active before the project was paused; restoring the project may make those existing routes available again. Before exposing the database to PusingCuk, re-check those routes and their auth boundaries. No data or schema was deleted or rewritten.
 
-### Encrypted database export workflow
+A private database export and a successful restore rehearsal have not been produced. Do not permanently delete the only project: previous read-only counts are a snapshot, not a backup.
 
-A manual-only workflow has been added at `.github/workflows/backup-core-supabase.yml`. It targets only the named CORE project, uses a PostgreSQL 17 client, creates a logical database dump, encrypts it, verifies its integrity and archive listing, and uploads **encrypted files only** for three days. It does not run on pushes or pull requests and refuses to run unless the selected scope and the `main` branch match.
+## Single Supabase database direction for PusingCuk
 
-Before manually running it, the repository owner must add these two values under **Settings → Secrets and variables → Actions**:
-- `SUPABASE_DB_URL`: the PostgreSQL URI copied from the Supabase dashboard's Connect panel. Prefer a **Session pooler** URI if the direct host is not reachable from GitHub-hosted runners. Never paste it into chat, issue comments, workflow inputs, or committed files.
-- `BACKUP_ENCRYPTION_PASSPHRASE`: a randomly generated, unique passphrase of at least 32 characters. Save it outside GitHub in a password manager; it is required to decrypt the artifact later. Do not reuse an account password.
+**Decision (2026-10-15): use the one existing project `lnpzgrodwnhthcwudebk` as the sole database project for the PusingCuk ecosystem; do not create a second project.** There is no second Supabase project to merge:
 
-The public repository means workflow artifacts may be publicly downloadable. Only the encrypted dump, its keyed integrity checksum, and a non-secret manifest are uploaded; the unencrypted dump exists temporarily on an ephemeral runner and is removed before the artifact step. **This workflow has not been run yet**; the second secret is reported by the owner as configured, but `SUPABASE_DB_URL` has not been confirmed configured. A successful archive-list check is not a full restore rehearsal. Because the owner prioritized pausing without navigating more setup, the project has been returned to `PAUSING`; do not assume any backup exists. Resume later only when ready to finish the backup steps.
+- Connection `Primary` points to the Free organization `Pusingcuk`; it currently has **zero projects**.
+- Connection `Supabase` points to the Free organization `Kawasan-masjid-1000ha`; it contains the sole existing project `lnpzgrodwnhthcwudebk`.
+- The database remains in the Kawasan organization for now. The available ChatGPT connector does not expose a project-transfer operation, and ownership transfer is not required merely to designate the existing project as the single intended database.
+- No new project, schema, or table was created by this decision. Existing CORE tables and operational records are preserved, not represented as if already migrated to PusingCuk.
+- **The PusingCuk runtime is not yet connected to this database.** That requires a specific application use case and a correctly scoped authentication/data-access path. Never put the database password or service-role key in the public repository, a distributable CLI, or browser JavaScript. Do not point PusingCuk directly at old CORE tables without reviewing schema ownership and access policies.
+- Both organizations are on Free; this path avoids creating a new paid resource.
+
+## Project restore and safety state
+
+On 2026-10-15, a restore request for the sole existing project was accepted (`success: true`). The latest live status observed was `COMING_UP`, so it is **not yet confirmed `ACTIVE_HEALTHY`**. Wait until the provider reports healthy before any data/schema operations.
+
+The two inspected cron jobs remain inactive. Ten Edge Functions were reported deployed and active before the project was paused; restoring the project may make those existing routes available again. Before exposing the database to PusingCuk, re-check those routes and their auth boundaries. No data or schema was deleted or rewritten.
+
+A private database export and a successful restore rehearsal have not been produced. Do not permanently delete the only project: previous read-only counts are a snapshot, not a backup.
 
