@@ -1,7 +1,7 @@
 # CORE Tool Contract for PusingCuk
 
-**Status:** design contract; not yet a production integration.  
-**Version:** 1 (proposed)  
+**Status:** CI integration proof implemented; production execution boundary not yet deployed.  
+**Version:** 1 (CI proof; service execution remains gated)  
 **Owner:** PusingCuk owns this contract's language-facing request/response shape; CORE owns authorization, persistence, limits and deployment.
 
 ## Goal and trust boundary
@@ -16,6 +16,14 @@ The first integration should execute only a registered program artifact with a r
 - CORE owns the authenticated tool endpoint, user authorization, approved program registry, audit trail, business data access and execution evidence.
 - MEMORY records the long-lived architecture decision and accepted rollout gates; it is not a mirror of request/response logs.
 - PUBLIC must not expose internal tool requests, credentials, private source or operational evidence.
+
+## Verified CI proof (2026-10-14)
+
+The canonical pure rule is `examples/core/anggaran_threshold.cuk`. It classifies a nominal against a budget limit and returns one of `DALAM_BATAS`, `PERLU_PERSETUJUAN`, or `INPUT_TIDAK_VALID`. The native test target `make test-native` compares five deterministic cases against exact expected stdout.
+
+CORE's `Core Quality Gate` pins this repository to a full commit SHA, builds the native runtime, runs the canonical example, and checks malformed input exits non-zero. This proves deterministic native execution in CI only. It does not prove that Supabase Edge Functions can spawn the native binary or that a production runner exists.
+
+The runtime currently opens a source file and is not an OS sandbox. A production service must therefore be a separately isolated executor or a deliberately engineered WASI/runtime boundary. Do not bypass this requirement by executing arbitrary program text in an Edge Function.
 
 ## Proposed request envelope
 
