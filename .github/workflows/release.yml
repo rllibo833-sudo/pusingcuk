@@ -172,7 +172,7 @@ jobs:
           notes="$RELEASE_TAG - Linux x86-64 PyInstaller CLI plus Android ARM64 native CLI. The native runtime is a subset, not an OS sandbox; do not run untrusted programs."
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             gh release upload "$RELEASE_TAG" dist/pusingcuk dist/android/pusingcuk-native-android-arm64 --clobber
-            gh release edit "$RELEASE_TAG" --title "$RELEASE_TAG" --notes "$notes"
+            # Preserve curated title and release notes when retrying an existing release; only replace assets.
           else
             gh release create "$RELEASE_TAG" dist/pusingcuk dist/android/pusingcuk-native-android-arm64 \
               --title "$RELEASE_TAG" \
