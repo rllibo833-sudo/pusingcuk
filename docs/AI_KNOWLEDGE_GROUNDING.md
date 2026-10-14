@@ -9,7 +9,7 @@ This module provides deterministic lexical retrieval and provenance-checked cita
 
 ## Index and source policy
 
-library/knowledge_index.json contains 14 independently authored summaries sourced only from the PusingCuk repository. Each entry binds this repository, commit SHA, and path; the reader rejects mismatches, duplicate IDs, private visibility, malformed URLs, and indexes above 100 records. Founder-OS and CORE are not runtime or knowledge-index dependencies.
+library/knowledge_index.json contains 16 independently authored summaries sourced only from the PusingCuk repository. Each entry binds this repository, commit SHA, and path; the reader rejects mismatches, duplicate IDs, private visibility, malformed URLs, and indexes above 100 records. Founder-OS and CORE are not runtime or knowledge-index dependencies.
 
 Only a small, reviewed subset of primary documents should be added. The summaries are local to PusingCuk; source URLs preserve provenance and are not a runtime dependency. Do not automatically index any repository; keep the index limited to reviewed PusingCuk sources.
 
@@ -36,7 +36,7 @@ The Ollama adapter parses a bounded set of structured tool calls. The assistant 
 
 ## Regression coverage
 
-The grounding suite covers 14 synthetic records plus the actual 14-entry curated index, Indonesian query ranking, normalization, unrelated-query rejection, commit/path matching, URL validation, visibility, duplicate IDs, index size, citation filtering/deduplication, and bounded results. The local provider suite covers request shape, system prompt placement, loopback-only enforcement, bounded inputs and outputs, malformed responses, and network failure.
+The grounding suite covers 14 synthetic records plus the actual 16-entry curated index, Indonesian query ranking, normalization, unrelated-query rejection, commit/path matching, URL validation, visibility, duplicate IDs, index size, citation filtering/deduplication, and bounded results. The local provider suite covers request shape, system prompt placement, loopback-only enforcement, bounded inputs and outputs, malformed responses, and network failure.
 
 
 ## Local assistant CLI
@@ -54,7 +54,7 @@ Type `/reset` to clear session memory or `/keluar` to exit. The local model runt
 
 ## Retrieval evaluation
 
-The 14-case Indonesian retrieval benchmark is stored in tests/fixtures/knowledge_retrieval_cases.json and asserted by the test suite. It currently targets top-1 exact source IDs for a small curated query set over PusingCuk sources; it is a regression baseline, not evidence of general semantic-search quality.
+The 16-case Indonesian retrieval benchmark is stored in tests/fixtures/knowledge_retrieval_cases.json and asserted by the test suite. It currently targets top-1 exact source IDs for a small curated query set over PusingCuk sources; it is a regression baseline, not evidence of general semantic-search quality.
 
 
 ## Local project memory

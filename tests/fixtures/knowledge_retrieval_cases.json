@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "description": "Benchmark deterministik untuk kueri bahasa Indonesia terhadap indeks pengetahuan terkurasi PusingCuk.",
+  "description": "Benchmark deterministik 16 kasus untuk kueri bahasa Indonesia terhadap indeks pengetahuan terkurasi PusingCuk.",
   "cases": [
     {
       "id": "query-01",
@@ -71,6 +71,16 @@
       "id": "query-14",
       "query": "ikhtisar interpreter compiler bahasa indonesia runtime",
       "expected_top_id": "pusingcuk-project-overview"
+    },
+    {
+      "id": "query-15",
+      "query": "layanan HTTP AI lokal bearer token loopback batas sesi konkurensi",
+      "expected_top_id": "pusingcuk-local-ai-service"
+    },
+    {
+      "id": "query-16",
+      "query": "Founder-OS CORE knowledge migration safeguards backup restore",
+      "expected_top_id": "pusingcuk-ai-migration-ledger"
     }
   ]
 }

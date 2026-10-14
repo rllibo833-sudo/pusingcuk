@@ -26,7 +26,7 @@ A release must not skip gates or turn a prototype into a production claim just b
 
 ### Gate 1 — measurable answer quality and reliability
 
-- Expand the 14-case exact-top-1 retrieval benchmark in small reviewed increments: ordinary Indonesian, colloquial wording/typos, ambiguous queries, questions outside the corpus, and security/policy questions.
+- The current 16-case exact-top-1 retrieval benchmark is still a small regression baseline; expand it in small reviewed increments: ordinary Indonesian, colloquial wording/typos, ambiguous queries, questions outside the corpus, and security/policy questions.
 - Record expected source IDs and whether a question is answerable. Measure retrieval top-1/top-3, unsupported-claim rate, citation precision, refusal behavior, and provider failure handling; publish the fixture set and result rather than saying "accurate" without evidence.
 - Add regressions for prompt injection inside retrieved documents, fabricated URLs, malformed/oversized provider responses, timeouts, quota/rate-limit responses, and repeated/invalid tool calls.
 - Model output is not proof that a requested tool ran. Tool outcomes must come from validated tool responses and their citations must retain the trusted source envelope.

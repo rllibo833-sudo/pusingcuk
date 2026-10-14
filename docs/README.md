@@ -30,6 +30,9 @@ Use this index to choose the right document. The current engineering baseline is
 - [Compatibility matrix](COMPATIBILITY.md) — which features are verified on which runtime.
 - [Conformance fixtures](CONFORMANCE_FIXTURES.md) — how Python and native C behavior is compared, including common error classes, exit codes, and source lines.
 - [Native C runtime](NATIVE_RUNTIME.md) — supported subset, limits, and build instructions.
+- [AI Engine readiness gates](AI_ENGINE_READINESS.md) — local service boundary, production gates, and incremental knowledge migration.
+- [AI knowledge migration ledger](AI_ENGINE_MIGRATION_LEDGER.md) — rewritten, immutable-provenance concepts from Founder-OS and CORE.
+- [Local AI HTTP service](AI_LOCAL_SERVICE.md) — loopback-only endpoint, request contract, and security limits.
 - [Native Termux setup](NATIVE_TERMUX.md) — source build and installation details.
 - [Android distribution/verification](ANDROID_DISTRIBUTION.md) — separates cross-build, emulator smoke test, and physical Termux validation.
 - [Module system](MODULE_SYSTEM.md) — current import behavior and limitations.

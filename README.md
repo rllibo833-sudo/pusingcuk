@@ -120,7 +120,7 @@ The native runtime and its limits are documented in the [native runtime guide](d
 - **Start and learn:** [Beginner guide](docs/PEMULA.md) · [Termux quick start](docs/termux/README.md) · [Examples index](examples/README.md)
 - **Language reference and dictionary:** [Language reference index](docs/language/README.md) · [Built-in catalogue](docs/language/BUILTINS.md) · [Syntax specification](SPEC.md) · [English dictionary](docs/DICTIONARY.md) · [Kamus Indonesia](docs/KAMUS_PUSINGCUK.md)
 - **Consistency and runtime support:** [Semantic contract](docs/SEMANTIC_CONTRACT.md) · [Compatibility matrix](docs/COMPATIBILITY.md) · [Conformance fixtures](docs/CONFORMANCE_FIXTURES.md)
-- **AI Engine:** [Grounding contract](docs/AI_KNOWLEDGE_GROUNDING.md) · [Production readiness gates and knowledge migration policy](docs/AI_ENGINE_READINESS.md)
+- **AI Engine:** [Grounding contract](docs/AI_KNOWLEDGE_GROUNDING.md) · [Readiness gates](docs/AI_ENGINE_READINESS.md) · [Knowledge migration ledger](docs/AI_ENGINE_MIGRATION_LEDGER.md) · [Local HTTP service](docs/AI_LOCAL_SERVICE.md)
 - **Development:** [Contributor guide](CONTRIBUTING.md) · [Development and test gates](docs/development/README.md) · [Repository map](docs/REPO_STRUCTURE.md)
 - **Security:** [Security policy](SECURITY.md) · [Security review guide](docs/security/README.md)
 - **CORE integration:** [Tool contract and trust boundary](docs/integrations/CORE_TOOL_CONTRACT.md) · [Local registered-rule runner](tools/core-rule-runner.mjs)
