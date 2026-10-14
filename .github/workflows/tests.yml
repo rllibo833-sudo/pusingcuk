@@ -94,5 +94,7 @@ jobs:
         uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: "22"
+      - name: Validasi sintaks local CORE rule runner
+        run: node --check tools/core-rule-runner.mjs
       - name: Uji pembatasan file PVM dan kesetaraan backend
         run: bash tests/test_all.sh
