@@ -298,7 +298,7 @@ const server = createServer(async (req, res) => {
 
 server.listen(port, host, () => {
   console.log(`PusingCuk local rule runner listening on ${host}:${port}`);
-  console.log(`Pinned source: ${PINNED_COMMIT}; program: ${PROGRAM_ID}`);
+  console.log(`Pinned source: ${PINNED_COMMIT}; registered programs: ${[...PROGRAMS.keys()].join(", ")}`);
   if (host === "0.0.0.0") {
     console.warn("WARNING: binding to all interfaces. Protect with a firewall and the runner token; never expose this port to the public internet.");
   }
