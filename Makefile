@@ -118,3 +118,20 @@ test-native: native test-cli
 	@actual="$$($(NATIVE_BIN) examples/core/anggaran_threshold.cuk)"; \
 	 expected="$$(printf 'DALAM_BATAS\nDALAM_BATAS\nPERLU_PERSETUJUAN\nINPUT_TIDAK_VALID\nINPUT_TIDAK_VALID')"; \
 	 test "$$actual" = "$$expected"
+
+	@actual="$$($(NATIVE_BIN) tests/native/conversions.cuk)"; \
+	 expected="$$(printf '42\nokelah\ntidak\n42\n-3\n2.5\ntidak\nokelah')"; \
+	 test "$$actual" = "$$expected"
+	@if $(NATIVE_BIN) tests/native/conversions_invalid_integer.cuk >/dev/null 2>&1; then echo 'bilangan("3.0") seharusnya gagal' >&2; exit 1; fi
+	@if $(NATIVE_BIN) tests/native/conversions_empty_number.cuk >/dev/null 2>&1; then echo 'desimal teks kosong/whitespace seharusnya gagal' >&2; exit 1; fi
+	@set -eu; \
+	 actual="$$(printf '0\n1000000\n' | $(NATIVE_BIN) examples/core/anggaran_threshold_service.cuk)"; \
+	 test "$$actual" = "DALAM_BATAS"; \
+	 actual="$$(printf '1000000\n1000000\n' | $(NATIVE_BIN) examples/core/anggaran_threshold_service.cuk)"; \
+	 test "$$actual" = "DALAM_BATAS"; \
+	 actual="$$(printf '1000001\n1000000\n' | $(NATIVE_BIN) examples/core/anggaran_threshold_service.cuk)"; \
+	 test "$$actual" = "PERLU_PERSETUJUAN"; \
+	 actual="$$(printf '%s\n' '-1' '1000000' | $(NATIVE_BIN) examples/core/anggaran_threshold_service.cuk)"; \
+	 test "$$actual" = "INPUT_TIDAK_VALID"; \
+	 actual="$$(printf '250000\n-1\n' | $(NATIVE_BIN) examples/core/anggaran_threshold_service.cuk)"; \
+	 test "$$actual" = "INPUT_TIDAK_VALID"
