@@ -101,4 +101,15 @@ The owner resumed the project after the previous pause attempt. The latest live 
 
 A private database export and a successful restore rehearsal in a separate environment have **not** been produced by this migration. Before permanently deleting or retiring this project, preserve or explicitly decide to discard the 34,031 `ai_activity` rows, 4 `ai_tasks`, 16 AI-agent configuration rows, one Auth user, and the schema/migration history. The 0 Storage objects do not substitute for a database backup. Counts are not a backup.
 
-Provider-origin Gemini key revocation has not been independently verified here; the owner reported deleting the current Supabase/GitHub copies. Do not commit or export secret values. No schema/data changes were made during this read-only verification.
+Provider-origin Gemini key revocation has not been independently verified here; the owner reported deleting the current Supabase/GitHub copies. Do not commit or export secret values.
+
+### Encrypted database export workflow
+
+A manual-only workflow has been added at `.github/workflows/backup-core-supabase.yml`. It targets only the named CORE project, uses a PostgreSQL 17 client, creates a logical database dump, encrypts it, verifies its integrity and archive listing, and uploads **encrypted files only** for three days. It does not run on pushes or pull requests and refuses to run unless the selected scope and the `main` branch match.
+
+Before manually running it, the repository owner must add these two values under **Settings → Secrets and variables → Actions**:
+- `SUPABASE_DB_URL`: the PostgreSQL URI copied from the Supabase dashboard's Connect panel. Prefer a **Session pooler** URI if the direct host is not reachable from GitHub-hosted runners. Never paste it into chat, issue comments, workflow inputs, or committed files.
+- `BACKUP_ENCRYPTION_PASSPHRASE`: a randomly generated, unique passphrase of at least 32 characters. Save it outside GitHub in a password manager; it is required to decrypt the artifact later. Do not reuse an account password.
+
+The public repository means workflow artifacts may be publicly downloadable. Only the encrypted dump, its keyed integrity checksum, and a non-secret manifest are uploaded; the unencrypted dump exists temporarily on an ephemeral runner and is removed before the artifact step. **This workflow has not been run yet** because those two secrets are not configured from this connection. A successful archive-list check is not a full restore rehearsal. Do not pause/delete the source project until the encrypted artifact is downloaded to a safe location and a restore is verified elsewhere.
+
