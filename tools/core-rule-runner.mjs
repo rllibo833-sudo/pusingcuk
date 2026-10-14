@@ -171,7 +171,7 @@ function runRule(runtime, input, timeoutMs, programId) {
     let stderr = "";
     let finished = false;
     const args = [
-      "run", "--rm", "--pull=never", "--cidfile", cidfile,
+      "run", "-i", "--rm", "--pull=never", "--cidfile", cidfile,
       "--network=none", "--memory=64m", "--memory-swap=64m", "--cpus=0.5",
       "--pids-limit=16", "--read-only", "--cap-drop=ALL",
       "--security-opt=no-new-privileges", "--user=65534:65534",
