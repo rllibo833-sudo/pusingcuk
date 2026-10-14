@@ -28,7 +28,7 @@ The runtime currently opens a source file and is not an OS sandbox. A production
 ## Local registered-rule runner
 
 A local prototype service is available at `tools/core-rule-runner.mjs`. It:
-- fetches/builds runtime source at the full pinned commit `23cc6b5b7d42ce5bc58babd37792a0ec32d117a8` unless an exact matching checkout is supplied;
+- fetches/builds runtime source at the full pinned commit `e367f45b0a35ccb8fdb91424099b8046b346d77d` unless an exact matching checkout is supplied;
 - verifies the canonical `examples/core/anggaran_threshold_service.cuk` SHA-256 before serving requests;
 - accepts only `budget.threshold.v1`, two bounded safe integers, an empty capability list, and a short request timeout;
 - requires a random bearer token held by the runner process, bounds request/output sizes and concurrency, and passes a reduced environment to the native process;
