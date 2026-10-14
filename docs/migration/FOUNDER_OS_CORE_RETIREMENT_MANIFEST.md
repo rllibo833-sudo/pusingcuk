@@ -88,21 +88,43 @@ The most recent log query during this audit found no Gemini/provider-name matche
 
 The two source repositories themselves have **not** been deleted or archived. No Issue or Pull Request was opened. Deletion of source repositories is separate from permanent deletion of the Supabase database/project.
 
-## Single Supabase database direction for PusingCuk
+## Supabase project arrangement (verified 2026-10-15)
 
-**Decision (2026-10-15): use the one existing project `lnpzgrodwnhthcwudebk` as the sole database project for the PusingCuk ecosystem; do not create a second project.** There is no second Supabase project to merge:
+**Decision: use the existing project `vcvejjpzklpvknxmymgy` for future PusingCuk-owned Supabase integration. Keep the older Kawasan/CORE project separate. No organization transfer or additional project is necessary for this arrangement.**
 
-- Connection `Primary` points to the Free organization `Pusingcuk`; it currently has **zero projects**.
-- Connection `Supabase` points to the Free organization `Kawasan-masjid-1000ha`; it contains the sole existing project `lnpzgrodwnhthcwudebk`.
-- The database remains in the Kawasan organization for now. The available ChatGPT connector does not expose a project-transfer operation, and ownership transfer is not required merely to designate the existing project as the single intended database.
-- No new project, schema, or table was created by this decision. Existing CORE tables and operational records are preserved, not represented as if already migrated to PusingCuk.
-- **The PusingCuk runtime is not yet connected to this database.** That requires a specific application use case and a correctly scoped authentication/data-access path. Never put the database password or service-role key in the public repository, a distributable CLI, or browser JavaScript. Do not point PusingCuk directly at old CORE tables without reviewing schema ownership and access policies.
-- Both organizations are on Free; this path avoids creating a new paid resource.
+The current Supabase dashboard and project inventory show two independent projects under the Free organization `Kawasan-masjid-1000ha`:
 
-## Project restore and safety state
+| Purpose | Project | Ref | Status | Region |
+|---|---|---|---|---|
+| PusingCuk's future database integration | `Pusingcuk` | `vcvejjpzklpvknxmymgy` | `ACTIVE_HEALTHY` | `ap-southeast-2` |
+| Legacy Kawasan Masjid / CORE data and services | `Kawasan-mesjid-1000ha` | `lnpzgrodwnhthcwudebk` | `ACTIVE_HEALTHY` | `ap-southeast-2` |
 
-On 2026-10-15, a restore request for the sole existing project was accepted (`success: true`). The latest live status observed was `COMING_UP`, so it is **not yet confirmed `ACTIVE_HEALTHY`**. Wait until the provider reports healthy before any data/schema operations.
+PusingCuk project API URL: `https://vcvejjpzklpvknxmymgy.supabase.co`.
 
-The two inspected cron jobs remain inactive. Ten Edge Functions were reported deployed and active before the project was paused; restoring the project may make those existing routes available again. Before exposing the database to PusingCuk, re-check those routes and their auth boundaries. No data or schema was deleted or rewritten.
+Being under the same organization does **not** merge these project databases. They have different project refs and separate database instances. The separate organization labelled `Pusingcuk` on the other linked account currently has zero projects; moving a project there is not required to keep the two databases isolated.
 
-A private database export and a successful restore rehearsal have not been produced. Do not permanently delete the only project: previous read-only counts are a snapshot, not a backup.
+### Verified state of the PusingCuk project
+
+- The project is active and healthy.
+- Read-only inspection found no application-owned base tables in non-system schemas.
+- The Supabase connector returned no migration-history entries and no deployed Edge Functions for this project.
+- No source data was copied from the legacy project; no schema or table was created as part of this inspection.
+- The PusingCuk repository currently uses a confined local SQLite adapter for its database abstraction. Its runtime and static site are **not yet connected to Supabase**. A project URL alone does not constitute a working or secure integration.
+
+### Safety and implementation boundary
+
+- Do not point new PusingCuk operations at the legacy CORE tables by default.
+- Do not put a database password, service-role/secret key, or other privileged credential in public GitHub files, browser JavaScript, or a distributable CLI.
+- Before implementing a live integration, define the actual data use case, add reviewed versioned schema migrations, enable row-level security where tables are exposed, and test the intended access path.
+- Keep the legacy project intact while its records and still-deployed endpoints have not been exported, verified, and explicitly retired.
+- This manifest is documentation, not a database backup or proof of a completed runtime integration.
+
+## Project health and recovery state
+
+On 2026-10-15, live project inventory confirmed both project refs are `ACTIVE_HEALTHY`. The PusingCuk project is a clean project from an application-schema perspective; the legacy project continues to hold CORE operational data and historical schema.
+
+The previous read-only CORE inventory recorded 54 migration-history rows, 16 configured AI-agent rows, 4 `ai_tasks` rows (one each queued, completed, failed, and cancelled), 34,031 `ai_activity` rows, 1 Auth user, 0 Storage objects, 0 client-service inquiries, 0 revenue opportunities, 0 revenue orders, and 0 API orders. Those counts are a snapshot from the recorded inspection, not a row-by-row export and not proof that external callers are absent.
+
+The two known cron jobs on the legacy project were inactive at the previous inspection. Ten deployed Edge Functions were also reported at that inspection; their caller/auth status must be rechecked before retirement or exposure. Project health does not mean every old endpoint should be re-enabled or used by PusingCuk.
+
+A private database export and successful restore rehearsal have **not** been produced. Do not permanently delete the legacy project or its operational data based only on the above counts.
