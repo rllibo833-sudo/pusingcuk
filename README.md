@@ -100,6 +100,7 @@ The native runtime and its limits are documented in the [native runtime guide](d
 - **Consistency and runtime support:** [Semantic contract](docs/SEMANTIC_CONTRACT.md) · [Compatibility matrix](docs/COMPATIBILITY.md) · [Conformance fixtures](docs/CONFORMANCE_FIXTURES.md)
 - **Development:** [Contributor guide](CONTRIBUTING.md) · [Development and test gates](docs/development/README.md) · [Repository map](docs/REPO_STRUCTURE.md)
 - **Security:** [Security policy](SECURITY.md) · [Security review guide](docs/security/README.md)
+- **CORE integration:** [Tool contract and trust boundary](docs/integrations/CORE_TOOL_CONTRACT.md) · [Local registered-rule runner](tools/core-rule-runner.mjs)
 - **Complete documentation index:** [docs/README.md](docs/README.md)
 
 ## Quality gates
