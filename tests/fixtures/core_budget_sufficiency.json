@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "rule_id": "budget.sufficiency.v1",
+  "source_path": "examples/core/anggaran_sufficiency_service.cuk",
+  "source_commit": "411c532454028d2d5e733373d085050eca1d402a",
+  "source_sha256": "d6fcee54d17afbf0fc0a1aee115b2c0c9f57dcc172e56a6c6cf1d0dd9a789771",
+  "input_contract": ["saldo_tersedia", "nominal_pengajuan"],
+  "cases": [
+    {"id": "sufficient", "input": [1000000, 750000], "expected": "SALDO_CUKUP"},
+    {"id": "equal-boundary", "input": [500000, 500000], "expected": "SALDO_CUKUP"},
+    {"id": "insufficient-by-one", "input": [500000, 500001], "expected": "SALDO_TIDAK_CUKUP"},
+    {"id": "zero-boundary", "input": [0, 0], "expected": "SALDO_CUKUP"},
+    {"id": "negative-balance-invalid", "input": [-1, 100], "expected": "INPUT_TIDAK_VALID"},
+    {"id": "negative-request-invalid", "input": [100, -1], "expected": "INPUT_TIDAK_VALID"}
+  ]
+}
