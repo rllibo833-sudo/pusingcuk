@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "rule_id": "operations.priority-triage.v1",
+  "source_path": "examples/core/priority_triage.cuk",
+  "source_sha256": "afd2f82af88e35d2203c85ab235f494cb085df68ff8de449ce93df6fbab05dde",
+  "input_contract": [
+    {
+      "name": "urgensi",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    {
+      "name": "dampak",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    }
+  ],
+  "cases": [
+    {
+      "id": "both-high",
+      "input": [
+        5,
+        5
+      ],
+      "expected": "P1_SEGERA"
+    },
+    {
+      "id": "high-boundary",
+      "input": [
+        4,
+        4
+      ],
+      "expected": "P1_SEGERA"
+    },
+    {
+      "id": "impact-dominates",
+      "input": [
+        3,
+        4
+      ],
+      "expected": "P2_DAMPAK_TINGGI"
+    },
+    {
+      "id": "impact-maximum",
+      "input": [
+        1,
+        5
+      ],
+      "expected": "P2_DAMPAK_TINGGI"
+    },
+    {
+      "id": "urgency-dominates",
+      "input": [
+        4,
+        3
+      ],
+      "expected": "P3_MENDESAK"
+    },
+    {
+      "id": "urgency-maximum",
+      "input": [
+        5,
+        1
+      ],
+      "expected": "P3_MENDESAK"
+    },
+    {
+      "id": "normal-work",
+      "input": [
+        3,
+        3
+      ],
+      "expected": "P4_RUTIN"
+    },
+    {
+      "id": "minimum-valid",
+      "input": [
+        1,
+        1
+      ],
+      "expected": "P4_RUTIN"
+    },
+    {
+      "id": "urgency-too-low",
+      "input": [
+        0,
+        4
+      ],
+      "expected": "INPUT_TIDAK_VALID"
+    },
+    {
+      "id": "urgency-too-high",
+      "input": [
+        6,
+        4
+      ],
+      "expected": "INPUT_TIDAK_VALID"
+    },
+    {
+      "id": "impact-too-low",
+      "input": [
+        4,
+        0
+      ],
+      "expected": "INPUT_TIDAK_VALID"
+    },
+    {
+      "id": "impact-too-high",
+      "input": [
+        4,
+        6
+      ],
+      "expected": "INPUT_TIDAK_VALID"
+    }
+  ]
+}

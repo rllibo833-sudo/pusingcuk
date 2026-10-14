@@ -41,7 +41,7 @@ A hosted service also needs authentication/authorization, abuse controls, per-us
 - Portability is claimed only for runtimes that pass the same required fixtures. Keep a truthful capability matrix; never equate Python reference, native C, transpilers, and PVM without conformance evidence.
 - Before any untrusted-code feature is considered, require OS-level isolation, network denial, a read-only filesystem, least privilege, CPU/memory/process/output/time limits, and adversarial testing. The current project runtime is not a general sandbox.
 
-### Gate 4 — small opt-in pilot
+### Gate 3A — deterministic rule test evidence\n\nThe pure example `examples/core/priority_triage.cuk` now defines a bounded operations triage decision using urgency/impact integers from 1 to 5. Its fixture pins source SHA-256 and covers all four outputs plus invalid lower/upper bounds. It is exercised by the Python reference test and native C test target. This proves only this example's tested behavior on those two runtimes; it is not a registered hosted tool, and it is not an isolation boundary.\n\n### Gate 4 — small opt-in pilot
 
 Start with a narrow, non-sensitive workflow and explicit human review. Define success, failure, latency, cost/quota, and rollback thresholds before collecting results. No customer, uptime, security, or production-readiness claims without observed evidence. Expand scope only after the previous gate is green.
 

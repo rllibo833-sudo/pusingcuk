@@ -11,6 +11,7 @@ python pusingcuk_new.py examples/halo_dunia.cuk
 python pusingcuk_new.py examples/keuangan_sederhana.cuk
 python pusingcuk_new.py examples/warung.cuk
 python pusingcuk_new.py examples/rekap_anggaran.cuk
+python pusingcuk_new.py examples/core/priority_triage.cuk  # input: urgensi 1..5, dampak 1..5
 python pusingcuk_new.py examples/kalkulator.cuk
 python pusingcuk_new.py examples/terminal_bot.cuk
 ```
@@ -20,7 +21,7 @@ python pusingcuk_new.py examples/terminal_bot.cuk
 | `halo_dunia.cuk` | Input interaktif dan output teks | Meminta nama lalu menyapa pengguna. Shebang dapat dipakai setelah CLI `pusingcuk` terpasang dan tersedia di `PATH`. |
 | `keuangan_sederhana.cuk` | Fungsi, konversi angka, loop, kondisi, dan input | Jika menyetujui penyimpanan, menulis `keuangan_sederhana.txt` sebagai berkas relatif dalam project root. |
 | `warung.cuk` | Variabel, operasi matematika, kondisi | Contoh statis sederhana tanpa akses jaringan atau file. |
-| `rekap_anggaran.cuk` | Kamus, fungsi buatan, total pengeluaran, dan kondisi | Contoh kalkulasi anggaran menggunakan kamus. |
+| `rekap_anggaran.cuk` | Kamus, fungsi buatan, total pengeluaran, dan kondisi | Contoh kalkulasi anggaran menggunakan kamus. |\n| `core/priority_triage.cuk` | Aturan triase prioritas tugas berdasarkan urgensi dan dampak | Aturan pure/deterministik dengan domain integer 1..5, 12 fixture, hash sumber terpin; bukan sandbox dan belum didaftarkan ke layanan CORE. |
 | `kalkulator.cuk` | Input interaktif, konversi angka, kondisi, dan operasi dasar | Menggunakan keyword inti `njir`, `kampret`, dan `selesai`; bukan keyword `jika`. Dijalankan pada interpreter referensi karena built-in konversi belum tersedia di native C. Uji pembagian nol dan input nonnumerik. |
 | `terminal_bot.cuk` | Bot terminal interaktif berbasis percabangan | Contoh reference Python; menggunakan `tanya`, perbandingan teks, dan `njir/kampret`. |
 
@@ -52,7 +53,7 @@ Aturan kecukupan saldo memiliki fixture referensi di `examples/core/anggaran_suf
 
 **Batas dukungan:** aturan kedua dibuktikan sebagai program deterministik di CI CORE; hal itu tidak otomatis mendaftarkannya pada HTTP runner lokal atau membuat layanan produksi. Runtime PusingCuk tetap eksperimental dan bukan sandbox OS.
 
-## Contoh kompatibilitas (.pusingcuk)
+## Aturan tambahan deterministik (.cuk)\n\n`examples/core/priority_triage.cuk` adalah aturan ketiga yang mengklasifikasikan pekerjaan menjadi `P1_SEGERA`, `P2_DAMPAK_TINGGI`, `P3_MENDESAK`, atau `P4_RUTIN`. Nilai urgensi dan dampak wajib berada pada skala integer 1–5; nilai di luar rentang menghasilkan `INPUT_TIDAK_VALID`. Fixture JSON mengunci source SHA-256, kasus batas, nilai invalid, dan expected output. Tes referensi Python serta tes native C harus sama-sama lulus sebelum aturan disebut portabel. Ini merupakan contoh aturan lokal, belum menjadi tool produksi atau endpoint terdaftar CORE.\n\n## Contoh kompatibilitas (.pusingcuk)
 
 Contoh ini dipertahankan untuk demonstrasi API yang sudah ada dan kompatibilitas sumber lama:
 

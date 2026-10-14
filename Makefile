@@ -7,7 +7,7 @@ LANGUAGE_VERSION ?= 0.5-dev
 PREFIX ?= /usr/local
 DESTDIR ?=
 
-.PHONY: native run-native test test-native test-cli version language-version install package
+.PHONY: native run-native test test-native test-cli test-registered-rules version language-version install package
 
 version:
 	@printf '%s\n' '$(VERSION)'
@@ -49,7 +49,7 @@ test-cli: native
 	if $(NATIVE_BIN) "$$missing" >/dev/null 2>"$$missing_log"; then echo 'berkas hilang seharusnya gagal' >&2; exit 1; else status=$$?; test "$$status" -eq 3; fi; \
 	grep -q 'berkas tidak ditemukan' "$$missing_log"
 
-test-native: native test-cli
+test-native: native test-cli test-registered-rules
 	@set -eu; \
 	actual="$$($(NATIVE_BIN) tests/native/slang_aliases.pusingcuk)"; \
 	expected="$$(printf 'Pusingcuk native\ntidak\ncabang utama\nadooh aktif')"; \
@@ -62,7 +62,7 @@ test-native: native test-cli
 	test "$$actual" = "$$expected"; \
 	actual="$$($(NATIVE_BIN) tests/native/dictionaries.pusingcuk)"; \
 	expected="$$(printf 'Budi\n20\n21\nsatu\nya\n5\nnama\numur\n1\nokelah\nstatus\nkamus terisi\nkamus kosong')"; \
-	if [ "$$actual" != "$$expected" ]; then printf "%s\\n" "$$actual" > $(CURDIR)/pusingcuk-dict.actual; printf "%s\\n" "$$expected" > $(CURDIR)/pusingcuk-dict.expected; diff -u $(CURDIR)/pusingcuk-dict.expected $(CURDIR)/pusingcuk-dict.actual; exit 1; fi; \
+	if [ "$$actual" != "$$expected" ]; then printf "%s\n" "$$actual" > $(CURDIR)/pusingcuk-dict.actual; printf "%s\n" "$$expected" > $(CURDIR)/pusingcuk-dict.expected; diff -u $(CURDIR)/pusingcuk-dict.expected $(CURDIR)/pusingcuk-dict.actual; exit 1; fi; \
 	if $(NATIVE_BIN) tests/native/dictionary_missing_key.pusingcuk >/dev/null 2>&1; then \
 		echo 'kunci kamus yang tidak ada seharusnya gagal' >&2; exit 1; \
 	fi; \
@@ -84,7 +84,7 @@ test-native: native test-cli
 	diff -u $(CURDIR)/pusingcuk-list-reallocation.expected $(CURDIR)/pusingcuk-list-reallocation.out; \
 	actual="$$($(NATIVE_BIN) tests/native/functions.pusingcuk)"; \
 	expected="$$(printf '5\n120\n3\n9')"; \
-	if [ "$$actual" != "$$expected" ]; then printf "fungsi actual=[%s] expected=[%s]\\n" "$$actual" "$$expected" >&2; exit 1; fi; \
+	if [ "$$actual" != "$$expected" ]; then printf "fungsi actual=[%s] expected=[%s]\n" "$$actual" "$$expected" >&2; exit 1; fi; \
 	actual="$$($(NATIVE_BIN) tests/native/nested_functions.pusingcuk)"; \
 	expected="$$(printf '11\n10')"; \
 	test "$$actual" = "$$expected"; \
@@ -136,3 +136,28 @@ test-native: native test-cli
 	 test "$$actual" = "INPUT_TIDAK_VALID"; \
 	 actual="$$(printf '250000\n-1\n' | $(NATIVE_BIN) examples/core/anggaran_threshold_service.cuk)"; \
 	 test "$$actual" = "INPUT_TIDAK_VALID"
+
+# Shared fixture cases for the pure operations.priority-triage.v1 rule.
+# This native gate uses the same source artifact and expected outputs as the Python regression.
+test-registered-rules: native
+	@set -eu; \
+	check_case() { \
+		urgency="$$1"; impact="$$2"; expected="$$3"; \
+		actual="$$(printf '%s\n%s\n' "$$urgency" "$$impact" | "$(NATIVE_BIN)" examples/core/priority_triage.cuk)"; \
+		if [ "$$actual" != "$$expected" ]; then \
+			printf 'priority triage mismatch input=(%s,%s) expected=[%s] actual=[%s]\n' "$$urgency" "$$impact" "$$expected" "$$actual" >&2; exit 1; \
+		fi; \
+	}; \
+	check_case 5 5 P1_SEGERA; \
+	check_case 4 4 P1_SEGERA; \
+	check_case 3 4 P2_DAMPAK_TINGGI; \
+	check_case 1 5 P2_DAMPAK_TINGGI; \
+	check_case 4 3 P3_MENDESAK; \
+	check_case 5 1 P3_MENDESAK; \
+	check_case 3 3 P4_RUTIN; \
+	check_case 1 1 P4_RUTIN; \
+	check_case 0 4 INPUT_TIDAK_VALID; \
+	check_case 6 4 INPUT_TIDAK_VALID; \
+	check_case 4 0 INPUT_TIDAK_VALID; \
+	check_case 4 6 INPUT_TIDAK_VALID; \
+	echo 'PASS: operations.priority-triage.v1 (12 native cases)'
