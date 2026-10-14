@@ -22,12 +22,12 @@ class CoreBudgetRuleTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(
             result.stdout,
-            "SALDO_CUKUP\\n"
-            "SALDO_CUKUP\\n"
-            "SALDO_TIDAK_CUKUP\\n"
-            "SALDO_CUKUP\\n"
-            "INPUT_TIDAK_VALID\\n"
-            "INPUT_TIDAK_VALID\\n",
+            "SALDO_CUKUP\n"
+            "SALDO_CUKUP\n"
+            "SALDO_TIDAK_CUKUP\n"
+            "SALDO_CUKUP\n"
+            "INPUT_TIDAK_VALID\n"
+            "INPUT_TIDAK_VALID\n",
         )
         self.assertEqual(result.stderr, "")
 
