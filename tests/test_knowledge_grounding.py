@@ -116,6 +116,12 @@ class KnowledgeGroundingTests(unittest.TestCase):
     def test_empty_answer_stays_empty(self):
         self.assertEqual(append_citations("  ", self.documents), "")
 
+    def test_model_markdown_link_destination_is_removed(self):
+        answer = append_citations("Buka [tautan](https://attacker.example/path).", [])
+        self.assertIn("tautan", answer)
+        self.assertNotIn("https://", answer)
+        self.assertNotIn("](", answer)
+
     def test_invalid_query_and_limit_are_rejected(self):
         with self.assertRaisesRegex(ValueError, "QUERY_INVALID"):
             rank_knowledge(self.documents, "   ")
