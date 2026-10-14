@@ -8,6 +8,10 @@ The maintained AI entry point is an experimental local-first CLI. It delegates i
 
 This is an application/orchestrator, not a foundation model trained by PusingCuk. It is not yet a multi-user HTTP service, and the language runtimes are not OS security sandboxes. Passing CI is evidence for the tested contracts only; it is not proof of production availability, general answer quality, or safe execution of arbitrary programs.
 
+## Local integration service now available
+
+`library/ai_service.py` provides a bounded authenticated HTTP adapter for local clients. It has loopback-only binding, bearer-token protection, duplicate-key rejection, bounded JSON input, per-session in-memory contexts, session/concurrency caps, generic provider errors and a liveness endpoint. Contract tests use a fake provider, so CI does not require a running model. This is a local integration surface, **not** an externally hosted production service; see [AI_LOCAL_SERVICE.md](AI_LOCAL_SERVICE.md).
+
 ## Release gates
 
 A release must not skip gates or turn a prototype into a production claim just because the code builds.
