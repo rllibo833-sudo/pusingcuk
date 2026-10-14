@@ -124,6 +124,7 @@ test-native: native test-cli
 	 test "$$actual" = "$$expected"
 	@if $(NATIVE_BIN) tests/native/conversions_invalid_integer.cuk >/dev/null 2>&1; then echo 'bilangan("3.0") seharusnya gagal' >&2; exit 1; fi
 	@if $(NATIVE_BIN) tests/native/conversions_empty_number.cuk >/dev/null 2>&1; then echo 'desimal teks kosong/whitespace seharusnya gagal' >&2; exit 1; fi
+	@if $(NATIVE_BIN) tests/native/conversions_non_finite_decimal.cuk >/dev/null 2>&1; then echo 'desimal teks non-finite seharusnya gagal' >&2; exit 1; fi
 	@set -eu; \
 	 actual="$$(printf '0\n1000000\n' | $(NATIVE_BIN) examples/core/anggaran_threshold_service.cuk)"; \
 	 test "$$actual" = "DALAM_BATAS"; \
