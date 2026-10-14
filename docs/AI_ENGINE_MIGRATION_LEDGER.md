@@ -64,3 +64,33 @@ This ledger records why a pattern is being adopted, how it is rewritten for Pusi
 - PusingCuk, native C, PVM and transpiled outputs are not a general-purpose security sandbox; never run untrusted code without independently reviewed OS-level isolation.
 - It does not make CORE or Founder-OS safe to delete today.
 - It does not claim hosted availability, real users, uptime, answer accuracy or a successful external outcome.
+
+## Asset disposition and retirement gates — 2026-10-15
+
+This is the current working disposition of old-repository assets. It is a migration record, not a claim that either source repository is already safe to delete.
+
+| Source asset | Decision | Destination / proof | Exit condition |
+|---|---|---|---|
+| Founder-OS decisions, constraints, governance, and recovery records | Selectively distill; do not bulk-import raw memory | Keep only reviewed, relevant principles in this ledger or a PusingCuk-owned document. Preserve immutable source references when useful. | Inventory unique record IDs, export retained history, verify the export and rehearse restore; record what is intentionally not migrated. |
+| Founder-OS local-first, human approval, and “No Proof, No Claim” principles | Adopt as architectural policy, not model training | Assistant system boundaries and this ledger; tool results and trusted citations remain separate from model claims. | Add or retain behavior-level tests for approval boundaries, citation integrity, and no silent memory writes. |
+| CORE deterministic rule contracts, input/output schemas, hash pins, allowlists, bounded results, and fail-closed behavior | Re-implement as PusingCuk-owned code and fixtures where reusable | `library/ai_tools.py`, fixed reviewed `.cuk` artifacts, `tests/test_ai_tools.py`, and offline E2E coverage. | Each rule has a stable ID/version, hash, schema, explicit capability set, boundary fixtures, and verified CI evidence. |
+| CORE's specific budget rule behavior | Keep the PusingCuk-owned `library/budget_threshold.cuk` as the AI tool artifact | Internal `ToolRegistry`; it no longer needs the legacy HTTP runner for assistant execution. | Continue only while its fixtures and source hash agree; the current executor is not an OS sandbox and must not run untrusted source. |
+| CORE-hosted Edge Functions, database, queues, cron, payment/webhook handlers, notification workers, and audit/economic records | Do not copy automatically into PusingCuk. Classify each as migrate, explicitly retire, or retain outside PusingCuk. | No claim of equivalent replacement exists in the PusingCuk CLI/loopback HTTP adapter today. | Inventory callers and deployed resources, preserve required data, test restore, reconcile payment/idempotency contracts, rehearse rollback, and assign explicit ownership before decommissioning. |
+| `tools/core-rule-runner.mjs` and its Docker sandbox harness | Legacy compatibility/regression harness, not assistant runtime | Still exercised by PusingCuk's security regression workflow and associated integration evidence. | Remove only after all consuming contract tests/workflows are migrated or intentionally retired and the replacement passes CI. Do not delete solely because `ToolRegistry` no longer calls it. |
+| PUBLIC static Islamic/dakwah website | Keep independent; no PusingCuk AI runtime dependency | Its own repository/deployment remains the owner. | No action required for AI centralization unless a specific, approved content-grounding use case is introduced. |
+
+### Current implementation evidence and limitations
+
+- PusingCuk owns a curated, public-safe knowledge index with 16 source records in `library/knowledge_index.json`; runtime retrieval does not crawl CORE or Founder-OS.
+- The local-first assistant has Ollama and Gemini adapters, bounded in-process chat history, explicit local memory, validated citation handling, a loopback-only HTTP adapter, and a small allowlisted `ToolRegistry`. This is an application around a replaceable model provider, not a foundation model trained by PusingCuk.
+- Offline HTTP-to-rule E2E tests were added in `tests/test_ai_e2e.py` at commit `97482dc0aacc298f921a58e2654f5983ac1fadc4`; README's stale runner description was corrected at `c0592c3485455bb73f560a967534c4e6018181ca`. The connector does not currently expose push-triggered Actions run details here, so successful CI for those latest commits must not be inferred from the presence of the tests.
+- The current fixed-artifact Python reference executor is explicitly not an OS sandbox. Hash pinning, allowlisting, and bounded I/O are useful safeguards but do not provide OS-level isolation for arbitrary code.
+
+### Repository exit criteria
+
+**Founder-OS may be archived only after** the required decision/history export is complete, its integrity is checked, restoration is rehearsed, every in-scope unique record is mapped or intentionally excluded, and the owner accepts the preserved-history plan.
+
+**CORE may be archived only after** every deployed service and caller has an explicit disposition, required operational/audit/economic data is exported and restore-tested, payment/webhook/queue behavior is migrated or intentionally retired with tests, credentials are rotated/revoked where appropriate, and deployment/CI/operator paths no longer require CORE.
+
+Repository deletion is a separate, later decision. An archive must preserve the evidence and rollback point; deleting GitHub source does not itself retire deployed Supabase resources or erase their data.
+
