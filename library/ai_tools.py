@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import uuid
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -13,6 +14,9 @@ from library.knowledge_grounding import rank_knowledge
 
 _RUNNER_URL = "http://127.0.0.1:8787/v1/execute"
 _THRESHOLD_SHA256 = "e79058b314d921a4b4353133b30a7a7b0da64d32785a39f66cb5ce356406067d"
+_THRESHOLD_SOURCE_COMMIT = "e367f45b0a35ccb8fdb91424099b8046b346d77d"
+_THRESHOLD_RUNTIME_VERSION = "Pusingcuk native 0.8.0.dev0"
+_SANDBOX_IMAGE_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 _MAX_RULE_INPUT = 1_000_000_000_000
 
 
@@ -27,7 +31,7 @@ class ToolRegistry:
                 "type": "function",
                 "function": {
                     "name": "knowledge_search",
-                    "description": "Cari dokumen proyek yang terkurasi. Gunakan untuk memverifikasi klaim khusus PusingCuk, CORE, dan keputusan Founder.",
+                    "description": "Cari dokumen primer terkurasi milik PusingCuk serta ledger migrasi konsep terpilih. Klaim historis CORE/Founder hanya dapat diverifikasi sejauh dirangkum dalam ledger, bukan sebagai indeks penuh kedua repositori.",
                     "parameters": {
                         "type": "object",
                         "properties": {
@@ -93,9 +97,10 @@ class ToolRegistry:
         parsed = urlparse(_RUNNER_URL)
         if parsed.scheme != "http" or parsed.hostname != "127.0.0.1" or parsed.path != "/v1/execute":
             return {"ok": False, "error": "RULE_RUNNER_ENDPOINT_INVALID"}
+        request_id = str(uuid.uuid4())
         body = {
             "contract_version": "pusingcuk.core.tool.v1",
-            "request_id": str(uuid.uuid4()),
+            "request_id": request_id,
             "program_id": "budget.threshold.v1",
             "program_sha256": _THRESHOLD_SHA256,
             "language_version": "0.5-dev",
@@ -123,12 +128,27 @@ class ToolRegistry:
             return {"ok": False, "error": "RULE_RUNNER_RESPONSE_INVALID"}
         if not isinstance(result, dict) or result.get("status") != "succeeded" or result.get("program_id") != "budget.threshold.v1":
             return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
-        if result.get("program_sha256") != _THRESHOLD_SHA256 or result.get("result") not in {
-            "DALAM_BATAS", "PERLU_PERSETUJUAN", "INPUT_TIDAK_VALID",
-        }:
+        elapsed_ms = result.get("elapsed_ms")
+        if (
+            result.get("contract_version") != "pusingcuk.core.tool.v1"
+            or result.get("request_id") != request_id
+            or result.get("program_sha256") != _THRESHOLD_SHA256
+            or result.get("source_commit") != _THRESHOLD_SOURCE_COMMIT
+            or result.get("runtime_version") != _THRESHOLD_RUNTIME_VERSION
+            or result.get("runtime_build_sha") != _THRESHOLD_SOURCE_COMMIT
+            or result.get("sandbox") != "docker-isolated"
+            or not isinstance(result.get("sandbox_image"), str)
+            or not _SANDBOX_IMAGE_RE.fullmatch(result["sandbox_image"])
+            or isinstance(elapsed_ms, bool)
+            or not isinstance(elapsed_ms, int)
+            or not 0 <= elapsed_ms <= 3000
+            or result.get("result") not in {
+                "DALAM_BATAS", "PERLU_PERSETUJUAN", "INPUT_TIDAK_VALID",
+            }
+        ):
             return {"ok": False, "error": "RULE_EVIDENCE_INVALID"}
         return {
             "ok": True, "program_id": result["program_id"], "result": result["result"],
-            "source_commit": result.get("source_commit"), "runtime_build_sha": result.get("runtime_build_sha"),
-            "elapsed_ms": result.get("elapsed_ms"),
+            "source_commit": result["source_commit"], "runtime_build_sha": result["runtime_build_sha"],
+            "elapsed_ms": elapsed_ms,
         }
