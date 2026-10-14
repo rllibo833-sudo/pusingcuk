@@ -41,7 +41,7 @@ The grounding suite covers 14 synthetic records plus the actual 14-entry curated
 
 ## Local assistant CLI
 
-The local-first assistant entry point is `pusingcuk-ai`. It combines the pinned curated index, bounded in-process conversation history, the loopback-only Ollama adapter, and citations derived from validated index entries. It keeps the active conversation in memory, supports registered tool calls through the assistant orchestrator, and only saves project notes when the user explicitly opts in. It is not a production web service.
+The local-first assistant entry point is `pusingcuk-ai`. It combines the pinned curated index, bounded in-process conversation history, the loopback-only Ollama adapter, and citations derived from validated index entries. It keeps the active conversation in memory, supports registered tool calls through the assistant orchestrator, and only saves project notes when the user explicitly opts in. The CLI is not a production web service. An experimental loopback-only HTTP adapter exists at `library/ai_service.py`; it has no public deployment or per-user identity. See `AI_LOCAL_SERVICE.md` for its exact boundary.
 
 Run after installing the project and a compatible local Ollama model with:
 
@@ -67,3 +67,8 @@ The assistant can load a small local project-memory file at the user's home dire
 `library/gemini_ai_provider.py` implements the public Gemini GenerateContent REST contract independently of external application backends. The default remains local Ollama; Gemini is an explicit opt-in via `pusingcuk-ai --provider gemini` and `GEMINI_API_KEY`. The key is sent in the HTTPS `x-goog-api-key` header, never embedded in the URL or stored in the repository. Request/response sizes, model identifiers, tool declarations, tool-call count, timeout, and error messages are bounded. API availability and quota depend on the user's Google AI account.
 
 The adapter follows the public [Gemini GenerateContent API](https://ai.google.dev/api/generate-content) and [function-calling contract](https://ai.google.dev/gemini-api/docs/function-calling). It is an optional inference provider, not a runtime dependency and not evidence of production deployment.
+
+
+## Source migration
+
+The PusingCuk-only index is intentional. Reviewed ideas from Founder-OS and CORE are rewritten and tracked in [AI_ENGINE_MIGRATION_LEDGER.md](AI_ENGINE_MIGRATION_LEDGER.md); their immutable external links provide provenance for the decisions, not runtime retrieval sources. Do not copy external knowledge indexes or operational records wholesale.

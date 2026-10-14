@@ -38,7 +38,11 @@ Start it locally with `PUSINGCUK_RUNNER_TOKEN="$(openssl rand -hex 32)" node too
 
 **This runner is still not an OS sandbox.** The native executable still runs as the operating-system user, so a reviewed fixed program and the language's current limitations reduce risk but do not establish OS isolation. It is a local development adapter only. Do not route production or arbitrary user/model source through it until an independently reviewed sandbox or isolated worker exists.
 
-## Additional pure rule example (not registered as a CORE tool)\n\n`examples/core/priority_triage.cuk` adds a deterministic triage rule with two bounded integer inputs (urgency and impact, each 1–5) and four stable output classes. Twelve fixture cases cover branch boundaries and invalid ranges; the source SHA-256 is pinned in `tests/fixtures/priority_triage.json`, and both the reference Python suite and native C gate execute those cases. This example is not yet added to `tools/core-rule-runner.mjs` or to a hosted tool registry. It must not be treated as a production endpoint or a security sandbox.\n\n## Proposed request envelope
+## Additional pure rule example (not registered as a CORE tool)
+
+`examples/core/priority_triage.cuk` adds a deterministic triage rule with two bounded integer inputs (urgency and impact, each 1–5) and four stable output classes. Twelve fixture cases cover branch boundaries and invalid ranges; the source SHA-256 is pinned in `tests/fixtures/priority_triage.json`, and both the reference Python suite and native C gate execute those cases. This example is not yet added to `tools/core-rule-runner.mjs` or to a hosted tool registry. It must not be treated as a production endpoint or a security sandbox.
+
+## Proposed request envelope
 
 A CORE adapter sends a validated, versioned request to the PusingCuk execution boundary. It may use a registered artifact ID, not arbitrary shell text or arbitrary commands.
 

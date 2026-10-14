@@ -35,5 +35,29 @@ class DocumentationContractTests(unittest.TestCase):
             self.assertNotIn("## 19 Built-in Terkontrak", content)
 
 
+
+    def test_ai_engine_docs_match_local_service_and_migration_boundaries(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        readiness = (ROOT / "docs/AI_ENGINE_READINESS.md").read_text(encoding="utf-8")
+        grounding = (ROOT / "docs/AI_KNOWLEDGE_GROUNDING.md").read_text(encoding="utf-8")
+        service = (ROOT / "docs/AI_LOCAL_SERVICE.md").read_text(encoding="utf-8")
+        ledger = (ROOT / "docs/AI_ENGINE_MIGRATION_LEDGER.md").read_text(encoding="utf-8")
+
+        self.assertIn("pusingcuk-ai-service", readme)
+        self.assertIn("docs/AI_LOCAL_SERVICE.md", readme)
+        self.assertIn("loopback-only", readiness)
+        self.assertNotIn("It is not yet a multi-user HTTP service", readiness)
+        self.assertIn("GET /healthz", service)
+        self.assertIn("not a public hosted service", service)
+        self.assertIn("AI_ENGINE_MIGRATION_LEDGER.md", grounding)
+        self.assertIn("No Proof, No Claim", ledger)
+        self.assertIn("Founder-OS", ledger)
+        self.assertIn("kawasan-masjid-core", ledger)
+        self.assertIn("not a general-purpose security sandbox", ledger)
+        self.assertIn("/blob/d9a41ae35dcc08628c7ac1fc38b3ac52fb982792/", ledger)
+        self.assertIn("/blob/2e11dd3d8974a8a8390636a55a286057db99db05/", ledger)
+        self.assertNotIn("/blob/main/", ledger)
+
+
 if __name__ == "__main__":
     unittest.main()

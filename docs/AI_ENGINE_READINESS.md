@@ -6,7 +6,7 @@
 
 The maintained AI entry point is an experimental local-first CLI. It delegates inference to a selected provider (local Ollama by default, Gemini only by explicit opt-in), performs deterministic lexical retrieval over a small curated index, appends citations from validated source records, keeps active chat history in process memory, and offers a small allowlisted tool registry. Explicit project notes can be saved to the user's local memory store.
 
-This is an application/orchestrator, not a foundation model trained by PusingCuk. It is not yet a multi-user HTTP service, and the language runtimes are not OS security sandboxes. Passing CI is evidence for the tested contracts only; it is not proof of production availability, general answer quality, or safe execution of arbitrary programs.
+This is an application/orchestrator, not a foundation model trained by PusingCuk. An authenticated loopback-only HTTP adapter now serves local clients, but there is no externally hosted production API or per-user identity/authorization yet. The language runtimes are not OS security sandboxes. Passing CI is evidence for tested contracts only; it is not proof of production availability, general answer quality, or safe execution of arbitrary programs.
 
 ## Local integration service now available
 
@@ -31,11 +31,13 @@ A release must not skip gates or turn a prototype into a production claim just b
 - Add regressions for prompt injection inside retrieved documents, fabricated URLs, malformed/oversized provider responses, timeouts, quota/rate-limit responses, and repeated/invalid tool calls.
 - Model output is not proof that a requested tool ran. Tool outcomes must come from validated tool responses and their citations must retain the trusted source envelope.
 
-### Gate 2 — explicit service contract before hosting
+### Gate 2 — local service contract and hosted-service gate
 
-Before the CLI becomes an API, define and test a versioned request/response schema, health/readiness semantics, request IDs, cancellation/timeouts, bounded input/output, concurrent request limits, graceful shutdown, structured error codes, and streaming behavior. Keep provider-specific behavior behind an interface and do not silently retry non-idempotent tool operations.
+The local adapter is implemented and tested for a versioned `POST /v1/chat` schema, bearer authentication, request IDs, 4 KiB request bound, bounded session/concurrency counts, duplicate-key rejection, generic errors, loopback-only binding, and ephemeral in-memory session context. `GET /healthz` reports process liveness only—not provider readiness. Details and limitations are in [AI_LOCAL_SERVICE.md](AI_LOCAL_SERVICE.md).
 
-A hosted service also needs authentication/authorization, abuse controls, per-user quotas, secret management, log redaction, privacy/retention controls, monitoring, backup/restore, dependency updates, rollback, and an incident procedure. Do not expose an unauthenticated model proxy or the local rule runner to the public internet.
+Not implemented as production guarantees: per-user identities/authorization and quotas, application-level abuse/rate controls, end-to-end cancellation/deadlines, streaming, graceful orchestration under SIGTERM, production metrics/alerts, TLS termination, backup/restore of durable service state, rollout/rollback automation, and an incident process. These must be designed and tested before public deployment. Keep provider-specific behavior behind an interface and do not blindly retry non-idempotent tool operations.
+
+Never expose the local model adapter or registered-rule runner directly to the public internet. Gemini is explicit opt-in and sends prompt/context data to a third party.
 
 ### Gate 3 — safe deterministic rule execution
 
@@ -45,13 +47,17 @@ A hosted service also needs authentication/authorization, abuse controls, per-us
 - Portability is claimed only for runtimes that pass the same required fixtures. Keep a truthful capability matrix; never equate Python reference, native C, transpilers, and PVM without conformance evidence.
 - Before any untrusted-code feature is considered, require OS-level isolation, network denial, a read-only filesystem, least privilege, CPU/memory/process/output/time limits, and adversarial testing. The current project runtime is not a general sandbox.
 
-### Gate 3A — deterministic rule test evidence\n\nThe pure example `examples/core/priority_triage.cuk` now defines a bounded operations triage decision using urgency/impact integers from 1 to 5. Its fixture pins source SHA-256 and covers all four outputs plus invalid lower/upper bounds. It is exercised by the Python reference test and native C test target. This proves only this example's tested behavior on those two runtimes; it is not a registered hosted tool, and it is not an isolation boundary.\n\n### Gate 4 — small opt-in pilot
+### Gate 3A — deterministic rule test evidence
+
+The pure example `examples/core/priority_triage.cuk` now defines a bounded operations triage decision using urgency/impact integers from 1 to 5. Its fixture pins source SHA-256 and covers all four outputs plus invalid lower/upper bounds. It is exercised by the Python reference test and native C test target. This proves only this example's tested behavior on those two runtimes; it is not a registered hosted tool, and it is not an isolation boundary.
+
+### Gate 4 — small opt-in pilot
 
 Start with a narrow, non-sensitive workflow and explicit human review. Define success, failure, latency, cost/quota, and rollback thresholds before collecting results. No customer, uptime, security, or production-readiness claims without observed evidence. Expand scope only after the previous gate is green.
 
 ## Gradually absorbing Founder OS and CORE knowledge
 
-Founder OS and CORE are **reference sources for reviewed decisions and patterns**, not runtime dependencies. Their repositories must never be crawled wholesale. A migration entry should be added only after a maintainer has checked the primary document, determined that the information is relevant and safe to publish, and rewritten the transferable insight in PusingCuk's own words.
+Founder OS and CORE are **reference sources for reviewed decisions and patterns**, not runtime dependencies. See the [AI Engine knowledge migration ledger](AI_ENGINE_MIGRATION_LEDGER.md) for rewritten principles, immutable source pins, and remaining evidence gates. Their repositories must never be crawled wholesale. A migration entry should be added only after a maintainer has checked the primary document, determined that the information is relevant and safe to publish, and rewritten the transferable insight in PusingCuk's own words.
 
 | Source area | Transferable subject | PusingCuk-owned destination | Acceptance evidence |
 | --- | --- | --- | --- |
