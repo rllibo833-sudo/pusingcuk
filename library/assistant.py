@@ -10,6 +10,7 @@ from typing import Any
 from library.ai_tools import ToolRegistry
 from library.knowledge_grounding import append_citations, load_index, rank_knowledge
 from library.local_ai_provider import LocalAIProviderError, OllamaChatProvider
+from library.local_memory import LocalMemoryError, LocalMemoryStore
 
 _SYSTEM_BASE = """Kamu adalah asisten AI yang jujur dan membantu. Jawab dalam bahasa pengguna, utamakan bahasa Indonesia bila sesuai.
 Pisahkan fakta yang didukung sumber dari pengetahuan umum. Jangan mengaku menjalankan kode, memeriksa produksi, atau mengetahui data yang tidak diberikan.
@@ -22,12 +23,13 @@ Jangan meminta atau membocorkan rahasia. Jangan menjalankan atau menyarankan eks
 class PusingCukAssistant:
     """In-process conversation memory; no transcript is persisted to disk."""
 
-    def __init__(self, provider: Any, documents: list[dict[str, Any]], *, retrieval_limit: int = 3, tool_registry: ToolRegistry | None = None):
+    def __init__(self, provider: Any, documents: list[dict[str, Any]], *, retrieval_limit: int = 3, tool_registry: ToolRegistry | None = None, memory_store: LocalMemoryStore | None = None):
         self.provider = provider
         self.documents = documents
         self.by_id = {document["id"]: document for document in documents}
         self.retrieval_limit = retrieval_limit
         self.tool_registry = tool_registry or ToolRegistry(documents)
+        self.memory_store = memory_store
         self.history: list[dict[str, str]] = []
 
     def reset(self) -> None:
@@ -62,6 +64,11 @@ class PusingCukAssistant:
             system_prompt += "\n\n---\n\n".join(context_blocks)
         else:
             system_prompt += "\n\nTidak ada sumber proyek yang cocok dengan kueri ini. Jangan membuat klaim khusus proyek seolah telah diverifikasi."
+        if self.memory_store is not None:
+            saved_memories = self.memory_store.search(query, limit=3)
+            if saved_memories:
+                system_prompt += "\n\nCatatan proyek yang disimpan secara eksplisit oleh pengguna (konteks, bukan sumber eksternal terverifikasi):\n"
+                system_prompt += "\n".join(f"- [{item['category']}] {item['text'][:500]}" for item in saved_memories)
         messages = self._bounded_history() + [{"role": "user", "content": query}]
         used_source_ids: list[str] = []
         for item in retrieved:
@@ -133,12 +140,13 @@ def main() -> int:
     try:
         documents = load_index(args.index)
         provider = OllamaChatProvider(model=args.model, endpoint=args.endpoint)
-    except (OSError, ValueError, LocalAIProviderError) as exc:
+        memory_store = LocalMemoryStore()
+    except (OSError, ValueError, LocalAIProviderError, LocalMemoryError) as exc:
         code = getattr(exc, "code", str(exc))
         print(f"PusingCuk AI belum siap: {code}")
         return 2
-    assistant = PusingCukAssistant(provider, documents)
-    print(f"PusingCuk AI lokal ({args.model}). Ketik /reset untuk menghapus konteks, /keluar untuk berhenti.")
+    assistant = PusingCukAssistant(provider, documents, memory_store=memory_store)
+    print(f"PusingCuk AI lokal ({args.model}). Perintah: /reset, /ingat <catatan>, /memori [kueri], /hapus-memori <id>, /keluar.")
     while True:
         try:
             query = input("Lu: ").strip()
@@ -152,10 +160,42 @@ def main() -> int:
             return 0
         if query.casefold() == "/reset":
             assistant.reset()
-            print("Konteks percakapan lokal dihapus.")
+            print("Konteks percakapan lokal dihapus; catatan tersimpan tidak dihapus.")
+            continue
+        if query.casefold() == "/memori" or query.casefold().startswith("/memori "):
+            try:
+                tail = query[len("/memori"):].strip()
+                records = memory_store.search(tail, limit=10) if tail else memory_store.list_records(limit=10)
+                if not records:
+                    print("Belum ada catatan yang cocok.")
+                for item in records:
+                    print(f"[{item['id']}] ({item['category']}) {item['text']}")
+            except LocalMemoryError as exc:
+                print(f"Memori gagal dibaca: {exc}")
+            continue
+        if query.casefold().startswith("/ingat "):
+            tail = query[len("/ingat "):].strip()
+            category = "decision"
+            first, separator, rest = tail.partition(" ")
+            if separator and first in {"decision", "constraint", "project_fact", "recovery"}:
+                category, tail = first, rest.strip()
+            try:
+                item = memory_store.remember(tail, category=category, confirmed=True)
+                print(f"Catatan disimpan lokal: {item['id']} ({item['category']}). Gunakan /hapus-memori {item['id']} untuk menghapusnya.")
+            except LocalMemoryError as exc:
+                print(f"Catatan tidak disimpan: {exc}")
+            continue
+        if query.casefold().startswith("/hapus-memori "):
+            record_id = query[len("/hapus-memori "):].strip()
+            try:
+                print("Catatan dihapus." if memory_store.delete(record_id, confirmed=True) else "ID catatan tidak ditemukan.")
+            except LocalMemoryError as exc:
+                print(f"Catatan tidak dihapus: {exc}")
             continue
         try:
             print("\nPusingCuk AI: " + assistant.ask(query) + "\n")
+        except LocalMemoryError as exc:
+            print(f"Memori lokal gagal: {exc}")
         except ValueError as exc:
             print(f"Pertanyaan ditolak: {exc}")
         except LocalAIProviderError as exc:

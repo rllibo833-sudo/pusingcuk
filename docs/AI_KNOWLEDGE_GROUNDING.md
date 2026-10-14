@@ -55,3 +55,8 @@ Type `/reset` to clear session memory or `/keluar` to exit. The local model runt
 ## Retrieval evaluation
 
 The 14-case Indonesian retrieval benchmark is stored in tests/fixtures/knowledge_retrieval_cases.json and asserted by the test suite. It currently targets top-1 exact source IDs for a small curated query set; it is a regression baseline, not evidence of general semantic-search quality.
+
+
+## Local project memory
+
+The assistant can load a small local project-memory file at the user's home directory under .pusingcuk/memory.json (or the path explicitly configured by PUSINGCUK_AI_MEMORY_PATH). Chat transcripts are never persisted automatically. Users must explicitly run /ingat to save a project decision, constraint, fact, or recovery note; /memori searches/list notes and /hapus-memori deletes a selected ID. The store has a 200-record and 2,000-character-per-record cap, rejects common credential patterns, writes atomically, and uses restrictive POSIX permissions when available. This is local continuity memory, not an external citation source.

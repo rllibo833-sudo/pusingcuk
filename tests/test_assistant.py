@@ -8,6 +8,8 @@ from library.ai_tools import ToolRegistry, _THRESHOLD_SHA256
 from library.assistant import PusingCukAssistant
 from library.knowledge_grounding import load_index
 from library.local_ai_provider import LocalAIProviderError
+from library.local_memory import LocalMemoryStore
+import tempfile
 
 
 class FakeProvider:
@@ -47,6 +49,23 @@ class AssistantTests(unittest.TestCase):
         self.assistant.ask("Apa itu PusingCuk?")
         self.assistant.reset()
         self.assertEqual(self.assistant.history, [])
+
+    def test_explicit_local_memory_is_retrieved_as_context(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = LocalMemoryStore(Path(directory) / "memory.json")
+            store.remember("PusingCuk adalah repositori utama; Founder OS dan CORE dibekukan setelah migrasi.", confirmed=True)
+            assistant = PusingCukAssistant(self.provider, self.documents, memory_store=store)
+            assistant.ask("Apa keputusan repositori utama PusingCuk?")
+            prompt = self.provider.calls[0]["system_prompt"]
+            self.assertIn("Catatan proyek yang disimpan", prompt)
+            self.assertIn("Founder OS dan CORE dibekukan", prompt)
+
+    def test_chat_does_not_persist_memory_without_explicit_command(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "memory.json"
+            assistant = PusingCukAssistant(self.provider, self.documents, memory_store=LocalMemoryStore(path))
+            assistant.ask("Apa itu PusingCuk?")
+            self.assertFalse(path.exists())
 
     def test_invalid_query_is_rejected_before_provider_call(self):
         with self.assertRaisesRegex(ValueError, "AI_QUERY_INVALID"):

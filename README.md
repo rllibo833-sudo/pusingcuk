@@ -49,7 +49,7 @@ python -m pip install .
 pusingcuk-ai --model qwen3:4b
 ```
 
-Ollama harus berjalan di perangkat yang sama dan mendengarkan di loopback port 11434. Tidak diperlukan API key berbayar, tetapi model memerlukan ruang penyimpanan dan RAM. Ketik `/reset` untuk menghapus konteks sesi atau `/keluar` untuk berhenti. Riwayat chat hanya ada di memori proses dan tidak disimpan ke disk.
+Ollama harus berjalan di perangkat yang sama dan mendengarkan di loopback port 11434. Tidak diperlukan API key berbayar, tetapi model memerlukan ruang penyimpanan dan RAM. Ketik `/reset` untuk menghapus konteks sesi atau `/keluar` untuk berhenti. Riwayat chat tidak disimpan ke disk. Catatan proyek yang ingin dipertahankan harus disimpan secara eksplisit dengan `/ingat <catatan>`, dilihat melalui `/memori [kueri]`, dan dihapus dengan `/hapus-memori <id>`. Catatan tersimpan berada di file lokal pengguna, dibatasi jumlah/ukuran, dan pola kredensial umum ditolak.
 
 Tool yang tersedia hanya pencarian dokumen read-only dan aturan anggaran terdaftar melalui runner Docker lokal yang dilindungi token. Tanpa runner tersebut, tool anggaran gagal dengan aman. Model tidak dapat mengirim source code arbitrer untuk dieksekusi. Jangan mengekspos runner ke internet.
 
