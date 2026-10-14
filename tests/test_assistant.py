@@ -170,18 +170,28 @@ class AssistantTests(unittest.TestCase):
     def test_budget_rule_sends_only_fixed_registered_request_to_runner(self):
         class FakeResponse:
             status = 200
+            def __init__(self, payload): self.payload = payload
             def __enter__(self): return self
             def __exit__(self, *_args): return False
-            def read(self, _limit=-1):
-                return json.dumps({
-                    "status": "succeeded", "program_id": "budget.threshold.v1",
-                    "program_sha256": _THRESHOLD_SHA256, "result": "DALAM_BATAS",
-                    "source_commit": "e367f45b0a35ccb8fdb91424099b8046b346d77d",
-                    "runtime_build_sha": "e367f45b0a35ccb8fdb91424099b8046b346d77d", "elapsed_ms": 3,
-                }).encode()
+            def read(self, _limit=-1): return json.dumps(self.payload).encode()
+
+        def fake_open(request, *, timeout):
+            sent = json.loads(request.data.decode())
+            return FakeResponse({
+                "contract_version": "pusingcuk.core.tool.v1",
+                "request_id": sent["request_id"],
+                "status": "succeeded", "program_id": "budget.threshold.v1",
+                "program_sha256": _THRESHOLD_SHA256, "result": "DALAM_BATAS",
+                "source_commit": "e367f45b0a35ccb8fdb91424099b8046b346d77d",
+                "runtime_version": "Pusingcuk native 0.8.0.dev0",
+                "runtime_build_sha": "e367f45b0a35ccb8fdb91424099b8046b346d77d",
+                "sandbox": "docker-isolated", "sandbox_image": "sha256:" + "a" * 64,
+                "elapsed_ms": 3,
+            })
+
         registry = ToolRegistry(self.documents)
         with patch.dict("os.environ", {"PUSINGCUK_RUNNER_TOKEN": "x" * 40}), patch("library.ai_tools.build_opener") as builder:
-            builder.return_value.open.return_value = FakeResponse()
+            builder.return_value.open.side_effect = fake_open
             result = registry.execute("budget_threshold", {"nominal": 100, "batas": 200})
         self.assertEqual(result["result"], "DALAM_BATAS")
         request = builder.return_value.open.call_args.args[0]
