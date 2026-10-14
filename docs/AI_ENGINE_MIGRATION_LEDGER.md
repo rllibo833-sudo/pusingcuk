@@ -20,6 +20,8 @@ This ledger records why a pattern is being adopted, how it is rewritten for Pusi
 
 ### 2. Human authority, evidence and truthful claims
 
+**Rule:** No Proof, No Claim. Report users, customers, partners, revenue, production status and outcomes only when current evidence supports the exact claim.
+
 **Transferred principle:** consequential external commitments stay behind explicit human review; reported outcomes must not exceed their evidence.
 
 **PusingCuk interpretation:** model text is not proof that a tool ran or an outcome occurred. A citation establishes source provenance, not truth of every claim. Tools may execute only after registry and input validation; business decisions and irreversible actions must remain outside model-only authority until an authorized service enforces a human approval boundary.
