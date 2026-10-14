@@ -74,6 +74,16 @@ class GeminiProviderTests(unittest.TestCase):
         with self.assertRaisesRegex(LocalAIProviderError, "MODEL_INVALID"):
             GeminiGenerateContentProvider("test-api-key-123456", model="../bad")
 
+    def test_gemini3_rejects_function_call_without_required_signature(self):
+        provider = GeminiGenerateContentProvider("test-api-key-123456", model="gemini-3.8-flash")
+        body = json.dumps({"candidates": [{"content": {"parts": [{
+            "functionCall": {"name": "knowledge_search", "args": {"query": "pusingcuk"}}
+        }]}}]}).encode()
+        with patch("library.gemini_ai_provider.build_opener") as builder:
+            builder.return_value.open.return_value = FakeResponse(body)
+            with self.assertRaisesRegex(LocalAIProviderError, "AI_THOUGHT_SIGNATURE_MISSING"):
+                provider.generate_turn(self.messages)
+
     def test_more_than_two_function_calls_are_rejected(self):
         parts = [{"functionCall": {"name": "knowledge_search", "args": {"query": str(i)}}} for i in range(3)]
         body = json.dumps({"candidates": [{"content": {"parts": parts}}]}).encode()

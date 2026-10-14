@@ -146,6 +146,9 @@ class GeminiGenerateContentProvider:
             calls.append(parsed_call)
             if len(calls) > 2:
                 raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
+        if calls and re.match(r"^gemini-(?:3|4)(?:[.-]|$)", self.model, re.IGNORECASE) and not calls[0].get("thought_signature"):
+            # Gemini 3/4 require the first function-call part's signature for a valid tool round trip.
+            raise LocalAIProviderError("AI_THOUGHT_SIGNATURE_MISSING")
         answer = "\n".join(texts).strip()
         if not answer and not calls:
             raise LocalAIProviderError("AI_RESPONSE_CONTENT_MISSING")
