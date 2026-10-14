@@ -112,7 +112,7 @@ jobs:
             sleep 1
           done
           curl --silent --show-error --fail http://127.0.0.1:8787/health >/dev/null
-          node --input-type=module <<'NODE'
+          node --input-type=module <<'NODE' || { cat "$RUNNER_TEMP/pusingcuk-runner.log"; exit 1; }
           import assert from "node:assert/strict";
           import { randomUUID } from "node:crypto";
 
@@ -144,7 +144,7 @@ jobs:
           for (const [input, expected] of cases) {
             const body = { ...base, request_id: randomUUID(), input };
             const result = await call(body);
-            assert.equal(result.status, 200);
+            assert.equal(result.status, 200, JSON.stringify(result.body));
             assert.equal(result.body.status, "succeeded");
             assert.equal(result.body.result, expected);
             assert.equal(result.body.runtime_build_sha, "e367f45b0a35ccb8fdb91424099b8046b346d77d");
@@ -164,7 +164,7 @@ jobs:
           ];
           for (const [input, expected] of sufficiencyCases) {
             const result = await call({ ...sufficiencyBase, request_id: randomUUID(), input });
-            assert.equal(result.status, 200);
+            assert.equal(result.status, 200, JSON.stringify(result.body));
             assert.equal(result.body.status, "succeeded");
             assert.equal(result.body.result, expected);
             assert.equal(result.body.source_commit, "411c532454028d2d5e733373d085050eca1d402a");
