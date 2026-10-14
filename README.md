@@ -9,7 +9,7 @@ Pusingcuk is an experimental programming language built around Indonesian-friend
 | Target | Contracted built-ins | Status |
 |---|---:|---|
 | Reference Python | 21 | Full contracted built-in set; additional reference-only intrinsics are separate |
-| Native C | 17 | Subset; no file I/O, HTTP, or module system |
+| Native C | 21 (scalar subset) | Tested C11 runtime; no file I/O, HTTP, or module system. Conversion built-ins support scalar values; `teks()` does not stringify collections yet |
 | JS transpiler | 14 | Subset |
 | Python transpiler | 14 | Subset |
 | VM | 6 | Experimental |
