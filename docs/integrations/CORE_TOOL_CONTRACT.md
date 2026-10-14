@@ -25,6 +25,19 @@ CORE's `Core Quality Gate` pins this repository to a full commit SHA, builds the
 
 The runtime currently opens a source file and is not an OS sandbox. A production service must therefore be a separately isolated executor or a deliberately engineered WASI/runtime boundary. Do not bypass this requirement by executing arbitrary program text in an Edge Function.
 
+## Local registered-rule runner
+
+A local prototype service is available at `tools/core-rule-runner.mjs`. It:
+- fetches/builds runtime source at the full pinned commit `23cc6b5b7d42ce5bc58babd37792a0ec32d117a8` unless an exact matching checkout is supplied;
+- verifies the canonical `examples/core/anggaran_threshold_service.cuk` SHA-256 before serving requests;
+- accepts only `budget.threshold.v1`, two bounded safe integers, an empty capability list, and a short request timeout;
+- requires a random bearer token held by the runner process, bounds request/output sizes and concurrency, and passes a reduced environment to the native process;
+- does not accept source code, arbitrary file paths, shell commands, database access, or model-provider credentials.
+
+Start it locally with `PUSINGCUK_RUNNER_TOKEN="$(openssl rand -hex 32)" node tools/core-rule-runner.mjs`. The HTTP service binds to loopback by default. For a local Edge Function in a Docker container, use a private host bridge only if needed; never publish this endpoint to the public internet.
+
+**This runner is still not an OS sandbox.** The native executable still runs as the operating-system user, so a reviewed fixed program and the language's current limitations reduce risk but do not establish OS isolation. It is a local development adapter only. Do not route production or arbitrary user/model source through it until an independently reviewed sandbox or isolated worker exists.
+
 ## Proposed request envelope
 
 A CORE adapter sends a validated, versioned request to the PusingCuk execution boundary. It may use a registered artifact ID, not arbitrary shell text or arbitrary commands.
