@@ -31,6 +31,23 @@ Dokumen ini menunjukkan tempat yang tepat untuk memulai. Baseline yang aktif ada
 
 `interpreter.py` adalah implementasi historis yang terpisah; verifikasi entry point sebelum mengubah perilaku. `compiler/`, `compiler_ir.py`, `src/backends/`, dan `src/c-core/` berisi eksperimen compiler/VM/PVM, bukan jalur kompatibilitas utama. Khusus `src/c-core/`, periksa dokumen PVM karena itu bukan duplikat runtime di `native/pusingcuk.c`.
 
+## AI Engine dan kontrak authoring .cuk
+
+Peta implementasi AI saat ini—semua lokasi berikut sudah ada kecuali contoh authoring baru yang ditandai:
+
+| Lokasi | Peran |
+|---|---|
+| `library/assistant.py` | Orkestrasi percakapan CLI |
+| `library/local_ai_provider.py` | Adapter Ollama lokal |
+| `library/gemini_ai_provider.py` | Adapter Gemini yang dipilih secara eksplisit |
+| `library/knowledge_grounding.py` + `library/knowledge_index.json` | Retrieval leksikal dan indeks sumber PusingCuk yang dikurasi |
+| `library/ai_tools.py` | Registry tool host dengan validasi input |
+| `library/local_memory.py` | Catatan lokal yang disimpan secara eksplisit |
+| `library/ai_service.py` | Adapter HTTP lokal eksperimental, loopback-only |
+| `examples/ai/engine_contract.cuk` | **Contoh baru:** prompt, aturan deterministik, dan deklarasi binding tool memakai grammar yang sudah ada |
+
+Alur yang dipelihara tetap `lexer.py` → `parser.py` → `ast_nodes.py` → `evaluator.py`; native C tetap di `native/pusingcuk.c`. Jangan membuat parser, provider layer, atau indeks AI kedua untuk tujuan yang sama. Deklarasi tool dalam contoh .cuk adalah metadata; eksekusi tetap hanya melalui registry host yang mengizinkan tool secara eksplisit. Handler `budget_threshold` masih memakai kontrak runner lokal lama dan perlu dipisahkan pada tahap berikutnya sebelum mengklaim semua kemampuan AI sudah bebas dari adapter historis.
+
 ## Tes dan bukti kompatibilitas
 
 - `tests/test_*.py`: unit/integration tests Python.

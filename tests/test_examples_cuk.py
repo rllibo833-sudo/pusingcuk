@@ -15,6 +15,7 @@ class CukExampleCliTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="pusingcuk-example-") as temporary:
             project = Path(temporary)
             script = project / name
+            script.parent.mkdir(parents=True, exist_ok=True)
             script.write_bytes((EXAMPLES / name).read_bytes())
             script.chmod(0o755)
             result = subprocess.run(
@@ -30,6 +31,14 @@ class CukExampleCliTests(unittest.TestCase):
             note = note_path.read_text(encoding="utf-8") if note_path.is_file() else None
             note_inside_project = note_path.resolve().is_relative_to(project)
             return result.stdout, note, note_inside_project
+
+    def test_ai_engine_contract_example_runs_without_provider_or_network(self):
+        output, _, _ = self.run_example("ai/engine_contract.cuk", "")
+        self.assertIn("OUTPUT_MENUNGGU_TINJAUAN", output)
+        self.assertIn(
+            "Gunakan konteks terverifikasi saja. Konteks: Kontrak runtime lokal. Pertanyaan: Apa batas tool?",
+            output,
+        )
 
     def test_terminal_bot_handles_interactive_answers(self):
         output, _, _ = self.run_example("terminal_bot.cuk", "Ayu\nbaik\n")

@@ -12,6 +12,28 @@ This is an application/orchestrator, not a foundation model trained by PusingCuk
 
 `library/ai_service.py` provides a bounded authenticated HTTP adapter for local clients. It has loopback-only binding, bearer-token protection, duplicate-key rejection, bounded JSON input, per-session in-memory contexts, session/concurrency caps, generic provider errors and a liveness endpoint. Contract tests use a fake provider, so CI does not require a running model. This is a local integration surface, **not** an externally hosted production service; see [AI_LOCAL_SERVICE.md](AI_LOCAL_SERVICE.md).
 
+## .cuk AI authoring contract (v1)
+
+PusingCuk already has a maintained language pipeline: `lexer.py` → `parser.py` → `ast_nodes.py` → `evaluator.py`, plus the separately tested `native/pusingcuk.c` runtime. Do not create a second parser or introduce new reserved words just to describe AI behavior. Version 1 uses existing `.cuk` statements and data types as a small authoring convention:
+
+- **Prompt/context:** a pure `fungsi` receives explicit context and question values and returns bounded text. Templates must not silently read memory, environment variables, or network resources.
+- **Deterministic rule:** a pure `fungsi` validates inputs and returns a stable enumerated result. The host validates input types/ranges before calling it. Rules do not get ambient capabilities.
+- **Tool binding:** a `lah` dictionary records a stable tool ID, host handler ID, input fields, and declared capabilities. This is metadata, not automatic authority: only the existing host `ToolRegistry` may execute an explicitly allowlisted handler after schema validation.
+- **Provider choice:** remains in the existing Python provider adapters; model selection is not encoded as an executable `.cuk` tool. Never place API keys or service credentials in source, context, or manifests.
+
+Runnable example: [`examples/ai/engine_contract.cuk`](../examples/ai/engine_contract.cuk). It uses existing grammar only; it demonstrates a prompt builder, a pure output-review rule, and a declarative local knowledge-tool binding. The tool declaration does not itself invoke the host tool. First-class declarations such as `prompt ...`, `rule ...`, or `tool ...` should be considered only if the convention proves insufficient; any such grammar change must update the existing lexer/parser/AST/evaluator and required runtime conformance fixtures together.
+
+## Existing project structure to extend, not duplicate
+
+- Language frontend and Python runtime: `lexer.py`, `parser.py`, `ast_nodes.py`, `evaluator.py`, `pusingcuk_new.py`.
+- Native runtime and cross-runtime evidence: `native/pusingcuk.c`, `tests/conformance/`, `tests/native/`, `tools/conformance.py`.
+- AI orchestration and tools: `library/assistant.py`, `library/ai_tools.py`, `library/knowledge_grounding.py`, `library/local_memory.py`.
+- Existing provider adapters: `library/local_ai_provider.py` (Ollama) and `library/gemini_ai_provider.py` (Gemini opt-in).
+- Local service: `library/ai_service.py`; its current contract is loopback-only and experimental.
+- User-facing executable contract example: `examples/ai/engine_contract.cuk`; its CLI test belongs in the existing `tests/test_examples_cuk.py`.
+
+Do not create a second `pusingcuk_ai/`, parser, knowledge index, provider framework, or migration ledger. Split provider adapters into a subpackage only when a real implementation need justifies it. The current `budget_threshold` handler in `library/ai_tools.py` still uses the legacy local runner contract; treat that as a future detachment task, not as a reason to port CORE services into PusingCuk.
+
 ## Release gates
 
 A release must not skip gates or turn a prototype into a production claim just because the code builds.
@@ -71,6 +93,27 @@ Do not copy code or lengthy document text from repositories unless its licensing
 
 Each migrated source record must state: why it matters to PusingCuk, the exact immutable source path/commit, public-safe classification, the distilled principle, the test or acceptance check that makes it useful, and an owner for reevaluation. Remove a record if its evidence becomes obsolete or the acceptance test no longer holds. Keep the index curated and bounded.
 
+## Prioritas ekstraksi selektif dari CORE
+
+Ambil **pola yang reusable**, bukan layanan CORE atau riwayat operasionalnya. Kerjakan dalam urutan berikut; catat satu sumber primer dan satu tujuan PusingCuk untuk setiap aset yang benar-benar dipakai.
+
+1. **P0 — aturan deterministik dan kontrak artefak.** Pelajari kontrak ID stabil, versi bahasa, hash sumber, skema input/output, batas ukuran/waktu, dan hasil enumerasi dari [kontrak runner PusingCuk yang sudah ada](integrations/CORE_TOOL_CONTRACT.md) serta contoh aturan milik PusingCuk. Tujuan: fungsi `.cuk` murni, manifest terdaftar, fixture bersama. Tidak menyalin service endpoint CORE.
+2. **P1 — batas tool dan izin minimum.** Ambil pola allowlist tool, validasi skema, capability deny-by-default, pembatasan output, dan bukti hasil tool. Tujuan: `library/ai_tools.py` dan tes yang sudah ada; handler yang tidak terdaftar harus tetap gagal tertutup.
+3. **P1 — provider dan penanganan kegagalan.** Ambil klasifikasi error autentikasi, model/endpoint tidak ditemukan, timeout, rate limit/kuota, dan cooldown/backoff. Tujuan: adapter Ollama/Gemini yang tidak saling bergantung; tes pakai provider tiruan agar tidak membutuhkan API berbayar.
+4. **P2 — grounding dan provenance.** Ambil aturan kutipan sumber, validasi URL/commit/path, pembedaan bukti dari teks model, dan penanganan prompt injection dalam dokumen. Tujuan: indeks kecil milik PusingCuk; jangan crawl CORE/Founder-OS otomatis.
+5. **P3 — pola operasional yang berguna untuk AI lokal.** Catat hanya pelajaran tentang retry terbatas, idempotensi, review manusia, dan redaksi rahasia jika benar-benar relevan. Tujuan: kebijakan dan implementasi lokal yang ditulis ulang, bukan memindahkan antrean/cron Supabase.
+6. **Nanti atau tidak dimigrasikan — domain dan infrastruktur lama.** Materi masterplan yang aman untuk publik dapat masuk korpus domain terpisah setelah ada kebutuhan nyata. Tabel Supabase, Auth, pembayaran/webhook, data operasional pribadi, API key, notifikasi, cron, dan log historis bukan fitur inti bahasa/AI; arsipkan sebagai catatan sejarah atau pensiunkan, jangan salin ke runtime atau indeks AI.
+
+Checklist penerimaan per aset:
+- [ ] sumber primer dan commit/path spesifik tercatat;
+- [ ] alasan relevansi dan klasifikasi aman untuk digunakan dicatat;
+- [ ] prinsip ditulis ulang dalam istilah PusingCuk, tanpa menyalin rahasia atau data pribadi;
+- [ ] perubahan runtime yang nyata punya tes/fixture yang membuktikan perilaku, bukan sekadar tes keberadaan teks;
+- [ ] tidak ada fetch, import, indeks runtime, atau panggilan layanan ke repositori lama;
+- [ ] bila aset tidak menambah kemampuan pengguna, hapus dari antrean migrasi.
+
+Migrasi pengetahuan ini **bukan pelatihan bobot model**. Fine-tuning adalah proyek terpisah setelah ada dataset legal/aman, benchmark, anggaran komputasi, dan bukti bahwa prompt, aturan, atau retrieval tidak cukup.
+
 ## Conditions for retiring Founder OS and CORE
 
 The public website is already a separate content site, but that does not establish that CORE's backend or data can be deleted safely. Before any repository is deleted (rather than merely archived), confirm all of the following:
@@ -86,4 +129,4 @@ Until these checks pass, prefer disabling retired endpoints explicitly and docum
 
 ## Immediate acceptance target
 
-For this phase, the acceptance target is a provenance-clean 14-source index, a non-contradictory grounding contract, automated local-only source assertions, and a documented release/migration gate. This narrows the next implementation step to measurable tests instead of claiming that the Engine is already production-ready.
+For this phase, the acceptance target is a provenance-clean 16-source index, a non-contradictory grounding contract, automated local-only source assertions, and a documented release/migration gate. This narrows the next implementation step to measurable tests instead of claiming that the Engine is already production-ready.
