@@ -23,6 +23,7 @@ classifiers = [
 
 [project.scripts]
 pusingcuk = "pusingcuk_new:main"
+pusingcuk-ai = "library.assistant:main"
 pusingcuk-repl = "terminal:main"
 
 [tool.pusingcuk]

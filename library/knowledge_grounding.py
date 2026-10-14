@@ -186,9 +186,22 @@ def format_citations(sources: Iterable[dict[str, Any]], limit: int = 5) -> str:
 
 
 def append_citations(answer: str, sources: Iterable[dict[str, Any]]) -> str:
-    """Append validated citations; never infer citations from answer text."""
+    """Append validated citations and strip model-invented external URLs."""
     if not isinstance(answer, str) or not answer.strip():
         return ""
-    body = answer.strip()
-    citations = format_citations(sources)
-    return f"{body}\n\n{citations}" if citations else body
+    valid_sources = [source for source in sources if validate_source(source)]
+    allowed_urls = {source["url"] for source in valid_sources}
+
+    def clean_markdown_link(match: re.Match[str]) -> str:
+        label, url = match.group(1), match.group(2)
+        return match.group(0) if url in allowed_urls else label
+
+    body = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", clean_markdown_link, answer.strip())
+    body = re.sub(
+        r"https?://[^\s<>]+",
+        lambda match: match.group(0) if match.group(0).rstrip(".,;:!?\\]") in allowed_urls else "",
+        body,
+    )
+    body = re.sub(r"[ \t]{2,}", " ", body)
+    citations = format_citations(valid_sources)
+    return f"{body.strip()}\n\n{citations}" if citations else body.strip()

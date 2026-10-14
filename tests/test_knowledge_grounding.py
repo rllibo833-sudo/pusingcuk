@@ -111,7 +111,7 @@ class KnowledgeGroundingTests(unittest.TestCase):
     def test_answer_citations_are_not_inferred_from_model_text(self):
         answer = append_citations("Jawaban dengan tautan palsu https://attacker.example", [self.documents[1]])
         self.assertIn(self.documents[1]["url"], answer)
-        self.assertNotIn("[https://attacker.example]", answer)
+        self.assertNotIn("attacker.example", answer)
 
     def test_empty_answer_stays_empty(self):
         self.assertEqual(append_citations("  ", self.documents), "")

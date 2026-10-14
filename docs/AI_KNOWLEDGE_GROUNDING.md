@@ -33,3 +33,16 @@ library/local_ai_provider.py provides a no-paid-key Ollama-compatible chat adapt
 ## Regression coverage
 
 The grounding suite covers 14 synthetic records plus the actual 14-entry curated index, Indonesian query ranking, normalization, unrelated-query rejection, commit/path matching, URL validation, visibility, duplicate IDs, index size, citation filtering/deduplication, and bounded results. The local provider suite covers request shape, system prompt placement, loopback-only enforcement, bounded inputs and outputs, malformed responses, and network failure.
+
+
+## Local assistant CLI
+
+The local-first assistant entry point is `pusingcuk-ai`. It combines the pinned curated index, bounded in-process conversation history, the loopback-only Ollama adapter, and citations derived from validated index entries. It does not persist chat history and does not yet provide tool calling or a production web service.
+
+Run after installing the project and a compatible local Ollama model with:
+
+```sh
+pusingcuk-ai --model qwen3:4b
+```
+
+Type `/reset` to clear session memory or `/keluar` to exit. The local model runtime must already be running. The adapter rejects remote endpoints by default.
