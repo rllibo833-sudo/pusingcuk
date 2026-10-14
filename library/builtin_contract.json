@@ -68,7 +68,8 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "not-claimed",
+          "limitation": "Native C only stringifies scalar text/number/boolean/None values; collection string formatting is not claimed."
         },
         "reference": {
           "status": "supported"
@@ -98,7 +99,8 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "not-claimed",
+          "limitation": "Native C accepts scalar numeric values and integer strings in the safe cross-target range; collection conversion and unbounded Python integers are not claimed."
         },
         "reference": {
           "status": "supported"
@@ -128,7 +130,8 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "not-claimed",
+          "limitation": "Native C accepts finite scalar numeric values or finite numeric strings; collection conversion and non-finite values are not claimed."
         },
         "reference": {
           "status": "supported"
@@ -158,7 +161,8 @@
           "status": "unsupported"
         },
         "native_c": {
-          "status": "unsupported"
+          "status": "not-claimed",
+          "limitation": "Native C applies truthiness to supported runtime values; this does not imply full builtin parity for all conversion operations."
         },
         "reference": {
           "status": "supported"
