@@ -1,0 +1,25 @@
+# Fixed registered CORE operation. Never accept source code from callers.
+# CORE validates the JSON input and the isolated runner supplies exactly two
+# newline-delimited decimal integers on stdin. This program has no other I/O.
+
+jancuk
+
+fungsi status_anggaran(nominal, batas)
+    njir nominal < 0 atau batas < 0
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        njir nominal <= batas
+            balek "DALAM_BATAS"
+        kampret
+            balek "PERLU_PERSETUJUAN"
+        selesai njir
+    selesai njir
+selesai fungsi
+
+tanya nominal_teks = ""
+tanya batas_teks = ""
+lah nominal = bilangan(nominal_teks)
+lah batas = bilangan(batas_teks)
+hedeh status_anggaran(nominal, batas)
+
+selesai jancuk
