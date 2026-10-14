@@ -40,5 +40,13 @@ jobs:
           python -c "from library.builtin_contract import BUILTIN_CONTRACT; assert BUILTIN_CONTRACT['schema_version'] == 1"
       - name: Build executable
         run: pyinstaller --log-level DEBUG --noconfirm --clean pusingcuk.spec
-      - name: Verify executable
-        run: test -x dist/pusingcuk
+      - name: Verify executable and bundled runtime data
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s dist/pusingcuk
+          test -x dist/pusingcuk
+          output="$(./dist/pusingcuk examples/modular.pusingcuk)"
+          printf '%s\n' "$output"
+          grep -Fq 'Halo, Budi!' <<< "$output"
+          grep -Fq 'selesai' <<< "$output"

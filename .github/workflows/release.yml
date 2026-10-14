@@ -3,7 +3,7 @@ name: Release binary
 on:
   push:
     tags:
-      - "v*"
+      - "v*.*.*"
   workflow_dispatch:
     inputs:
       release_tag:
@@ -69,25 +69,24 @@ jobs:
           fi
           python -m pip install pyinstaller==6.11.1
 
-      - name: Build standalone executable (spec, with one-file fallback)
+      - name: Build standalone executable with contract data
         shell: bash
         run: |
           set -euo pipefail
-          if pyinstaller --noconfirm --clean --log-level DEBUG pusingcuk.spec; then
-            echo "Built executable using pusingcuk.spec"
-          else
-            echo "::warning::Spec build failed; retrying with explicit one-file configuration"
-            rm -rf build dist
-            pyinstaller --noconfirm --clean --log-level DEBUG --onefile pusingcuk_new.py \
-              --name pusingcuk \
-              --add-data "examples:examples" \
-              --hidden-import evaluator \
-              --hidden-import parser \
-              --hidden-import lexer \
-              --hidden-import ast_nodes \
-              --hidden-import tools \
-              --hidden-import tools.formatter
-          fi
+          rm -rf build dist
+          pyinstaller --noconfirm --clean --log-level DEBUG --onefile pusingcuk_new.py \
+            --name pusingcuk \
+            --add-data "library/builtin_contract.json:library" \
+            --add-data "library/kosakata.json:library" \
+            --add-data "examples:examples" \
+            --hidden-import evaluator \
+            --hidden-import parser \
+            --hidden-import lexer \
+            --hidden-import ast_nodes \
+            --hidden-import library.stdlib \
+            --hidden-import library.builtin_contract \
+            --hidden-import tools \
+            --hidden-import tools.formatter
 
       - name: Verify executable and bundled example
         shell: bash

@@ -17,6 +17,13 @@ hiddenimports += collect_submodules("tools")
 # Analysis(datas=...) requires (source, destination) pairs. Tree emits TOC
 # entries with a different shape and fails with current PyInstaller releases.
 datas = []
+# The contract is loaded from a JSON file at runtime; include package data in
+# the frozen bundle as well as example programs.
+if os.path.isdir("library"):
+    for filename in os.listdir("library"):
+        if filename.endswith(".json"):
+            datas.append((os.path.join("library", filename), "library"))
+
 if os.path.isdir("examples"):
     for root, _dirs, filenames in os.walk("examples"):
         destination = os.path.relpath(root, ".")
