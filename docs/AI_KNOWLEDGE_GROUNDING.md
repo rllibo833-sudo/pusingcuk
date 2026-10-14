@@ -36,7 +36,7 @@ The Ollama adapter parses a bounded set of structured tool calls. The assistant 
 
 ## Regression coverage
 
-The grounding suite covers 14 synthetic records plus the actual 16-entry curated index, Indonesian query ranking, normalization, unrelated-query rejection, commit/path matching, URL validation, visibility, duplicate IDs, index size, citation filtering/deduplication, and bounded results. The local provider suite covers request shape, system prompt placement, loopback-only enforcement, bounded inputs and outputs, malformed responses, and network failure.
+The grounding suite covers 14 synthetic records plus the actual 16-entry curated index, Indonesian query ranking, normalization, unrelated-query rejection, commit/path matching, URL validation, visibility, duplicate IDs, index size, citation filtering/deduplication, and bounded results. AI tool-contract tests also reject booleans, floats, strings, nulls, negative and over-limit rule inputs, missing/extra fields, and unregistered shell, filesystem, network, database, provider, or process capabilities before dispatch; accepted boundary integers are forwarded without coercion, and the fixed rule request declares no ambient capabilities. The local provider suite covers request shape, system prompt placement, loopback-only enforcement, bounded inputs and outputs, malformed responses, and network failure.
 
 
 ## Local assistant CLI
