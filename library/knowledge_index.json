@@ -560,6 +560,44 @@
       ],
       "summary": "Memuat pemetaan aset Founder-OS/CORE ke PusingCuk, snapshot live Supabase, status job 8 dan 10, sepuluh Edge Function yang masih ACTIVE, serta gerbang penutupan. Menonaktifkan cron tidak mematikan endpoint dan tidak membuktikan backup sudah bisa dipulihkan.",
       "excerpt": "Pada pemeriksaan 2026-10-15, dua cron yang diketahui tidak aktif; sepuluh Edge Function tetap ACTIVE. Audit ini hanya menghitung data, bukan mengekspor atau memulihkan database. Setiap endpoint, caller, webhook, dan data wajib punya keputusan migrate/retire dan bukti."
+    },
+    {
+      "id": "pusingcuk-kawasan-masterplan-operating-model",
+      "title": "Masterplan Kawasan Masjid dan model operasi ekonomi",
+      "path": "docs/knowledge/KAWASAN_MASJID_MASTERPLAN_AND_OPERATING_MODEL.md",
+      "url": "https://github.com/rllibo833-sudo/pusingcuk/blob/fb5d9570388ec434ad4cd3cb9e9bc0846aface93/docs/knowledge/KAWASAN_MASJID_MASTERPLAN_AND_OPERATING_MODEL.md",
+      "source_repository": "rllibo833-sudo/pusingcuk",
+      "source_commit": "fb5d9570388ec434ad4cd3cb9e9bc0846aface93",
+      "authority": "PUSINGCUK_KNOWLEDGE",
+      "evidence_type": "concept-and-operating-policy",
+      "claim_status": "conceptual-masterplan-and-targets-not-physical-or-revenue-proof",
+      "visibility": "public-safe",
+      "topics": [
+        "masterplan",
+        "kawasan masjid",
+        "1000 ha",
+        "riset",
+        "hidrologi",
+        "tata ruang",
+        "fase digital",
+        "ekonomi",
+        "bukti",
+        "pilot",
+        "Founder Gate",
+        "evidence to decision"
+      ],
+      "keywords": [
+        "masterplan 1000 hektar 10.000.000 m2",
+        "lahan kepemilikan izin bangunan",
+        "digital ecosystem first",
+        "Rp0 verified revenue",
+        "pilot sebelum skala",
+        "no proof no claim",
+        "Source Evidence Human Review Decision",
+        "air tanah lingkungan kelayakan"
+      ],
+      "summary": "Kawasan Masjid 1.000 Ha adalah konsep ekosistem berbasis masjid yang menghubungkan ibadah, pendidikan, pangan, lingkungan, air, energi, ekonomi, dan teknologi. Fase awal mengutamakan produk digital kecil untuk masalah nyata, bukti penggunaan, pilot, penerimaan, pembayaran, dan keputusan berhenti atau berkembang.",
+      "excerpt": "Skala lahan 1.000 Ha masih konseptual. Perizinan, kepemilikan lahan, konstruksi, mitra, pengguna, dan pendapatan tidak boleh diklaim tanpa bukti. Gunakan riset first, pilot before scale, Founder Gate, dan keputusan berbasis evidence."
     }
   ]
 }

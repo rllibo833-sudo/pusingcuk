@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "description": "Benchmark deterministik 19 kasus untuk kueri bahasa Indonesia terhadap indeks pengetahuan terkurasi PusingCuk, termasuk tiga paket migrasi Founder-OS/CORE.",
+  "description": "Benchmark deterministik 20 kasus untuk kueri bahasa Indonesia terhadap indeks pengetahuan terkurasi PusingCuk, termasuk paket migrasi Founder-OS/CORE dan masterplan konseptual.",
   "cases": [
     {
       "id": "query-01",
@@ -96,6 +96,11 @@
       "id": "query-19",
       "query": "inventaris Supabase job 8 job 10 Edge Function backup restore penghapusan repo",
       "expected_top_id": "pusingcuk-core-retirement-manifest"
+    },
+    {
+      "id": "query-20",
+      "query": "masterplan 1000 hektar hidrologi lahan tata ruang fase digital pilot ekonomi pendapatan",
+      "expected_top_id": "pusingcuk-kawasan-masterplan-operating-model"
     }
   ]
 }
