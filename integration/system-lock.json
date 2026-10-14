@@ -38,7 +38,7 @@
     "public_system_status_source_commit": "78b8d1bdd213b10244a7c89f55c7d09510a2376a",
     "founder_os_knowledge_document_count": 20,
     "core_knowledge_citations_commit": "482e354fc616ffff6133cb615a9e2cd124a9bf48",
-    "core_knowledge_grounding_test_commit": "80ee4d5f7bcb894575394608109d8bbdd7c09c9b",
+    "core_knowledge_grounding_test_commit": "5b95399a1908e8f9dba1205132bfd96d6a57e676",
     "core_ai_contract_test_commit": "5f28700c4d765af1848393b7acb9f34c9aee1cd7",
     "core_package_contract_commit": "6a863cfe670054c39b8d35f8476216f7356efee8",
     "pusingcuk_sufficiency_rule_path": "examples/core/anggaran_sufficiency_service.cuk",
@@ -55,12 +55,13 @@
     "model_training": "Not implemented; PusingCuk is a language/runtime, not a trained LLM.",
     "production_runner": "Not deployed; local runner is not an OS sandbox and must not be internet-exposed.",
     "repository_freeze": "Not approved until migration parity, auth/data/audit preservation, backups, restore and rollback are verified.",
-    "additional_pusingcuk_rule": "budget.sufficiency.v1 source and fixture are pinned and tested by PusingCuk reference tests plus CORE native CI; not yet exposed through the local HTTP rule runner."
+    "additional_pusingcuk_rule": "budget.sufficiency.v1 source and fixture are pinned and tested by PusingCuk reference tests plus CORE native CI; not yet exposed through the local HTTP rule runner.",
+    "cross_repository_sync": "CORE CI fetches integration/system-lock.json from main in Founder-OS, CORE, PUBLIC and PusingCuk, then requires schema version, sync_id and parsed JSON content to match the checked-out CORE lock. This is an automated drift detector, not a claim that every repository commit SHA should be identical."
   },
   "verification_status": {
-    "last_known_green_core_run": "https://github.com/rllibo833-sudo/kawasan-masjid-core/actions/runs/38534587145",
-    "last_known_green_core_run_scope": "Core Quality Gate passed on synchronized main commit 575c6c040fd7b2af8f8ab2d8dca19d2a0c180e87. It runs the automated 20-source immutable commit/path checks, seven Indonesian retrieval relevance queries, deterministic citation validation, lint/E2E/build, and native CI behavior for the existing threshold rule and added sufficiency rule. This is code/CI evidence, not live local Ollama inference or production deployment.",
-    "current_main_push_runs": "Confirmed on 2026-10-14: CORE Quality Gate passed on main commit 575c6c040fd7b2af8f8ab2d8dca19d2a0c180e87 (run 38534587145); PUBLIC build/status-boundary validation and Pages deployment passed on main commit 05ca436c1282973d0c52902ab7c54f8cb8db17a6 (runs 38534874349 and 38534873726); PusingCuk tests and packaging passed on synchronized main commit 1e3e915f3fb271ed40f81c5095868f08cb664f6a (runs 38534603359 and 38534603367). Founder-OS had no Actions workflow in the checked run list. CI does not prove live Ollama inference or production AI deployment.",
+    "last_known_green_core_run": "https://github.com/rllibo833-sudo/kawasan-masjid-core/actions/runs/38535272576",
+    "last_known_green_core_run_scope": "Core Quality Gate passed on main commit 5b95399a1908e8f9dba1205132bfd96d6a57e676. It validates the curated 20-source index and immutable paths, Indonesian retrieval relevance, citations, and reads all four remote main lock files to require identical parsed content; lint/E2E/build and native CI for both budget rules passed. This is CI evidence, not live local Ollama inference or production deployment.",
+    "current_main_push_runs": "Confirmed 2026-10-14: CORE Quality Gate passed on main commit 5b95399a1908e8f9dba1205132bfd96d6a57e676 (run 38535272576), including the cross-repository lock parity regression; PUBLIC status boundary validation and Pages deployment passed on main commit 35a1d03b66f08785db8c564f654361e42d5cdb3f (runs 38535131971 and 38535130788); PusingCuk tests and packaging passed on synchronized main commit b155874bf5fef3fc8291e65a9340fe4274eba07a (runs 38535140016 and 38535140067). Founder-OS has no Actions workflow in the checked list. CI does not prove live local Ollama inference or production AI deployment.",
     "production_deployments": "No Supabase production Edge Function deployment or database migration was performed. The PusingCuk HTTP runner is local-only and not OS-sandboxed; do not expose it to the public internet.",
     "last_known_green_pusingcuk_run": "https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38534603359",
     "last_known_green_pusingcuk_run_scope": "Tes Pusingcuk passed on synchronized main commit 1e3e915f3fb271ed40f81c5095868f08cb664f6a; PyInstaller build test passed on the same commit (run 38534603367). The budget sufficiency reference fixture passed on commit 411c532454028d2d5e733373d085050eca1d402a, and CORE separately verifies its native outcomes against that exact source commit and SHA.",
@@ -80,14 +81,27 @@
       "pusingcuk_sufficiency_rule_commit": "411c532454028d2d5e733373d085050eca1d402a",
       "pusingcuk_sufficiency_rule_sha256": "d6fcee54d17afbf0fc0a1aee115b2c0c9f57dcc172e56a6c6cf1d0dd9a789771",
       "status_note": "All referenced Core, PusingCuk and Public CI runs passed. Founder-OS Actions workflow is absent in the checked list; index JSON and pinned source paths are tested by CORE CI. Public local-model inference has not been tested on the Founder's device. The second budget sufficiency rule is CI-verified but not exposed by the local HTTP runner. The local runner remains experimental and is not an OS sandbox.",
-      "core_quality_run": "https://github.com/rllibo833-sudo/kawasan-masjid-core/actions/runs/38534587145",
+      "core_quality_run": "https://github.com/rllibo833-sudo/kawasan-masjid-core/actions/runs/38535272576",
       "public_validation_run": "https://github.com/rllibo833-sudo/kawasan-masjid-public/actions/runs/38534874349",
       "public_deployment_run": "https://github.com/rllibo833-sudo/kawasan-masjid-public/actions/runs/38534873726",
       "pusingcuk_tests_run": "https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38534603359",
       "pusingcuk_packaging_run": "https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38534603367",
       "local_ollama_tested": false,
       "production_deployment_claimed": false,
-      "public_status_boundary_test": "https://github.com/rllibo833-sudo/kawasan-masjid-public/blob/05ca436c1282973d0c52902ab7c54f8cb8db17a6/scripts/validate-public-system-status.mjs"
+      "public_status_boundary_test": "https://github.com/rllibo833-sudo/kawasan-masjid-public/blob/05ca436c1282973d0c52902ab7c54f8cb8db17a6/scripts/validate-public-system-status.mjs",
+      "core_knowledge_grounding_test_commit": "5b95399a1908e8f9dba1205132bfd96d6a57e676",
+      "cross_repository_lock_validation": {
+        "status": "passed",
+        "source": "CORE Quality Gate",
+        "run": "https://github.com/rllibo833-sudo/kawasan-masjid-core/actions/runs/38535272576",
+        "repositories": [
+          "rllibo833-sudo/Founder-OS",
+          "rllibo833-sudo/kawasan-masjid-core",
+          "rllibo833-sudo/kawasan-masjid-public",
+          "rllibo833-sudo/pusingcuk"
+        ],
+        "assertion": "The checked-out lock and all three remote main locks have the same schema_version, sync_id and parsed JSON content."
+      }
     }
   },
   "freeze_gates": [
