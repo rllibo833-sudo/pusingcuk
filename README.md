@@ -53,7 +53,7 @@ Ollama harus berjalan di perangkat yang sama dan mendengarkan di loopback port 1
 
 Sebagai opsi provider terpisah, PusingCuk juga menyediakan adapter independen untuk Gemini GenerateContent API. Atur `GEMINI_API_KEY` di environment (jangan simpan kunci di repository), lalu jalankan `pusingcuk-ai --provider gemini`. Model default adalah `gemini-3.8-flash` dan dapat diganti dengan `--model`. Pemakaian API tunduk pada ketersediaan model, kuota, dan ketentuan akun Google. Kunci dikirim melalui header HTTPS, tidak ditulis ke URL atau log. Provider ini opsional dan memakai layanan eksternal; bukan jalur model lokal tanpa biaya. Ketik `/reset` untuk menghapus konteks sesi atau `/keluar` untuk berhenti. Riwayat chat tidak disimpan ke disk. Catatan proyek yang ingin dipertahankan harus disimpan secara eksplisit dengan `/ingat <catatan>`, dilihat melalui `/memori [kueri]`, dan dihapus dengan `/hapus-memori <id>`. Catatan tersimpan berada di file lokal pengguna, dibatasi jumlah/ukuran, dan pola kredensial umum ditolak.
 
-Tool yang tersedia hanya pencarian dokumen read-only dan aturan anggaran terdaftar melalui runner Docker lokal yang dilindungi token. Tanpa runner tersebut, tool anggaran gagal dengan aman. Model tidak dapat mengirim source code arbitrer untuk dieksekusi. Jangan mengekspos runner ke internet.
+Tool yang tersedia adalah pencarian dokumen read-only (`knowledge_search`) dan aturan anggaran terdaftar (`budget_threshold`) melalui `ToolRegistry` internal. Rule `.cuk` yang dipakai dipatok dengan SHA-256 dan menerima input sesuai skema; model tidak dapat mengirim source code arbitrer untuk dieksekusi. Eksekusi runtime referensi lokal tetap **bukan sandbox OS**, sehingga hanya artefak tetap yang telah ditinjau boleh didaftarkan. `tools/core-rule-runner.mjs` masih dipertahankan sebagai harness kompatibilitas/integrasi terpisah untuk pengujian lintas-repo dan regresi sandbox; runner tersebut bukan dependensi runtime assistant. Jangan mengekspos runner lama atau layanan lokal AI ke internet.
 
 ### Layanan HTTP AI lokal (eksperimental)
 
@@ -123,7 +123,7 @@ The native runtime and its limits are documented in the [native runtime guide](d
 - **AI Engine:** [Grounding contract](docs/AI_KNOWLEDGE_GROUNDING.md) · [Readiness gates](docs/AI_ENGINE_READINESS.md) · [Knowledge migration ledger](docs/AI_ENGINE_MIGRATION_LEDGER.md) · [Local HTTP service](docs/AI_LOCAL_SERVICE.md)
 - **Development:** [Contributor guide](CONTRIBUTING.md) · [Development and test gates](docs/development/README.md) · [Repository map](docs/REPO_STRUCTURE.md)
 - **Security:** [Security policy](SECURITY.md) · [Security review guide](docs/security/README.md)
-- **CORE integration:** [Tool contract and trust boundary](docs/integrations/CORE_TOOL_CONTRACT.md) · [Local registered-rule runner](tools/core-rule-runner.mjs)
+- **CORE integration:** [Tool contract and trust boundary](docs/integrations/CORE_TOOL_CONTRACT.md) · [Legacy compatibility runner (not used by assistant runtime)](tools/core-rule-runner.mjs)
 - **Complete documentation index:** [docs/README.md](docs/README.md)
 
 ## Quality gates
