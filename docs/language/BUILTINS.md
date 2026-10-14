@@ -4,7 +4,7 @@ Halaman ini adalah katalog built-in yang dipakai bersama oleh dokumentasi dan pe
 
 **Versi bahasa:** `0.5-dev`. Bagian pertama berisi tepat 21 built-in terkontrak; fungsi tambahan yang langsung ditangani evaluator reference dipisahkan dan tidak masuk hitungan built-in lintas target.
 
-Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python mentah. Misalnya, `teks(benar)` menghasilkan `okelah` dan `teks(salah)` menghasilkan `tidak`, bukan ejaan boolean dari bahasa host. Statistik `rata_rata` dan `median` menerima daftar angka finite non-boolean yang tidak kosong; `jumlah` menerima daftar termasuk daftar kosong yang menghasilkan nol. Nilai integer di luar rentang aman dan hasil non-finite ditolak.
+Status `not-claimed` pada native C berarti scalar subset telah diuji, tetapi kesetaraan penuh dengan interpreter referensi belum diklaim. `teks()` native menerima teks, angka finite, boolean dan None; koleksi belum diformat. `bilangan()` membatasi angka integer ke rentang aman lintas target dan menerima teks integer. `desimal()` menerima angka finite atau teks angka finite; nilai `NaN`/tak hingga ditolak. `logika()` memakai truthiness native yang tersedia. Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python mentah. Misalnya, `teks(benar)` menghasilkan `okelah` dan `teks(salah)` menghasilkan `tidak`, bukan ejaan boolean dari bahasa host. Statistik `rata_rata` dan `median` menerima daftar angka finite non-boolean yang tidak kosong; `jumlah` menerima daftar termasuk daftar kosong yang menghasilkan nol. Nilai integer di luar rentang aman dan hasil non-finite ditolak.
 
 ## Status target
 
@@ -18,10 +18,10 @@ Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python m
 | Built-in | Argumen | Perilaku | Python reference | Native C | JS transpiler | Python transpiler | HTML | VM |
 |---|---:|---|---|---|---|---|---|---|
 | `panjang` | 1 | Jumlah elemen pada teks, daftar, kamus, atau rentang yang didukung runtime. | supported | supported | supported | supported | supported | supported |
-| `teks` | 1 | Konversi nilai menjadi teks. | supported | unsupported | unsupported | unsupported | unsupported | unsupported |
-| `bilangan` | 1 | Konversi nilai menjadi bilangan bulat. | supported | unsupported | unsupported | unsupported | unsupported | unsupported |
-| `desimal` | 1 | Konversi nilai menjadi bilangan desimal. | supported | unsupported | unsupported | unsupported | unsupported | unsupported |
-| `logika` | 1 | Konversi nilai menjadi benar/salah. | supported | unsupported | unsupported | unsupported | unsupported | unsupported |
+| `teks` | 1 | Konversi nilai menjadi teks. | supported | not-claimed | unsupported | unsupported | unsupported | unsupported |
+| `bilangan` | 1 | Konversi nilai menjadi bilangan bulat. | supported | not-claimed | unsupported | unsupported | unsupported | unsupported |
+| `desimal` | 1 | Konversi nilai menjadi bilangan desimal. | supported | not-claimed | unsupported | unsupported | unsupported | unsupported |
+| `logika` | 1 | Konversi nilai menjadi benar/salah. | supported | not-claimed | unsupported | unsupported | unsupported | unsupported |
 | `rentang` | 1–3 | Rentang bilangan bulat dengan batas akhir eksklusif. | supported | supported | supported | supported | supported | supported |
 | `mutlak` | 1 | Nilai absolut angka finite. | supported | supported | supported | supported | supported | supported |
 | `minimum` | 2 | Nilai terkecil dari dua angka finite. | supported | supported | supported | supported | supported | supported |
