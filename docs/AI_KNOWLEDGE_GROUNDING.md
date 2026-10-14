@@ -19,6 +19,10 @@ rank_knowledge() applies deterministic lexical weights to title, topics, keyword
 
 format_citations() and append_citations() accept only validated source records. Citation URLs come from the index, never from URLs invented by a model. A citation establishes provenance, not that every answer claim is true.
 
+## Local model adapter
+
+library/local_ai_provider.py provides a no-paid-key Ollama-compatible chat adapter for a model running on the same device. It defaults to loopback-only HTTP, disables environment-configured proxies, bounds conversation length and response size, applies a timeout, and emits stable errors without returning endpoint details. It does not yet orchestrate tools or persist memory. A local model and Ollama runtime must be installed separately.
+
 ## Security boundaries
 
 - Retrieved text is untrusted data, not system instructions or executable code.
@@ -28,4 +32,4 @@ format_citations() and append_citations() accept only validated source records. 
 
 ## Regression coverage
 
-tests/test_knowledge_grounding.py covers 14 synthetic records plus the actual 14-entry curated index, Indonesian query ranking, normalization, unrelated-query rejection, commit/path matching, URL validation, visibility, duplicate IDs, index size, citation filtering/deduplication, and bounded results. Synthetic records test the contract only; they are not production sources.
+The grounding suite covers 14 synthetic records plus the actual 14-entry curated index, Indonesian query ranking, normalization, unrelated-query rejection, commit/path matching, URL validation, visibility, duplicate IDs, index size, citation filtering/deduplication, and bounded results. The local provider suite covers request shape, system prompt placement, loopback-only enforcement, bounded inputs and outputs, malformed responses, and network failure.
