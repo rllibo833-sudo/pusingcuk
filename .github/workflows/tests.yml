@@ -96,6 +96,10 @@ jobs:
           node-version: "22"
       - name: Validasi sintaks local CORE rule runner
         run: node --check tools/core-rule-runner.mjs
+      - name: Validasi skrip sandbox
+        run: |
+          sh -n tools/sandbox/build-image.sh
+          sh -n tools/sandbox/entrypoint.sh
       - name: Uji layanan lokal CORE rule runner
         timeout-minutes: 5
         run: |
