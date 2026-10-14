@@ -14,7 +14,7 @@ import { execFileSync } from "node:child_process";
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
 
-const PINNED_COMMIT = "23cc6b5b7d42ce5bc58babd37792a0ec32d117a8";
+const PINNED_COMMIT = "e367f45b0a35ccb8fdb91424099b8046b346d77d";
 const LANGUAGE_VERSION = "0.5-dev";
 const RUNTIME_VERSION = "Pusingcuk native 0.8.0.dev0";
 const CONTRACT_VERSION = "pusingcuk.core.tool.v1";
