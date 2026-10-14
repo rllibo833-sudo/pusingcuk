@@ -101,6 +101,10 @@ class RegisteredRuleEvidenceTests(unittest.TestCase):
                 result, _ = self.run_rule(lambda response, _sent: response.update(elapsed_ms=elapsed))
                 self.assertEqual(result, {"ok": False, "error": "RULE_EVIDENCE_INVALID"})
 
+    def test_rejects_unhashable_rule_result(self):
+        result, _ = self.run_rule(lambda response, _sent: response.update(result={"unexpected": True}))
+        self.assertEqual(result, {"ok": False, "error": "RULE_EVIDENCE_INVALID"})
+
     def test_rejects_other_contract_and_runtime_identity(self):
         mutations = (
             lambda response, _sent: response.update(contract_version="unrecognized.v9"),

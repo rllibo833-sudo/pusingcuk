@@ -142,7 +142,8 @@ class ToolRegistry:
             or isinstance(elapsed_ms, bool)
             or not isinstance(elapsed_ms, int)
             or not 0 <= elapsed_ms <= 3000
-            or result.get("result") not in {
+            or not isinstance(result.get("result"), str)
+            or result["result"] not in {
                 "DALAM_BATAS", "PERLU_PERSETUJUAN", "INPUT_TIDAK_VALID",
             }
         ):
