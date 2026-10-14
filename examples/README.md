@@ -12,6 +12,7 @@ python pusingcuk_new.py examples/keuangan_sederhana.cuk
 python pusingcuk_new.py examples/warung.cuk
 python pusingcuk_new.py examples/rekap_anggaran.cuk
 python pusingcuk_new.py examples/kalkulator.cuk
+python pusingcuk_new.py examples/terminal_bot.cuk
 ```
 
 | Berkas | Kegunaan | Catatan |
@@ -21,6 +22,7 @@ python pusingcuk_new.py examples/kalkulator.cuk
 | `warung.cuk` | Variabel, operasi matematika, kondisi | Contoh statis sederhana tanpa akses jaringan atau file. |
 | `rekap_anggaran.cuk` | Kamus, fungsi buatan, total pengeluaran, dan kondisi | Contoh kalkulasi anggaran menggunakan kamus. |
 | `kalkulator.cuk` | Input interaktif, konversi angka, kondisi, dan operasi dasar | Menggunakan keyword inti `njir`, `kampret`, dan `selesai`; bukan keyword `jika`. Dijalankan pada interpreter referensi karena built-in konversi belum tersedia di native C. Uji pembagian nol dan input nonnumerik. |
+| `terminal_bot.cuk` | Bot terminal interaktif berbasis percabangan | Contoh reference Python; menggunakan `tanya`, perbandingan teks, dan `njir/kampret`. |
 
 Untuk memeriksa sintaks tanpa menjalankan program, tambahkan `--check`, misalnya:
 

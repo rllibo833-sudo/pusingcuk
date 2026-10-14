@@ -21,6 +21,45 @@
       }
     },
     {
+      "id": "builtins.logarithms",
+      "source": "logarithms.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "math",
+        "logarithms"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "0\n1\n2\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "builtins.logarithm-domain-error",
+      "source": "logarithm_domain_error.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "math",
+        "runtime-errors"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 3
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
       "id": "syntax.malformed-expression",
       "source": "malformed_expression.pusingcuk",
       "profile": "core",

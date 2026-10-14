@@ -9,7 +9,7 @@ ANDROID_HOME="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
 OUTPUT_DIR="${1:-dist/android}"
 if [[ -z "${PUSINGCUK_VERSION:-}" ]]; then
   SOURCE_VERSION="$(awk '$1 == "VERSION" && $2 == "?=" { print $3; exit }' Makefile)"
-  PUSINGCUK_VERSION="${SOURCE_VERSION:-0.7.2}-android"
+  PUSINGCUK_VERSION="${SOURCE_VERSION:-0.8.0.dev0}-android"
 fi
 VERSION_DEFINE="-DPUSINGCUK_VERSION=\"${PUSINGCUK_VERSION}\""
 

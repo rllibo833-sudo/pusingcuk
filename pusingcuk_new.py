@@ -18,7 +18,10 @@ def main():
     parser.add_argument("file", nargs="?", help="Berkas sumber .cuk (atau .pusingcuk untuk kompatibilitas)")
     args = parser.parse_args()
     if not args.file:
-        parser.error("berkas sumber wajib diisi (gunakan --help untuk petunjuk)")
+        if args.fmt or args.check:
+            parser.error("--fmt dan --check membutuhkan berkas sumber")
+        from terminal import main as repl_main
+        return repl_main()
     input_path = Path(args.file).expanduser()
     path = input_path.resolve()
     cwd = Path.cwd().resolve()

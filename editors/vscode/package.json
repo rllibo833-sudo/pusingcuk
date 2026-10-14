@@ -1,0 +1,22 @@
+{
+  "name": "pusingcuk-language",
+  "displayName": "PusingCuk Language Support",
+  "description": "Syntax highlighting for PusingCuk .cuk and .pusingcuk source files.",
+  "version": "0.1.0",
+  "publisher": "rllibo833-sudo",
+  "engines": { "vscode": "^1.80.0" },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [{
+      "id": "pusingcuk",
+      "aliases": ["PusingCuk", "pusingcuk", "cuk"],
+      "extensions": [".cuk", ".pusingcuk"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "pusingcuk",
+      "scopeName": "source.pusingcuk",
+      "path": "./syntaxes/pusingcuk.tmLanguage.json"
+    }]
+  }
+}

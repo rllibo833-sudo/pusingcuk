@@ -31,6 +31,11 @@ class CukExampleCliTests(unittest.TestCase):
             note_inside_project = note_path.resolve().is_relative_to(project)
             return result.stdout, note, note_inside_project
 
+    def test_terminal_bot_handles_interactive_answers(self):
+        output, _, _ = self.run_example("terminal_bot.cuk", "Ayu\nbaik\n")
+        self.assertIn("Halo, Ayu!", output)
+        self.assertIn("Senang mendengarnya", output)
+
     def test_halo_dunia_accepts_interactive_name(self):
         output, _, _ = self.run_example("halo_dunia.cuk", "Ayu\n")
         self.assertIn("Halo, Ayu!", output)

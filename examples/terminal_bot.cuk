@@ -1,0 +1,10 @@
+jancuk
+tanya nama = "Nama kamu: "
+tanya suasana = "Bagaimana kabarmu? (baik/buruk): "
+hedeh "Halo, " + nama + "!"
+njir suasana == "baik"
+    hedeh "Senang mendengarnya."
+kampret
+    hedeh "Semoga harimu membaik."
+selesai njir
+selesai jancuk

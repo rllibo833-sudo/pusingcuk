@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pusingcuk"
-version = "0.7.2"
+version = "0.8.0.dev0"
 description = "Bahasa pemrograman dengan sintaks Indonesia dan alias slang, untuk belajar dan eksperimen compiler."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -26,7 +26,7 @@ pusingcuk = "pusingcuk_new:main"
 pusingcuk-repl = "terminal:main"
 
 [tool.pusingcuk]
-language-version = "0.4-dev"
+language-version = "0.5-dev"
 # [project].version is the package/release version, not the language version.
 
 [tool.setuptools]

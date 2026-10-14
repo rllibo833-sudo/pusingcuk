@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "contract_version": "0.4-dev",
-  "language_version": "0.4-dev",
-  "description": "Canonical metadata contract for Pusingcuk language 0.4-dev built-ins, Python import allow-lists, arity, and target capabilities. Metadata and documentation are validated by tests; implementation code remains target-specific.",
+  "contract_version": "0.5-dev",
+  "language_version": "0.5-dev",
+  "description": "Canonical metadata contract for Pusingcuk language 0.5-dev built-ins, Python import allow-lists, arity, and target capabilities. Metadata and documentation are validated by tests; implementation code remains target-specific.",
   "targets": [
     "reference",
     "js",
@@ -455,6 +455,66 @@
         "html": {
           "status": "supported",
           "via": "js"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "supported"
+        },
+        "reference": {
+          "status": "supported"
+        }
+      }
+    },
+    {
+      "name": "logaritma",
+      "parameters": [
+        "angka"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Logaritma natural untuk angka finite positif.",
+      "implementation": "log",
+      "backends": {
+        "js": {
+          "status": "unsupported"
+        },
+        "python": {
+          "status": "unsupported"
+        },
+        "html": {
+          "status": "unsupported"
+        },
+        "vm": {
+          "status": "unsupported"
+        },
+        "native_c": {
+          "status": "supported"
+        },
+        "reference": {
+          "status": "supported"
+        }
+      }
+    },
+    {
+      "name": "log10",
+      "parameters": [
+        "angka"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Logaritma basis 10 untuk angka finite positif.",
+      "implementation": "log10",
+      "backends": {
+        "js": {
+          "status": "unsupported"
+        },
+        "python": {
+          "status": "unsupported"
+        },
+        "html": {
+          "status": "unsupported"
         },
         "vm": {
           "status": "unsupported"

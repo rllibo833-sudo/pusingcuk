@@ -22,7 +22,7 @@ class VersionContractTests(unittest.TestCase):
         expected = package["project"]["version"]
         make_match = re.search(r"^VERSION\s*\?=\s*(\S+)\s*$", makefile, re.MULTILINE)
         native_match = re.search(r'^#define\s+PUSINGCUK_VERSION\s+"([^"]+)"\s*$', native, re.MULTILINE)
-        android_match = re.search(r"SOURCE_VERSION:-([0-9]+\.[0-9]+\.[0-9]+)\}-android", android)
+        android_match = re.search(r"SOURCE_VERSION:-([0-9]+\.[0-9]+\.[0-9]+(?:\.dev[0-9]+)?)\}-android", android)
 
         self.assertIsNotNone(make_match, "Makefile must declare VERSION")
         self.assertIsNotNone(native_match, "native C must have a package-version fallback")
@@ -44,7 +44,7 @@ class VersionContractTests(unittest.TestCase):
         vocabulary = json.loads((ROOT / "library" / "kosakata.json").read_text(encoding="utf-8"))
 
         expected = package["tool"]["pusingcuk"]["language-version"]
-        self.assertEqual(expected, "0.4-dev")
+        self.assertEqual(expected, "0.5-dev")
         self.assertEqual(contract["contract_version"], expected)
         self.assertEqual(contract["language_version"], expected)
         self.assertEqual(vocabulary["language_version"], expected)

@@ -24,7 +24,7 @@ class TerminalTests(unittest.TestCase):
     def test_contoh_command_executes_and_prints_seven(self):
         result = self.run_terminal(":contoh\n:keluar\n")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("Pusingcuk Terminal 0.1", result.stdout)
+        self.assertIn("Pusingcuk Terminal 0.5-dev", result.stdout)
         self.assertRegex(result.stdout, r"7\npusingcuk>")
         self.assertIn("Sampai jumpa!", result.stdout)
 

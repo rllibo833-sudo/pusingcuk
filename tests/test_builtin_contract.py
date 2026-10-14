@@ -138,6 +138,8 @@ class BuiltinContractTests(unittest.TestCase):
             "bawah": ((2.9,), 2),
             "atas": ((2.1,), 3),
             "pangkat": ((2, 3), 8),
+            "logaritma": ((2.718281828459045,), 1),
+            "log10": ((100,), 2),
             "sinus": ((0,), 0.0),
             "kosinus": ((0,), 1.0),
             "rata_rata": (([1, 2, 3],), 2),
@@ -216,10 +218,24 @@ class BuiltinContractTests(unittest.TestCase):
                 with self.assertRaises(TypeError):
                     call_builtin(name, *args)
 
+    def test_logarithmic_numeric_contract(self):
+        self.assertEqual(call_builtin("logaritma", 1), 0)
+        self.assertEqual(call_builtin("logaritma", 2.718281828459045), 1)
+        self.assertEqual(call_builtin("log10", 100), 2)
+        for name in ("logaritma", "log10"):
+            with self.subTest(builtin=name):
+                for invalid in (0, -1, True, "2", float("inf")):
+                    with self.assertRaises((TypeError, ValueError)):
+                        call_builtin(name, invalid)
+                with self.assertRaises(TypeError):
+                    call_builtin(name)
+                with self.assertRaises(TypeError):
+                    call_builtin(name, 1, 2)
+
     def test_native_c_support_status_matches_implemented_builtin_surface(self):
         native_supported = {
             "panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan",
-            "bawah", "atas", "akar", "pangkat", "sinus", "kosinus", "jumlah", "rata_rata", "median",
+            "bawah", "atas", "akar", "pangkat", "logaritma", "log10", "sinus", "kosinus", "jumlah", "rata_rata", "median",
         }
         for name, entry in BUILTIN_BY_NAME.items():
             with self.subTest(builtin=name):

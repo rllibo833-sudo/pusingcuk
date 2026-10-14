@@ -2,14 +2,14 @@
 
 Pusingcuk is an experimental programming language built around Indonesian-friendly keywords and readable examples. Its near-term goal is not to support every compiler target; it is to make one language behave predictably across its **Python reference interpreter** and **native C runtime**.
 
-**Canonical language version:** `0.4-dev`. New programs use `.cuk`; `.pusingcuk` remains a compatibility extension.
+**Canonical language version:** `0.5-dev`. Development package metadata is `0.8.0.dev0` (PEP 440 spelling for the `0.8.0-dev` line). New programs use `.cuk`; `.pusingcuk` remains a compatibility extension.
 
 ### Runtime capability matrix
 
 | Target | Contracted built-ins | Status |
 |---|---:|---|
-| Reference Python | 19 | Full contracted built-in set; additional reference-only intrinsics are separate |
-| Native C | 15 | Subset; no file I/O, HTTP, or module system |
+| Reference Python | 21 | Full contracted built-in set; additional reference-only intrinsics are separate |
+| Native C | 17 | Subset; no file I/O, HTTP, or module system |
 | JS transpiler | 14 | Subset |
 | Python transpiler | 14 | Subset |
 | VM | 6 | Experimental |
@@ -55,7 +55,7 @@ python pusingcuk_new.py --check program.cuk
 
 The `.cuk` extension is Pusingcuk's canonical source-file identity for new programs. The distinctive identity comes from its Indonesian-readable syntax and tested language rules—not the suffix alone. Existing `.pusingcuk` files remain supported for compatibility.
 
-Metadata paket pada `main` adalah `0.7.2` (`pyproject.toml`, `Makefile`, `library/kosakata.json`, dan fallback runtime native); kontrak bahasa tetap `0.4-dev` (`lexer.py`, `SPEC.md`). Tag/artefak rilis `v0.7.1` berasal dari snapshot yang lebih lama daripada `main`, jadi jangan menyamakan artefak tag itu dengan build dari `main`. Gunakan `make version` dan `make language-version` untuk memeriksa keduanya.
+Metadata paket pada `main` adalah `0.8.0.dev0` (`pyproject.toml`, `Makefile`, `library/kosakata.json`, dan fallback runtime native); kontrak bahasa tetap `0.5-dev` (`lexer.py`, `SPEC.md`). Tag rilis yang lebih lama tetap menunjuk snapshot historis; metadata pengembangan saat ini menggunakan versi paket PEP 440 `0.8.0.dev0`. Gunakan `make version` dan `make language-version` untuk memeriksa keduanya.
 
 After installing the CLI, run `pusingcuk script.cuk` directly. Executable scripts can start with `#!/usr/bin/env pusingcuk` and use `chmod +x script.cuk`; the CLI must be installed and on `PATH`.
 
@@ -81,7 +81,7 @@ Contoh keuangan meminta pemasukan dan pengeluaran, lalu menyimpan catatan relati
 | Path | What it is | Important limit |
 |---|---|---|
 | Python reference | The modular interpreter launched by `pusingcuk_new.py`; reference for language behavior | Requires Python; host file/network capabilities are not a sandbox |
-| Native C | A standalone C11 runtime built with GCC or Clang; no Python needed at runtime | Fifteen built-ins are verified, including trigonometry, summation, and statistics, alongside arithmetic, collection, scope, numeric-domain, and error fixtures; the native module system is not available |
+| Native C | A standalone C11 runtime built with GCC or Clang; no Python needed at runtime | Seventeen built-ins are verified, including logarithms, trigonometry, summation, and statistics, alongside arithmetic, collection, scope, numeric-domain, and error fixtures; the native module system is not available |
 
 For the native C runtime on Termux:
 

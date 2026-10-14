@@ -1,0 +1,20 @@
+{
+  "scopeName": "source.pusingcuk",
+  "name": "PusingCuk",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#builtins" },
+    { "include": "#keywords" },
+    { "include": "#constants" }
+  ],
+  "repository": {
+    "comments": { "patterns": [{ "name": "comment.line.number-sign.pusingcuk", "match": "#.*$" }] },
+    "strings": { "name": "string.quoted.double.pusingcuk", "begin": "\"", "end": "\"", "patterns": [{ "name": "constant.character.escape.pusingcuk", "match": "\\\\." }] },
+    "numbers": { "name": "constant.numeric.pusingcuk", "match": "\\b\\d+(?:\\.\\d+)?\\b" },
+    "builtins": { "name": "support.function.pusingcuk", "match": "\\b(?:panjang|teks|bilangan|desimal|logika|rentang|mutlak|minimum|maksimum|bulatkan|bawah|atas|akar|pangkat|logaritma|log10|sinus|kosinus|jumlah|rata_rata|median|jadi_json|jadi_teks)\\b(?=\\s*\\()" },
+    "keywords": { "name": "keyword.control.pusingcuk", "match": "\\b(?:jancuk|selesai|lah|hedeh|tanya|njir|kampret|mumet|untuk|dalam|fungsi|balek|coba|ketangkep|akhirnya|gas|spill|bestie|valid|zonk|skip|kelar)\\b" },
+    "constants": { "name": "constant.language.pusingcuk", "match": "\\b(?:benar|salah)\\b" }
+  }
+}

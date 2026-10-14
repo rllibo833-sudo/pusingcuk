@@ -249,7 +249,7 @@ static int is_builtin_name(const char *name) {
     static const char *const names[] = {
         "panjang", "teks", "bilangan", "desimal", "logika", "rentang",
         "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah",
-        "atas", "pangkat", "sinus", "kosinus", "jumlah", "rata_rata", "median"
+        "atas", "pangkat", "sinus", "kosinus", "jumlah", "rata_rata", "median", "logaritma", "log10"
     };
     for (size_t i = 0; i < sizeof names / sizeof names[0]; i++)
         if (!strcmp(name, names[i])) return 1;
@@ -259,7 +259,7 @@ static int is_builtin_name(const char *name) {
 static int is_native_numeric_builtin(const char *name) {
     static const char *const names[] = {
         "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat",
-        "sinus", "kosinus", "jumlah", "rata_rata", "median"
+        "sinus", "kosinus", "jumlah", "rata_rata", "median", "logaritma", "log10"
     };
     for (size_t i = 0; i < sizeof names / sizeof names[0]; i++)
         if (!strcmp(name, names[i])) return 1;
@@ -359,6 +359,14 @@ static Val call_native_numeric_builtin(const char *name, Val *args, int argc, in
         return checked_num(sin(args[0].n), "sinus() menghasilkan angka non-finite");
     if (!strcmp(name, "kosinus"))
         return checked_num(cos(args[0].n), "kosinus() menghasilkan angka non-finite");
+    if (!strcmp(name, "logaritma")) {
+        if (args[0].n <= 0.0) { fail("logaritma() domain tidak valid: angka harus lebih besar dari nol"); return num(0); }
+        return checked_num(log(args[0].n), "logaritma() menghasilkan angka non-finite");
+    }
+    if (!strcmp(name, "log10")) {
+        if (args[0].n <= 0.0) { fail("log10() domain tidak valid: angka harus lebih besar dari nol"); return num(0); }
+        return checked_num(log10(args[0].n), "log10() menghasilkan angka non-finite");
+    }
     if (!strcmp(name, "mutlak"))
         return checked_num(fabs(args[0].n), "mutlak() menghasilkan angka tidak valid");
     if (!strcmp(name, "minimum"))
@@ -1038,7 +1046,7 @@ static Val call_user_function(const char *name, Val *args, int argc) {
 
 
 #ifndef PUSINGCUK_VERSION
-#define PUSINGCUK_VERSION "0.7.2"
+#define PUSINGCUK_VERSION "0.8.0.dev0"
 #endif
 
 static void print_usage(FILE *out, const char *program) {

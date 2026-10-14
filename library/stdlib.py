@@ -138,6 +138,20 @@ def _cos(value: Any) -> int | float:
     return _canonical_math_result("kosinus", math.cos(_numeric("kosinus", value)))
 
 
+def _log(value: Any) -> int | float:
+    value = _numeric("logaritma", value)
+    if value <= 0:
+        raise ValueError("logaritma() domain tidak valid: angka harus lebih besar dari nol")
+    return _canonical_math_result("logaritma", math.log(value))
+
+
+def _log10(value: Any) -> int | float:
+    value = _numeric("log10", value)
+    if value <= 0:
+        raise ValueError("log10() domain tidak valid: angka harus lebih besar dari nol")
+    return _canonical_math_result("log10", math.log10(value))
+
+
 def _stat_values(name: str, value: Any) -> list[int | float]:
     if not isinstance(value, list) or not value:
         raise TypeError(name + "() membutuhkan daftar angka yang tidak kosong")
@@ -220,6 +234,8 @@ _IMPLEMENTATIONS: dict[str, Callable[..., Any]] = {
     "floor": _floor,
     "ceil": _ceil,
     "pow": _pow,
+    "log": _log,
+    "log10": _log10,
     "sin": _sin,
     "cos": _cos,
     "mean": _mean,
