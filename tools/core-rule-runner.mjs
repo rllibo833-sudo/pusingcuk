@@ -70,7 +70,7 @@ function digestFile(filename) {
 
 function buildRuntime(root) {
   const rule = path.join(root, SOURCE_PATH);
-  if (!fs.existsSync(rule) || digestFile(rule) !== PROGRAM_SHA256) {
+  if (!fs.existsSync(rule) || digestFile(rule) !== PROGRAMS.get("budget.threshold.v1").sha256) {
     throw new Error("Pinned registered .cuk artifact failed its SHA-256 check.");
   }
 
