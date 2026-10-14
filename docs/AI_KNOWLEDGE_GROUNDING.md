@@ -50,3 +50,8 @@ pusingcuk-ai --model qwen3:4b
 ```
 
 Type `/reset` to clear session memory or `/keluar` to exit. The local model runtime must already be running. The adapter rejects remote endpoints by default.
+
+
+## Retrieval evaluation
+
+The 14-case Indonesian retrieval benchmark is stored in tests/fixtures/knowledge_retrieval_cases.json and asserted by the test suite. It currently targets top-1 exact source IDs for a small curated query set; it is a regression baseline, not evidence of general semantic-search quality.

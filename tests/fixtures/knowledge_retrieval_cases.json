@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "description": "Benchmark deterministik untuk kueri bahasa Indonesia terhadap indeks pengetahuan terkurasi PusingCuk.",
+  "cases": [
+    {
+      "id": "query-01",
+      "query": "aturan sintaks bahasa PusingCuk",
+      "expected_top_id": "pusingcuk-language-specification"
+    },
+    {
+      "id": "query-02",
+      "query": "kontrak semantik runtime native python",
+      "expected_top_id": "pusingcuk-semantic-contract"
+    },
+    {
+      "id": "query-03",
+      "query": "aturan anggaran terdaftar sandbox hash sha256",
+      "expected_top_id": "pusingcuk-registered-tool-contract"
+    },
+    {
+      "id": "query-04",
+      "query": "tes konformansi fixture regresi python c",
+      "expected_top_id": "pusingcuk-conformance-runner"
+    },
+    {
+      "id": "query-05",
+      "query": "saldo cukup input batas nominal fixture",
+      "expected_top_id": "pusingcuk-budget-rule-fixture"
+    },
+    {
+      "id": "query-06",
+      "query": "cara model Ollama lokal tanpa biaya API",
+      "expected_top_id": "local-first-ai-decision"
+    },
+    {
+      "id": "query-07",
+      "query": "adapter provider timeout respons tool calling model",
+      "expected_top_id": "core-provider-adapter-reference"
+    },
+    {
+      "id": "query-08",
+      "query": "cari dokumen knowledge retrieval ranking metadata",
+      "expected_top_id": "core-lexical-retrieval-reference"
+    },
+    {
+      "id": "query-09",
+      "query": "validasi sitasi URL commit path provenance",
+      "expected_top_id": "core-citation-validation-reference"
+    },
+    {
+      "id": "query-10",
+      "query": "memori keputusan percakapan recovery",
+      "expected_top_id": "core-founder-memory-architecture"
+    },
+    {
+      "id": "query-11",
+      "query": "batas kepemilikan repositori sinkronisasi source of truth",
+      "expected_top_id": "canonical-repository-boundaries"
+    },
+    {
+      "id": "query-12",
+      "query": "indeks terkurasi dokumen primer public safe",
+      "expected_top_id": "founder-os-knowledge-index-policy"
+    },
+    {
+      "id": "query-13",
+      "query": "backend otorisasi bukti status deployment",
+      "expected_top_id": "core-system-contract"
+    },
+    {
+      "id": "query-14",
+      "query": "ikhtisar interpreter compiler bahasa indonesia runtime",
+      "expected_top_id": "pusingcuk-project-overview"
+    }
+  ]
+}

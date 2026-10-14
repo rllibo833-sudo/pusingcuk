@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import unittest
 from pathlib import Path
 
@@ -56,6 +57,21 @@ class KnowledgeGroundingTests(unittest.TestCase):
         self.assertEqual(results[0]["id"], "local-first-ai-decision")
         self.assertEqual(results[0]["source_commit"], "38ad3035af7e7eaba8a332656ab6155dcc313c72")
         self.assertEqual(results[0]["source_path"], "docs/LOCAL_FIRST_PUSINGCUK_AI.md")
+
+    def test_indonesian_retrieval_benchmark_top_one(self):
+        root = Path(__file__).resolve().parents[1]
+        documents = load_index(root / "library" / "knowledge_index.json")
+        cases = json.loads((root / "tests" / "fixtures" / "knowledge_retrieval_cases.json").read_text(encoding="utf-8"))["cases"]
+        self.assertEqual(len(cases), 14)
+        correct = 0
+        for case in cases:
+            with self.subTest(case=case["id"]):
+                results = rank_knowledge(documents, case["query"], limit=3)
+                self.assertTrue(results, f"no retrieval result for {case['query']}")
+                if results[0]["id"] == case["expected_top_id"]:
+                    correct += 1
+                self.assertEqual(results[0]["id"], case["expected_top_id"])
+        self.assertEqual(correct, 14)
 
     def test_indonesian_query_ranks_relevant_title_first(self):
         results = rank_knowledge(self.documents, "bagaimana validasi sitasi sumber", limit=3)
