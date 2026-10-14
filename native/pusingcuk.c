@@ -320,8 +320,9 @@ static Val call_native_conversion_builtin(const char *name, Val *args, int argc,
         errno = 0;
         char *end = NULL;
         long long parsed = strtoll(value.s, &end, 10);
+        char *parse_end = end;
         while (end && isspace((unsigned char)*end)) end++;
-        if (end == value.s || !end || *end != '\0' || errno == ERANGE ||
+        if (parse_end == value.s || !end || *end != '\0' || errno == ERANGE ||
             parsed > 9007199254740991LL || parsed < -9007199254740991LL) {
             fail("bilangan() menerima teks integer dalam rentang aman lintas target");
             return num(0);
@@ -338,8 +339,9 @@ static Val call_native_conversion_builtin(const char *name, Val *args, int argc,
         errno = 0;
         char *end = NULL;
         double parsed = strtod(value.s, &end);
+        char *parse_end = end;
         while (end && isspace((unsigned char)*end)) end++;
-        if (end == value.s || !end || *end != '\0' || errno == ERANGE || !isfinite(parsed)) {
+        if (parse_end == value.s || !end || *end != '\0' || errno == ERANGE || !isfinite(parsed)) {
             fail("desimal() menerima teks angka finite");
             return num(0);
         }
