@@ -216,6 +216,7 @@ function runRule(runtime, input, timeoutMs, programId) {
       if (finished) return;
       const result = stdout.trim();
       if (code !== 0 || !program.safe_results.includes(result)) {
+        console.error("Registered sandbox rule failed", { programId, exitCode: code, stderr: stderr.slice(0, 256), outputBytes: Buffer.byteLength(stdout) });
         finish({ status: "failed", diagnostics: { code: "SANDBOX_EXECUTION_FAILED", message: "Registered rule failed inside the OS sandbox." } });
         return;
       }
