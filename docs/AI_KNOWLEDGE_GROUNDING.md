@@ -41,7 +41,7 @@ The grounding suite covers 14 synthetic records plus the actual 14-entry curated
 
 ## Local assistant CLI
 
-The local-first assistant entry point is `pusingcuk-ai`. It combines the pinned curated index, bounded in-process conversation history, the loopback-only Ollama adapter, and citations derived from validated index entries. It does not persist chat history and does not yet provide tool calling or a production web service.
+The local-first assistant entry point is `pusingcuk-ai`. It combines the pinned curated index, bounded in-process conversation history, the loopback-only Ollama adapter, and citations derived from validated index entries. It keeps the active conversation in memory, supports registered tool calls through the assistant orchestrator, and only saves project notes when the user explicitly opts in. It is not a production web service.
 
 Run after installing the project and a compatible local Ollama model with:
 

@@ -36,7 +36,7 @@ class AssistantTests(unittest.TestCase):
         self.assertIn("bukan klaim bahwa model dasar dilatih sendiri", self.provider.calls[0]["system_prompt"])
         self.assertIn("LOCAL", self.provider.calls[0]["system_prompt"].upper())
         self.assertIn("Sumber rujukan", answer)
-        self.assertIn("38ad3035af7e7eaba8a332656ab6155dcc313c72", answer)
+        self.assertIn("9e40ef150e2d3dbee9156e8774a859b428de3e38", answer)
 
     def test_unmatched_query_does_not_invent_source_citation(self):
         answer = self.assistant.ask("zebra xylophone nebula")
