@@ -156,6 +156,12 @@ class BuiltinContractTests(unittest.TestCase):
                     call_builtin(name, *args, None)
 
 
+    def test_decimal_conversion_rejects_non_finite_values(self):
+        for invalid in ("nan", "inf", "-inf", float("nan"), float("inf"), float("-inf")):
+            with self.subTest(value=invalid):
+                with self.assertRaises((TypeError, ValueError)):
+                    call_builtin("desimal", invalid)
+
     def test_square_root_and_power_numeric_contract(self):
         self.assertIs(type(call_builtin("akar", 9)), int)
         self.assertIs(type(call_builtin("pangkat", 2, 3)), int)
@@ -237,9 +243,15 @@ class BuiltinContractTests(unittest.TestCase):
             "panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan",
             "bawah", "atas", "akar", "pangkat", "logaritma", "log10", "sinus", "kosinus", "jumlah", "rata_rata", "median",
         }
+        native_partial = {"teks", "bilangan", "desimal", "logika"}
         for name, entry in BUILTIN_BY_NAME.items():
             with self.subTest(builtin=name):
-                expected = "supported" if name in native_supported else "unsupported"
+                if name in native_supported:
+                    expected = "supported"
+                elif name in native_partial:
+                    expected = "not-claimed"
+                else:
+                    expected = "unsupported"
                 self.assertEqual(entry["backends"]["native_c"]["status"], expected)
 
     def test_human_builtin_catalog_matches_canonical_contract(self):
