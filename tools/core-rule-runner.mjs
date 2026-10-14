@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 /**
- * Local-only prototype runner for one reviewed PusingCuk artifact.
- *
- * This is not an OS sandbox and must not be exposed to the public internet.
- * It never accepts program source from the caller. The process only executes
- * the fixed .cuk file from the pinned repository commit.
+ * Local-only authenticated gateway for fixed PusingCuk programs.
+ * All rule execution fails closed unless routed through the prebuilt, digest-pinned
+ * Docker sandbox. The caller can select only registered program IDs, never source.
  */
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -18,10 +16,20 @@ const PINNED_COMMIT = "e367f45b0a35ccb8fdb91424099b8046b346d77d";
 const LANGUAGE_VERSION = "0.5-dev";
 const RUNTIME_VERSION = "Pusingcuk native 0.8.0.dev0";
 const CONTRACT_VERSION = "pusingcuk.core.tool.v1";
-const PROGRAM_ID = "budget.threshold.v1";
-const PROGRAM_SHA256 = "e79058b314d921a4b4353133b30a7a7b0da64d32785a39f66cb5ce356406067d";
 const SOURCE_PATH = "examples/core/anggaran_threshold_service.cuk";
-const SAFE_RESULTS = new Set(["DALAM_BATAS", "PERLU_PERSETUJUAN", "INPUT_TIDAK_VALID"]);
+const PROGRAMS = new Map([
+  ["budget.threshold.v1", {
+    sha256: "e79058b314d921a4b4353133b30a7a7b0da64d32785a39f66cb5ce356406067d",
+    source_commit: PINNED_COMMIT, language_version: LANGUAGE_VERSION, entrypoint: "status_anggaran",
+    safe_results: ["DALAM_BATAS", "PERLU_PERSETUJUAN", "INPUT_TIDAK_VALID"],
+  }],
+  ["budget.sufficiency.v1", {
+    sha256: "d6fcee54d17afbf0fc0a1aee115b2c0c9f57dcc172e56a6c6cf1d0dd9a789771",
+    source_commit: "411c532454028d2d5e733373d085050eca1d402a",
+    language_version: LANGUAGE_VERSION, entrypoint: "cek_kecukupan_saldo",
+    safe_results: ["SALDO_CUKUP", "SALDO_TIDAK_CUKUP", "INPUT_TIDAK_VALID"],
+  }],
+]);
 const MAX_BODY_BYTES = 4096;
 const MAX_OUTPUT_BYTES = 1024;
 const MAX_INPUT_NUMBER = 1_000_000_000_000;
@@ -126,9 +134,10 @@ function validateRequest(body) {
   if (!body || typeof body !== "object" || Array.isArray(body)) return "INVALID_CONTRACT";
   if (body.contract_version !== CONTRACT_VERSION) return "INVALID_CONTRACT";
   if (typeof body.request_id !== "string" || !/^[0-9a-f-]{36}$/i.test(body.request_id)) return "INVALID_CONTRACT";
-  if (body.program_id !== PROGRAM_ID) return "UNKNOWN_PROGRAM";
-  if (body.program_sha256 !== PROGRAM_SHA256) return "ARTIFACT_HASH_MISMATCH";
-  if (body.language_version !== LANGUAGE_VERSION || body.entrypoint !== "status_anggaran") return "INVALID_CONTRACT";
+  const program = PROGRAMS.get(body.program_id);
+  if (!program) return "UNKNOWN_PROGRAM";
+  if (body.program_sha256 !== program.sha256) return "ARTIFACT_HASH_MISMATCH";
+  if (body.language_version !== program.language_version || body.entrypoint !== program.entrypoint) return "INVALID_CONTRACT";
   if (!Array.isArray(body.capabilities) || body.capabilities.length !== 0) return "CAPABILITY_DENIED";
   if (!body.limits || typeof body.limits !== "object") return "INVALID_CONTRACT";
   if (
@@ -152,45 +161,62 @@ function validateRequest(body) {
   return null;
 }
 
-function runRule(runtime, input, timeoutMs) {
+function runRule(runtime, input, timeoutMs, programId) {
   return new Promise((resolve) => {
+    const program = PROGRAMS.get(programId);
+    const image = process.env.PUSINGCUK_SANDBOX_IMAGE;
     const started = Date.now();
+    const cidfile = path.join(os.tmpdir(), `pusingcuk-sandbox-${crypto.randomUUID()}.cid`);
     let stdout = "";
     let stderr = "";
     let finished = false;
-    const child = spawn(runtime.binary, [runtime.rule], {
-      cwd: os.tmpdir(),
-      shell: false,
-      env: { PATH: process.env.PATH || "/usr/bin:/bin", LANG: "C.UTF-8" },
-      stdio: ["pipe", "pipe", "pipe"],
-    });
+    const args = [
+      "run", "--rm", "--pull=never", "--cidfile", cidfile,
+      "--network=none", "--memory=64m", "--memory-swap=64m", "--cpus=0.5",
+      "--pids-limit=16", "--read-only", "--cap-drop=ALL",
+      "--security-opt=no-new-privileges", "--user=65534:65534",
+      "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=1m",
+      "--ulimit", "cpu=2:2", "--ulimit", "fsize=1024:1024",
+      "--ulimit", "nofile=32:32", "--env", `PROGRAM_ID=${programId}`, image,
+    ];
+    const child = spawn("docker", args, { shell: false, stdio: ["pipe", "pipe", "pipe"] });
+    const killSandbox = () => {
+      try {
+        const containerId = fs.readFileSync(cidfile, "utf8").trim();
+        if (/^[0-9a-f]{64}$/.test(containerId)) {
+          execFileSync("docker", ["kill", containerId], { stdio: "ignore", timeout: 1000 });
+        }
+      } catch { /* Container may not have been created yet. */ }
+      try { child.kill("SIGKILL"); } catch { /* Process may already be gone. */ }
+    };
     const finish = (result) => {
       if (finished) return;
       finished = true;
       clearTimeout(timer);
+      try { fs.unlinkSync(cidfile); } catch { /* cidfile may not exist. */ }
       resolve({ ...result, elapsed_ms: Date.now() - started });
     };
     const timer = setTimeout(() => {
-      child.kill("SIGKILL");
-      finish({ status: "timed_out", diagnostics: { code: "TIMEOUT", message: "Rule execution timed out." } });
+      killSandbox();
+      finish({ status: "timed_out", diagnostics: { code: "TIMEOUT", message: "Sandbox execution timed out." } });
     }, timeoutMs);
 
     child.stdout.on("data", (chunk) => {
       stdout += chunk.toString("utf8");
       if (Buffer.byteLength(stdout) > MAX_OUTPUT_BYTES) {
-        child.kill("SIGKILL");
-        finish({ status: "resource_limited", diagnostics: { code: "RESOURCE_LIMIT", message: "Output limit exceeded." } });
+        killSandbox();
+        finish({ status: "resource_limited", diagnostics: { code: "RESOURCE_LIMIT", message: "Sandbox output limit exceeded." } });
       }
     });
     child.stderr.on("data", (chunk) => {
       if (Buffer.byteLength(stderr) < 1024) stderr += chunk.toString("utf8").slice(0, 1024);
     });
-    child.on("error", () => finish({ status: "failed", diagnostics: { code: "RUNTIME_ERROR", message: "Runtime process could not start." } }));
+    child.on("error", () => finish({ status: "failed", diagnostics: { code: "SANDBOX_UNAVAILABLE", message: "Docker sandbox process could not start." } }));
     child.on("close", (code) => {
       if (finished) return;
       const result = stdout.trim();
-      if (code !== 0 || !SAFE_RESULTS.has(result)) {
-        finish({ status: "failed", diagnostics: { code: "RUNTIME_ERROR", message: "Registered rule failed." } });
+      if (code !== 0 || !program.safe_results.includes(result)) {
+        finish({ status: "failed", diagnostics: { code: "SANDBOX_EXECUTION_FAILED", message: "Registered rule failed inside the OS sandbox." } });
         return;
       }
       finish({ status: "succeeded", result });
@@ -202,6 +228,12 @@ function runRule(runtime, input, timeoutMs) {
 const token = process.env.PUSINGCUK_RUNNER_TOKEN || "";
 if (token.length < 32) {
   console.error("Set PUSINGCUK_RUNNER_TOKEN to a random value of at least 32 characters.");
+  process.exit(2);
+}
+
+const sandboxImage = process.env.PUSINGCUK_SANDBOX_IMAGE || "";
+if (!/^sha256:[0-9a-f]{64}$/.test(sandboxImage)) {
+  console.error("Set PUSINGCUK_SANDBOX_IMAGE to the immutable sha256 image ID printed by tools/sandbox/build-image.sh.");
   process.exit(2);
 }
 
@@ -220,7 +252,7 @@ const runtime = buildRuntime(pinnedSourceRoot());
 let activeRuns = 0;
 const server = createServer(async (req, res) => {
   if (req.method === "GET" && req.url === "/health") {
-    return send(res, 200, { ok: true, runtime_version: runtime.version, runtime_build_sha: PINNED_COMMIT });
+    return send(res, 200, { ok: true, runtime_version: runtime.version, runtime_build_sha: PINNED_COMMIT, sandbox: "docker-isolated", sandbox_image: sandboxImage, registered_programs: [...PROGRAMS.keys()] });
   }
   if (req.method !== "POST" || req.url !== "/v1/execute") {
     return send(res, 404, { error: "NOT_FOUND" });
@@ -243,14 +275,16 @@ const server = createServer(async (req, res) => {
 
   activeRuns += 1;
   try {
-    const result = await runRule(runtime, body.input, body.limits.timeout_ms);
+    const program = PROGRAMS.get(body.program_id);
+    const result = await runRule(runtime, body.input, body.limits.timeout_ms, body.program_id);
     return send(res, result.status === "succeeded" ? 200 : 422, {
       contract_version: CONTRACT_VERSION,
       request_id: body.request_id,
-      program_id: PROGRAM_ID,
-      program_sha256: PROGRAM_SHA256,
+      program_id: body.program_id,
+      program_sha256: program.sha256,
+      source_commit: program.source_commit,
       runtime_version: runtime.version,
-      runtime_build_sha: PINNED_COMMIT,
+      runtime_build_sha: program.source_commit,
       status: result.status,
       ...(result.status === "succeeded" ? { result: result.result } : { diagnostics: result.diagnostics }),
       elapsed_ms: result.elapsed_ms,
