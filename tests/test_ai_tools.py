@@ -1,132 +1,95 @@
-"""Trust-boundary regression tests for registered .cuk rule evidence."""
+"""Tests for internal allowlisted tool and registered .cuk rule bindings."""
 from __future__ import annotations
 
-import json
+import hashlib
 import os
+import subprocess
 import unittest
 from unittest.mock import patch
 
 from library.ai_tools import (
     ToolRegistry,
-    _THRESHOLD_SHA256,
-    _THRESHOLD_SOURCE_COMMIT,
-    _THRESHOLD_RUNTIME_VERSION,
+    _REGISTERED_RULES,
+    _TOOL_RULE_BINDINGS,
+    _load_rule_source,
 )
-
-
-class _FakeResponse:
-    def __init__(self, payload):
-        self.raw = json.dumps(payload).encode("utf-8")
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *_args):
-        return False
-
-    def read(self, size=-1):
-        return self.raw if size < 0 else self.raw[:size]
-
-
-class _FakeOpener:
-    def __init__(self, mutate=None):
-        self.mutate = mutate
-        self.request = None
-        self.timeout = None
-
-    def open(self, request, *, timeout):
-        self.request = request
-        self.timeout = timeout
-        sent = json.loads(request.data.decode("utf-8"))
-        response = {
-            "contract_version": "pusingcuk.core.tool.v1",
-            "request_id": sent["request_id"],
-            "program_id": "budget.threshold.v1",
-            "program_sha256": _THRESHOLD_SHA256,
-            "source_commit": _THRESHOLD_SOURCE_COMMIT,
-            "runtime_version": _THRESHOLD_RUNTIME_VERSION,
-            "runtime_build_sha": _THRESHOLD_SOURCE_COMMIT,
-            "sandbox": "docker-isolated",
-            "sandbox_image": "sha256:" + "a" * 64,
-            "status": "succeeded",
-            "result": "DALAM_BATAS",
-            "elapsed_ms": 12,
-        }
-        if self.mutate:
-            self.mutate(response, sent)
-        return _FakeResponse(response)
-
-
-class RegisteredRuleEvidenceTests(unittest.TestCase):
-    def run_rule(self, mutate=None):
-        opener = _FakeOpener(mutate)
-        with (
-            patch.dict(os.environ, {"PUSINGCUK_RUNNER_TOKEN": "t" * 48}),
-            patch("library.ai_tools.build_opener", return_value=opener),
-        ):
-            result = ToolRegistry._run_registered_threshold({"nominal": 2, "batas": 3})
-        return result, opener
-
-    def test_accepts_complete_matching_execution_evidence(self):
-        result, opener = self.run_rule()
-        self.assertEqual(result["ok"], True)
-        self.assertEqual(result["result"], "DALAM_BATAS")
-        self.assertEqual(result["source_commit"], _THRESHOLD_SOURCE_COMMIT)
-        self.assertEqual(result["runtime_build_sha"], _THRESHOLD_SOURCE_COMMIT)
-        self.assertEqual(result["elapsed_ms"], 12)
-        self.assertEqual(opener.timeout, 4)
-        self.assertEqual(opener.request.get_header("Authorization"), "Bearer " + "t" * 48)
-
-    def test_rejects_wrong_source_commit(self):
-        result, _ = self.run_rule(lambda response, _sent: response.update(source_commit="f" * 40))
-        self.assertEqual(result, {"ok": False, "error": "RULE_EVIDENCE_INVALID"})
-
-    def test_rejects_wrong_runtime_build(self):
-        result, _ = self.run_rule(lambda response, _sent: response.update(runtime_build_sha="f" * 40))
-        self.assertEqual(result, {"ok": False, "error": "RULE_EVIDENCE_INVALID"})
-
-    def test_rejects_non_matching_request_id(self):
-        result, _ = self.run_rule(lambda response, _sent: response.update(request_id="0" * 36))
-        self.assertEqual(result, {"ok": False, "error": "RULE_EVIDENCE_INVALID"})
-
-    def test_rejects_missing_or_non_digest_sandbox_image(self):
-        for image in (None, "latest", "sha256:" + "G" * 64):
-            with self.subTest(image=image):
-                result, _ = self.run_rule(lambda response, _sent: response.update(sandbox_image=image))
-                self.assertEqual(result, {"ok": False, "error": "RULE_EVIDENCE_INVALID"})
-
-    def test_rejects_invalid_execution_duration(self):
-        for elapsed in (None, True, -1, 3001, "12"):
-            with self.subTest(elapsed=elapsed):
-                result, _ = self.run_rule(lambda response, _sent: response.update(elapsed_ms=elapsed))
-                self.assertEqual(result, {"ok": False, "error": "RULE_EVIDENCE_INVALID"})
-
-    def test_rejects_unhashable_rule_result(self):
-        result, _ = self.run_rule(lambda response, _sent: response.update(result={"unexpected": True}))
-        self.assertEqual(result, {"ok": False, "error": "RULE_EVIDENCE_INVALID"})
-
-    def test_rejects_other_contract_and_runtime_identity(self):
-        mutations = (
-            lambda response, _sent: response.update(contract_version="unrecognized.v9"),
-            lambda response, _sent: response.update(runtime_version="unknown"),
-            lambda response, _sent: response.update(sandbox="not-isolated"),
-            lambda response, _sent: response.update(program_sha256="0" * 64),
-        )
-        for mutate in mutations:
-            with self.subTest(mutation=mutate):
-                result, _ = self.run_rule(mutate)
-                self.assertEqual(result, {"ok": False, "error": "RULE_EVIDENCE_INVALID"})
 
 
 class ToolInputContractTests(unittest.TestCase):
     def setUp(self):
         self.registry = ToolRegistry([])
 
-    def test_budget_rule_rejects_wrong_types_and_out_of_range_values_without_runner_call(self):
+    def test_tool_binding_resolves_to_named_registered_rule(self):
+        self.assertEqual(_TOOL_RULE_BINDINGS["budget_threshold"], "budget.threshold.v1")
+        names = [item["function"]["name"] for item in self.registry.definitions]
+        self.assertIn("budget_threshold", names)
+        definition = next(item["function"] for item in self.registry.definitions
+                          if item["function"]["name"] == "budget_threshold")
+        self.assertEqual(definition["parameters"]["required"], ["nominal", "batas"])
+        self.assertIs(definition["parameters"]["additionalProperties"], False)
+
+    def test_rule_source_is_packaged_and_hash_pinned(self):
+        rule = _REGISTERED_RULES["budget.threshold.v1"]
+        source = _load_rule_source(rule)
+        self.assertEqual(hashlib.sha256(source).hexdigest(), rule["source_sha256"])
+        self.assertIn(b"fungsi status_anggaran(nominal, batas)", source)
+        self.assertEqual(rule["capabilities"], ())
+
+    def test_budget_rule_executes_locally_without_legacy_runner_token(self):
+        cases = (
+            (0, 0, "DALAM_BATAS"),
+            (2, 3, "DALAM_BATAS"),
+            (3, 3, "DALAM_BATAS"),
+            (4, 3, "PERLU_PERSETUJUAN"),
+            (0, 1_000_000_000_000, "DALAM_BATAS"),
+            (1_000_000_000_000, 0, "PERLU_PERSETUJUAN"),
+        )
+        with patch.dict(os.environ, {}, clear=True):
+            for nominal, batas, expected in cases:
+                with self.subTest(nominal=nominal, batas=batas):
+                    result = self.registry.execute(
+                        "budget_threshold", {"nominal": nominal, "batas": batas}
+                    )
+                    self.assertTrue(result["ok"], result)
+                    self.assertEqual(result["program_id"], "budget.threshold.v1")
+                    self.assertEqual(result["result"], expected)
+                    self.assertEqual(result["capabilities"], [])
+                    self.assertEqual(
+                        result["execution_boundary"],
+                        "fixed-hash-local-rule-not-os-sandbox",
+                    )
+
+    def test_tampered_artifact_fails_closed_before_execution(self):
+        with patch("library.ai_tools._load_rule_source", return_value=b"tampered"):
+            result = self.registry.execute("budget_threshold", {"nominal": 2, "batas": 3})
+        self.assertEqual(result, {"ok": False, "error": "RULE_ARTIFACT_HASH_MISMATCH"})
+
+    def test_missing_artifact_fails_closed(self):
+        with patch("library.ai_tools._load_rule_source", side_effect=OSError("missing")):
+            result = self.registry.execute("budget_threshold", {"nominal": 2, "batas": 3})
+        self.assertEqual(result, {"ok": False, "error": "RULE_ARTIFACT_UNAVAILABLE"})
+
+    def test_runtime_timeout_fails_closed(self):
+        with patch(
+            "library.ai_tools.subprocess.run",
+            side_effect=subprocess.TimeoutExpired(cmd=["python"], timeout=3),
+        ):
+            result = self.registry.execute("budget_threshold", {"nominal": 2, "batas": 3})
+        self.assertEqual(result, {"ok": False, "error": "RULE_EXECUTION_TIMEOUT"})
+
+    def test_unexpected_rule_output_fails_closed(self):
+        completed = subprocess.CompletedProcess(
+            args=["python"], returncode=0, stdout="UNEXPECTED\n", stderr=""
+        )
+        with patch("library.ai_tools.subprocess.run", return_value=completed):
+            result = self.registry.execute("budget_threshold", {"nominal": 2, "batas": 3})
+        self.assertEqual(result, {"ok": False, "error": "RULE_EXECUTION_FAILED"})
+
+    def test_budget_rule_rejects_wrong_types_and_out_of_range_values_without_execution(self):
         invalid_values = (
             True, False, -1, 1_000_000_000_001, 1.0, "1", None,
         )
-        with patch.object(ToolRegistry, "_run_registered_threshold") as runner:
+        with patch.object(ToolRegistry, "_run_registered_rule") as runner:
             for value in invalid_values:
                 for field in ("nominal", "batas"):
                     args = {"nominal": 1, "batas": 1}
@@ -137,19 +100,6 @@ class ToolInputContractTests(unittest.TestCase):
                             {"ok": False, "error": "RULE_INPUT_INVALID"},
                         )
             runner.assert_not_called()
-
-    def test_budget_rule_accepts_inclusive_numeric_boundaries_without_coercion(self):
-        with patch.object(
-            ToolRegistry, "_run_registered_threshold", return_value={"ok": True}
-        ) as runner:
-            for value in (0, 1_000_000_000_000):
-                with self.subTest(value=value):
-                    result = self.registry.execute(
-                        "budget_threshold", {"nominal": value, "batas": value}
-                    )
-                    self.assertEqual(result, {"ok": True})
-                    runner.assert_called_with({"nominal": value, "batas": value})
-        self.assertEqual(runner.call_count, 2)
 
     def test_budget_rule_rejects_missing_and_extra_fields(self):
         for args in (
@@ -175,16 +125,6 @@ class ToolInputContractTests(unittest.TestCase):
                     self.registry.execute(name, {}),
                     {"ok": False, "error": "TOOL_NOT_ALLOWLISTED"},
                 )
-
-    def test_registered_rule_request_declares_no_ambient_capabilities(self):
-        result, opener = RegisteredRuleEvidenceTests().run_rule()
-        self.assertTrue(result["ok"])
-        sent = json.loads(opener.request.data.decode("utf-8"))
-        self.assertEqual(sent["capabilities"], [])
-        self.assertEqual(sent["input"], {"nominal": 2, "batas": 3})
-        self.assertEqual(sent["limits"], {
-            "timeout_ms": 3000, "input_bytes": 128, "output_bytes": 1024,
-        })
 
 
 if __name__ == "__main__":

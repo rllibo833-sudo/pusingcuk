@@ -1,23 +1,65 @@
-"""Small allowlisted tool registry for PusingCuk's local AI assistant."""
+"""Internal allowlisted tool registry for PusingCuk's local AI assistant."""
 from __future__ import annotations
 
-import json
+import hashlib
 import os
-import re
-import uuid
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
 from typing import Any
-from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse
-from urllib.request import ProxyHandler, Request, build_opener
 
 from library.knowledge_grounding import rank_knowledge
 
-_RUNNER_URL = "http://127.0.0.1:8787/v1/execute"
-_THRESHOLD_SHA256 = "e79058b314d921a4b4353133b30a7a7b0da64d32785a39f66cb5ce356406067d"
-_THRESHOLD_SOURCE_COMMIT = "e367f45b0a35ccb8fdb91424099b8046b346d77d"
-_THRESHOLD_RUNTIME_VERSION = "Pusingcuk native 0.8.0.dev0"
-_SANDBOX_IMAGE_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 _MAX_RULE_INPUT = 1_000_000_000_000
+_MAX_RULE_INPUT_BYTES = 128
+_MAX_RULE_OUTPUT_BYTES = 1024
+_RULE_TIMEOUT_SECONDS = 3.0
+
+# Rule source is package data owned by PusingCuk. The registry accepts inputs,
+# never source code or caller-selected paths. This is a trusted fixed-artifact
+# runner, not an OS sandbox; never register model-generated or untrusted source.
+_REGISTERED_RULES: dict[str, dict[str, Any]] = {
+    "budget.threshold.v1": {
+        "source_file": "budget_threshold.cuk",
+        "source_sha256": "0320f50b48489251d4a784ce3c1781a1a014ca2aecc5dfd1b8317f8a6b9fb911",
+        "entrypoint": "status_anggaran",
+        "language_version": "0.5-dev",
+        "input_fields": ("nominal", "batas"),
+        "properties": {
+            "nominal": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "batas": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+        },
+        "required": ("nominal", "batas"),
+        "allowed_outputs": ("DALAM_BATAS", "PERLU_PERSETUJUAN", "INPUT_TIDAK_VALID"),
+        "capabilities": (),
+        "description": (
+            "Jalankan aturan anggaran .cuk tetap yang terdaftar pada PusingCuk. "
+            "Tidak menerima source dari model dan tidak memerlukan server/runner HTTP. "
+            "Runtime referensi lokal bukan sandbox OS."
+        ),
+    },
+}
+
+# Model-facing tool names map only to internal registered rule IDs.
+_TOOL_RULE_BINDINGS = {
+    "budget_threshold": "budget.threshold.v1",
+}
+
+
+def _load_rule_source(rule: dict[str, Any]) -> bytes:
+    """Load the bundled artifact; callers cannot choose its path."""
+    return (Path(__file__).resolve().parent / rule["source_file"]).read_bytes()
+
+
+def _rule_subprocess_environment() -> dict[str, str]:
+    """Avoid inheriting API keys, runner tokens, and other ambient secrets."""
+    allowed = ("PATH", "SYSTEMROOT", "WINDIR", "TEMP", "TMP")
+    env = {key: os.environ[key] for key in allowed if os.environ.get(key)}
+    env["PYTHONIOENCODING"] = "utf-8"
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    return env
 
 
 class ToolRegistry:
@@ -31,33 +73,39 @@ class ToolRegistry:
                 "type": "function",
                 "function": {
                     "name": "knowledge_search",
-                    "description": "Cari dokumen primer terkurasi milik PusingCuk serta ledger migrasi konsep terpilih. Klaim historis CORE/Founder hanya dapat diverifikasi sejauh dirangkum dalam ledger, bukan sebagai indeks penuh kedua repositori.",
+                    "description": (
+                        "Cari dokumen primer terkurasi milik PusingCuk serta ledger "
+                        "migrasi konsep terpilih. Klaim historis CORE/Founder hanya "
+                        "dapat diverifikasi sejauh dirangkum di ledger, bukan sebagai "
+                        "indeks penuh kedua repositori."
+                    ),
                     "parameters": {
                         "type": "object",
                         "properties": {
                             "query": {"type": "string", "minLength": 1, "maxLength": 300},
                             "limit": {"type": "integer", "minimum": 1, "maximum": 3},
                         },
-                        "required": ["query"], "additionalProperties": False,
+                        "required": ["query"],
+                        "additionalProperties": False,
                     },
                 },
-            },
-            {
+            }
+        ]
+        for tool_name, rule_id in _TOOL_RULE_BINDINGS.items():
+            rule = _REGISTERED_RULES[rule_id]
+            self.definitions.append({
                 "type": "function",
                 "function": {
-                    "name": "budget_threshold",
-                    "description": "Jalankan aturan anggaran deterministik yang terdaftar dan terisolasi. Tidak menjalankan source dari model. Gunakan hanya bila pengguna memberi nominal dan batas anggaran.",
+                    "name": tool_name,
+                    "description": rule["description"],
                     "parameters": {
                         "type": "object",
-                        "properties": {
-                            "nominal": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
-                            "batas": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
-                        },
-                        "required": ["nominal", "batas"], "additionalProperties": False,
+                        "properties": rule["properties"],
+                        "required": list(rule["required"]),
+                        "additionalProperties": False,
                     },
                 },
-            },
-        ]
+            })
 
     def execute(self, name: str, arguments: Any) -> dict[str, Any]:
         if not isinstance(arguments, dict):
@@ -73,83 +121,114 @@ class ToolRegistry:
                 return {"ok": False, "error": "KNOWLEDGE_LIMIT_INVALID"}
             ranked = rank_knowledge(self.documents, query, limit=limit)
             results = [{
-                "id": item["id"], "title": item["title"], "summary": item["summary"][:300],
-                "source_path": item["source_path"], "source_url": item["source_url"],
-                "source_repository": item["source_repository"], "source_commit": item["source_commit"],
-                "authority": item["authority"], "claim_status": item["claim_status"],
+                "id": item["id"],
+                "title": item["title"],
+                "summary": item["summary"][:300],
+                "source_path": item["source_path"],
+                "source_url": item["source_url"],
+                "source_repository": item["source_repository"],
+                "source_commit": item["source_commit"],
+                "authority": item["authority"],
+                "claim_status": item["claim_status"],
             } for item in ranked]
             return {"ok": True, "result_count": len(results), "results": results}
-        if name == "budget_threshold":
-            if set(arguments) != {"nominal", "batas"}:
+
+        rule_id = _TOOL_RULE_BINDINGS.get(name)
+        if rule_id is not None:
+            rule = _REGISTERED_RULES.get(rule_id)
+            if rule is None:
+                return {"ok": False, "error": "RULE_NOT_REGISTERED"}
+            if set(arguments) != set(rule["input_fields"]):
                 return {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"}
-            for key in ("nominal", "batas"):
-                value = arguments[key]
-                if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= _MAX_RULE_INPUT:
+            for field, schema in rule["properties"].items():
+                value = arguments[field]
+                if (
+                    schema["type"] == "integer"
+                    and (
+                        isinstance(value, bool)
+                        or not isinstance(value, int)
+                        or not schema["minimum"] <= value <= schema["maximum"]
+                    )
+                ):
                     return {"ok": False, "error": "RULE_INPUT_INVALID"}
-            return self._run_registered_threshold(arguments)
+            return self._run_registered_rule(rule_id, arguments)
+
         return {"ok": False, "error": "TOOL_NOT_ALLOWLISTED"}
 
     @staticmethod
-    def _run_registered_threshold(arguments: dict[str, int]) -> dict[str, Any]:
-        token = os.environ.get("PUSINGCUK_RUNNER_TOKEN", "")
-        if len(token) < 32:
-            return {"ok": False, "error": "RULE_RUNNER_NOT_CONFIGURED"}
-        parsed = urlparse(_RUNNER_URL)
-        if parsed.scheme != "http" or parsed.hostname != "127.0.0.1" or parsed.path != "/v1/execute":
-            return {"ok": False, "error": "RULE_RUNNER_ENDPOINT_INVALID"}
-        request_id = str(uuid.uuid4())
-        body = {
-            "contract_version": "pusingcuk.core.tool.v1",
-            "request_id": request_id,
-            "program_id": "budget.threshold.v1",
-            "program_sha256": _THRESHOLD_SHA256,
-            "language_version": "0.5-dev",
-            "entrypoint": "status_anggaran",
-            "capabilities": [],
-            "limits": {"timeout_ms": 3000, "input_bytes": 128, "output_bytes": 1024},
-            "input": arguments,
-        }
-        request = Request(
-            _RUNNER_URL, data=json.dumps(body).encode("utf-8"), method="POST",
-            headers={"Content-Type": "application/json", "Authorization": f"Bearer {token}"},
-        )
+    def _run_registered_rule(rule_id: str, arguments: dict[str, int]) -> dict[str, Any]:
+        """Execute one hash-pinned .cuk artifact without a local HTTP runner."""
+        rule = _REGISTERED_RULES.get(rule_id)
+        if rule is None:
+            return {"ok": False, "error": "RULE_NOT_REGISTERED"}
+        if rule["capabilities"]:
+            return {"ok": False, "error": "RULE_CAPABILITY_DENIED"}
+        if set(arguments) != set(rule["input_fields"]):
+            return {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"}
+        for field, schema in rule["properties"].items():
+            value = arguments[field]
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, int)
+                or not schema["minimum"] <= value <= schema["maximum"]
+            ):
+                return {"ok": False, "error": "RULE_INPUT_INVALID"}
+
         try:
-            opener = build_opener(ProxyHandler({}))
-            with opener.open(request, timeout=4) as response:
-                raw = response.read(4097)
-                if len(raw) > 4096:
-                    return {"ok": False, "error": "RULE_RUNNER_RESPONSE_TOO_LARGE"}
-                result = json.loads(raw.decode("utf-8"))
-        except HTTPError as exc:
-            return {"ok": False, "error": "RULE_RUNNER_HTTP_ERROR", "status": exc.code}
-        except (URLError, TimeoutError, OSError):
-            return {"ok": False, "error": "RULE_RUNNER_UNAVAILABLE"}
-        except (UnicodeError, json.JSONDecodeError):
-            return {"ok": False, "error": "RULE_RUNNER_RESPONSE_INVALID"}
-        if not isinstance(result, dict) or result.get("status") != "succeeded" or result.get("program_id") != "budget.threshold.v1":
-            return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
-        elapsed_ms = result.get("elapsed_ms")
+            source = _load_rule_source(rule)
+        except OSError:
+            return {"ok": False, "error": "RULE_ARTIFACT_UNAVAILABLE"}
+        if hashlib.sha256(source).hexdigest() != rule["source_sha256"]:
+            return {"ok": False, "error": "RULE_ARTIFACT_HASH_MISMATCH"}
+
+        cli_path = Path(__file__).resolve().parent.parent / "pusingcuk_new.py"
+        if not cli_path.is_file():
+            return {"ok": False, "error": "RULE_RUNTIME_UNAVAILABLE"}
+
+        stdin_text = "".join(f"{arguments[field]}\n" for field in rule["input_fields"])
+        if len(stdin_text.encode("utf-8")) > _MAX_RULE_INPUT_BYTES:
+            return {"ok": False, "error": "RULE_INPUT_TOO_LARGE"}
+
+        started = time.monotonic()
+        try:
+            with tempfile.TemporaryDirectory(prefix="pusingcuk-rule-") as workdir:
+                program_path = Path(workdir) / "registered_rule.cuk"
+                program_path.write_bytes(source)
+                completed = subprocess.run(
+                    [sys.executable, str(cli_path), str(program_path)],
+                    cwd=workdir,
+                    env=_rule_subprocess_environment(),
+                    input=stdin_text,
+                    text=True,
+                    encoding="utf-8",
+                    capture_output=True,
+                    timeout=_RULE_TIMEOUT_SECONDS,
+                    check=False,
+                )
+        except subprocess.TimeoutExpired:
+            return {"ok": False, "error": "RULE_EXECUTION_TIMEOUT"}
+        except OSError:
+            return {"ok": False, "error": "RULE_RUNTIME_UNAVAILABLE"}
+
+        elapsed_ms = int((time.monotonic() - started) * 1000)
+        stdout = completed.stdout
         if (
-            result.get("contract_version") != "pusingcuk.core.tool.v1"
-            or result.get("request_id") != request_id
-            or result.get("program_sha256") != _THRESHOLD_SHA256
-            or result.get("source_commit") != _THRESHOLD_SOURCE_COMMIT
-            or result.get("runtime_version") != _THRESHOLD_RUNTIME_VERSION
-            or result.get("runtime_build_sha") != _THRESHOLD_SOURCE_COMMIT
-            or result.get("sandbox") != "docker-isolated"
-            or not isinstance(result.get("sandbox_image"), str)
-            or not _SANDBOX_IMAGE_RE.fullmatch(result["sandbox_image"])
-            or isinstance(elapsed_ms, bool)
-            or not isinstance(elapsed_ms, int)
-            or not 0 <= elapsed_ms <= 3000
-            or not isinstance(result.get("result"), str)
-            or result["result"] not in {
-                "DALAM_BATAS", "PERLU_PERSETUJUAN", "INPUT_TIDAK_VALID",
-            }
+            completed.returncode != 0
+            or completed.stderr
+            or not isinstance(stdout, str)
+            or len(stdout.encode("utf-8")) > _MAX_RULE_OUTPUT_BYTES
+            or stdout not in {f"{value}\n" for value in rule["allowed_outputs"]}
         ):
-            return {"ok": False, "error": "RULE_EVIDENCE_INVALID"}
+            return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
+
         return {
-            "ok": True, "program_id": result["program_id"], "result": result["result"],
-            "source_commit": result["source_commit"], "runtime_build_sha": result["runtime_build_sha"],
+            "ok": True,
+            "program_id": rule_id,
+            "program_sha256": rule["source_sha256"],
+            "language_version": rule["language_version"],
+            "entrypoint": rule["entrypoint"],
+            "capabilities": [],
+            "execution_boundary": "fixed-hash-local-rule-not-os-sandbox",
+            "result": stdout[:-1],
             "elapsed_ms": elapsed_ms,
         }

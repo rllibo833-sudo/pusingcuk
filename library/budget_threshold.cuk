@@ -1,0 +1,24 @@
+# Registered PusingCuk AI budget-threshold rule v1.
+# This reviewed artifact accepts data only; callers cannot supply source code.
+
+jancuk
+
+fungsi status_anggaran(nominal, batas)
+    njir nominal < 0 atau batas < 0
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        njir nominal <= batas
+            balek "DALAM_BATAS"
+        kampret
+            balek "PERLU_PERSETUJUAN"
+        selesai njir
+    selesai njir
+selesai fungsi
+
+tanya nominal_teks = ""
+tanya batas_teks = ""
+lah nominal = bilangan(nominal_teks)
+lah batas = bilangan(batas_teks)
+hedeh status_anggaran(nominal, batas)
+
+selesai jancuk

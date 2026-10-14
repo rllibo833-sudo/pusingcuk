@@ -21,7 +21,7 @@ datas = []
 # the frozen bundle as well as example programs.
 if os.path.isdir("library"):
     for filename in os.listdir("library"):
-        if filename.endswith(".json"):
+        if filename.endswith((".json", ".cuk")):
             datas.append((os.path.join("library", filename), "library"))
 
 if os.path.isdir("examples"):

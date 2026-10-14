@@ -32,7 +32,7 @@ Runnable example: [`examples/ai/engine_contract.cuk`](../examples/ai/engine_cont
 - Local service: `library/ai_service.py`; its current contract is loopback-only and experimental.
 - User-facing executable contract example: `examples/ai/engine_contract.cuk`; its CLI test belongs in the existing `tests/test_examples_cuk.py`.
 
-Do not create a second `pusingcuk_ai/`, parser, knowledge index, provider framework, or migration ledger. Split provider adapters into a subpackage only when a real implementation need justifies it. The current `budget_threshold` handler in `library/ai_tools.py` still uses the legacy local runner contract; treat that as a future detachment task, not as a reason to port CORE services into PusingCuk.
+Do not create a second `pusingcuk_ai/`, parser, knowledge index, provider framework, or migration ledger. Split provider adapters into a subpackage only when a real implementation need justifies it. `budget_threshold` now maps through the internal `ToolRegistry` to the packaged, SHA-256-pinned `library/budget_threshold.cuk`; it no longer calls a localhost HTTP runner or needs a runner token, Node service, or Docker daemon. The legacy `tools/core-rule-runner.mjs` remains a separately tested compatibility/integration harness, not a runtime dependency of the local assistant. The Python-reference execution boundary is **not an OS sandbox** and may run only registered, fixed, reviewed artifacts—not model-generated source.
 
 ## Release gates
 
