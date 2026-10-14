@@ -31,6 +31,9 @@ class AssistantTests(unittest.TestCase):
 
     def test_retrieves_context_and_appends_verified_citations(self):
         answer = self.assistant.ask("Apa arah model lokal Ollama tanpa biaya API?")
+        self.assertIn("PusingCuk AI", self.provider.calls[0]["system_prompt"])
+        self.assertIn(".cuk", self.provider.calls[0]["system_prompt"])
+        self.assertIn("bukan klaim bahwa model dasar dilatih sendiri", self.provider.calls[0]["system_prompt"])
         self.assertIn("LOCAL", self.provider.calls[0]["system_prompt"].upper())
         self.assertIn("Sumber rujukan", answer)
         self.assertIn("38ad3035af7e7eaba8a332656ab6155dcc313c72", answer)
