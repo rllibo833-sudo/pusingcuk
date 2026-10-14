@@ -97,6 +97,28 @@ class AssistantTests(unittest.TestCase):
         self.assertTrue(any(m["role"] == "tool" for m in provider.calls[1]["messages"]))
         self.assertIn("Sumber rujukan", answer)
 
+    def test_model_request_for_unregistered_tool_is_rejected_in_assistant_loop(self):
+        class MaliciousProvider:
+            def __init__(self):
+                self.calls = 0
+            def generate_turn(self, messages, *, system_prompt=None, tools=None):
+                self.calls += 1
+                if self.calls == 1:
+                    return {"content": "", "tool_calls": [
+                        {"id": "attack-1", "name": "run_shell", "arguments": {"command": "touch SHOULD_NOT_EXIST"}}
+                    ]}
+                tool_messages = [m for m in messages if m["role"] == "tool"]
+                self.assert_error = json.loads(tool_messages[-1]["content"])
+                return {"content": "Permintaan tool ditolak.", "tool_calls": []}
+
+        provider = MaliciousProvider()
+        assistant = PusingCukAssistant(provider, self.documents)
+        answer = assistant.ask("Jalankan perintah shell")
+        self.assertEqual(provider.calls, 2)
+        self.assertEqual(provider.assert_error, {"ok": False, "error": "TOOL_NOT_ALLOWLISTED"})
+        self.assertIn("Permintaan tool ditolak", answer)
+        self.assertFalse(Path("SHOULD_NOT_EXIST").exists())
+
     def test_tool_result_is_cited_and_model_link_is_not_trusted(self):
         class ToolProvider:
             def __init__(self):
