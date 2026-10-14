@@ -41,6 +41,17 @@ make native
 
 Contoh native masih memakai ekstensi kompatibilitas lama dan alias sintaks yang diuji pada runtime C. Kalkulator memakai `bilangan` dan `teks`, sehingga contoh itu untuk interpreter Python; native C belum mendukung built-in konversi tersebut. Jangan menganggap modul, HTTP, atau file I/O tersedia pada runtime native hanya karena interpreter Python mendukungnya.
 
+## Aturan bisnis deterministik untuk integrasi CORE
+
+Dua aturan contoh memperlihatkan dua keputusan yang berbeda dan deterministik:
+
+- `examples/core/anggaran_threshold_service.cuk`: membandingkan nominal dengan batas yang memerlukan persetujuan.
+- `examples/core/anggaran_sufficiency_service.cuk`: memeriksa apakah saldo tersedia mencukupi pengajuan.
+
+Aturan kecukupan saldo memiliki fixture referensi di `examples/core/anggaran_sufficiency.cuk`, yang mencakup saldo cukup, nilai batas yang sama, pengajuan di atas saldo, nol, dan input negatif. Pytest memeriksa perilaku interpreter referensi; CORE Quality Gate membangun runtime native pada commit PusingCuk yang dipatok dan menguji input layanan secara terpisah.
+
+**Batas dukungan:** aturan kedua dibuktikan sebagai program deterministik di CI CORE; hal itu tidak otomatis mendaftarkannya pada HTTP runner lokal atau membuat layanan produksi. Runtime PusingCuk tetap eksperimental dan bukan sandbox OS.
+
 ## Contoh kompatibilitas (.pusingcuk)
 
 Contoh ini dipertahankan untuk demonstrasi API yang sudah ada dan kompatibilitas sumber lama:
