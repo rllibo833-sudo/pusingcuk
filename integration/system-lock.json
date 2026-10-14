@@ -47,23 +47,26 @@
     "repository_freeze": "Not approved until migration parity, auth/data/audit preservation, backups, restore and rollback are verified."
   },
   "verification_status": {
-    "last_known_green_core_run": "https://github.com/rllibo833-sudo/kawasan-masjid-core/actions/runs/38525685951",
-    "last_known_green_core_run_scope": "Core Quality Gate passed on main commit 9779fab55bd1eb64d654313b2e7767cccc5bb57d: type-check, system/security/AI contracts, E2E boundary tests, production build, and registered PusingCuk rule proof. This verifies CI source paths, not production deployment.",
-    "current_main_push_runs": "Source changes applied directly to main on 2026-10-14: Founder-OS index 0f14523d90cf948d2ad29a95fde921d66bbc4910; CORE ranker 0f0b7cfefdb8eebb30ba733fb1073a3d7970c54a, reader 2f6f6d6dca7a0638ec22bfb4500c8104b6992178, and AI entrypoint f75bb6b72460bf33fe3c422dacce013887a19bce. The previously listed green runs predate these grounding changes and do not validate them. Verify workflows for the synchronized main heads before treating this update as CI-passed. Live Ollama inference was not tested; no production deployment is claimed.",
+    "last_known_green_core_run": "https://github.com/rllibo833-sudo/kawasan-masjid-core/actions/runs/38529872729",
+    "last_known_green_core_run_scope": "Core Quality Gate succeeded on main commit 7f5b82b21b057fadb43acad79707bd3e4c816ab2 after the expanded Founder-OS index, CORE reader/ranker, grounded prompt and synchronized pins were present. This is CI/source-path evidence, not live local Ollama inference or a production deployment.",
+    "current_main_push_runs": "Confirmed on 2026-10-14 after the grounding changes: CORE Quality Gate succeeded on main commit 7f5b82b21b057fadb43acad79707bd3e4c816ab2 (run 38529872729); PusingCuk Tes Pusingcuk and PyInstaller succeeded on main commit 14cd0c2a380ee08a3fbaf724219a283c207f38a5 (runs 38529888106 and 38529888154); PUBLIC validation and GitHub Pages deployment succeeded on main commit 4fd4cce7d45b007d861f7897639826db35a54433 (runs 38529879078 and 38529879008). No Founder-OS Actions run was found in the checked list. These checks do not prove live Ollama inference or production deployment.",
     "production_deployments": "No Supabase production Edge Function deployment or database migration was performed. The PusingCuk HTTP runner is local-only and not OS-sandboxed; do not expose it to the public internet.",
-    "last_known_green_pusingcuk_run": "https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38525678192",
-    "last_known_green_pusingcuk_run_scope": "Tes Pusingcuk passed on main commit dc7ba57685de0e2b7e7b5a4bf6f9d265b5a4e1ab across Python 3.11/3.12, GCC, Clang and PVM security regression; PyInstaller build test also passed.",
-    "last_known_green_public_validation_run": "https://github.com/rllibo833-sudo/kawasan-masjid-public/actions/runs/38525243847",
-    "last_known_green_public_deployment_run": "https://github.com/rllibo833-sudo/kawasan-masjid-public/actions/runs/38525242631",
+    "last_known_green_pusingcuk_run": "https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38529888106",
+    "last_known_green_pusingcuk_run_scope": "Tes Pusingcuk passed on main commit 14cd0c2a380ee08a3fbaf724219a283c207f38a5; PyInstaller build test also passed on the same commit (run 38529888154).",
+    "last_known_green_public_validation_run": "https://github.com/rllibo833-sudo/kawasan-masjid-public/actions/runs/38529879078",
+    "last_known_green_public_deployment_run": "https://github.com/rllibo833-sudo/kawasan-masjid-public/actions/runs/38529879008",
     "knowledge_grounding_update": {
-      "status": "published-to-main-ci-verification-pending",
+      "status": "ci-source-path-validated-not-live-inference",
       "founder_os_index_commit": "0f14523d90cf948d2ad29a95fde921d66bbc4910",
       "core_ranker_commit": "0f0b7cfefdb8eebb30ba733fb1073a3d7970c54a",
       "core_reader_commit": "2f6f6d6dca7a0638ec22bfb4500c8104b6992178",
       "core_ai_entrypoint_commit": "f75bb6b72460bf33fe3c422dacce013887a19bce",
       "curated_document_count": 14,
       "local_ollama_tested": false,
-      "production_deployment_claimed": false
+      "production_deployment_claimed": false,
+      "core_quality_run": "https://github.com/rllibo833-sudo/kawasan-masjid-core/actions/runs/38529872729",
+      "pusingcuk_tests_run": "https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38529888106",
+      "public_validation_run": "https://github.com/rllibo833-sudo/kawasan-masjid-public/actions/runs/38529879078"
     }
   },
   "freeze_gates": [
