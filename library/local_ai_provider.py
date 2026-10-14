@@ -82,7 +82,7 @@ def validate_messages(messages: Iterable[dict[str, Any]]) -> list[dict[str, Any]
             if not isinstance(calls, list) or len(calls) > 2:
                 raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
             for call in calls:
-                if not isinstance(call, dict) or set(call) - {"id", "type", "function"}:
+                if not isinstance(call, dict) or set(call) - {"id", "type", "function", "thought_signature"}:
                     raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
                 function = call.get("function")
                 if not isinstance(function, dict) or set(function) - {"name", "arguments"}:
@@ -91,7 +91,11 @@ def validate_messages(messages: Iterable[dict[str, Any]]) -> list[dict[str, Any]
                     raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
                 if not isinstance(function.get("arguments"), dict):
                     raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
-                if len(json.dumps(call, ensure_ascii=False)) > 4_000:
+                signature = call.get("thought_signature")
+                if signature is not None and (not isinstance(signature, str) or not signature or len(signature) > 16_000):
+                    raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
+                bounded_call = {key: value for key, value in call.items() if key != "thought_signature"}
+                if len(json.dumps(bounded_call, ensure_ascii=False)) > 4_000:
                     raise LocalAIProviderError("AI_TOOL_CALLS_INVALID")
             item["tool_calls"] = calls
         total += len(content)
