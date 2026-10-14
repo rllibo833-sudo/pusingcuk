@@ -6,6 +6,8 @@ Gaya dokumentasi mengikuti [Panduan Gaya Bahasa](GAYA_BAHASA.md): santai, jelas,
 
 ## 1. Siapkan alat di Android / Termux
 
+Versi bahasa saat ini `0.5-dev`, sedangkan versi paket pengembangan `0.8.0.dev0`. Kontrak memiliki 21 built-in; 17 di antaranya didukung runtime native C.
+
 Gunakan Termux dari sumber yang terpelihara. Jalankan perintah berikut di shell Termux:
 
 ```sh
@@ -34,7 +36,7 @@ Selesai build, executable dipasang sebagai `pusingcuk-native`. Compiler dibutuhk
 pusingcuk-native examples/native/rekap_anggaran.pusingcuk
 ```
 
-Program contoh menghitung anggaran menggunakan kamus, perulangan, kondisi, dan fungsi. Beberapa hasil yang diharapkan adalah total pengeluaran `1200000`, sisa anggaran `1300000`, dan status anggaran aman.
+Program contoh menghitung anggaran menggunakan kamus, perulangan, kondisi, dan fungsi. Beberapa hasil yang diharapkan adalah total pengeluaran `2535000`, saldo bulan ini `965000`, persentase pendapatan terpakai `72`, dan status target tabungan tercapai.
 
 Kalau ingin memastikan build dan fixture native lulus, jalankan:
 

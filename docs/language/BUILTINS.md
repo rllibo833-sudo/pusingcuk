@@ -13,7 +13,7 @@ Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python m
 - `not-claimed`: dukungan belum diverifikasi; jangan menjanjikan kompatibilitas.
 - **Python reference** adalah interpreter bahasa utama. **Python transpiler** adalah target compiler yang berbeda dan tidak boleh disamakan dengannya.
 
-## 19 Built-in Terkontrak
+## 21 Built-in Terkontrak
 
 | Built-in | Argumen | Perilaku | Python reference | Native C | JS transpiler | Python transpiler | HTML | VM |
 |---|---:|---|---|---|---|---|---|---|

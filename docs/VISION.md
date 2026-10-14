@@ -8,7 +8,7 @@ The goal is not to replace established programming languages or claim that slang
 
 Pusingcuk is a work in progress. Runtime support, compiler targets, and security guarantees differ by feature. The project must describe those limits honestly.
 
-**Canonical language version:** `0.4-dev`. The opening keyword `jancuk` is a deliberate part of Pusingcuk's identity.
+**Canonical language version:** `0.5-dev`. The Python package version `0.8.0.dev0` is a separate distribution version, not the language version. The opening keyword `jancuk` is a deliberate part of Pusingcuk's identity.
 
 ## 2. Who should feel welcome
 

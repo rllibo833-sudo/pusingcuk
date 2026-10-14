@@ -40,6 +40,25 @@ class TerminalTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertRegex(result.stdout, r"7\npusingcuk>")
 
+    def test_variables_persist_between_submissions(self):
+        source = (
+            "jancuk\nlah saldo = 100\nhedeh saldo\nselesai jancuk\n"
+            "jancuk\nsaldo = saldo + 50\nhedeh saldo\nselesai jancuk\n:keluar\n"
+        )
+        result = self.run_terminal(source)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("100\n", result.stdout)
+        self.assertIn("150\n", result.stdout)
+
+    def test_functions_persist_between_submissions(self):
+        source = (
+            "jancuk\nfungsi gandakan(n)\n    balek n * 2\nselesai fungsi\nselesai jancuk\n"
+            "jancuk\nhedeh gandakan(21)\nselesai jancuk\n:keluar\n"
+        )
+        result = self.run_terminal(source)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertRegex(result.stdout, r"42\npusingcuk>")
+
     def test_tanya_reads_terminal_input(self):
         source = (
             "jancuk\n"

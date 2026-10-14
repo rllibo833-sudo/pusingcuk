@@ -1,12 +1,35 @@
-# Contoh native: rekap anggaran dengan fungsi buatan, tanpa Python.
+# Contoh native: rekap anggaran dengan kategori, saldo awal, target tabungan, dan rasio.
 # Jalankan: pusingcuk-native examples/native/rekap_anggaran.pusingcuk
+# Batas: data ditulis langsung di kamus; runtime native belum punya file I/O.
 
 inthiseco
-lah pendapatan = 2500000
-lah pengeluaran = {"pangan": 750000, "transport": 250000, "listrik": 200000}
-lah total = hitung_total(pengeluaran)
+lah pendapatan = 3500000
+lah saldo_awal = 250000
+lah pengeluaran = {"pangan": 820000, "transport": 275000, "listrik_air": 310000, "internet": 285000, "pendidikan": 450000, "kesehatan": 125000, "hiburan": 180000, "lainnya": 90000}
+lah target_tabungan = 500000
 
-jir "REKAP ANGGARAN BULANAN"
+fungsi hitung_total(data)
+    lah total = 0
+    untuk kategori dalam data
+        total = total + data[kategori]
+    gitu untuk
+    balek total
+gitu fungsi
+
+fungsi hitung_persentase(nilai, dasar)
+    njir dasar <= 0
+        balek 0
+    adooh
+        balek bulatkan(nilai * 100 / dasar)
+    gitu njir
+gitu fungsi
+
+lah total_pengeluaran = hitung_total(pengeluaran)
+lah saldo_bulan_ini = pendapatan - total_pengeluaran
+lah saldo_akhir = saldo_awal + saldo_bulan_ini
+lah rasio_pengeluaran = hitung_persentase(total_pengeluaran, pendapatan)
+
+jir "=== REKAP ANGGARAN BULANAN ==="
 jir "Pendapatan:"
 jir pendapatan
 jir "Rincian pengeluaran:"
@@ -14,23 +37,24 @@ untuk kategori dalam pengeluaran
     jir kategori
     jir pengeluaran[kategori]
 gitu untuk
-
 jir "Total pengeluaran:"
-jir total
-jir "Sisa anggaran:"
-jir pendapatan - total
-
-njir pendapatan - total >= 0
-    jir "Status: anggaran aman"
+jir total_pengeluaran
+jir "Persentase pendapatan terpakai:"
+jir rasio_pengeluaran
+jir "Saldo bulan ini:"
+jir saldo_bulan_ini
+jir "Saldo akhir termasuk saldo awal:"
+jir saldo_akhir
+jir "Target tabungan:"
+jir target_tabungan
+njir saldo_bulan_ini < 0
+    jir "Status: DEFISIT - kurangi pengeluaran atau tambah pemasukan"
 adooh
-    jir "Status: defisit"
+    njir saldo_bulan_ini >= target_tabungan
+        jir "Status: AMAN - target tabungan tercapai"
+    adooh
+        jir "Status: PERLU DIATUR - saldo positif, tetapi target belum tercapai"
+    gitu njir
 gitu njir
-
-fungsi hitung_total(data)
-    lah jumlah = 0
-    untuk kategori dalam data
-        jumlah = jumlah + data[kategori]
-    gitu untuk
-    balek jumlah
-gitu fungsi
+jir "Catatan: contoh ini tidak menyimpan transaksi ke disk."
 gitu inthiseco

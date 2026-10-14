@@ -870,6 +870,21 @@ class Evaluator:
         self.block(tree.body, env)
         return env
 
+    def run_repl(self, source, env):
+        """Execute one REPL submission while preserving names and functions."""
+        self.budget = 0
+        tree = parse(source)
+        for statement in tree.body:
+            if statement.kind != "Function":
+                continue
+            line = statement.line
+            name = statement.name
+            if name in ("panjang", "rentang"):
+                self.fail(line, f"nama fungsi '{name}' sudah digunakan")
+            self.functions[name] = (statement.params, statement.body, line)
+        self.block(tree.body, env)
+        return env
+
     def run(self, source):
         self.run_module(source)
         return None

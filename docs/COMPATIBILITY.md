@@ -2,7 +2,7 @@
 
 Dokumen ini menetapkan batas kompatibilitas yang boleh diklaim, bukan janji bahwa semua sasaran sudah tercapai. Pusingcuk masih eksperimental dan runtime Python serta C belum setara untuk semua fitur.
 
-**Versi bahasa kanonis:** `0.4-dev`. Angka dukungan built-in dibaca per target: reference Python 19, native C 15, transpiler JS/Python masing-masing 14, dan VM 6.
+**Versi bahasa kanonis:** `0.5-dev`. Versi paket pengembangan `0.8.0.dev0` adalah versi distribusi, bukan versi bahasa. Kontrak memuat 21 built-in; 17 di antaranya didukung runtime native C. Dukungan transpiler dan VM berbeda per built-in, jadi gunakan matriks kontrak.
 
 **Baseline yang dipelihara:** Python modular adalah referensi; runtime native C adalah implementasi kedua untuk subset yang diuji. Sebuah perilaku disebut lintas-runtime hanya jika fixture yang sama berstatus `required` pada `reference` dan `native` serta lulus di CI. Fitur Python-only tetap valid sebagai kemampuan referensi, tetapi tidak otomatis tersedia pada C. Compiler/transpiler lain dan PVM ditunda dari jalur kompatibilitas utama.
 
@@ -24,8 +24,8 @@ Pusingcuk harus mudah dimulai oleh pemula, tetap dapat dipakai untuk proyek seri
 | Linux dengan compiler C11 | Jalur native diuji di CI Ubuntu GCC/Clang | Bukan bukti otomatis untuk semua distro |
 | Android melalui Termux | Ada skrip instalasi dan panduan | Pengujian perangkat fisik masih perlu dilakukan |
 | Windows / macOS | Belum menjadi target native yang terverifikasi | Jangan menjanjikan kompatibilitas native sebelum ada CI dan tes platform |
-| Interpreter Python | Unit test berjalan pada Python 3.11 dan 3.12 di CI; 19 built-in kontrak tersedia di interpreter referensi | Ini jalur referensi pengembangan, bukan runtime mandiri |
-| Runtime native C | Subset yang diuji tercatat di [panduan runtime native](NATIVE_RUNTIME.md); 15 built-in memiliki fixture (`panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`, `sinus`, `kosinus`, `jumlah`, `rata_rata`, `median`) | Built-in konversi (`teks`, `bilangan`, `desimal`, `logika`) belum tersedia pada native C |
+| Interpreter Python | Unit test berjalan pada Python 3.11 dan 3.12 di CI; 21 built-in terkontrak tersedia di interpreter referensi | Ini jalur referensi pengembangan, bukan runtime mandiri |
+| Runtime native C | Subset yang diuji tercatat di [panduan runtime native](NATIVE_RUNTIME.md); 17 built-in terkontrak didukung native C (`panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`, `sinus`, `kosinus`, `jumlah`, `rata_rata`, `median`) | Built-in konversi (`teks`, `bilangan`, `desimal`, `logika`) belum tersedia pada native C |
 | Modul dan paket | Belum tersedia penuh pada native | Impor modul bukan kontrak portabel saat ini |
 | UTF-8 | Berkas sumber dibaca sebagai teks UTF-8 pada CLI Python; native menangani sebagian operasi UTF-8 | Validasi UTF-8 penuh, normalisasi, dan semantik Unicode lintas runtime belum dijamin |
 | File, jaringan, database | Belum ada pustaka standar lintas runtime yang lengkap | Gunakan hanya API yang secara eksplisit tersedia pada runtime target |

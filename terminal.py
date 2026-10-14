@@ -2,7 +2,7 @@
 """Terminal interaktif sederhana untuk bahasa Pusingcuk."""
 import sys
 
-from evaluator import run
+from evaluator import Evaluator
 
 
 HELP = """Perintah terminal Pusingcuk
@@ -22,6 +22,8 @@ def main():
     print("Pusingcuk Terminal 0.5-dev")
     print("Ketik :bantuan untuk petunjuk, :keluar untuk keluar.")
     lines = []
+    repl_env = {}
+    repl = Evaluator()
 
     while True:
         try:
@@ -40,7 +42,7 @@ def main():
             continue
         if not lines and command == ":contoh":
             try:
-                run(EXAMPLE)
+                repl.run_repl(EXAMPLE, repl_env)
             except (SyntaxError, RuntimeError, ValueError, TypeError, IndexError) as exc:
                 print(f"Kesalahan: {exc}", file=sys.stderr)
             continue
@@ -57,7 +59,7 @@ def main():
         source = "\n".join(lines).strip()
         if source.endswith("selesai jancuk"):
             try:
-                run(source)
+                repl.run_repl(source, repl_env)
             except (SyntaxError, RuntimeError, ValueError, TypeError, IndexError) as exc:
                 print(f"Kesalahan: {exc}", file=sys.stderr)
             finally:
