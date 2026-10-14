@@ -203,9 +203,9 @@ jobs:
             .digest("hex");
           assert.equal(actualHash, expectedHash, "Canonical threshold .cuk rule must match its pinned SHA-256.");
           const sufficiencyActualHash = crypto.createHash("sha256")
-            .update(fs.readFileSync("tests/fixtures/../fixtures/core_budget_sufficiency.json"))
+            .update(fs.readFileSync("examples/core/anggaran_sufficiency_service.cuk"))
             .digest("hex");
-          assert.ok(sufficiencyActualHash, "Shared sufficiency fixture exists.");
+          assert.equal(sufficiencyActualHash, sufficiencyHash, "Canonical sufficiency .cuk rule must match its pinned SHA-256.");
           console.log("PASS: shared lock, runner runtime pin, and both registered rule hashes agree.");
           NODE
       - name: Uji pembatasan file PVM dan kesetaraan backend
