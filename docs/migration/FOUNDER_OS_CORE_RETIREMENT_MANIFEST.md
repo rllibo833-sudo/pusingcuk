@@ -106,23 +106,3 @@ On 2026-10-15, a restore request for the sole existing project was accepted (`su
 The two inspected cron jobs remain inactive. Ten Edge Functions were reported deployed and active before the project was paused; restoring the project may make those existing routes available again. Before exposing the database to PusingCuk, re-check those routes and their auth boundaries. No data or schema was deleted or rewritten.
 
 A private database export and a successful restore rehearsal have not been produced. Do not permanently delete the only project: previous read-only counts are a snapshot, not a backup.
-
-## Single Supabase database direction for PusingCuk
-
-**Decision (2026-10-15): use the one existing project `lnpzgrodwnhthcwudebk` as the sole database project for the PusingCuk ecosystem; do not create a second project.** There is no second Supabase project to merge:
-
-- Connection `Primary` points to the Free organization `Pusingcuk`; it currently has **zero projects**.
-- Connection `Supabase` points to the Free organization `Kawasan-masjid-1000ha`; it contains the sole existing project `lnpzgrodwnhthcwudebk`.
-- The database remains in the Kawasan organization for now. The available ChatGPT connector does not expose a project-transfer operation, and ownership transfer is not required merely to designate the existing project as the single intended database.
-- No new project, schema, or table was created by this decision. Existing CORE tables and operational records are preserved, not represented as if already migrated to PusingCuk.
-- **The PusingCuk runtime is not yet connected to this database.** That requires a specific application use case and a correctly scoped authentication/data-access path. Never put the database password or service-role key in the public repository, a distributable CLI, or browser JavaScript. Do not point PusingCuk directly at old CORE tables without reviewing schema ownership and access policies.
-- Both organizations are on Free; this path avoids creating a new paid resource.
-
-## Project restore and safety state
-
-On 2026-10-15, a restore request for the sole existing project was accepted (`success: true`). The latest live status observed was `COMING_UP`, so it is **not yet confirmed `ACTIVE_HEALTHY`**. Wait until the provider reports healthy before any data/schema operations.
-
-The two inspected cron jobs remain inactive. Ten Edge Functions were reported deployed and active before the project was paused; restoring the project may make those existing routes available again. Before exposing the database to PusingCuk, re-check those routes and their auth boundaries. No data or schema was deleted or rewritten.
-
-A private database export and a successful restore rehearsal have not been produced. Do not permanently delete the only project: previous read-only counts are a snapshot, not a backup.
-
