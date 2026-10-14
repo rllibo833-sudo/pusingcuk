@@ -45,7 +45,9 @@
     "pusingcuk_sufficiency_rule_source_commit": "411c532454028d2d5e733373d085050eca1d402a",
     "pusingcuk_sufficiency_rule_sha256": "d6fcee54d17afbf0fc0a1aee115b2c0c9f57dcc172e56a6c6cf1d0dd9a789771",
     "public_system_status_validator_commit": "05ca436c1282973d0c52902ab7c54f8cb8db17a6",
-    "public_check_script_commit": "948824d98829e138f62c8d75e23ecf6c3d315bda"
+    "public_check_script_commit": "948824d98829e138f62c8d75e23ecf6c3d315bda",
+    "pusingcuk_sufficiency_fixture_path": "tests/fixtures/core_budget_sufficiency.json",
+    "pusingcuk_sufficiency_fixture_commit": "1678f601433de8d4cb6f11e5f6cee4cee12ceaaf"
   },
   "capabilities": {
     "native_rule": "One deterministic registered .cuk rule; exact source commit and source hash are pinned.",
