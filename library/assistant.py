@@ -9,6 +9,7 @@ from typing import Any
 
 from library.ai_tools import ToolRegistry
 from library.knowledge_grounding import append_citations, load_index, rank_knowledge
+from library.gemini_ai_provider import GeminiGenerateContentProvider
 from library.local_ai_provider import LocalAIProviderError, OllamaChatProvider
 from library.local_memory import LocalMemoryError, LocalMemoryStore
 
@@ -126,8 +127,9 @@ class PusingCukAssistant:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Asisten AI lokal PusingCuk berbasis Ollama.")
-    parser.add_argument("--model", default=os.environ.get("PUSINGCUK_AI_MODEL", "qwen3:4b"))
+    parser = argparse.ArgumentParser(description="Asisten AI PusingCuk dengan provider lokal atau Gemini API.")
+    parser.add_argument("--provider", choices=("ollama", "gemini"), default=os.environ.get("PUSINGCUK_AI_PROVIDER", "ollama"))
+    parser.add_argument("--model", default=os.environ.get("PUSINGCUK_AI_MODEL"))
     parser.add_argument(
         "--endpoint", default=os.environ.get("PUSINGCUK_OLLAMA_ENDPOINT", "http://127.0.0.1:11434/api/chat"),
         help="Endpoint Ollama lokal; secara default hanya loopback yang diizinkan.",
@@ -139,14 +141,23 @@ def main() -> int:
     args = parser.parse_args()
     try:
         documents = load_index(args.index)
-        provider = OllamaChatProvider(model=args.model, endpoint=args.endpoint)
+        if args.provider == "gemini":
+            provider = GeminiGenerateContentProvider(
+                api_key=os.environ.get("GEMINI_API_KEY", ""),
+                model=args.model or "gemini-3.8-flash",
+            )
+        else:
+            provider = OllamaChatProvider(
+                model=args.model or "qwen3:4b", endpoint=args.endpoint,
+            )
+        model_name = provider.model
         memory_store = LocalMemoryStore()
     except (OSError, ValueError, LocalAIProviderError, LocalMemoryError) as exc:
         code = getattr(exc, "code", str(exc))
         print(f"PusingCuk AI belum siap: {code}")
         return 2
     assistant = PusingCukAssistant(provider, documents, memory_store=memory_store)
-    print(f"PusingCuk AI lokal ({args.model}). Perintah: /reset, /ingat <catatan>, /memori [kueri], /hapus-memori <id>, /keluar.")
+    print(f"PusingCuk AI ({args.provider}, {model_name}). Perintah: /reset, /ingat <catatan>, /memori [kueri], /hapus-memori <id>, /keluar.")
     while True:
         try:
             query = input("Lu: ").strip()
