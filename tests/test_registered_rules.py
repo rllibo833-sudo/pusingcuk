@@ -72,7 +72,7 @@ class RegisteredRuleTests(unittest.TestCase):
             reference = [sys.executable, str(ROOT / "pusingcuk_new.py"), str(self.source)]
             native = [str(native_bin), str(self.source)]
             for case in self.fixture["cases"]:
-                stdin_text = f"{case['input'][0]}\\n{case['input'][1]}\\n"
+                stdin_text = f"{case['input'][0]}\n{case['input'][1]}\n"
                 with self.subTest(case=case["id"]):
                     reference_result = subprocess.run(
                         reference, input=stdin_text, text=True, encoding="utf-8",
@@ -86,7 +86,7 @@ class RegisteredRuleTests(unittest.TestCase):
                     )
                     self.assertEqual(native_result.returncode, reference_result.returncode)
                     self.assertEqual(native_result.stdout, reference_result.stdout)
-                    self.assertEqual(native_result.stdout, case["expected"] + "\\n")
+                    self.assertEqual(native_result.stdout, case["expected"] + "\n")
                     self.assertEqual(native_result.stderr == "", reference_result.stderr == "")
 
     def test_reference_runtime_matches_all_rule_cases(self):
