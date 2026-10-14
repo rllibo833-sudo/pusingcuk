@@ -1076,6 +1076,19 @@
         "c": "unsupported",
         "pvm": "unsupported"
       }
+    },
+    {
+      "name": "eksekusi",
+      "parameters": [
+        "perintah"
+      ],
+      "description": "Menjalankan hanya perintah diagnostik yang diizinkan (df -h /data, df -h /, free -m, ls -la, dan ./pusingcuk-native examples/native/rekap_anggaran.pusingcuk); opt-in wajib melalui PUSINGCUK_ENABLE_EXECUTION=1; tanpa shell, timeout 30 detik.",
+      "status": "supported",
+      "backends": {
+        "python": "supported",
+        "c": "unsupported",
+        "pvm": "unsupported"
+      }
     }
   ]
 }

@@ -1,0 +1,21 @@
+# Modul helper Gemini untuk interpreter referensi PusingCuk.
+# Kunci API disediakan oleh pemanggil; jangan hard-code rahasia di sini.
+jancuk
+fungsi tanya_ai(kunci_api, prompt_user)
+    lah url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=" + kunci_api
+    lah payload = {"contents": [{"parts": [{"text": prompt_user}]}]}
+    lah raw = kirim_api(url, payload)
+    njir raw == salah
+        balek "Gagal menghubungi Gemini API. Periksa jaringan, kuota, dan API key."
+    selesai njir
+    lah data = jadi_json(raw)
+    njir data == salah
+        balek "Respons Gemini bukan JSON yang valid."
+    selesai njir
+    coba
+        balek data["candidates"][0]["content"]["parts"][0]["text"]
+    ketangkep err
+        balek "Gemini tidak mengembalikan teks jawaban yang diharapkan."
+    gitu coba
+selesai fungsi
+selesai jancuk

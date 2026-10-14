@@ -66,3 +66,11 @@ Permintaan tersebut memerlukan jaringan dan dapat mengirim permintaan ke layanan
 Jalankan contoh file/JSON di direktori kerja sementara atau cadangkan berkas target terlebih dahulu. Walaupun evaluator Python membatasi operasi file relatif terhadap project root, batas itu bukan sandbox sistem operasi dan tidak menggantikan kehati-hatian terhadap penimpaan berkas. Jangan menjalankan program atau bytecode yang tidak dipercaya.
 
 Lihat juga [spesifikasi bahasa](../SPEC.md), [katalog built-in](../docs/language/BUILTINS.md), [matriks kompatibilitas](../docs/COMPATIBILITY.md), dan [kebijakan keamanan](../SECURITY.md).
+
+## Integrasi opsional untuk Termux/Linux
+
+- examples/remote/gemini_agent.cuk: fungsi pemanggil Gemini REST API menggunakan built-in HTTP Python reference.
+- examples/remote/bot_termux.cuk: Telegram long polling dengan allowlist chat ID, perintah status/daftar berkas/rekap, dan fallback pertanyaan ke Gemini.
+- examples/remote/secrets.example.json: template konfigurasi; salin ke secrets.json di akar repo dan jangan pernah commit token nyata.
+
+Contoh remote hanya didukung interpreter Python reference. Built-in eksekusi memerlukan opt-in PUSINGCUK_ENABLE_EXECUTION=1 dan hanya mengizinkan perintah diagnostik yang terdaftar; tidak menerima perintah shell arbitrer.

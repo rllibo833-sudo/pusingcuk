@@ -12,6 +12,9 @@ import socket
 import ssl
 import stat
 import json
+import shlex
+import shutil
+import subprocess
 from pathlib import Path, PureWindowsPath
 from datetime import datetime, date
 from ast_nodes import Node
@@ -116,6 +119,52 @@ class ReturnSignal(BaseException):
 
 MAX_HTTP_RESPONSE_BYTES = 2 * 1024 * 1024
 MAX_HTTP_REQUEST_BYTES = 1 * 1024 * 1024
+
+# Deliberately small, read-only command surface for Termux/Linux diagnostics.
+# Shell metacharacters and arbitrary commands are never interpreted.
+_ALLOWED_COMMANDS = {
+    ("df", "-h", "/data"),
+    ("df", "-h", "/"),
+    ("free", "-m"),
+    ("ls", "-la"),
+    ("./pusingcuk-native", "examples/native/rekap_anggaran.pusingcuk"),
+}
+
+
+def _execute_command(command, project_root):
+    """Run one explicitly allow-listed diagnostic command after opt-in."""
+    if os.environ.get("PUSINGCUK_ENABLE_EXECUTION") != "1":
+        return "Error: eksekusi dinonaktifkan; set PUSINGCUK_ENABLE_EXECUTION=1 untuk mengaktifkannya."
+    if not isinstance(command, str) or not command.strip() or len(command) > 512:
+        return "Error: perintah harus berupa teks non-kosong (maksimal 512 karakter)."
+    try:
+        argv = tuple(shlex.split(command, posix=True))
+    except ValueError:
+        return "Error: format perintah tidak valid."
+    if argv not in _ALLOWED_COMMANDS:
+        return "Error: perintah tidak ada dalam daftar izin eksekusi."
+    executable = shutil.which(argv[0])
+    if executable is None:
+        return f"Error: program {argv[0]!r} tidak ditemukan di PATH."
+    try:
+        result = subprocess.run(
+            [executable, *argv[1:]],
+            cwd=project_root,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+            shell=False,
+        )
+    except subprocess.TimeoutExpired:
+        return "Error: perintah melewati batas waktu 30 detik."
+    except OSError as exc:
+        return f"Error: perintah gagal dijalankan ({exc.__class__.__name__})."
+    output = result.stdout.strip()
+    if result.returncode != 0:
+        detail = result.stderr.strip() or output or "tidak ada detail"
+        return f"Error ({result.returncode}): {detail}"
+    return output or "(perintah selesai tanpa output)"
 
 
 # Reject local/private redirect destinations before urllib follows them.
@@ -629,6 +678,10 @@ class Evaluator:
                         return _language_json(data)
                     except (OSError, ValueError, UnicodeError):
                         return False
+                if n.name == "eksekusi":
+                    if len(args) != 1 or not isinstance(args[0], str):
+                        self.fail(line, "eksekusi membutuhkan satu teks perintah")
+                    return _execute_command(args[0], self.project_root)
                 if n.name == "kepo_internet":
                     if len(args) != 1 or not isinstance(args[0], str):
                         self.fail(line, "kepo_internet membutuhkan satu URL teks")

@@ -76,9 +76,9 @@ test-native: native test-cli
 		echo 'indeks teks di luar batas seharusnya gagal' >&2; exit 1; \
 	fi; \
 	$(NATIVE_BIN) examples/native/rekap_anggaran.pusingcuk > $(CURDIR)/pusingcuk-budget.out; \
-	grep -q 'Status: anggaran aman' $(CURDIR)/pusingcuk-budget.out; \
-	grep -q '^1200000$$' $(CURDIR)/pusingcuk-budget.out; \
-	grep -q '^1300000$$' $(CURDIR)/pusingcuk-budget.out; \
+	grep -q 'Status: AMAN - target tabungan tercapai' $(CURDIR)/pusingcuk-budget.out; \
+	grep -q '^965000$$' $(CURDIR)/pusingcuk-budget.out; \
+	grep -q '^1215000$$' $(CURDIR)/pusingcuk-budget.out; \
 	$(NATIVE_BIN) tests/native/list_reallocation.pusingcuk > $(CURDIR)/pusingcuk-list-reallocation.out; \
 	printf '1\n' > $(CURDIR)/pusingcuk-list-reallocation.expected; \
 	diff -u $(CURDIR)/pusingcuk-list-reallocation.expected $(CURDIR)/pusingcuk-list-reallocation.out; \

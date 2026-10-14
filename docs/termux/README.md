@@ -78,3 +78,20 @@ chmod +x script.cuk
 ```
 
 Di Linux desktop, ekstensi sumber didaftarkan lewat `pusingcuk.xml` (`text/x-pusingcuk`). Registrasi MIME bukan fasilitas shell yang dibutuhkan Termux.
+
+## Gemini agent dan Telegram bridge (opsional)
+
+Contoh ini memakai interpreter referensi Python; bukan runtime native C. HTTP client PusingCuk menyediakan GET melalui kepo_internet, POST melalui kirim_api, dan parsing JSON melalui jadi_json. Contoh menggunakan model Gemini gemini-3.8-flash; ketersediaan API mengikuti akun Google AI Anda.
+
+1. Salin examples/remote/secrets.example.json menjadi secrets.json di akar repositori.
+2. Isi token Telegram BotFather, API key Gemini, dan chat ID Telegram milik Anda. secrets.json sudah dikecualikan dari Git.
+3. Build runtime native jika ingin memakai perintah /rekap: make native.
+4. Jalankan dari akar repositori:
+
+```sh
+PUSINGCUK_ENABLE_EXECUTION=1 python pusingcuk_new.py examples/remote/bot_termux.cuk
+```
+
+Bot hanya merespons chat ID yang terdaftar di secrets.json. Perintah terminal dibatasi ke daftar diagnostik yang eksplisit; tidak ada evaluasi shell bebas. Perintah /rekap menjalankan contoh anggaran native yang sudah ditentukan, bukan membuat backup file. Perintah /ls mengirim daftar nama berkas ke chat yang diizinkan, jadi jalankan hanya pada direktori project yang Anda pahami.
+
+Penting: eksekusi berjalan dengan izin OS pengguna dan bukan sandbox. Jangan bagikan token/API key, jangan gunakan chat ID yang tidak Anda kontrol, dan matikan bot bila token Telegram bocor. Gemini API berpotensi menimbulkan biaya/kuota dan pesan yang dikirim akan diteruskan ke Google.

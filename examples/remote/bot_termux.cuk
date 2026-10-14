@@ -1,0 +1,78 @@
+# Telegram bridge untuk Termux/Linux; jalankan dari akar repositori.
+# Perintah terminal dibatasi oleh built-in eksekusi dan chat ID allowlist.
+jancuk
+fungsi kirim_pesan(kunci_bot, chat_id, teks)
+    lah url = "https://api.telegram.org/bot" + kunci_bot + "/sendMessage"
+    lah payload = {"chat_id": chat_id, "text": teks}
+    balek kirim_api(url, payload)
+selesai fungsi
+
+lah teks_rahasia = baca("secrets.json")
+njir teks_rahasia == salah
+    hedeh "Konfigurasi belum ada. Salin examples/remote/secrets.example.json menjadi secrets.json di akar repo."
+kampret
+    lah rahasia = jadi_json(teks_rahasia)
+    njir rahasia == salah
+        hedeh "secrets.json bukan JSON valid."
+    kampret
+        lah gemini = angkut("gemini_agent.cuk")
+        njir gemini == salah
+            hedeh "Modul gemini_agent.cuk tidak dapat dimuat."
+        kampret
+            lah offset = 0
+            lah url_get = ""
+            lah raw_updates = ""
+            lah data = {}
+            lah chat_id = 0
+            lah teks_masuk = ""
+            lah hasil_df = ""
+            lah hasil_mem = ""
+            lah hasil = ""
+            lah jawaban_ai = ""
+            hedeh "PusingCuk Remote Agent aktif. Kirim /status, /ls, /rekap, atau pertanyaan."
+            mumet benar
+                url_get = "https://api.telegram.org/bot" + rahasia["telegram_bot_token"] + "/getUpdates?timeout=8&offset=" + jadi_teks(offset) + "&allowed_updates=%5B%22message%22%5D"
+                raw_updates = kepo_internet(url_get)
+                njir raw_updates != salah
+                    data = jadi_json(raw_updates)
+                    njir data != salah
+                        njir data["ok"] == benar
+                            untuk update dalam data["result"]
+                                offset = update["update_id"] + 1
+                                coba
+                                    chat_id = update["message"]["chat"]["id"]
+                                    teks_masuk = update["message"]["text"]
+                                    njir chat_id == rahasia["telegram_chat_id"]
+                                        njir teks_masuk == "/status"
+                                            hasil_df = eksekusi("df -h /data")
+                                            hasil_mem = eksekusi("free -m")
+                                            kirim_pesan(rahasia["telegram_bot_token"], chat_id, "Status Termux:\n" + hasil_df + "\n" + hasil_mem)
+                                        kampret
+                                            njir teks_masuk == "/ls"
+                                                hasil = eksekusi("ls -la")
+                                                kirim_pesan(rahasia["telegram_bot_token"], chat_id, "Daftar berkas:\n" + hasil)
+                                            kampret
+                                                njir teks_masuk == "/rekap"
+                                                    kirim_pesan(rahasia["telegram_bot_token"], chat_id, "Menjalankan rekap anggaran native...")
+                                                    hasil = eksekusi("./pusingcuk-native examples/native/rekap_anggaran.pusingcuk")
+                                                    kirim_pesan(rahasia["telegram_bot_token"], chat_id, "Hasil rekap:\n" + hasil)
+                                                kampret
+                                                    kirim_pesan(rahasia["telegram_bot_token"], chat_id, "Memproses pertanyaan dengan Gemini...")
+                                                    jawaban_ai = gemini.tanya_ai(rahasia["gemini_api_key"], teks_masuk)
+                                                    kirim_pesan(rahasia["telegram_bot_token"], chat_id, jawaban_ai)
+                                                selesai njir
+                                            selesai njir
+                                        selesai njir
+                                    selesai njir
+                                ketangkep err_update
+                                    hedeh "Update Telegram dilewati karena format pesan tidak didukung."
+                                gitu coba
+                            selesai untuk
+                        selesai njir
+                    selesai njir
+                selesai njir
+            selesai mumet
+        selesai njir
+    selesai njir
+selesai njir
+selesai jancuk
