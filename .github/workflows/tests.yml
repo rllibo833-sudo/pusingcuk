@@ -191,8 +191,8 @@ jobs:
           assert.equal(lock.schema_version, "founder-system.sync.v1");
           const runnerSource = fs.readFileSync("tools/core-rule-runner.mjs", "utf8");
           const runnerPin = runnerSource.match(/PINNED_COMMIT = "([0-9a-f]{40})"/)?.[1];
-          const thresholdHash = runnerSource.match(/"budget\\.threshold\\.v1", \\{\\s*sha256: "([0-9a-f]{64})"/)?.[1];
-          const sufficiencyHash = runnerSource.match(/"budget\\.sufficiency\\.v1", \\{\\s*sha256: "([0-9a-f]{64})"/)?.[1];
+          const thresholdHash = runnerSource.match(/"budget\.threshold\.v1", \{\s*sha256: "([0-9a-f]{64})"/)?.[1];
+          const sufficiencyHash = runnerSource.match(/"budget\.sufficiency\.v1", \{\s*sha256: "([0-9a-f]{64})"/)?.[1];
           const expectedCommit = lock.component_pins.pusingcuk_runtime_commit;
           const expectedHash = lock.component_pins.pusingcuk_rule_sha256;
           assert.equal(runnerPin, expectedCommit, "Local runner pin must match the shared four-repository lock.");
