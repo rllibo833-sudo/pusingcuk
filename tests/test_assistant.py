@@ -97,6 +97,26 @@ class AssistantTests(unittest.TestCase):
         self.assertTrue(any(m["role"] == "tool" for m in provider.calls[1]["messages"]))
         self.assertIn("Sumber rujukan", answer)
 
+    def test_tool_result_is_cited_and_model_link_is_not_trusted(self):
+        class ToolProvider:
+            def __init__(self):
+                self.calls = 0
+            def generate_turn(self, messages, *, system_prompt=None, tools=None):
+                self.calls += 1
+                if self.calls == 1:
+                    return {"content": "", "tool_calls": [
+                        {"id": "lookup-1", "name": "knowledge_search", "arguments": {"query": "ollama lokal", "limit": 2}}
+                    ]}
+                return {"content": "Model lokal dijalankan terpisah. Rujukan lain: https://untrusted.invalid/source", "tool_calls": []}
+
+        provider = ToolProvider()
+        assistant = PusingCukAssistant(provider, self.documents)
+        answer = assistant.ask("Tolong cari sumber tentang Ollama lokal.")
+        self.assertEqual(provider.calls, 2)
+        self.assertIn("Sumber rujukan", answer)
+        self.assertIn("github.com/rllibo833-sudo/", answer)
+        self.assertNotIn("untrusted.invalid", answer)
+
     def test_tool_registry_rejects_unregistered_names_and_invalid_rule_input(self):
         registry = ToolRegistry(self.documents)
         self.assertEqual(registry.execute("run_shell", {"command": "id"})["error"], "TOOL_NOT_ALLOWLISTED")
