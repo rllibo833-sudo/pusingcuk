@@ -26,6 +26,7 @@ pusingcuk = "pusingcuk_new:main"
 pusingcuk-ai = "library.assistant:main"
 pusingcuk-ai-service = "library.ai_service:main"
 pusingcuk-repl = "terminal:main"
+pusingcuk-build = "compiler.js_backend:main"
 
 [tool.pusingcuk]
 language-version = "0.5-dev"

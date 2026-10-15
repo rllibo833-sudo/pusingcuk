@@ -77,6 +77,18 @@ python pusingcuk_new.py program.cuk
 python pusingcuk_new.py --check program.cuk
 ```
 
+### Build a standalone JavaScript program
+
+The experimental JavaScript backend can compile supported `.cuk` programs into a `.js` file that runs with Node.js. Install the project first with `python -m pip install .`, then:
+
+```sh
+pusingcuk-build examples/halo_dunia.cuk --output halo_dunia.js
+node halo_dunia.js
+```
+
+The build command validates the source and stops with a compilation error when it encounters unsupported syntax or features. The generated file does not need Python at runtime, but it does need Node.js. This is an experimental JavaScript target—not an Android APK, Windows EXE, or browser application package.
+
+
 The `.cuk` extension is Pusingcuk's canonical source-file identity for new programs. The distinctive identity comes from its Indonesian-readable syntax and tested language rules—not the suffix alone. Existing `.pusingcuk` files remain supported for compatibility.
 
 Metadata paket pada `main` adalah `0.8.0.dev0` (`pyproject.toml`, `Makefile`, `library/kosakata.json`, dan fallback runtime native); kontrak bahasa tetap `0.5-dev` (`lexer.py`, `SPEC.md`). Tag rilis yang lebih lama tetap menunjuk snapshot historis; metadata pengembangan saat ini menggunakan versi paket PEP 440 `0.8.0.dev0`. Gunakan `make version` dan `make language-version` untuk memeriksa keduanya.
