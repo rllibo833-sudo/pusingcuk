@@ -97,8 +97,8 @@ class DocumentationContractTests(unittest.TestCase):
 
     def test_supabase_notes_migration_has_owner_only_rls_and_no_client_secret(self):
         root = Path(__file__).resolve().parents[1]
-        migration = (root / "supabase/migrations/20261015080000_pusingcuk_project_notes.sql").read_text(encoding="utf-8").lower()
-        smoke = (root / "supabase/tests/20261015080000_pusingcuk_project_notes_smoke.sql").read_text(encoding="utf-8").lower()
+        migration = (root / "supabase/migrations/20261015002334_pusingcuk_project_notes_v1.sql").read_text(encoding="utf-8").lower()
+        smoke = (root / "supabase/tests/20261015002334_pusingcuk_project_notes_smoke.sql").read_text(encoding="utf-8").lower()
         status = (root / "docs/integrations/SUPABASE_PROJECTS.md").read_text(encoding="utf-8").lower()
         self.assertIn("references auth.users(id) on delete cascade", migration)
         self.assertIn("enable row level security", migration)

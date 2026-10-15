@@ -4,7 +4,7 @@
 **Cakupan:** repositori `rllibo833-sudo/pusingcuk`, runtime bahasa `.cuk`, aplikasi AI, dokumentasi, CI, dan proyek Supabase yang dipetakan.  
 **Baseline yang diperiksa:** `a5ad400102044c3e6c215afbe1adda184396ed12`. Push CI dan build paket pada baseline ini berhasil; perubahan dokumentasi audit setelah baseline tetap harus melewati CI baru.
 
-> **Kesimpulan utama:** PusingCuk adalah bahasa pemrograman eksperimental dengan jalur Python referensi dan runtime native C yang diuji untuk subset fitur. PusingCuk AI adalah aplikasi/orchestrator MVP di atas model provider yang dapat diganti, bukan model dasar yang dilatih sendiri. Supabase Free saat ini adalah infrastruktur opsional yang belum terhubung ke runtime aplikasi PusingCuk.
+> **Kesimpulan utama:** PusingCuk adalah bahasa pemrograman eksperimental dengan jalur Python referensi dan runtime native C yang diuji untuk subset fitur. PusingCuk AI adalah aplikasi/orchestrator MVP di atas model provider yang dapat diganti, bukan model dasar yang dilatih sendiri. Supabase Free sudah memiliki skema catatan proyek pribadi dengan RLS yang diuji di database, tetapi runtime aplikasi PusingCuk masih belum terhubung.
 
 ## 1. Status komponen
 
@@ -103,7 +103,7 @@ pusingcuk-ai CLI / adapter HTTP lokal
 
 | Peran | Project ref | Status saat audit | Keadaan aplikasi |
 |---|---|---|---|
-| Target integrasi PusingCuk mendatang | `vcvejjpzklpvknxmymgy` | `ACTIVE_HEALTHY`, region `ap-southeast-2` | Tidak ditemukan tabel aplikasi, migration history, atau Edge Function pada pemeriksaan terakhir. |
+| Catatan proyek pribadi (DB schema applied) | `vcvejjpzklpvknxmymgy` | `ACTIVE_HEALTHY`, region `ap-southeast-2` | Tidak ditemukan tabel aplikasi, migration history, atau Edge Function pada pemeriksaan terakhir. |
 | Data lama Kawasan Masjid/CORE | `lnpzgrodwnhthcwudebk` | `ACTIVE_HEALTHY`, region `ap-southeast-2` | Database lama memiliki schema/records dan tidak boleh dianggap sudah dimigrasikan ke project PusingCuk. |
 
 Keduanya tetap merupakan database project terpisah meskipun berada dalam organisasi Supabase yang sama. Organisasi terpisah bernama `Pusingcuk` yang muncul pada koneksi akun lain tidak perlu dipakai agar kedua project tetap terisolasi.
