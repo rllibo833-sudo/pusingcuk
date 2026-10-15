@@ -86,3 +86,9 @@ Lihat juga [spesifikasi bahasa](../SPEC.md), [katalog built-in](../docs/language
 - examples/remote/secrets.example.json: template konfigurasi; salin ke secrets.json di akar repo dan jangan pernah commit token nyata.
 
 Contoh remote hanya didukung interpreter Python reference. Built-in eksekusi memerlukan opt-in PUSINGCUK_ENABLE_EXECUTION=1 dan hanya mengizinkan perintah diagnostik yang terdaftar; tidak menerima perintah shell arbitrer.
+
+
+## Contoh akuntansi untuk mahasiswa
+
+- `examples/accounting/rekap_keuangan.cuk`: contoh input pendapatan, beban, aset, liabilitas, dan ekuitas dalam Rupiah; menghitung laba/rugi dan memeriksa persamaan posisi keuangan. Ini contoh pendidikan dasar, bukan implementasi seluruh SAK/PSAK.
+- Aplikasi desktop offline, rumus dasar, batasan, dan instruksi build Windows dijelaskan di [`docs/ACCOUNTING_STUDENT_APP.md`](../docs/ACCOUNTING_STUDENT_APP.md). Sumber aplikasi berada di `apps/accounting/`.

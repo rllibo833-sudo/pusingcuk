@@ -1,0 +1,43 @@
+name: Build Accounting Windows EXE
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "apps/accounting/**"
+      - ".github/workflows/accounting-windows.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/accounting
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Package Windows portable executable
+        run: npm run dist:win
+      - name: Verify package exists
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Path dist -Filter *.exe
+          if (-not $files -or $files.Count -eq 0) { throw "No Windows EXE was produced." }
+          $files | ForEach-Object { Write-Host $_.FullName }
+      - name: Upload Windows EXE
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.1
+        with:
+          name: PusingCuk-Accounting-Windows
+          path: apps/accounting/dist/*.exe
+          if-no-files-found: error
+          retention-days: 14

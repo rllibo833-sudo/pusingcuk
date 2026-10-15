@@ -140,7 +140,7 @@ class KnowledgeGroundingTests(unittest.TestCase):
             keywords=["evaluasi pencarian"],
             summary="uji kualitas pencarian pengetahuan",
         )
-        results = rank_knowledge([document], "benchmarck retrival", limit=1)
+        results = rank_knowledge([document], "benchmakr retrievel", limit=1)
         self.assertEqual([item["id"] for item in results], ["primer-99"])
         self.assertEqual(set(results[0]["matched_terms"]), {"benchmarck", "retrival"})
 

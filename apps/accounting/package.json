@@ -1,0 +1,10 @@
+{
+  "name": "pusingcuk-accounting",
+  "version": "0.1.0",
+  "description": "Offline-first Indonesian accounting learning desktop app",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {"start": "electron .", "dist:win": "electron-builder --win portable"},
+  "devDependencies": {"electron": "33.2.1", "electron-builder": "25.1.8"},
+  "build": {"appId": "id.pusingcuk.accounting", "productName": "PusingCuk Accounting", "asar": true, "files": ["main.cjs", "index.html", "package.json"], "win": {"target": ["portable"], "artifactName": "PusingCuk-Accounting-${version}.${ext}"}}
+}
