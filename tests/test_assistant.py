@@ -269,7 +269,7 @@ class AssistantTests(unittest.TestCase):
                         "tool_calls": [{
                             "id": "compile-bad",
                             "name": "cuk_compile_check",
-                            "arguments": {"source": "jancuk\\nhedeh fungsi_tidak_ada(1)\\nselesai jancuk"},
+                            "arguments": {"source": chr(10).join(("jancuk", "hedeh fungsi_tidak_ada(1)", "selesai jancuk"))},
                         }],
                     }
                 if len(self.calls) == 2:
@@ -280,7 +280,7 @@ class AssistantTests(unittest.TestCase):
                         "tool_calls": [{
                             "id": "compile-fixed",
                             "name": "cuk_compile_check",
-                            "arguments": {"source": "jancuk\\nhedeh 42\\nselesai jancuk"},
+                            "arguments": {"source": chr(10).join(("jancuk", "hedeh 42", "selesai jancuk"))},
                         }],
                     }
                 prior = [m for m in messages if m.get("role") == "tool"][-1]
