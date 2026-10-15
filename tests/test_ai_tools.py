@@ -3,16 +3,24 @@ from __future__ import annotations
 
 import hashlib
 import os
+import shutil
 import subprocess
+import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
+from compiler.ir import from_source
+from compiler.js_backend import generate
 from library.ai_tools import (
     ToolRegistry,
     _REGISTERED_RULES,
     _TOOL_RULE_BINDINGS,
     _load_rule_source,
 )
+
+
+NODE = shutil.which("node")
 
 
 class ToolInputContractTests(unittest.TestCase):
@@ -58,6 +66,24 @@ class ToolInputContractTests(unittest.TestCase):
                         result["execution_boundary"],
                         "fixed-hash-local-rule-not-os-sandbox",
                     )
+
+    @unittest.skipUnless(NODE, "Node.js tidak tersedia")
+    def test_registered_cuk_rule_matches_compiled_javascript_artifact(self):
+        rule = _REGISTERED_RULES["budget.threshold.v1"]
+        source = _load_rule_source(rule)
+        generated = generate(from_source(source.decode("utf-8"), rule["source_file"]))
+        cases = ((0, 0, "DALAM_BATAS"), (2, 3, "DALAM_BATAS"), (3, 3, "DALAM_BATAS"), (4, 3, "PERLU_PERSETUJUAN"), (1_000_000_000_000, 0, "PERLU_PERSETUJUAN"))
+        with tempfile.TemporaryDirectory(prefix="pusingcuk-ai-artifact-") as temp:
+            artifact = Path(temp) / "registered-rule.js"
+            artifact.write_text(generated, encoding="utf-8")
+            for nominal, batas, expected in cases:
+                with self.subTest(nominal=nominal, batas=batas):
+                    result = self.registry.execute("budget_threshold", {"nominal": nominal, "batas": batas})
+                    compiled = subprocess.run([NODE, str(artifact)], input=f"{nominal}\\n{batas}\\n", text=True, encoding="utf-8", capture_output=True, timeout=15, check=False)
+                    self.assertTrue(result["ok"], result)
+                    self.assertEqual(result["result"], expected)
+                    self.assertEqual(compiled.returncode, 0, compiled.stderr)
+                    self.assertEqual(compiled.stdout, expected + "\\n")
 
     def test_tampered_artifact_fails_closed_before_execution(self):
         with patch("library.ai_tools._load_rule_source", return_value=b"tampered"):
