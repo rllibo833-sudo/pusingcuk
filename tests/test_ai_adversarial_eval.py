@@ -41,6 +41,20 @@ class RetrievalEvaluationTests(unittest.TestCase):
         self.assertGreaterEqual(metrics["top3"], metrics["top1"])
         self.assertLessEqual(metrics["top3"], metrics["cases"])
 
+    def test_adversarial_retrieval_has_a_documented_minimum_top1_score(self):
+        answerable = [
+            case for case in self.corpus["cases"]
+            if case["expected_scope"] not in {"needs-clarification", "out-of-scope"}
+        ]
+        correct = sum(
+            bool((results := rank_knowledge(self.documents, case["query"], limit=3))
+                 and results[0]["id"] == case["expected_top_id"])
+            for case in answerable
+        )
+        # This small regression floor is not a claim of general language understanding.
+        self.assertGreaterEqual(correct, 5)
+        self.assertEqual(len(answerable), 8)
+
     def test_citation_precision_is_measured_on_untrusted_model_links(self):
         trusted = self.documents[0]
         invalid = {**trusted, "url": "https://attacker.example/fake"}

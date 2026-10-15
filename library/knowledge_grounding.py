@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import re
 import unicodedata
+from difflib import SequenceMatcher
 from pathlib import Path
 from urllib.parse import urlparse
 from typing import Any, Iterable
@@ -33,9 +34,25 @@ def _normalise(value: Any) -> str:
     return text.casefold()
 
 
+_INDONESIAN_QUERY_ALIASES = {
+    # Common conversational Indonesian forms mapped to their canonical forms.
+    "gimana": "bagaimana",
+    "gmn": "bagaimana",
+    "jelasin": "menjelaskan",
+    "nanganin": "menangani",
+    "ngubungin": "menghubungkan",
+    "ngarang": "mengarang",
+    "ga": "tidak",
+    "gak": "tidak",
+    "nggak": "tidak",
+    "enggak": "tidak",
+}
+
+
 def tokenize(value: Any) -> list[str]:
-    """Tokenise Indonesian and multilingual text consistently across hosts."""
-    return [token for token in _TOKEN_RE.split(_normalise(value)) if len(token) >= 2]
+    """Tokenise Indonesian text, normalise common slang, and keep deterministic output."""
+    tokens = [token for token in _TOKEN_RE.split(_normalise(value)) if len(token) >= 2]
+    return [_INDONESIAN_QUERY_ALIASES.get(token, token) for token in tokens]
 
 
 def validate_source(source: Any) -> bool:
@@ -132,11 +149,28 @@ def rank_knowledge(
         for field in _SEARCH_FIELDS:
             value = doc.get(field, [])
             normalised_fields[field] = tokenize(" ".join(value) if isinstance(value, list) else value)
+        all_field_tokens = set().union(*normalised_fields.values())
         for term in sorted(terms):
             found = False
             for field, weight in weights.items():
                 if term in normalised_fields[field]:
                     score += weight
+                    found = True
+            # Bounded typo tolerance is a fallback only: exact lexical matches
+            # always win, and fuzzy matches add just one point rather than
+            # inheriting the weight of a title/topic match.
+            if not found and len(term) >= 6:
+                candidates = (
+                    token for token in all_field_tokens
+                    if abs(len(token) - len(term)) <= 2
+                )
+                best = max(
+                    candidates,
+                    key=lambda token: SequenceMatcher(None, term, token).ratio(),
+                    default=None,
+                )
+                if best is not None and SequenceMatcher(None, term, best).ratio() >= 0.82:
+                    score += 1
                     found = True
             if found:
                 matched.append(term)

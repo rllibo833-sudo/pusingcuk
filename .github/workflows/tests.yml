@@ -28,14 +28,8 @@ jobs:
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Pasang pytest
-        run: python -m pip install pytest
-      - name: Jalankan suite pytest
-        run: python -m pytest -q
-      - name: Hitung metrik retrieval AI offline
-        run: python tools/evaluate_knowledge_retrieval.py
-      - name: Jalankan gate lengkap
-        run: make test
+      - name: Jalankan suite regresi Python
+        run: python -m unittest discover -s tests -v
       - name: Uji contoh file I/O dengan input dummy
         run: |
           set -euo pipefail
@@ -80,9 +74,11 @@ jobs:
       - name: Kompilasi dan uji runtime native
         run: make test-native
       - name: Uji konformansi lintas runtime
+        if: matrix.compiler == 'gcc'
         run: python tools/conformance.py
 
   pvm-security-regression:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

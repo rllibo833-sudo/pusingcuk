@@ -1,9 +1,8 @@
 name: PyInstaller build test
 
+# Packaging is manual to avoid rebuilding PyInstaller on every push.
+# Run before releases or after packaging-related changes.
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
 
 permissions:

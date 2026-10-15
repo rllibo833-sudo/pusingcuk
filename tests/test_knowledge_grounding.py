@@ -117,6 +117,25 @@ class KnowledgeGroundingTests(unittest.TestCase):
         self.assertEqual(document["url"], "https://github.com/rllibo833-sudo/pusingcuk/blob/fb5d9570388ec434ad4cd3cb9e9bc0846aface93/docs/knowledge/KAWASAN_MASJID_MASTERPLAN_AND_OPERATING_MODEL.md")
         self.assertIn("conceptual-masterplan", document["claim_status"])
 
+    def test_common_indonesian_slang_maps_to_canonical_search_terms(self):
+        from library.knowledge_grounding import tokenize
+
+        self.assertEqual(
+            tokenize("gimana jelasin cara nanganin masalah, ga ngarang"),
+            ["bagaimana", "menjelaskan", "cara", "menangani", "masalah", "tidak", "mengarang"],
+        )
+
+    def test_typo_tolerance_recovers_long_query_terms(self):
+        document = source(
+            99,
+            "Benchmark retrieval bahasa Indonesia",
+            keywords=["evaluasi pencarian"],
+            summary="uji kualitas pencarian pengetahuan",
+        )
+        results = rank_knowledge([document], "benchmarck retrival", limit=1)
+        self.assertEqual([item["id"] for item in results], ["primer-99"])
+        self.assertEqual(set(results[0]["matched_terms"]), {"benchmarck", "retrival"})
+
     def test_indonesian_retrieval_benchmark_top_one(self):
         root = Path(__file__).resolve().parents[1]
         documents = load_index(root / "library" / "knowledge_index.json")
