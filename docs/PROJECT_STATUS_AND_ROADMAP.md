@@ -17,7 +17,7 @@
 | VM/PVM | Eksperimen; mempunyai beberapa regresi keamanan serta batas path tersendiri. | Runtime utama atau sandbox umum. |
 | PusingCuk AI CLI | MVP lokal: provider Ollama sebagai default, Gemini sebagai pilihan eksplisit, retrieval leksikal, sitasi tervalidasi, memori lokal opt-in, serta registry tool terbatas. | Foundation model buatan sendiri, chatbot cloud publik, atau kualitas jawaban umum yang sudah tervalidasi secara luas. |
 | HTTP AI lokal | Adapter eksperimental ber-token, dibatasi ke loopback, `POST /v1/chat`. | API publik/produksi, multi-tenant, atau sudah memiliki autentikasi per pengguna. |
-| Supabase | Dua project Supabase aktif terpisah telah ditemukan; project PusingCuk bersih dan belum terhubung ke runtime. | Chat, user, memori, atau file lokal tersinkron ke database. |
+| Supabase | Dua project terpisah; tabel catatan proyek PusingCuk sudah memiliki empat policy RLS dan lolos smoke SQL. Runtime tetap belum terhubung. | Chat, user, memori, atau file lokal tersinkron otomatis ke database. |
 
 ## 2. Bahasa pemrograman `.cuk`
 
@@ -147,30 +147,27 @@ Nama `CORE` pada file historis seperti `docs/integrations/CORE_TOOL_CONTRACT.md`
 
 ### P0 — sinkronisasi dan source of truth
 
-- Pertahankan satu entry point bahasa di README dan satu peta status/roadmap.
-- Jaga angka indeks sumber, benchmark retrieval, versi paket/bahasa, dan fixture konformansi melalui tes otomatis.
-- Koreksi referensi dokumentasi yang mengklaim adapter/runner lama masih berada di jalur runtime AI.
-- Pisahkan jelas baseline stabil yang diuji dari eksperimen compiler/VM/APK.
+**Selesai pada audit ini:** `SPEC.md` tetap menjadi kontrak semantik; tes sekarang membandingkan alias terdaftar di spesifikasi dengan lexer Python, alias inti native C, dan metadata kosakata. Tes dokumentasi mengunci versi bahasa/paket, built-in, provenance dan hitungan fixture/index. Peta struktur dan status `ToolRegistry` telah diselaraskan.
+
+**Berikutnya:** pertahankan tes ini sebagai gate setiap perubahan semantik; pisahkan dengan jelas baseline Python/native dari eksperimen compiler/VM/APK.
 
 ### P1 — kualitas bahasa
 
-- Lanjutkan regression tests untuk nilai batas, diagnostik, error code/exit code, dan kompatibilitas alias.
-- Setiap klaim parity harus berdasarkan fixture yang `required` di Python dan native C.
-- Jangan menambah grammar, keyword, atau built-in baru sebelum ada spesifikasi, metadata, tes positif/negatif, dan status setiap target.
+**Selesai pada audit ini:** manifest bertambah menjadi 66 fixture (66 reference-required, 61 native-required, 5 native-unsupported). Dua fixture baru mengunci `bulatkan(2.5/3.5)` ties-to-even dan penolakan boolean sebagai angka, termasuk kelas error, exit code, dan nomor baris.
+
+**Berikutnya:** tambah fixture untuk bug semantik yang benar-benar ditemukan; jangan menambah grammar/keyword/built-in sebelum SPEC, metadata, implementasi, fixture dan label dukungan target diperbarui bersama.
 
 ### P1 — kualitas AI yang terukur
 
-- Tambahkan kueri bahasa Indonesia sehari-hari, typo/slang, kueri ambigu, pertanyaan di luar korpus, dan kasus prompt injection dalam dokumen.
-- Ukur retrieval top-1/top-3, citation precision, unsupported-claim rate, refusal behavior, serta kegagalan timeout/kuota/tool-call. Simpan fixture dan hasilnya di repo.
-- Tambahkan uji manual pada perangkat yang memang menjalankan Ollama; tandai hasil model/provider dan perangkat secara spesifik.
-- Hindari mengeksekusi source code dari model. Tool hanya boleh menerima input sesuai skema terhadap artefak tetap yang direview.
+**Selesai pada audit ini:** 12 kueri adversarial ditambah (natural, slang, typo, ambigu, off-topic, prompt injection); CI menghitung baseline top-1/top-3 dan adversarial top-1/top-3, uji tautan sitasi struktural, serta tool fail-closed. Provider Ollama/Gemini menormalisasi timeout, rate-limit/kuota, auth, model tidak ditemukan, HTTP server error, dan malformed response menjadi error stabil. Jalankan `python tools/evaluate_live_ai.py --provider ollama` di mesin dengan model lokal; Gemini memerlukan `GEMINI_API_KEY`. Script itu menilai klarifikasi/refusal secara heuristik per kasus, tetapi belum dijalankan untuk provider live dalam audit ini.
+
+**Berikutnya:** ukur unsupported claims dan refusal pada provider/model/perangkat spesifik; review jawaban kasus yang gagal dan jangan menganggap heuristic pass sebagai bukti keamanan atau akurasi umum.
 
 ### P2 — integrasi Supabase opsional
 
-- Pilih satu fitur yang benar-benar perlu data lintas perangkat atau autentikasi; jangan hubungkan semua memori tanpa kebutuhan.
-- Buat migration versioned untuk project `vcvejjpzklpvknxmymgy`; aktifkan RLS dan tes izin read/write least-privilege.
-- Buat integrasi server-side untuk rahasia/operasi privileged. Lakukan smoke test dan security advisors sebelum menyebutnya tersambung.
-- Siapkan ekspor privat dan uji restore sebelum data Supabase menjadi satu-satunya penyimpanan penting.
+**Selesai pada audit ini:** use case catatan proyek pribadi dipilih; dua migration versioned diterapkan ke `vcvejjpzklpvknxmymgy`; RLS owner-only diuji positif/negatif pada dua identitas; grants publik/anon diperiksa; keamanan dan performance advisors kembali zero lints. Tidak ada secret privileged di repo.
+
+**Belum selesai:** REST/Auth smoke test melalui klien aplikasi dengan user sungguhan, adapter sinkronisasi SQLite↔Supabase, dan uji konflik/retensi/penghapusan. Sampai gate itu lewat, runtime tetap offline-first dan jangan klaim sync aktif.
 
 ### P3 — layanan AI publik (hanya bila memang diperlukan)
 
@@ -180,7 +177,7 @@ Nama `CORE` pada file historis seperti `docs/integrations/CORE_TOOL_CONTRACT.md`
 
 ## 7. Gates rilis
 
-Jangan menyebut bahasa stabil, AI akurat, service produksi, database terhubung, atau deployment Android tervalidasi kecuali bukti yang sesuai tersedia.
+Audit ini tidak menyatakan bahasa stabil atau AI akurat secara umum. Database Supabase dan RLS sudah diuji langsung melalui SQL; aplikasi belum tersambung ke REST/Auth. Jangan menyebut API produksi atau Android teruji pada perangkat fisik tanpa bukti masing-masing.
 
 1. CI utama, evaluasi retrieval offline, dan build paket lulus pada commit yang dirilis.
 2. Matriks konformansi mencerminkan fixture yang benar-benar lulus.
@@ -188,6 +185,7 @@ Jangan menyebut bahasa stabil, AI akurat, service produksi, database terhubung, 
 4. Secret scan dan review keamanan selesai untuk perubahan yang menyentuh provider, memori, database, dan tool.
 5. Supabase hanya dinyatakan terhubung setelah smoke test aplikasi nyata sukses; status project `ACTIVE_HEALTHY` saja tidak cukup.
 6. Uji perangkat Android fisik dipisahkan dari hasil build/tes Ubuntu.
+7. Evaluasi refusal live harus menyebut provider, model, waktu, dan heuristic rubric; bila tidak dijalankan, catat sebagai belum terukur.
 
 ## 8. Rujukan cepat
 
