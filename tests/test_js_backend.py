@@ -93,27 +93,6 @@ class JavaScriptBackendTests(unittest.TestCase):
         self.assertEqual(result.stdout, "🌾\n3\n")
 
 
-    def test_accounting_rules_compile_to_standalone_javascript(self):
-        # This checks the proposed packaging route: compile .cuk during build,
-        # then run the generated JavaScript with Node/Electron, not Python.
-        result = self.run_source(
-            "jancuk\n"
-            "fungsi hitung_laba(pendapatan, beban)\n"
-            "    balek pendapatan - beban\n"
-            "selesai fungsi\n"
-            "fungsi posisi_seimbang(aset, liabilitas, ekuitas)\n"
-            "    balek aset == liabilitas + ekuitas\n"
-            "selesai fungsi\n"
-            "lah laba = hitung_laba(1250000, 300000)\n"
-            "lah ekuitas_akhir = 2000000 + laba\n"
-            "hedeh laba\n"
-            "hedeh posisi_seimbang(4450000, 1500000, ekuitas_akhir)\n"
-            "hedeh posisi_seimbang(5000000, 1500000, ekuitas_akhir)\n"
-            "selesai jancuk"
-        )
-        self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout, "950000\nokelah\ntidak\n")
-
     def test_accounting_example_runs_on_standalone_javascript(self):
         # Compile the real .cuk example to JS, then execute it without Python at runtime.
         root = Path(__file__).resolve().parents[1]
