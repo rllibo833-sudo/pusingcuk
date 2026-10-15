@@ -56,7 +56,8 @@
       "implementation": "text",
       "backends": {
         "js": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pcText"
         },
         "python": {
           "status": "unsupported"
@@ -87,7 +88,8 @@
       "implementation": "integer",
       "backends": {
         "js": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pcInteger"
         },
         "python": {
           "status": "unsupported"
