@@ -62,5 +62,33 @@ class AccountingEquationRuleTests(unittest.TestCase):
                 })
 
 
+    def test_cuk_report_classification_rule_diagnoses_real_cukaccount_gap(self):
+        import hashlib
+        rule = _REGISTERED_RULES["report.classification.v1"]
+        source = _load_rule_source(rule)
+        self.assertEqual(hashlib.sha256(source).hexdigest(), rule["source_sha256"])
+        compiled = self.registry.execute("cuk_compile_check", {"source": source.decode("utf-8")})
+        self.assertTrue(compiled["ok"], compiled)
+        cases = (
+            ((2, 0, 1, 0), "KLASIFIKASI_LAPORAN_LENGKAP"),
+            ((2, 1, 1, 0), "KLASIFIKASI_LAPORAN_BELUM_LENGKAP"),
+            ((2, 0, 1, 1), "KLASIFIKASI_LAPORAN_BELUM_LENGKAP"),
+            ((1, 2, 0, 0), "INPUT_TIDAK_VALID"),
+        )
+        for values, expected in cases:
+            with self.subTest(values=values):
+                result = self.registry.execute("report_classification_check", dict(zip((
+                    "jumlah_kas", "kas_tanpa_kategori", "jumlah_ekuitas", "ekuitas_tanpa_kategori",
+                ), values)))
+                self.assertTrue(result["ok"], result)
+                self.assertEqual(result["result"], expected)
+        invalid = self.registry.execute("report_classification_check", {
+            "jumlah_kas": True, "kas_tanpa_kategori": 0,
+            "jumlah_ekuitas": 0, "ekuitas_tanpa_kategori": 0,
+        })
+        self.assertFalse(invalid["ok"])
+        self.assertEqual(invalid["error"], "RULE_INPUT_INVALID")
+
+
 if __name__ == "__main__":
     unittest.main()

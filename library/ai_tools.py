@@ -101,6 +101,29 @@ _REGISTERED_RULES: dict[str, dict[str, Any]] = {
             "dibandingkan dengan CukAccount; tidak mem-posting jurnal."
         ),
     },
+    "report.classification.v1": {
+        "source_file": "report_classification_check.cuk",
+        "source_sha256": "6f1882ee8d68d0bbe1feb279ce438a592b458ef3f267fc7a5607a224ec423c1d",
+        "entrypoint": "cek_klasifikasi_laporan",
+        "language_version": "0.5-dev",
+        "input_fields": ("jumlah_kas", "kas_tanpa_kategori", "jumlah_ekuitas", "ekuitas_tanpa_kategori"),
+        "properties": {
+            "jumlah_kas": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "kas_tanpa_kategori": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "jumlah_ekuitas": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "ekuitas_tanpa_kategori": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+        },
+        "required": ("jumlah_kas", "kas_tanpa_kategori", "jumlah_ekuitas", "ekuitas_tanpa_kategori"),
+        "allowed_outputs": ("KLASIFIKASI_LAPORAN_BELUM_LENGKAP", "KLASIFIKASI_LAPORAN_LENGKAP", "INPUT_TIDAK_VALID"),
+        "capabilities": (),
+        "description": (
+            "Diagnosis CukAccount: periksa jumlah baris kas/ekuitas dan jumlah yang belum "
+            "diklasifikasikan sebelum laporan dihitung. Gunakan ketika arus kas atau perubahan "
+            "ekuitas gagal karena kategori hilang. Input hanya hitungan agregat sintetis; "
+            "rule tidak membaca atau mengubah buku pengguna. Setelah diagnosis, periksa program "
+            ".cuk melalui cuk_compile_check dan sarankan klasifikasi eksplisit pada jurnal."
+        ),
+    },
 }
 
 # Model-facing tool names map only to internal registered rule IDs.
@@ -109,6 +132,7 @@ _TOOL_RULE_BINDINGS = {
     "journal_balance_check": "journal.balance.v1",
     "accounting_equation_check": "accounting.equation.v1",
     "period_close_plan": "period.close.plan.v1",
+    "report_classification_check": "report.classification.v1",
 }
 
 
