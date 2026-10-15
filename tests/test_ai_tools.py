@@ -28,7 +28,7 @@ class ToolInputContractTests(unittest.TestCase):
         self.registry = ToolRegistry([])
 
     def test_cuk_compile_check_compiles_without_executing_or_persisting_source(self):
-        source = "jancuk\\nlah angka = 40 + 2\\nhedeh angka\\nselesai jancuk\\n"
+        source = "jancuk\nlah angka = 40 + 2\nhedeh angka\nselesai jancuk\n"
         result = self.registry.execute("cuk_compile_check", {"source": source})
         self.assertTrue(result["ok"], result)
         self.assertEqual(result["operation"], "compile_check")
@@ -44,7 +44,7 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertIs(definition["parameters"]["additionalProperties"], False)
 
     def test_cuk_compile_check_rejects_invalid_and_oversized_source(self):
-        invalid = self.registry.execute("cuk_compile_check", {"source": "jancuk\\nhedeh fungsi_tidak_ada(1)\\nselesai jancuk"})
+        invalid = self.registry.execute("cuk_compile_check", {"source": "jancuk\nhedeh fungsi_tidak_ada(1)\nselesai jancuk"})
         self.assertFalse(invalid["ok"])
         self.assertEqual(invalid["error"], "CUK_COMPILE_FAILED")
         oversized = self.registry.execute("cuk_compile_check", {"source": "x" * (16 * 1024 + 1)})

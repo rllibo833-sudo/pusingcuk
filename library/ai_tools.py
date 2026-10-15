@@ -162,7 +162,7 @@ class ToolRegistry:
             source = arguments.get("source")
             if not isinstance(source, str) or not source.strip():
                 return {"ok": False, "error": "CUK_SOURCE_INVALID"}
-            if "\\x00" in source:
+            if "\x00" in source:
                 return {"ok": False, "error": "CUK_SOURCE_INVALID"}
             try:
                 source_bytes = source.encode("utf-8")
