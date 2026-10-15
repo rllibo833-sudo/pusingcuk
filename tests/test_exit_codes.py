@@ -84,7 +84,7 @@ class ExitCodeTests(unittest.TestCase):
     def test_arithmetic_error_returns_runtime_code_without_traceback(self):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "arithmetic.pusingcuk"
-            source.write_text("jancuk\\nhedeh 1 / 0\\nselesai jancuk\\n", encoding="utf-8")
+            source.write_text("jancuk\nhedeh 1 / 0\nselesai jancuk\n", encoding="utf-8")
             result = self.run_cli(source)
         self.assertEqual(result.returncode, 1, result.stderr)
         self.assertIn("Kesalahan runtime", result.stderr)
