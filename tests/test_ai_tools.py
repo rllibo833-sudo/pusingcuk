@@ -127,6 +127,91 @@ class ToolInputContractTests(unittest.TestCase):
                     self.assertEqual(compiled.returncode, 0, compiled.stderr)
                     self.assertEqual(compiled.stdout, expected + "\n")
 
+    def test_journal_balance_rule_is_hash_pinned_and_registered(self):
+        rule = _REGISTERED_RULES["journal.balance.v1"]
+        source = _load_rule_source(rule)
+        self.assertEqual(hashlib.sha256(source).hexdigest(), rule["source_sha256"])
+        self.assertIn(b"fungsi cek_keseimbangan_jurnal(debit_total, kredit_total)", source)
+        self.assertEqual(rule["capabilities"], ())
+        self.assertEqual(_TOOL_RULE_BINDINGS["journal_balance_check"], "journal.balance.v1")
+
+    def test_journal_balance_rule_checks_only_positive_totals(self):
+        cases = (
+            (1250000, 1250000, "JURNAL_SEIMBANG"),
+            (1250000, 1249999, "JURNAL_TIDAK_SEIMBANG"),
+            (0, 0, "INPUT_TIDAK_VALID"),
+            (1, 0, "INPUT_TIDAK_VALID"),
+            (1_000_000_000_000, 1_000_000_000_000, "JURNAL_SEIMBANG"),
+        )
+        for debit_total, kredit_total, expected in cases:
+            with self.subTest(debit_total=debit_total, kredit_total=kredit_total):
+                result = self.registry.execute(
+                    "journal_balance_check",
+                    {"debit_total": debit_total, "kredit_total": kredit_total},
+                )
+                self.assertTrue(result["ok"], result)
+                self.assertEqual(result["program_id"], "journal.balance.v1")
+                self.assertEqual(result["result"], expected)
+                self.assertEqual(result["capabilities"], [])
+                self.assertEqual(
+                    result["execution_boundary"],
+                    "fixed-hash-local-rule-not-os-sandbox",
+                )
+
+    def test_journal_balance_rule_rejects_invalid_arguments(self):
+        cases = (
+            {"debit_total": 1},
+            {"kredit_total": 1},
+            {"debit_total": 1, "kredit_total": 2, "command": "id"},
+            {"debit_total": True, "kredit_total": 1},
+            {"debit_total": -1, "kredit_total": 1},
+            {"debit_total": 1_000_000_000_001, "kredit_total": 1},
+        )
+        for arguments in cases:
+            with self.subTest(arguments=arguments):
+                expected = (
+                    {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"}
+                    if set(arguments) != {"debit_total", "kredit_total"}
+                    else {"ok": False, "error": "RULE_INPUT_INVALID"}
+                )
+                self.assertEqual(
+                    self.registry.execute("journal_balance_check", arguments),
+                    expected,
+                )
+
+    @unittest.skipUnless(NODE, "Node.js tidak tersedia")
+    def test_journal_balance_rule_matches_compiled_javascript(self):
+        rule = _REGISTERED_RULES["journal.balance.v1"]
+        source = _load_rule_source(rule)
+        generated = generate(from_source(source.decode("utf-8"), rule["source_file"]))
+        cases = (
+            (1250000, 1250000, "JURNAL_SEIMBANG"),
+            (1250000, 1249999, "JURNAL_TIDAK_SEIMBANG"),
+            (0, 0, "INPUT_TIDAK_VALID"),
+        )
+        with tempfile.TemporaryDirectory(prefix="pusingcuk-ai-journal-rule-") as temp:
+            artifact = Path(temp) / "journal-balance.js"
+            artifact.write_text(generated, encoding="utf-8")
+            for debit_total, kredit_total, expected in cases:
+                with self.subTest(debit_total=debit_total, kredit_total=kredit_total):
+                    completed = subprocess.run(
+                        [NODE, str(artifact)],
+                        input=f"{debit_total}\n{kredit_total}\n",
+                        text=True,
+                        encoding="utf-8",
+                        capture_output=True,
+                        timeout=15,
+                        check=False,
+                    )
+                    result = self.registry.execute(
+                        "journal_balance_check",
+                        {"debit_total": debit_total, "kredit_total": kredit_total},
+                    )
+                    self.assertTrue(result["ok"], result)
+                    self.assertEqual(result["result"], expected)
+                    self.assertEqual(completed.returncode, 0, completed.stderr)
+                    self.assertEqual(completed.stdout, expected + "\n")
+
     def test_tampered_artifact_fails_closed_before_execution(self):
         with patch("library.ai_tools._load_rule_source", return_value=b"tampered"):
             result = self.registry.execute("budget_threshold", {"nominal": 2, "batas": 3})

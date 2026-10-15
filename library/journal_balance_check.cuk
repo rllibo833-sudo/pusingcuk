@@ -1,0 +1,24 @@
+# Registered PusingCuk AI journal-balance check v1.
+# This reviewed artifact accepts totals only; it does not post accounting entries.
+
+jancuk
+
+fungsi cek_keseimbangan_jurnal(debit_total, kredit_total)
+    njir debit_total <= 0 atau kredit_total <= 0
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        njir debit_total == kredit_total
+            balek "JURNAL_SEIMBANG"
+        kampret
+            balek "JURNAL_TIDAK_SEIMBANG"
+        selesai njir
+    selesai njir
+selesai fungsi
+
+tanya debit_teks = ""
+tanya kredit_teks = ""
+lah debit_total = bilangan(debit_teks)
+lah kredit_total = bilangan(kredit_teks)
+hedeh cek_keseimbangan_jurnal(debit_total, kredit_total)
+
+selesai jancuk

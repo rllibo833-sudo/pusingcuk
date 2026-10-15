@@ -44,11 +44,31 @@ _REGISTERED_RULES: dict[str, dict[str, Any]] = {
             "Runtime referensi lokal bukan sandbox OS."
         ),
     },
+    "journal.balance.v1": {
+        "source_file": "journal_balance_check.cuk",
+        "source_sha256": "ce519f68d20c0db3a5c611a30a7355e1dd1170a3450ab93d1f048e1945bd4f2c",
+        "entrypoint": "cek_keseimbangan_jurnal",
+        "language_version": "0.5-dev",
+        "input_fields": ("debit_total", "kredit_total"),
+        "properties": {
+            "debit_total": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "kredit_total": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+        },
+        "required": ("debit_total", "kredit_total"),
+        "allowed_outputs": ("JURNAL_SEIMBANG", "JURNAL_TIDAK_SEIMBANG", "INPUT_TIDAK_VALID"),
+        "capabilities": (),
+        "description": (
+            "Periksa dua total debit/kredit dengan aturan .cuk tetap. Ini hanya pemeriksaan "
+            "sekunder atas total yang diberikan, bukan pembukuan, posting jurnal, atau "
+            "pengganti mesin akuntansi deterministik CukAccount."
+        ),
+    },
 }
 
 # Model-facing tool names map only to internal registered rule IDs.
 _TOOL_RULE_BINDINGS = {
     "budget_threshold": "budget.threshold.v1",
+    "journal_balance_check": "journal.balance.v1",
 }
 
 
