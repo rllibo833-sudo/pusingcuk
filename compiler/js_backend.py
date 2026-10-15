@@ -378,8 +378,8 @@ def generate(document: dict, as_module: bool = False) -> str:
             op = f.get("op")
             left, right = expr(f.get("left"), names), expr(f.get("right"), names)
             if op == "+": return f"pcAdd({left}, {right})"
-            if op == "-": return f"(({left}) - ({right}))"
-            if op == "*": return f"(({left}) * ({right}))"
+            if op == "-": return f"pcSub({left}, {right})"
+            if op == "*": return f"pcMul({left}, {right})"
             if op == "/": return f"pcDiv({left}, {right})"
             if op == "//": return f"pcFloorDiv({left}, {right})"
             if op == "%": return f"pcMod({left}, {right})"
