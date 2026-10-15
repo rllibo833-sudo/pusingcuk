@@ -15,6 +15,12 @@ def _diagnostic_suggestion(message):
     lower = message.lower()
     if "balek butuh ekspresi" in lower:
         return "Tambahkan nilai setelah 'balek', misalnya: balek hasil."
+    if "string belum ditutup" in lower or "string tidak boleh melewati baris" in lower:
+        return "Tutup teks dengan tanda kutip yang sama sebelum akhir baris."
+    if "escape tidak dikenal" in lower or "escape string tidak lengkap" in lower or "escape baris baru" in lower:
+        return "Periksa escape string; yang didukung antara lain \\n, \\t, dan \\\\."
+    if "eksponen angka tidak valid" in lower:
+        return "Periksa format eksponen, misalnya 1e3 atau 2.5e-2."
     if "ketangkep" in lower or "akhirnya" in lower:
         return "Pastikan 'ketangkep' dan 'akhirnya' berada di dalam blok 'coba ... selesai coba'."
     if "baris baru" in lower:
@@ -373,5 +379,5 @@ def parse(source, filename="<string>"):
         line, column, message = _lexer_location(str(exc))
         raise ParserError(format_diagnostic(
             source, filename, line, column,
-            "karakter sumber tidak dikenali: " + message
+            "kesalahan lexer: " + message
         )) from exc
