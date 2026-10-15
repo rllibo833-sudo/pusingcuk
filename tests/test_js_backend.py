@@ -114,6 +114,42 @@ class JavaScriptBackendTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "950000\nokelah\ntidak\n")
 
+    def test_accounting_example_runs_on_standalone_javascript(self):
+        # Compile the real .cuk example to JS, then execute it without Python at runtime.
+        root = Path(__file__).resolve().parents[1]
+        source = (root / "examples" / "accounting" / "rekap_keuangan.cuk").read_text(encoding="utf-8")
+        result = self.run_source(
+            source,
+            input_text="1250000\\n300000\\n4450000\\n1500000\\n2000000\\n",
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            result.stdout,
+            "Pendapatan (Rp): Total beban (Rp): Total aset (Rp): Total liabilitas (Rp): "
+            "Ekuitas sebelum laba periode (Rp): === Ringkasan Akuntansi (Rp) ===\\n"
+            "Pendapatan: 1250000\\nBeban: 300000\\nLaba/(rugi): 950000\\n"
+            "Ekuitas akhir: 2950000\\nSelisih posisi keuangan: 0\\n"
+            "Persamaan posisi keuangan seimbang.\\n",
+        )
+
+    def test_javascript_conversion_builtins_enforce_shared_safe_integer_rules(self):
+        result = self.run_source(
+            "jancuk\\n"
+            "hedeh teks(benar)\\n"
+            "hedeh teks(salah)\\n"
+            "hedeh bilangan(42.9)\\n"
+            "hedeh bilangan(\\"-42\\")\\n"
+            "selesai jancuk"
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "okelah\\ntidak\\n42\\n-42\\n")
+
+        invalid = self.run_source(
+            'jancuk\\nhedeh bilangan("9007199254740992")\\nselesai jancuk'
+        )
+        self.assertNotEqual(invalid.returncode, 0)
+        self.assertIn("rentang aman lintas target", invalid.stderr)
+
     def test_rejects_integer_outside_javascript_safe_range(self):
         with self.assertRaisesRegex(JSBackendError, "rentang aman JavaScript"):
             generate(from_source("jancuk\nhedeh 9007199254740992\nselesai jancuk"))
