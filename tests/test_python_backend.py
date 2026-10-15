@@ -83,7 +83,7 @@ class PythonBackendTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("pembagian dengan nol", result.stdout)
-        self.assertTrue(result.stdout.endswith("akhir\\nluar\\n"), result.stdout)
+        self.assertTrue(result.stdout.endswith("akhir\nluar\n"), result.stdout)
 
     def test_try_finally_runs_when_error_is_not_caught(self):
         result = self.run_source(
@@ -91,7 +91,7 @@ class PythonBackendTests(unittest.TestCase):
             "    hedeh \"akhir\"\nselesai coba\nselesai jancuk"
         )
         self.assertNotEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, "akhir\\n")
+        self.assertEqual(result.stdout, "akhir\n")
         self.assertIn("pembagian dengan nol", result.stderr)
 
 if __name__ == "__main__":
