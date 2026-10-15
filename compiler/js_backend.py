@@ -23,7 +23,7 @@ class JSBackendError(ValueError):
 
 SUPPORTED = {
     "Program", "Declare", "Assign", "Input", "Print", "If", "While", "For",
-    "Function", "Return", "Literal", "Variable", "Unary", "Binary",
+    "Function", "Return", "Literal", "Variable", "Unary", "Binary", "Try",
     "List", "Dict", "Index", "IndexAssign", "Call",
 }
 IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
@@ -484,6 +484,30 @@ def generate(document: dict, as_module: bool = False) -> str:
                     raise JSBackendError(f"baris {line}: balek hanya boleh di dalam fungsi")
                 value = f.get("value")
                 output.append(f"{indent}return {expr(value, names) if value is not None else 'null'};")
+            elif kind == "Try":
+                body, handler_name = f.get("body", []), f.get("handler_name")
+                handler, final = f.get("handler", []), f.get("final", [])
+                if handler_name is not None and (
+                    not isinstance(handler_name, str) or not IDENTIFIER.fullmatch(handler_name)
+                ):
+                    raise JSBackendError(f"baris {line}: nama variabel ketangkep tidak valid")
+                if handler_name is None and not final:
+                    output.extend(statements(body, names, indent, in_function, in_loop))
+                    continue
+                output.append(f"{indent}try {{")
+                output.extend(statements(body, dict(names), indent + "  ", in_function, in_loop) or [indent + "  ;"])
+                if handler_name is not None:
+                    error_name = f"pc_error_{line}"
+                    catch_name = f"pc_catch_{handler_name}_{line}"
+                    handler_names = dict(names)
+                    handler_names[handler_name] = catch_name
+                    output.append(f"{indent}}} catch ({error_name}) {{")
+                    output.append(f"{indent}  const {catch_name} = String({error_name} && {error_name}.message !== undefined ? {error_name}.message : {error_name});")
+                    output.extend(statements(handler, handler_names, indent + "  ", in_function, in_loop) or [indent + "  ;"])
+                if final:
+                    output.append(f"{indent}}} finally {{")
+                    output.extend(statements(final, dict(names), indent + "  ", in_function, in_loop) or [indent + "  ;"])
+                output.append(f"{indent}}}")
             else:
                 raise JSBackendError(f"baris {line}: pernyataan {kind!r} belum didukung backend JavaScript")
         return output
