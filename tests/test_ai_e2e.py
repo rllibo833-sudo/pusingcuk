@@ -172,11 +172,11 @@ class AIAssistantEndToEndTests(unittest.TestCase):
             artifact.write_text(generated, encoding="utf-8")
             built = subprocess.run(
                 [_NODE, str(artifact)],
-                input="120\\n100\\n", text=True, encoding="utf-8",
+                input="120\n100\n", text=True, encoding="utf-8",
                 capture_output=True, timeout=15, check=False,
             )
         self.assertEqual(built.returncode, 0, built.stderr)
-        self.assertEqual(built.stdout, tool_result["result"] + "\\n")
+        self.assertEqual(built.stdout, tool_result["result"] + "\n")
         self.assertEqual(self.providers[0].tool_results[0]["program_sha256"], rule["source_sha256"])
     def test_http_path_rejects_model_requested_tool_outside_registry(self):
         self.tool_name = "run_shell"
