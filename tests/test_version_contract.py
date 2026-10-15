@@ -99,6 +99,9 @@ class VersionContractTests(unittest.TestCase):
             for item in vocabulary["keywords"]
             for alias in item.get("aliases", [])
         }
+        for item in vocabulary["keywords"]:
+            if item.get("alias_of"):
+                metadata_aliases[item["word"]] = item["alias_of"]
         self.assertEqual(metadata_aliases, all_aliases)
         self.assertEqual((len(all_aliases), len(core_aliases)), (23, 12))
 
