@@ -47,7 +47,7 @@ def evaluate() -> dict:
         "adversarial_retrieval_top3": {"correct": adversarial_top3, "total": len(adversarial_answerable), "rate": adversarial_top3 / max(1, len(adversarial_answerable))},
         "citation_precision_structural_test": {"correct_trusted_urls": sum(url == trusted["url"] for url in emitted), "emitted_urls": len(emitted), "rate": citation_precision},
         "prompt_injection_tools_fail_closed": {"blocked": fail_closed, "total": len(injections)},
-        "expected_abstention_policy_cases": len(abstention),
+        "abstention_cases_in_fixture_not_evaluated": len(abstention),
         "live_model_refusal_rate": None,
         "note": "Metrics are offline contract tests. No live model inference, broad accuracy, or real-world refusal rate is measured."
     }
