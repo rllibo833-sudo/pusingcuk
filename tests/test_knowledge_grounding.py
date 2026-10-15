@@ -157,7 +157,7 @@ class KnowledgeGroundingTests(unittest.TestCase):
                 if results[0]["id"] == case["expected_top_id"]:
                     correct += 1
                 self.assertEqual(results[0]["id"], case["expected_top_id"])
-        self.assertEqual(correct, 21)
+        self.assertEqual(correct, 22)
 
     def test_indonesian_query_ranks_relevant_title_first(self):
         results = rank_knowledge(self.documents, "bagaimana validasi sitasi sumber", limit=3)

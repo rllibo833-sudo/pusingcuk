@@ -81,7 +81,7 @@ Owner disposition (2026-10-15): Founder-OS and CORE are no longer the intended d
 
 ### Current implementation evidence and limitations
 
-- PusingCuk owns a curated, public-safe knowledge index with 20 source records in `library/knowledge_index.json`; runtime retrieval does not crawl CORE or Founder-OS.
+- PusingCuk owns a curated, public-safe knowledge index with 22 source records in `library/knowledge_index.json`; runtime retrieval does not crawl CORE or Founder-OS.
 - The local-first assistant has Ollama and Gemini adapters, bounded in-process chat history, explicit local memory, validated citation handling, a loopback-only HTTP adapter, and a small allowlisted `ToolRegistry`. This is an application around a replaceable model provider, not a foundation model trained by PusingCuk.
 - Offline HTTP-to-rule E2E tests are present in `tests/test_ai_e2e.py`. At the audit baseline `a5ad400102044c3e6c215afbe1adda184396ed12`, the main test workflow and package build workflow were both observed completed successfully: [core CI run](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38651560270) and [package build](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38651560334). These CI results verify the baseline commit, not every later commit automatically.
 - The current fixed-artifact Python reference executor is explicitly not an OS sandbox. Hash pinning, allowlisting, and bounded I/O are useful safeguards but do not provide OS-level isolation for arbitrary code.
