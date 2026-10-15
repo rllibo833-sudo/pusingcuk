@@ -113,7 +113,7 @@ const pcText = (value) => {
   if (value === null) return "None";
   if (Array.isArray(value)) {
     const repr = (item) => {
-      if (typeof item === "string") return "'" + item.replace(/\\\\/g, "\\\\\\\\").replace(/'/g, "\\\\'") + "'";
+      if (typeof item === "string") return "'" + item.replaceAll("\\", "\\\\").replaceAll("'", "\\'") + "'";
       if (item === null) return "None";
       if (item === true) return "True";
       if (item === false) return "False";
@@ -132,7 +132,7 @@ const pcInteger = (value) => {
   if (typeof value === "number") {
     if (!Number.isFinite(value)) throw new Error("bilangan() membutuhkan angka finite");
     result = Math.trunc(value);
-  } else if (typeof value === "string" && /^[+-]?\\d+$/.test(value.trim())) {
+  } else if (typeof value === "string" && /^[+-]?\d+$/.test(value.trim())) {
     const parsed = BigInt(value.trim());
     if (parsed > 9007199254740991n || parsed < -9007199254740991n)
       throw new Error("bilangan() di luar rentang aman lintas target");
