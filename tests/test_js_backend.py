@@ -92,6 +92,19 @@ class JavaScriptBackendTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "🌾\n3\n")
 
+    def test_dictionary_equality_matches_language_value_semantics(self):
+        result = self.run_source(
+            "jancuk\n"
+            'lah pertama = {"nama": "Budi", "umur": 20}\n'
+            'lah kedua = {"umur": 20, "nama": "Budi"}\n'
+            'lah ketiga = {"nama": "Budi", "umur": 21}\n'
+            "hedeh pertama == kedua\n"
+            "hedeh pertama == ketiga\n"
+            "selesai jancuk"
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "okelah\ntidak\n")
+
 
     def test_accounting_example_runs_on_standalone_javascript(self):
         # Compile the real .cuk example to JS, then execute it without Python at runtime.
