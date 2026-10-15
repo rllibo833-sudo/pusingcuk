@@ -157,7 +157,7 @@ CI tests the reference interpreter on Python 3.11 and 3.12 and builds the native
 
 PusingCuk is still experimental. The current language contract is `0.5-dev`; the Python package version `0.8.0.dev0` is separate. The active conformance manifest contains **67 fixtures**: all 67 are required on the Python reference interpreter, 62 are required on native C, and 5 are explicitly unsupported on native C. Unsupported fixtures are not counted as passes or cross-runtime parity.
 
-Recent engineering work has added regression coverage for the local AI path from HTTP chat handling through the allowlisted tool registry and a registered `.cuk` rule to a generated JavaScript artifact. The automated checks validate expected results and source/artifact identity. This is focused integration evidence, not proof of general live-model quality or production readiness.
+Recent engineering work has added regression coverage for the local AI path from HTTP chat handling through the allowlisted tool registry and a registered `.cuk` rule to a generated JavaScript artifact. The CukAccount financial fixture now also checks period-close profit, loss, and zero-result formulas; the AI regression test runs that fixture and checks the same synthetic closing totals through the registered journal-balance rule. These deterministic checks do not post real transactions and are not proof of general live-model quality or production readiness.
 
 The next work follows [the project vision](docs/VISION.md):
 
@@ -182,7 +182,7 @@ MIT. See [LICENSE](LICENSE).
 
 ## Integrasi CukAccount dan siklus evaluasi AI — 16 Oktober 2026
 
-CukAccount menggunakan PusingCuk sebagai runtime ber-pin untuk menjalankan fixture keuangan sintetis di CI. Pin yang didokumentasikan adalah `a90e4c9047584f16b02d650550faf912b21c55c6`; perubahan versi harus diikuti pengujian ulang bridge dan pembaruan kontrak pada kedua repositori. Jangan menganggap output fixture sebagai posting transaksi atau sumber kebenaran ledger.
+CukAccount menggunakan PusingCuk sebagai runtime ber-pin untuk menjalankan fixture keuangan sintetis di CI. Pin yang dipakai bridge adalah `5732076cb04b90b259b7e9d6beba8ff72b3ad117`; perubahan versi harus diikuti pengujian ulang bridge dan pembaruan kontrak pada kedua repositori. Fixture kini memiliki pemeriksaan senyap untuk penutupan laba/rugi/hasil nol agar output sukses lama tetap stabil; jika rumus meleset, marker kegagalan tambahan membuat perbandingan output gagal. Jangan menganggap output fixture sebagai posting transaksi atau sumber kebenaran ledger.
 
 Siklus peningkatan PusingCuk AI yang dapat diverifikasi:
 1. Gunakan dokumentasi terkurasi dan contoh finansial sintetis, bukan data keuangan pribadi.
