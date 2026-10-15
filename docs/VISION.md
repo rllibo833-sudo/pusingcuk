@@ -10,6 +10,30 @@ Pusingcuk is a work in progress. Runtime support, compiler targets, and security
 
 **Canonical language version:** `0.5-dev`. The Python package version `0.8.0.dev0` is a separate distribution version, not the language version. The opening keyword `jancuk` is a deliberate part of Pusingcuk's identity.
 
+## 1A. Founder intent, independence, and open source
+
+PusingCuk is not intended to win a contest against established programming languages or to make other languages obsolete. It is an independent experiment with its own identity: approachable `.cuk` syntax, Indonesian and regional linguistic roots, Gen Z/Gen Alpha cultural references handled thoughtfully, and a learning experience designed for the AI era. Its distinctiveness should be earned through clear semantics, useful examples, reliable tooling, and community practice—not through claims of superiority.
+
+The founder is currently building this project independently with a phone and internet access, without a technical team, dedicated funding, or professional infrastructure. The project should therefore remain understandable and manageable for a solo maintainer using accessible tools. Technical advice and changes must explain risks in plain language, avoid unnecessary operational complexity, and never assume the maintainer already knows specialist terms such as container orchestration, exploitation, compiler internals, or credential management.
+
+Open source and the MIT license are deliberate choices to invite use, learning, forks, collaboration, and contributions from people who may bring expertise or resources the founder does not currently have. The intent is not to compete with other languages, but to give `.cuk` a recognizable identity and an opportunity to grow through voluntary community participation. The license permits broad reuse; it does not guarantee contributions, funding, security, or support. Those must be built through a welcoming project, clear boundaries, and trustworthy engineering.
+
+The project must not depend on the founder personally mastering every technical domain. Contribution paths should welcome code and non-code work alike. Maintainers and contributors should communicate honestly about uncertainty, avoid pressuring the founder to run unfamiliar commands or disclose secrets, and prefer changes that can be reviewed from GitHub's web interface and verified by existing automated checks.
+
+## 1B. Relationship between `.cuk` and PusingCuk AI
+
+The `.cuk` language and PusingCuk AI are intended to reinforce one another. `.cuk` supplies explicit syntax, semantics, deterministic rules, and behavior that can be tested. PusingCuk AI should help people learn the language, draft programs, explain diagnostics, suggest repairs, run approved tools, and guide users toward build outputs supported by the project. AI is an assistive interface and replaceable inference component, not a substitute for the language contract or a source of unchecked authority.
+
+Where AI proposes code or invokes a tool, the system should validate inputs, use registered and explicitly permitted capabilities, preserve provenance for referenced rules and artifacts, and distinguish suggestions from executed and verified results. Model output must not silently expand permissions or bypass deterministic checks. A successful model response alone is not evidence that code compiles, executes correctly, or produces a usable application.
+
+The intended growth path includes flexible compiler backends and carefully designed bridges to databases and SQL, APIs and credential-backed services, and potentially Web3. These are goals, not blanket claims of current support. Each integration must be implemented with explicit capability boundaries, safe secret handling, compatibility contracts, and tests appropriate to its risk. Offline-first use should remain the default where feasible; network access and credentials must be explicit opt-ins.
+
+## 1C. Evidence-based development priorities
+
+The near-term priority is not adding the largest possible number of features. It is proving one small but meaningful user journey end to end: a user asks PusingCuk AI for help, the system selects an allowlisted tool, a registered `.cuk` rule is validated and executed, a supported compiler produces an artifact, and that artifact is run and checked against expected results. The source rule, input validation, artifact identity, execution limits, and output must remain traceable across the path.
+
+Tests that cover only individual stages are valuable but must not be described as proof of the entire journey. Reports must label what is implemented, what passed in CI, what was skipped, and what remains untested. Prefer extending existing tests and workflows, keeping changes small, and avoiding duplicate fixtures, documentation, and CI jobs. Never trigger extra runners manually without a concrete reason. Do not make an implementation claim for EXE, APK, ZIP, DLL, web apps, or SaaS-like deployment unless the corresponding build and acceptance path has actually been tested.
+
 ## 2. Who should feel welcome
 
 Pusingcuk welcomes:
