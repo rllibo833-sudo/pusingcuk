@@ -12,7 +12,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from compiler.ir import from_source
+from compiler.ir import LANGUAGE_VERSION, from_source
 from compiler.js_backend import generate
 from library.ai_tools import (
     ToolRegistry,
@@ -35,6 +35,7 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertTrue(result["ok"], result)
         self.assertEqual(result["operation"], "compile_check")
         self.assertEqual(result["target"], "javascript")
+        self.assertEqual(result["language_version"], LANGUAGE_VERSION)
         self.assertEqual(result["source_sha256"], hashlib.sha256(source.encode("utf-8")).hexdigest())
         self.assertGreater(result["artifact_bytes"], 0)
         self.assertEqual(len(result["artifact_sha256"]), 64)

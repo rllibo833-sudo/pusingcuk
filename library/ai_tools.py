@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from library.knowledge_grounding import rank_knowledge
-from compiler.ir import from_source
+from compiler.ir import LANGUAGE_VERSION, from_source
 from compiler.js_backend import generate
 
 _MAX_CUK_SOURCE_BYTES = 16 * 1024
@@ -267,7 +267,7 @@ class ToolRegistry:
                 "ok": True,
                 "operation": "compile_check",
                 "target": "javascript",
-                "language_version": "0.5-dev",
+                "language_version": LANGUAGE_VERSION,
                 "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
                 "artifact_sha256": hashlib.sha256(generated.encode("utf-8")).hexdigest(),
                 "artifact_bytes": len(generated.encode("utf-8")),
