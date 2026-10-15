@@ -14,7 +14,7 @@ Pusingcuk Studio adalah aplikasi Android awal untuk menulis dan menjalankan prog
 
 ## Build
 
-Job `android-apk` di `.github/workflows/tests.yml` membangun APK pada pull request dan workflow yang dijalankan sesuai pemicu di file tersebut. Artefak `pusingcuk-studio-debug-apk` tersedia pada halaman run GitHub Actions yang berhasil.
+Workflow `.github/workflows/android-studio-apk.yml` dijalankan manual melalui `workflow_dispatch`; build APK Studio tidak dipicu otomatis oleh setiap pull request. Artefak `pusingcuk-studio-debug-apk` tersedia pada halaman run GitHub Actions yang berhasil.
 
 Workflow mengompilasi `native/pusingcuk.c` untuk ABI `arm64-v8a` dan `armeabi-v7a`, menempatkan executable ke assets, lalu membangun APK dengan JDK 17, Android SDK/NDK, dan Gradle 8.9.
 
