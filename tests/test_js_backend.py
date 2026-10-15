@@ -97,22 +97,22 @@ class JavaScriptBackendTests(unittest.TestCase):
         # This checks the proposed packaging route: compile .cuk during build,
         # then run the generated JavaScript with Node/Electron, not Python.
         result = self.run_source(
-            "jancuk\\n"
-            "fungsi hitung_laba(pendapatan, beban)\\n"
-            "    balek pendapatan - beban\\n"
-            "selesai fungsi\\n"
-            "fungsi posisi_seimbang(aset, liabilitas, ekuitas)\\n"
-            "    balek aset == liabilitas + ekuitas\\n"
-            "selesai fungsi\\n"
-            "lah laba = hitung_laba(1250000, 300000)\\n"
-            "lah ekuitas_akhir = 2000000 + laba\\n"
-            "hedeh laba\\n"
-            "hedeh posisi_seimbang(4450000, 1500000, ekuitas_akhir)\\n"
-            "hedeh posisi_seimbang(5000000, 1500000, ekuitas_akhir)\\n"
+            "jancuk\n"
+            "fungsi hitung_laba(pendapatan, beban)\n"
+            "    balek pendapatan - beban\n"
+            "selesai fungsi\n"
+            "fungsi posisi_seimbang(aset, liabilitas, ekuitas)\n"
+            "    balek aset == liabilitas + ekuitas\n"
+            "selesai fungsi\n"
+            "lah laba = hitung_laba(1250000, 300000)\n"
+            "lah ekuitas_akhir = 2000000 + laba\n"
+            "hedeh laba\n"
+            "hedeh posisi_seimbang(4450000, 1500000, ekuitas_akhir)\n"
+            "hedeh posisi_seimbang(5000000, 1500000, ekuitas_akhir)\n"
             "selesai jancuk"
         )
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout, "950000\\nokelah\\ntidak\\n")
+        self.assertEqual(result.stdout, "950000\nokelah\ntidak\n")
 
     def test_rejects_integer_outside_javascript_safe_range(self):
         with self.assertRaisesRegex(JSBackendError, "rentang aman JavaScript"):
