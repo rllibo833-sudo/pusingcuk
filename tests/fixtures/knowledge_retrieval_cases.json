@@ -101,6 +101,11 @@
       "id": "query-20",
       "query": "masterplan 1000 hektar hidrologi lahan tata ruang fase digital pilot ekonomi pendapatan",
       "expected_top_id": "pusingcuk-kawasan-masterplan-operating-model"
+    },
+    {
+      "id": "query-21",
+      "query": "sinkronisasi historis FounderOS CORE agar AI memperbaiki kode .cuk berdasarkan diagnostik compiler dan memperbarui fixture konformansi",
+      "expected_top_id": "pusingcuk-ai-language-evolution-bridge"
     }
   ]
 }
