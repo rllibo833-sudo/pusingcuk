@@ -103,6 +103,18 @@ class JavaScriptBackendTests(unittest.TestCase):
                 result = self.run_source(f"jancuk\nhedeh {expression}\nselesai jancuk")
                 self.assertNotEqual(result.returncode, 0)
 
+    def test_modulo_unary_minus_and_comparisons_reject_javascript_coercion(self):
+        valid = self.run_source(
+            'jancuk\nhedeh -7 % 3\nhedeh "apel" < "jeruk"\nhedeh 2 <= 3\nselesai jancuk'
+        )
+        self.assertEqual(valid.returncode, 0, valid.stderr)
+        self.assertEqual(valid.stdout, "2\nokelah\nokelah\n")
+
+        for expression in ('"7" % 2', 'benar % 2', '-benar', '"7" < 8', 'benar >= 0'):
+            with self.subTest(expression=expression):
+                result = self.run_source(f"jancuk\nhedeh {expression}\nselesai jancuk")
+                self.assertNotEqual(result.returncode, 0, expression)
+
     def test_unicode_string_index_and_length_use_code_points(self):
         result = self.run_source(
             'jancuk\nlah teks = "A🌾Z"\nhedeh teks[1]\nhedeh panjang(teks)\nselesai jancuk'

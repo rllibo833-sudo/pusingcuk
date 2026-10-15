@@ -118,8 +118,31 @@ const pcDiv = (a, b) => {
 };
 const pcFloorDiv = (a, b) => Math.floor(pcDiv(a, b));
 const pcMod = (a, b) => {
+  if (typeof a !== "number" || typeof b !== "number" ||
+      !Number.isFinite(a) || !Number.isFinite(b))
+    throw new Error("operator % membutuhkan dua angka finite");
   if (b === 0) throw new Error("modulo dengan nol");
-  return ((a % b) + b) % b;
+  const n = ((a % b) + b) % b;
+  if (!Number.isFinite(n)) throw new Error("operasi angka non-finite");
+  return n;
+};
+const pcNeg = (value) => {
+  if (typeof value !== "number" || !Number.isFinite(value))
+    throw new Error("operator unary - membutuhkan angka finite");
+  const result = -value;
+  if (Number.isInteger(result) && !Number.isSafeInteger(result))
+    throw new Error("hasil integer di luar rentang aman lintas target");
+  return result;
+};
+const pcCompare = (a, b, op) => {
+  if (typeof a !== typeof b ||
+      !((typeof a === "number" && Number.isFinite(a) && Number.isFinite(b)) ||
+        typeof a === "string"))
+    throw new Error("perbandingan membutuhkan dua angka atau dua teks dengan tipe sama");
+  if (op === "<") return a < b;
+  if (op === "<=") return a <= b;
+  if (op === ">") return a > b;
+  return a >= b;
 };
 const pcGet = (collection, key) => {
   if (Array.isArray(collection) || typeof collection === "string") {
@@ -372,7 +395,7 @@ def generate(document: dict, as_module: bool = False) -> str:
             value = expr(f.get("value"), names)
             op = f.get("op")
             if op == "bukan": return f"(!pcTruthy({value}))"
-            if op == "-": return f"(-({value}))"
+            if op == "-": return f"pcNeg({value})"
             raise JSBackendError(f"baris {line}: operator unary {op!r} belum didukung")
         if kind == "Binary":
             op = f.get("op")
@@ -387,7 +410,7 @@ def generate(document: dict, as_module: bool = False) -> str:
                 eq = f"pcEq({left}, {right})"
                 return eq if op == "==" else f"(!{eq})"
             if op in {"<", "<=", ">", ">="}:
-                return f"(({left}) {op} ({right}))"
+                return f"pcCompare({left}, {right}, {json.dumps(op)})"
             if op == "dan": return f"(pcTruthy({left}) && pcTruthy({right}))"
             if op == "atau": return f"(pcTruthy({left}) || pcTruthy({right}))"
             raise JSBackendError(f"baris {line}: operator {op!r} belum didukung")
