@@ -218,7 +218,7 @@ class JavaScriptBackendTests(unittest.TestCase):
             "selesai jancuk"
         )
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout, "pembagian dengan nol\\nakhir\\nluar\\n")
+        self.assertEqual(result.stdout, "pembagian dengan nol\nakhir\nluar\n")
 
     def test_try_finally_runs_when_error_is_not_caught(self):
         result = self.run_source(
@@ -226,7 +226,7 @@ class JavaScriptBackendTests(unittest.TestCase):
             "    hedeh \"akhir\"\nselesai coba\nselesai jancuk"
         )
         self.assertNotEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, "akhir\\n")
+        self.assertEqual(result.stdout, "akhir\n")
         self.assertIn("pembagian dengan nol", result.stderr)
 
 if __name__ == "__main__":
