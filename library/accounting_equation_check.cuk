@@ -1,0 +1,26 @@
+# Pemeriksaan sekunder persamaan dasar akuntansi.
+# Input dalam unit Rupiah terkecil; bukan pengganti buku besar.
+
+jancuk
+
+fungsi cek_persamaan_akuntansi(aset, liabilitas, ekuitas)
+    njir aset < 0 atau liabilitas < 0 atau ekuitas < 0
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        njir aset == liabilitas + ekuitas
+            balek "PERSAMAAN_SEIMBANG"
+        kampret
+            balek "PERSAMAAN_TIDAK_SEIMBANG"
+        selesai njir
+    selesai njir
+selesai fungsi
+
+tanya aset_teks = ""
+tanya liabilitas_teks = ""
+tanya ekuitas_teks = ""
+lah aset = bilangan(aset_teks)
+lah liabilitas = bilangan(liabilitas_teks)
+lah ekuitas = bilangan(ekuitas_teks)
+hedeh cek_persamaan_akuntansi(aset, liabilitas, ekuitas)
+
+selesai jancuk

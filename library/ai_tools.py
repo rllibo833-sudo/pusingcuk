@@ -63,12 +63,32 @@ _REGISTERED_RULES: dict[str, dict[str, Any]] = {
             "pengganti mesin akuntansi deterministik CukAccount."
         ),
     },
+    "accounting.equation.v1": {
+        "source_file": "accounting_equation_check.cuk",
+        "source_sha256": "16146240a8eaadbecf0afac0e40a20314f85c8d56f9232741be3378a370a7f8f",
+        "entrypoint": "cek_persamaan_akuntansi",
+        "language_version": "0.5-dev",
+        "input_fields": ("aset", "liabilitas", "ekuitas"),
+        "properties": {
+            "aset": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "liabilitas": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "ekuitas": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+        },
+        "required": ("aset", "liabilitas", "ekuitas"),
+        "allowed_outputs": ("PERSAMAAN_SEIMBANG", "PERSAMAAN_TIDAK_SEIMBANG", "INPUT_TIDAK_VALID"),
+        "capabilities": (),
+        "description": (
+            "Periksa persamaan aset = liabilitas + ekuitas memakai artefak .cuk "
+            "tetap. Pemeriksaan pendamping; bukan pengganti buku besar CukAccount."
+        ),
+    },
 }
 
 # Model-facing tool names map only to internal registered rule IDs.
 _TOOL_RULE_BINDINGS = {
     "budget_threshold": "budget.threshold.v1",
     "journal_balance_check": "journal.balance.v1",
+    "accounting_equation_check": "accounting.equation.v1",
 }
 
 
