@@ -2,10 +2,6 @@ name: Build Accounting Windows EXE
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "apps/accounting/**"
-      - ".github/workflows/accounting-windows.yml"
 
 permissions:
   contents: read
