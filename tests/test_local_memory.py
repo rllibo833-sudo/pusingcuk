@@ -38,6 +38,23 @@ class LocalMemoryTests(unittest.TestCase):
         with self.assertRaisesRegex(LocalMemoryError, "TEXT_INVALID"):
             self.store.remember("x" * 2_001, confirmed=True)
 
+    def test_unhashable_category_inputs_fail_with_stable_validation_errors(self):
+        with self.assertRaisesRegex(LocalMemoryError, "CATEGORY_INVALID"):
+            self.store.remember("Catatan valid.", category=["decision"], confirmed=True)
+
+        self.path.parent.mkdir(parents=True)
+        self.path.write_text(json.dumps({
+            "schema_version": "pusingcuk.local-memory.v1",
+            "records": [{
+                "id": "record-1",
+                "category": ["decision"],
+                "text": "Catatan tersimpan.",
+                "created_at": "2026-10-15T00:00:00Z",
+            }],
+        }), encoding="utf-8")
+        with self.assertRaisesRegex(LocalMemoryError, "RECORD_CONTENT_INVALID"):
+            self.store.list_records()
+
     def test_delete_requires_confirmation_and_removes_record(self):
         record = self.store.remember("Gunakan model lokal.", confirmed=True)
         with self.assertRaisesRegex(LocalMemoryError, "CONFIRMATION_REQUIRED"):

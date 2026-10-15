@@ -66,7 +66,13 @@ class LocalMemoryStore:
                 raise LocalMemoryError("MEMORY_RECORD_INVALID")
             if not isinstance(record["id"], str) or not record["id"] or record["id"] in seen:
                 raise LocalMemoryError("MEMORY_RECORD_ID_INVALID")
-            if record["category"] not in _CATEGORIES or not isinstance(record["text"], str) or not record["text"].strip() or len(record["text"]) > _MAX_TEXT:
+            if (
+                not isinstance(record["category"], str)
+                or record["category"] not in _CATEGORIES
+                or not isinstance(record["text"], str)
+                or not record["text"].strip()
+                or len(record["text"]) > _MAX_TEXT
+            ):
                 raise LocalMemoryError("MEMORY_RECORD_CONTENT_INVALID")
             if _contains_secret(record["text"]):
                 raise LocalMemoryError("MEMORY_SECRET_DETECTED")
@@ -104,7 +110,7 @@ class LocalMemoryStore:
     def remember(self, text: str, *, category: str = "decision", confirmed: bool = False) -> dict[str, Any]:
         if confirmed is not True:
             raise LocalMemoryError("MEMORY_CONFIRMATION_REQUIRED")
-        if category not in _CATEGORIES:
+        if not isinstance(category, str) or category not in _CATEGORIES:
             raise LocalMemoryError("MEMORY_CATEGORY_INVALID")
         if not isinstance(text, str) or not text.strip() or len(text.strip()) > _MAX_TEXT:
             raise LocalMemoryError("MEMORY_TEXT_INVALID")
