@@ -174,7 +174,7 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertEqual(
             completed.stdout,
-            "\\n".join(
+            "\n".join(
                 (
                     "CUKACCOUNT_VALID_BALANCED",
                     "CUKACCOUNT_INVALID_UNBALANCED",
@@ -182,7 +182,7 @@ class ToolInputContractTests(unittest.TestCase):
                     "CUKACCOUNT_INVALID_NEGATIVE",
                     "CUKACCOUNT_BOUNDARY_MAX",
                 )
-            ) + "\\n",
+            ) + "\n",
         )
         self.assertNotIn("CUKACCOUNT_PERIOD_CLOSE_", completed.stdout)
 

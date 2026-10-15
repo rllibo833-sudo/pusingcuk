@@ -132,4 +132,4 @@ For PusingCuk development, the target state is no runtime/API-key/repository dep
 
 ## Immediate acceptance target
 
-Keep the 20-source curated index, 20-case baseline and 12-case adversarial corpus aligned by automated test. CI prints reproducible top-1/top-3 and structural safety metrics with `python tools/evaluate_knowledge_retrieval.py`. Maintain a non-contradictory grounding contract and document release gates. Live-model refusal and general response quality remain unmeasured; the AI Engine is not claimed production-ready.
+Keep the 22-source curated index, 22-case baseline and 12-case adversarial corpus aligned by automated test. CI prints reproducible top-1/top-3 and structural safety metrics with `python tools/evaluate_knowledge_retrieval.py`. Maintain a non-contradictory grounding contract and document release gates. Live-model refusal and general response quality remain unmeasured; the AI Engine is not claimed production-ready.

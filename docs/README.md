@@ -2,7 +2,7 @@
 
 Use this index to choose the right document. The current engineering baseline is the **Python reference interpreter + native C runtime**. Shared fixtures now cover numerical edge cases, collection boundaries, function scope, and consistent runtime diagnostics, including `akar`, `pangkat`, `sinus`, `kosinus`, `logaritma`, `log10`, `jumlah`, `rata_rata`, and `median` in native C. Compiler and Android app prototypes remain documented, but they are not part of the baseline compatibility promise.
 
-**Canonical language version:** `0.5-dev`. New examples should use `.cuk`; `.pusingcuk` remains accepted for existing programs. The manifest contains 64 fixtures: 64 required reference results, 59 required native results, and 5 explicit native-unsupported cases.
+**Canonical language version:** `0.5-dev`. New examples should use `.cuk`; `.pusingcuk` remains accepted for existing programs. The manifest contains 67 fixtures: 67 required reference results, 62 required native results, and 5 explicit native-unsupported cases.
 
 ## Start here
 

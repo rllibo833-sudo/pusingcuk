@@ -1,6 +1,6 @@
 # Compiler multi-target PusingCuk
 
-**Versi bahasa:** `0.4-dev`. Target compiler tetap eksperimental dan tidak mewarisi dukungan hanya karena interpreter reference memilikinya.
+**Versi bahasa:** `0.5-dev`. Target compiler tetap eksperimental dan tidak mewarisi dukungan hanya karena interpreter reference memilikinya.
 
 Compiler CLI mengubah satu sumber PusingCuk melalui parser dan IR v1 menjadi artefak target.
 
