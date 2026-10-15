@@ -42,13 +42,17 @@ def format_diagnostic(source, filename, line, column, message):
     line = max(1, int(line or 1))
     column = max(1, int(column or 1))
     snippet = lines[line - 1] if line <= len(lines) else ""
+    is_lexer_error = message.startswith("kesalahan lexer: ")
+    if is_lexer_error:
+        message = message[len("kesalahan lexer: "):]
+    category = "Kesalahan lexer" if is_lexer_error else "Kesalahan sintaks"
     # Expand tabs in both the source and caret prefix so the pointer remains aligned.
     shown = snippet.expandtabs(4)
     prefix = snippet[:max(0, min(column - 1, len(snippet)))].expandtabs(4)
     pointer = "  " + " " * len(prefix) + "^"
     suggestion = _diagnostic_suggestion(message)
     return (
-        f"[{filename}] Baris {line}, kolom {column}: Kesalahan sintaks: {message}\n"
+        f"[{filename}] Baris {line}, kolom {column}: {category}: {message}\n"
         f"  {shown}\n{pointer}\n"
         f"Saran: {suggestion}"
     )

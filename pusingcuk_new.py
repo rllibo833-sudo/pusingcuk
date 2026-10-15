@@ -65,7 +65,7 @@ def main():
             parse_source(source, filename=str(path))
         except ParserError as exc:
             message = str(exc)
-            if "Kesalahan sintaks:" not in message:
+            if "Kesalahan sintaks:" not in message and "Kesalahan lexer:" not in message:
                 message = f"Kesalahan sintaks: {message}"
             print(message, file=sys.stderr)
             return 2

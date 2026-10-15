@@ -46,6 +46,41 @@ class ExitCodeTests(unittest.TestCase):
         self.assertIn("Kesalahan runtime", result.stderr)
         self.assertEqual(result.stdout, "")
 
+
+    def test_lexer_error_cli_uses_lexer_label_and_syntax_exit_code(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "lexer.cuk"
+            source.write_text(
+                'jancuk\\nhedeh "belum tutup\\nselesai jancuk\\n',
+                encoding="utf-8",
+            )
+            result = self.run_cli(source)
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("Kesalahan lexer:", result.stderr)
+        self.assertNotIn("Kesalahan sintaks:", result.stderr)
+        self.assertIn("string tidak boleh melewati baris", result.stderr)
+        self.assertEqual(result.stdout, "")
+
+    def test_check_mode_returns_zero_for_valid_and_two_for_invalid_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            valid = Path(directory) / "valid.cuk"
+            invalid = Path(directory) / "invalid.cuk"
+            valid.write_text("jancuk\\nhedeh 1\\nselesai jancuk\\n", encoding="utf-8")
+            invalid.write_text("jancuk\\nhedeh 1 +\\nselesai jancuk\\n", encoding="utf-8")
+            valid_result = subprocess.run(
+                [sys.executable, str(CLI), "--check", str(valid)],
+                cwd=ROOT, text=True, capture_output=True, check=False,
+            )
+            invalid_result = subprocess.run(
+                [sys.executable, str(CLI), "--check", str(invalid)],
+                cwd=ROOT, text=True, capture_output=True, check=False,
+            )
+        self.assertEqual(valid_result.returncode, 0, valid_result.stderr)
+        self.assertIn("sintaks valid", valid_result.stdout)
+        self.assertEqual(invalid_result.returncode, 2, invalid_result.stderr)
+        self.assertIn("Kesalahan sintaks:", invalid_result.stderr)
+        self.assertEqual(invalid_result.stdout, "")
+
     def test_success_returns_0(self):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "success.pusingcuk"
