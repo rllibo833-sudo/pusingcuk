@@ -16,6 +16,7 @@
       "category": "program-structure",
       "meaning": "Memulai program.",
       "aliases": [
+        "gas",
         "inthiseco"
       ],
       "native_runtime": "tested",
@@ -26,7 +27,8 @@
       "category": "program-structure",
       "meaning": "Menutup blok; diikuti nama blok, misalnya selesai njir.",
       "aliases": [
-        "gitu"
+        "gitu",
+        "kelar"
       ],
       "native_runtime": "tested",
       "c_backend": "supported"
@@ -35,7 +37,9 @@
       "word": "lah",
       "category": "variables",
       "meaning": "Mendeklarasikan variabel baru.",
-      "aliases": [],
+      "aliases": [
+        "bestie"
+      ],
       "native_runtime": "tested",
       "c_backend": "supported"
     },
@@ -44,7 +48,8 @@
       "category": "output",
       "meaning": "Menampilkan nilai ke output standar.",
       "aliases": [
-        "jir"
+        "jir",
+        "spill"
       ],
       "native_runtime": "tested",
       "c_backend": "integer-and-boolean-subset"
@@ -53,7 +58,9 @@
       "word": "tanya",
       "category": "input",
       "meaning": "Menampilkan prompt dan membaca satu baris dari stdin.",
-      "aliases": [],
+      "aliases": [
+        "kepo"
+      ],
       "native_runtime": "tested",
       "c_backend": "unsupported"
     },
@@ -70,7 +77,8 @@
       "category": "control-flow",
       "meaning": "Menandai cabang alternatif pada kondisi.",
       "aliases": [
-        "adooh"
+        "adooh",
+        "skip"
       ],
       "native_runtime": "tested",
       "c_backend": "supported"
@@ -119,7 +127,9 @@
       "word": "benar",
       "category": "boolean",
       "meaning": "Nilai boolean benar; output ditampilkan sebagai okelah.",
-      "aliases": [],
+      "aliases": [
+        "valid"
+      ],
       "native_runtime": "tested",
       "c_backend": "supported"
     },
@@ -127,7 +137,9 @@
       "word": "salah",
       "category": "boolean",
       "meaning": "Nilai boolean salah; output ditampilkan sebagai tidak.",
-      "aliases": [],
+      "aliases": [
+        "zonk"
+      ],
       "native_runtime": "tested",
       "c_backend": "supported"
     },
@@ -240,7 +252,9 @@
       "word": "tulis",
       "category": "file-io",
       "meaning": "Menulis teks UTF-8 ke berkas dan mengembalikan benar jika berhasil.",
-      "aliases": [],
+      "aliases": [
+        "simpen"
+      ],
       "native_runtime": "reference-python",
       "c_backend": "unsupported"
     },
@@ -248,7 +262,9 @@
       "word": "baca",
       "category": "file-io",
       "meaning": "Membaca teks UTF-8 dari berkas; mengembalikan salah jika berkas tidak ditemukan.",
-      "aliases": [],
+      "aliases": [
+        "bongkar"
+      ],
       "native_runtime": "reference-python",
       "c_backend": "unsupported"
     },
@@ -283,7 +299,9 @@
       "word": "tulis_json",
       "category": "file-io",
       "meaning": "Menyimpan objek JSON ke berkas UTF-8 dan mengembalikan benar jika berhasil.",
-      "aliases": [],
+      "aliases": [
+        "simpen_json"
+      ],
       "native_runtime": "reference-python",
       "c_backend": "unsupported"
     },
@@ -291,7 +309,9 @@
       "word": "baca_json",
       "category": "file-io",
       "meaning": "Membaca JSON dari berkas dan mengubah objek JSON menjadi kamus Pusingcuk.",
-      "aliases": [],
+      "aliases": [
+        "bongkar_json"
+      ],
       "native_runtime": "reference-python",
       "c_backend": "unsupported"
     },

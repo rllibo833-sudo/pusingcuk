@@ -52,5 +52,30 @@ class VersionContractTests(unittest.TestCase):
         self.assertIn(f"Pusingcuk {expected}", spec)
 
 
+    def test_python_native_and_vocabulary_aliases_match_spec(self):
+        spec = (ROOT / "SPEC.md").read_text(encoding="utf-8")
+        lexer_source = (ROOT / "lexer.py").read_text(encoding="utf-8")
+        native_source = (ROOT / "native" / "pusingcuk.c").read_text(encoding="utf-8")
+        vocabulary = json.loads((ROOT / "library" / "kosakata.json").read_text(encoding="utf-8"))
+        section = spec[spec.index("## 16. Alias kosakata"):spec.index("## 17.")]
+        core_section = section.split("### Alias API tambahan")[0]
+        api_section = section.split("### Alias API tambahan")[1]
+        parse = lambda text: dict(re.findall(r"^- `([^`]+)` → `([^`]+)`", text, re.MULTILINE))
+        core_aliases = parse(core_section)
+        all_aliases = {**core_aliases, **parse(api_section)}
+        lexer_block = re.search(r"KEYWORD_ALIASES\\s*=\\s*\\{([\\s\\S]*?)\\n\\}", lexer_source)
+        self.assertIsNotNone(lexer_block, "lexer.py must expose KEYWORD_ALIASES")
+        python_aliases = dict(re.findall(r'^\\s*"([^"]+)"\\s*:\\s*"([^"]+)"\\s*,?\\s*
+    unittest.main()
+, lexer_block.group(1), re.MULTILINE))
+        self.assertEqual(python_aliases, all_aliases)
+        native_block = re.search(r"static const struct \\{ const char \\*alias, \\*canonical; \\} aliases\\[\\] = \\{([\\s\\S]*?)\\n    \\};", native_source)
+        self.assertIsNotNone(native_block, "native C must expose its claimed alias table")
+        native_aliases = dict(re.findall(r'\\{"([^"]+)", "([^"]+)"\\}', native_block.group(1)))
+        self.assertEqual(native_aliases, core_aliases)
+        metadata_aliases = {alias: item["word"] for item in vocabulary["keywords"] for alias in item.get("aliases", [])}
+        self.assertEqual(metadata_aliases, all_aliases)
+        self.assertEqual((len(all_aliases), len(core_aliases)), (23, 12))
+
 if __name__ == "__main__":
     unittest.main()

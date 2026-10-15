@@ -79,9 +79,9 @@ class DocumentationContractTests(unittest.TestCase):
             for runtime, status in fixture["runtimes"].items():
                 key = f"{runtime}:{status}"
                 counts[key] = counts.get(key, 0) + 1
-        self.assertEqual(len(manifest["fixtures"]), 64)
-        self.assertEqual(counts["reference:required"], 64)
-        self.assertEqual(counts["native:required"], 59)
+        self.assertEqual(len(manifest["fixtures"]), 66)
+        self.assertEqual(counts["reference:required"], 66)
+        self.assertEqual(counts["native:required"], 61)
         self.assertEqual(counts["native:unsupported"], 5)
 
         readiness = (root / "docs/AI_ENGINE_READINESS.md").read_text(encoding="utf-8")
@@ -93,7 +93,7 @@ class DocumentationContractTests(unittest.TestCase):
         self.assertNotIn("16 source records", ledger)
         self.assertIn("20 dokumen sumber terkurasi", status)
         self.assertIn("20 kasus benchmark", status)
-        self.assertIn("64 fixture", status)
+        self.assertIn("66 fixture", status)
 
 if __name__ == "__main__":
     unittest.main()

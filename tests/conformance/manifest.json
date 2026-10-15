@@ -1265,6 +1265,45 @@
         "reference": "required",
         "native": "unsupported"
       }
+    },
+    {
+      "id": "numbers.round-ties-to-even",
+      "source": "round_ties_even.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-boundary",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "2\n4\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.round-rejects-boolean",
+      "source": "round_rejects_boolean.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
     }
   ]
 }
