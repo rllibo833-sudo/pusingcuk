@@ -66,12 +66,12 @@ class DocumentationContractTests(unittest.TestCase):
         manifest = json.loads((root / "tests/conformance/manifest.json").read_text(encoding="utf-8"))
         documents = index["documents"]
         source_ids = {item["id"] for item in documents}
-        self.assertEqual(len(documents), 20)
-        self.assertEqual(len(source_ids), 20)
+        self.assertEqual(len(documents), 21)
+        self.assertEqual(len(source_ids), 21)
         self.assertTrue(all(item["source_repository"] == "rllibo833-sudo/pusingcuk" for item in documents))
         self.assertTrue(all(item["visibility"] == "public-safe" for item in documents))
         self.assertTrue(all(len(item["source_commit"]) == 40 for item in documents))
-        self.assertEqual(len(benchmark["cases"]), 20)
+        self.assertEqual(len(benchmark["cases"]), 21)
         self.assertTrue(all(case["expected_top_id"] in source_ids for case in benchmark["cases"]))
 
         counts = {"reference:required": 0, "native:required": 0, "native:unsupported": 0}
@@ -87,12 +87,12 @@ class DocumentationContractTests(unittest.TestCase):
         readiness = (root / "docs/AI_ENGINE_READINESS.md").read_text(encoding="utf-8")
         ledger = (root / "docs/AI_ENGINE_MIGRATION_LEDGER.md").read_text(encoding="utf-8")
         status = (root / "docs/PROJECT_STATUS_AND_ROADMAP.md").read_text(encoding="utf-8")
-        self.assertIn("20-case baseline currently yields top-1", readiness)
-        self.assertIn("20 curated source records", readiness)
+        self.assertIn("21-case baseline currently yields top-1", readiness)
+        self.assertIn("21 curated source records", readiness)
         self.assertNotIn("16-case exact-top-1 retrieval benchmark", readiness)
         self.assertNotIn("16 source records", ledger)
-        self.assertIn("20 dokumen sumber terkurasi", status)
-        self.assertIn("20 kasus baseline menghasilkan top-1", status)
+        self.assertIn("21 dokumen sumber terkurasi", status)
+        self.assertIn("21 kasus baseline menghasilkan top-1", status)
         self.assertIn("5/8 (62,5%)", status)
         self.assertIn("6/8 (75%)", status)
         self.assertIn("66 fixture", status)

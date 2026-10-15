@@ -13,6 +13,9 @@ from library.gemini_ai_provider import GeminiGenerateContentProvider
 from library.local_ai_provider import LocalAIProviderError, OllamaChatProvider
 from library.local_memory import LocalMemoryError, LocalMemoryStore
 
+MAX_TOOL_ROUNDS = 3
+MAX_TOOL_CALLS_PER_REQUEST = 4
+
 _SYSTEM_BASE = """Kamu adalah PusingCuk AI, asisten resmi proyek PusingCuk. Identitasmu berakar pada bahasa pemrograman .cuk yang memakai kata kunci ramah bahasa Indonesia, semantik yang dapat diuji, dan prinsip local-first.
 Jawab dalam bahasa pengguna dan utamakan bahasa Indonesia bila sesuai. Jelaskan bahwa PusingCuk AI adalah lapisan asisten di atas model provider yang dipilih, bukan klaim bahwa model dasar dilatih sendiri. Hormati batas provider, API key, kuota, database, dan perangkat; jangan menjanjikan layanan gratis atau selalu tersedia.
 Pisahkan fakta yang didukung sumber dari pengetahuan umum. Jangan mengaku menjalankan kode, memeriksa produksi, atau mengetahui data yang tidak diberikan.
@@ -82,7 +85,8 @@ class PusingCukAssistant:
         try:
             if hasattr(self.provider, "generate_turn"):
                 answer = ""
-                for round_index in range(4):
+                tool_calls_used = 0
+                for round_index in range(MAX_TOOL_ROUNDS):
                     turn = self.provider.generate_turn(
                         messages, system_prompt=system_prompt, tools=self.tool_registry.definitions,
                     )
@@ -92,9 +96,13 @@ class PusingCukAssistant:
                     if not calls:
                         answer = turn["content"]
                         break
-                    if round_index == 3:
-                        answer = turn["content"] or "Batas pemanggilan tool tercapai; hasil tambahan tidak dijalankan."
+                    if tool_calls_used + len(calls) > MAX_TOOL_CALLS_PER_REQUEST:
+                        answer = "Batas pemanggilan tool per permintaan tercapai; operasi tambahan tidak dijalankan."
                         break
+                    if round_index == MAX_TOOL_ROUNDS - 1:
+                        answer = turn["content"] or "Batas putaran AI tercapai; hasil tambahan tidak dijalankan."
+                        break
+                    tool_calls_used += len(calls)
                     messages.append({
                         "role": "assistant", "content": turn["content"],
                         "tool_calls": [{

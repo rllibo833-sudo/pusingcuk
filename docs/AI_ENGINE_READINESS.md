@@ -8,7 +8,7 @@ The maintained AI entry point is an experimental local-first CLI. It delegates i
 
 This is an application/orchestrator, not a foundation model trained by PusingCuk. An authenticated loopback-only HTTP adapter now serves local clients, but there is no externally hosted production API or per-user identity/authorization yet. The language runtimes are not OS security sandboxes. Passing CI is evidence for tested contracts only; it is not proof of production availability, general answer quality, or safe execution of arbitrary programs.
 
-The current runtime index (`library/knowledge_index.json`) contains **20 curated source records**, and the Indonesian retrieval regression contains **20 cases**. This small benchmark is regression evidence, not a broad accuracy score.
+The current runtime index (`library/knowledge_index.json`) contains **21 curated source records**, and the Indonesian retrieval regression contains **21 cases**. This small benchmark is regression evidence, not a broad accuracy score.
 
 ## Local integration service now available
 

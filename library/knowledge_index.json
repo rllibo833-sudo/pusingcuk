@@ -1,6 +1,6 @@
 {
   "schema_version": "pusingcuk.knowledge-index.v1",
-  "index_version": 3,
+  "index_version": 2,
   "purpose": "Indeks pengetahuan primer milik PusingCuk AI. Ringkasan ditulis untuk indeks ini; sumber merujuk ke snapshot immutable PusingCuk yang telah memuat indeks lokal-only dan kebijakan grounding yang berlaku.",
   "policy": {
     "max_documents": 100,
@@ -614,39 +614,6 @@
       ],
       "summary": "Kawasan Masjid 1.000 Ha adalah konsep ekosistem berbasis masjid yang menghubungkan ibadah, pendidikan, pangan, lingkungan, air, energi, ekonomi, dan teknologi. Fase awal mengutamakan produk digital kecil untuk masalah nyata, bukti penggunaan, pilot, penerimaan, pembayaran, dan keputusan berhenti atau berkembang.",
       "excerpt": "Skala lahan 1.000 Ha masih konseptual. Perizinan, kepemilikan lahan, konstruksi, mitra, pengguna, dan pendapatan tidak boleh diklaim tanpa bukti. Gunakan riset first, pilot before scale, Founder Gate, dan keputusan berbasis evidence."
-    },
-    {
-      "id": "pusingcuk-ai-language-evolution-bridge",
-      "title": "Jembatan pengetahuan FounderOS CORE untuk evolusi .cuk dan PusingCuk AI",
-      "path": "docs/AI_LANGUAGE_EVOLUTION_BRIDGE.md",
-      "url": "https://github.com/rllibo833-sudo/pusingcuk/blob/3df5b39889c28f08d2b23a761df9f46812b17e63/docs/AI_LANGUAGE_EVOLUTION_BRIDGE.md",
-      "source_repository": "rllibo833-sudo/pusingcuk",
-      "source_commit": "3df5b39889c28f08d2b23a761df9f46812b17e63",
-      "authority": "PUSINGCUK",
-      "evidence_type": "language-ai-integration-contract",
-      "claim_status": "workflow-contract-not-proof-of-all-features",
-      "visibility": "public-safe",
-      "topics": [
-        "FounderOS",
-        "CORE",
-        "evolusi bahasa",
-        "integrasi AI",
-        "feedback loop",
-        "compiler",
-        "diagnostik"
-      ],
-      "keywords": [
-        "founderos core sinkronisasi .cuk pusingcuk ai",
-        "AI perbaiki kode compiler diagnostik",
-        "bahasa berkembang bersama AI",
-        "historical knowledge",
-        "feedback loop",
-        "source of truth",
-        "cuk_compile_check",
-        "knowledge_search"
-      ],
-      "summary": "Menghubungkan prinsip historis FounderOS tentang keputusan dan bukti dengan pelajaran engineering CORE tentang kontrak deterministik, lalu menerapkannya sebagai alur AI mencari pengetahuan, memeriksa kode .cuk dengan compiler, memperbaiki diagnostik, dan memasukkan perubahan bahasa yang tervalidasi ke spesifikasi serta fixture.",
-      "excerpt": "FounderOS memberi konteks keputusan; CORE memberi pola kontrak deterministik dan fail-closed; spesifikasi dan compiler .cuk tetap otoritas eksekusi. AI mencari sumber, mengompilasi, memperbaiki diagnostik secara terbatas, dan tidak mengklaim eksekusi dari kompilasi. Fitur baru harus memperbarui spesifikasi, contoh, dan bukti konformansi."
     }
   ]
 }

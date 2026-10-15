@@ -37,7 +37,7 @@ class RetrievalEvaluationTests(unittest.TestCase):
             top1 += bool(actual and actual[0] == case["expected_top_id"])
             top3 += case["expected_top_id"] in actual
         metrics = {"cases": len(baseline["cases"]), "top1": top1, "top3": top3}
-        self.assertEqual(metrics["cases"], 20)
+        self.assertEqual(metrics["cases"], 21)
         self.assertGreaterEqual(metrics["top3"], metrics["top1"])
         self.assertLessEqual(metrics["top3"], metrics["cases"])
 

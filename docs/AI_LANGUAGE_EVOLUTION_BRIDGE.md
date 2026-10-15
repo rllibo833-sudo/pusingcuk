@@ -43,3 +43,10 @@ The intended mutual support is concrete: historical decisions define constraints
 ## Acceptance evidence
 
 A change to this loop is complete only when the relevant source/tool behavior is implemented, citations remain provenance-valid, compiler artifacts are not silently truncated, and focused tests demonstrate the claimed path. CI success is evidence for those tests and environments only; it is not production security certification.
+
+
+## Fixed orchestration budget and language learning UX
+
+PusingCuk AI uses one request orchestrator and a fixed registry of three tools (curated knowledge search, `.cuk` compile-check, and the registered budget rule). Do not create autonomous subagents or allow the model to register tools dynamically. Each request permits at most three model turns and four tool calls in total; exceeding the budget stops further tool execution and must be reported without claiming completion. Provider choice changes inference transport, not authority, tool permissions, or `.cuk` semantics. Any future specialist must first demonstrate a distinct task that cannot be handled by a bounded registered tool, and must have a hard call/latency budget and deterministic evaluation.
+
+For `.cuk` learning, preserve one language contract and build progressive examples on top of it: a beginner should be able to copy a tiny working program, change one value, read an Indonesian diagnostic, and re-run the compiler; advanced users should have the same explicit types, errors, and conformance rules rather than a separate “AI syntax.” Slang and Gen Z/Gen Alpha tone belong in teaching, examples, and diagnostics where clarity survives; they must not create ambiguous grammar or change runtime semantics. A language feature is accepted only when its specification, compiler behavior, and relevant conformance fixture agree.
