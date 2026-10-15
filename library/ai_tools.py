@@ -100,9 +100,9 @@ class ToolRegistry:
             "function": {
                 "name": "cuk_compile_check",
                 "description": (
-                    "Periksa apakah source .cuk yang diberikan dapat dikompilasi ke JavaScript "
-                    "oleh backend saat ini. Hanya kompilasi: tidak menjalankan source, tidak "
-                    "menyimpan artefak, dan tidak menjamin kesetaraan semua target."
+                    "Kompilasi source .cuk menjadi artefak JavaScript mandiri yang dapat diuji dengan Node.js. "
+                    "Mengembalikan source JavaScript dan hash artefak. Tidak menjalankan source "
+                    "dan tidak menyimpan artefak di server."
                 ),
                 "parameters": {
                     "type": "object",
@@ -187,6 +187,7 @@ class ToolRegistry:
                 "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
                 "artifact_sha256": hashlib.sha256(generated.encode("utf-8")).hexdigest(),
                 "artifact_bytes": len(generated.encode("utf-8")),
+                "artifact": generated,
                 "executed": False,
                 "artifact_saved": False,
             }

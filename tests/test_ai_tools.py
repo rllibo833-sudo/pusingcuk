@@ -36,6 +36,21 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertEqual(result["source_sha256"], hashlib.sha256(source.encode("utf-8")).hexdigest())
         self.assertGreater(result["artifact_bytes"], 0)
         self.assertEqual(len(result["artifact_sha256"]), 64)
+        self.assertIn('"use strict";', result["artifact"])
+        self.assertEqual(
+            hashlib.sha256(result["artifact"].encode("utf-8")).hexdigest(),
+            result["artifact_sha256"],
+        )
+        if NODE:
+            with tempfile.TemporaryDirectory(prefix="pusingcuk-ai-compiled-") as temp:
+                artifact = Path(temp) / "ai-output.js"
+                artifact.write_text(result["artifact"], encoding="utf-8")
+                executed = subprocess.run(
+                    [NODE, str(artifact)], text=True, encoding="utf-8",
+                    capture_output=True, timeout=15, check=False,
+                )
+            self.assertEqual(executed.returncode, 0, executed.stderr)
+            self.assertEqual(executed.stdout, "42\\n")
         self.assertIs(result["executed"], False)
         self.assertIs(result["artifact_saved"], False)
         definition = next(item["function"] for item in self.registry.definitions
