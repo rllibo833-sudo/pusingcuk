@@ -33,6 +33,18 @@ class AccountingEquationRuleTests(unittest.TestCase):
                 self.assertEqual(result["program_id"], "accounting.equation.v1")
                 self.assertEqual(result["capabilities"], [])
 
+    def test_non_integer_values_are_rejected_without_coercion(self):
+        invalid_values = (1.0, "1", None, [], {}, float("nan"), float("inf"))
+        for value in invalid_values:
+            with self.subTest(value=repr(value)):
+                result = self.registry.execute("accounting_equation_check", {
+                    "aset": value,
+                    "liabilitas": 0,
+                    "ekuitas": 0,
+                })
+                self.assertFalse(result["ok"])
+                self.assertEqual(result["error"], "RULE_INPUT_INVALID")
+
     def test_invalid_arguments_are_rejected(self):
         cases = (
             {"aset": 1, "liabilitas": 0},
