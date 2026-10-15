@@ -113,6 +113,27 @@ def generate(document):
                 loop_env = dict(env); loop_env[name] = "pc_v_" + name
                 out.append(indent + "for " + loop_env[name] + " in " + expr(f["iterable"], env) + ":")
                 out.extend(emit(f["body"], loop_env, indent + "    ", inside_function) or [indent + "    pass"])
+            elif k == "Try":
+                body, handler_name = f["body"], f["handler_name"]
+                handler, final = f["handler"], f["final"]
+                if handler_name is not None and (not isinstance(handler_name, str) or not handler_name.isidentifier()):
+                    raise PythonBackendError(f"baris {line}: nama variabel ketangkep tidak valid")
+                if handler_name is None and not final:
+                    out.extend(emit(body, env, indent, inside_function) or [])
+                    continue
+                out.append(indent + "try:")
+                out.extend(emit(body, dict(env), indent + "    ", inside_function) or [indent + "    pass"])
+                if handler_name is not None:
+                    error_name = "pc_error_" + str(line)
+                    catch_name = "pc_catch_" + handler_name + "_" + str(line)
+                    handler_env = dict(env)
+                    handler_env[handler_name] = catch_name
+                    out.append(indent + "except Exception as " + error_name + ":")
+                    out.append(indent + "    " + catch_name + " = str(" + error_name + ")")
+                    out.extend(emit(handler, handler_env, indent + "    ", inside_function) or [indent + "    pass"])
+                if final:
+                    out.append(indent + "finally:")
+                    out.extend(emit(final, dict(env), indent + "    ", inside_function) or [indent + "    pass"])
             else: raise PythonBackendError(f"baris {line}: pernyataan belum didukung: {k}")
         return out
 
