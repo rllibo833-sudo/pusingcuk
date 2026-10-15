@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -84,7 +85,7 @@ _REGISTERED_RULES: dict[str, dict[str, Any]] = {
     },
     "period.close.plan.v1": {
         "source_file": "period_close_plan.cuk",
-        "source_sha256": "a3a983a04dc6de3a15b8b1d115768728b92bbe03176a414302615a1929298e65",
+        "source_sha256": "345e8d5a76bc2549e32ac27f021d2baeb053a71ce954df7e875a5e560d5cc03b",
         "entrypoint": "status_penutupan_periode",
         "language_version": "0.5-dev",
         "input_fields": ("income_total", "expense_total"),
@@ -296,38 +297,33 @@ class ToolRegistry:
                     return {"ok": False, "error": "RULE_INPUT_INVALID"}
             result = self._run_registered_rule(rule_id, arguments)
             if result.get("ok") and rule_id == "period.close.plan.v1":
-                income = arguments["income_total"]
-                expense = arguments["expense_total"]
-                net_result = income - expense
+                values = result.pop("period_close_values", None)
+                if not isinstance(values, list) or len(values) != 7:
+                    return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
+                (
+                    net_result, income_debit, income_credit,
+                    expense_debit, expense_credit, retained_debit, retained_credit,
+                ) = values
                 closing_lines = []
-                if income:
-                    closing_lines.append({
-                        "role": "income",
-                        "debit_minor_units": income,
-                        "credit_minor_units": 0,
-                    })
-                if expense:
-                    closing_lines.append({
-                        "role": "expense",
-                        "debit_minor_units": 0,
-                        "credit_minor_units": expense,
-                    })
-                if net_result > 0:
-                    closing_lines.append({
-                        "role": "retained_earnings",
-                        "debit_minor_units": 0,
-                        "credit_minor_units": net_result,
-                    })
-                elif net_result < 0:
-                    closing_lines.append({
-                        "role": "retained_earnings",
-                        "debit_minor_units": -net_result,
-                        "credit_minor_units": 0,
-                    })
+                for role, debit, credit in (
+                    ("income", income_debit, income_credit),
+                    ("expense", expense_debit, expense_credit),
+                    ("retained_earnings", retained_debit, retained_credit),
+                ):
+                    if debit or credit:
+                        closing_lines.append({
+                            "role": role,
+                            "debit_minor_units": debit,
+                            "credit_minor_units": credit,
+                        })
+                debit_total = sum(line["debit_minor_units"] for line in closing_lines)
+                credit_total = sum(line["credit_minor_units"] for line in closing_lines)
+                if debit_total != credit_total:
+                    return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
                 result["net_result_minor_units"] = net_result
                 result["closing_lines"] = closing_lines
-                result["debit_total"] = max(income, expense)
-                result["credit_total"] = max(income, expense)
+                result["debit_total"] = debit_total
+                result["credit_total"] = credit_total
             return result
 
         return {"ok": False, "error": "TOOL_NOT_ALLOWLISTED"}
@@ -394,10 +390,33 @@ class ToolRegistry:
             or completed.stderr
             or not isinstance(stdout, str)
             or len(stdout.encode("utf-8")) > _MAX_RULE_OUTPUT_BYTES
-            or stdout not in {f"{value}\n" for value in rule["allowed_outputs"]}
         ):
             return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
 
+        if rule_id == "period.close.plan.v1":
+            lines = stdout.splitlines()
+            if len(lines) != 8 or lines[0] not in rule["allowed_outputs"]:
+                return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
+            if any(not re.fullmatch(r"-?\d+", value) for value in lines[1:]):
+                return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
+            values = [int(value) for value in lines[1:]]
+            if any(abs(value) > _MAX_RULE_INPUT for value in values):
+                return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
+            return {
+                "ok": True,
+                "program_id": rule_id,
+                "program_sha256": rule["source_sha256"],
+                "language_version": rule["language_version"],
+                "entrypoint": rule["entrypoint"],
+                "capabilities": [],
+                "execution_boundary": "fixed-hash-local-rule-not-os-sandbox",
+                "result": lines[0],
+                "period_close_values": values,
+                "elapsed_ms": elapsed_ms,
+            }
+
+        if stdout not in {f"{value}\n" for value in rule["allowed_outputs"]}:
+            return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
         return {
             "ok": True,
             "program_id": rule_id,

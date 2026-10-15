@@ -1,6 +1,6 @@
-# Registered period-close planning rule for synthetic CukAccount totals.
-# The rule classifies the result; the registry expands the reviewed result into
-# a deterministic, role-based closing-line plan. It never posts accounting data.
+# Registered period-close rule. It computes the result and every closing-line amount.
+# Output contract: status, net result, income D/C, expense D/C, retained earnings D/C.
+# This rule plans only; CukAccount remains responsible for posting and audit records.
 
 jancuk
 
@@ -24,6 +24,25 @@ tanya pendapatan_teks = ""
 tanya beban_teks = ""
 lah pendapatan_total = bilangan(pendapatan_teks)
 lah beban_total = bilangan(beban_teks)
+lah hasil_bersih = pendapatan_total - beban_total
+lah debit_laba_ditahan = 0
+lah kredit_laba_ditahan = 0
+
+njir hasil_bersih > 0
+    kredit_laba_ditahan = hasil_bersih
+kampret
+    njir hasil_bersih < 0
+        debit_laba_ditahan = 0 - hasil_bersih
+    selesai njir
+selesai njir
+
 hedeh status_penutupan_periode(pendapatan_total, beban_total)
+hedeh hasil_bersih
+hedeh pendapatan_total
+hedeh 0
+hedeh 0
+hedeh beban_total
+hedeh debit_laba_ditahan
+hedeh kredit_laba_ditahan
 
 selesai jancuk

@@ -273,7 +273,14 @@ class ToolInputContractTests(unittest.TestCase):
                         timeout=15, check=False,
                     )
                     self.assertEqual(compiled.returncode, 0, compiled.stderr)
-                    self.assertEqual(compiled.stdout, case["result"] + "\n")
+                    expected_output = "\n".join(str(value) for value in (
+                        case["result"],
+                        case["net_result_minor_units"],
+                        case["income_total"], 0, 0, case["expense_total"],
+                        max(-case["net_result_minor_units"], 0),
+                        max(case["net_result_minor_units"], 0),
+                    )) + "\n"
+                    self.assertEqual(compiled.stdout, expected_output)
 
     def test_journal_balance_rule_rejects_invalid_arguments(self):
         cases = (
