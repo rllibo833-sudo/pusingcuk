@@ -7,18 +7,11 @@ on:
       - "native/**"
       - "scripts/build-android.sh"
       - "halo.cuk"
-      - "pusingcuk_new.py"
-      - "evaluator.py"
-      - "parser.py"
-      - "tests/conformance/**"
-      - "examples/**"
-      - ".github/workflows/android-native.yml"
   pull_request:
     paths:
       - "native/**"
       - "scripts/build-android.sh"
       - "halo.cuk"
-      - ".github/workflows/android-native.yml"
   workflow_dispatch:
 
 permissions:
