@@ -85,6 +85,24 @@ class JavaScriptBackendTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "7\nBudi\n1\n2\n3\n")
 
+    def test_multiplication_matches_reference_for_string_and_list_repetition(self):
+        result = self.run_source(
+            'jancuk\nhedeh "cuk" * 3\nhedeh 3 * "x"\n'
+            'hedeh [1, 2] * 2\nhedeh 2 * [7]\nselesai jancuk'
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "cukcukcuk\nxxx\n[1, 2, 1, 2]\n[7, 7]\n")
+
+        invalid = self.run_source('jancuk\nhedeh "cuk" * 1.5\nselesai jancuk')
+        self.assertNotEqual(invalid.returncode, 0)
+        self.assertIn("operator *", invalid.stderr)
+
+    def test_subtraction_and_division_reject_javascript_type_coercion(self):
+        for expression in ('"5" - 2', '"6" / 2', 'benar * 3'):
+            with self.subTest(expression=expression):
+                result = self.run_source(f"jancuk\nhedeh {expression}\nselesai jancuk")
+                self.assertNotEqual(result.returncode, 0)
+
     def test_unicode_string_index_and_length_use_code_points(self):
         result = self.run_source(
             'jancuk\nlah teks = "A🌾Z"\nhedeh teks[1]\nhedeh panjang(teks)\nselesai jancuk'

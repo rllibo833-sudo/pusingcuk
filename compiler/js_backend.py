@@ -72,7 +72,45 @@ const pcAdd = (a, b) => {
   if (Array.isArray(a) && Array.isArray(b)) return a.concat(b);
   throw new Error("operator + membutuhkan dua angka, dua teks, atau dua daftar");
 };
+const pcSub = (a, b) => {
+  if (typeof a !== "number" || typeof b !== "number" ||
+      !Number.isFinite(a) || !Number.isFinite(b))
+    throw new Error("operator - membutuhkan dua angka finite");
+  const n = a - b;
+  if (!Number.isFinite(n)) throw new Error("operasi angka non-finite");
+  return n;
+};
+const pcMul = (a, b) => {
+  if (typeof a === "number" && typeof b === "number") {
+    if (!Number.isFinite(a) || !Number.isFinite(b))
+      throw new Error("operator * membutuhkan angka finite");
+    const n = a * b;
+    if (!Number.isFinite(n)) throw new Error("operasi angka non-finite");
+    if (Number.isInteger(n) && !Number.isSafeInteger(n))
+      throw new Error("hasil integer di luar rentang aman lintas target");
+    return n;
+  }
+  const repeat = (value, count) => {
+    if (!Number.isSafeInteger(count))
+      throw new Error("pengulangan membutuhkan integer aman");
+    const amount = Math.max(count, 0);
+    if (value.length * amount > 100000)
+      throw new Error("hasil perkalian terlalu besar (maksimal 100000 elemen)");
+    if (typeof value === "string") return value.repeat(amount);
+    const result = [];
+    for (let i = 0; i < amount; i++) result.push(...value);
+    return result;
+  };
+  if (typeof a === "string" && Number.isSafeInteger(b)) return repeat(a, b);
+  if (typeof b === "string" && Number.isSafeInteger(a)) return repeat(b, a);
+  if (Array.isArray(a) && Number.isSafeInteger(b)) return repeat(a, b);
+  if (Array.isArray(b) && Number.isSafeInteger(a)) return repeat(b, a);
+  throw new Error("operator * membutuhkan dua angka atau teks/daftar dengan integer");
+};
 const pcDiv = (a, b) => {
+  if (typeof a !== "number" || typeof b !== "number" ||
+      !Number.isFinite(a) || !Number.isFinite(b))
+    throw new Error("operator / membutuhkan dua angka finite");
   if (b === 0) throw new Error("pembagian dengan nol");
   const n = a / b;
   if (!Number.isFinite(n)) throw new Error("operasi angka non-finite");
