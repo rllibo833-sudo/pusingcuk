@@ -18,6 +18,14 @@ Nothing in the PusingCuk runtime is configured to use this Supabase project yet.
 
 This is intentional until a specific application data use-case and access model are agreed upon. Do not claim users, sessions, AI memories, language-runtime files, or local SQLite data are synchronized to Supabase.
 
+## First cloud use case: private project notes
+
+Selected use case: a signed-in user explicitly saves project notes and can retrieve them from another device. This does **not** mirror chat history or the local SQLite database. The versioned schema is `supabase/migrations/20261015080000_pusingcuk_project_notes.sql`. Each note references `auth.users`; RLS is enabled and forced, and separate select/insert/update/delete policies limit access to `auth.uid()`. Table privileges are revoked from `anon`, `public`, and `service_role`; only `authenticated` receives row-operation grants.
+
+The rollback smoke script is `supabase/tests/20261015080000_pusingcuk_project_notes_smoke.sql`. It simulates two authenticated identities and checks owner CRUD, spoofed insert denial, cross-user invisibility and blocked update/delete. This SQL role-level test is not a REST API or application-runtime integration test. Never publish privileged keys; this schema does not require a service-role key for end-user CRUD.
+
+**Status:** versioned schema staged for the PusingCuk project. Do not call the application connected until an authenticated client/API smoke test actually passes; the current repository runtime still uses SQLite.
+
 ## Safe integration checklist for a future feature
 
 1. Define the records and operations the feature needs; do not mirror the legacy CORE schema by default.

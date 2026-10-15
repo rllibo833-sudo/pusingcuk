@@ -61,7 +61,7 @@ The local adapter is implemented and tested for a versioned `POST /v1/chat` sche
 
 Not implemented as production guarantees: per-user identities/authorization and quotas, application-level abuse/rate controls, end-to-end cancellation/deadlines, streaming, graceful orchestration under SIGTERM, production metrics/alerts, TLS termination, backup/restore of durable service state, rollout/rollback automation, and an incident process. These must be designed and tested before public deployment. Keep provider-specific behavior behind an interface and do not blindly retry non-idempotent tool operations.
 
-Never expose the local model adapter or registered-rule runner directly to the public internet. Gemini is explicit opt-in and sends prompt/context data to a third party.
+Never expose the local model adapter or registered-rule runner directly to the public internet. Gemini is explicit opt-in and sends prompt/context data to a third party. Provider adapters normalize timeout, 429/rate-limit, authentication, missing-model and malformed-response failures to stable non-sensitive error codes. See tests in `tests/test_local_ai_provider.py` and `tests/test_gemini_ai_provider.py`.
 
 ### Gate 3 — safe deterministic rule execution
 

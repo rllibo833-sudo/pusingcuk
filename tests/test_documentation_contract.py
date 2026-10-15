@@ -95,5 +95,25 @@ class DocumentationContractTests(unittest.TestCase):
         self.assertIn("20 kasus benchmark", status)
         self.assertIn("66 fixture", status)
 
+    def test_supabase_notes_migration_has_owner_only_rls_and_no_client_secret(self):
+        root = Path(__file__).resolve().parents[1]
+        migration = (root / "supabase/migrations/20261015080000_pusingcuk_project_notes.sql").read_text(encoding="utf-8").lower()
+        smoke = (root / "supabase/tests/20261015080000_pusingcuk_project_notes_smoke.sql").read_text(encoding="utf-8").lower()
+        status = (root / "docs/integrations/SUPABASE_PROJECTS.md").read_text(encoding="utf-8").lower()
+        self.assertIn("references auth.users(id) on delete cascade", migration)
+        self.assertIn("enable row level security", migration)
+        self.assertIn("force row level security", migration)
+        for operation in ("select", "insert", "update", "delete"):
+            self.assertIn(f"pusingcuk_notes_{operation}_own", migration)
+        self.assertIn("auth.uid()", migration)
+        self.assertIn("revoke all on table", migration)
+        self.assertIn("to authenticated", migration)
+        self.assertIn("rls_cross_user_read_leak", smoke)
+        self.assertIn("rls_cross_user_insert_allowed", smoke)
+        self.assertIn("rls_cross_user_update_allowed", smoke)
+        self.assertIn("rls_cross_user_delete_allowed", smoke)
+        self.assertIn("not a rest api or application-runtime integration test", status)
+        self.assertNotIn("service_role key is required", status)
+
 if __name__ == "__main__":
     unittest.main()
