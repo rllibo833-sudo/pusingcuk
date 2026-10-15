@@ -81,6 +81,16 @@ class ExitCodeTests(unittest.TestCase):
         self.assertIn("Kesalahan sintaks:", invalid_result.stderr)
         self.assertEqual(invalid_result.stdout, "")
 
+    def test_arithmetic_error_returns_runtime_code_without_traceback(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "arithmetic.pusingcuk"
+            source.write_text("jancuk\\nhedeh 1 / 0\\nselesai jancuk\\n", encoding="utf-8")
+            result = self.run_cli(source)
+        self.assertEqual(result.returncode, 1, result.stderr)
+        self.assertIn("Kesalahan runtime", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertEqual(result.stdout, "")
+
     def test_success_returns_0(self):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "success.pusingcuk"

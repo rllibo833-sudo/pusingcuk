@@ -80,7 +80,7 @@ def main():
             message = f"Kesalahan sintaks: {message}"
         print(message, file=sys.stderr)
         return 2
-    except (RuntimeError, ValueError, TypeError, IndexError, OSError) as exc:
+    except (RuntimeError, ValueError, TypeError, IndexError, OSError, ArithmeticError, KeyError) as exc:
         print(f"Kesalahan runtime: {exc}", file=sys.stderr)
         return 1
     return 0
