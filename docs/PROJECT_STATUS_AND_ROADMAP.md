@@ -2,7 +2,7 @@
 
 **Audit:** 15 Oktober 2026  
 **Cakupan:** repositori `rllibo833-sudo/pusingcuk`, runtime bahasa `.cuk`, aplikasi AI, dokumentasi, CI, dan proyek Supabase yang dipetakan.  
-**Baseline yang diperiksa:** `a5ad400102044c3e6c215afbe1adda184396ed12`. Push CI dan build paket pada baseline ini berhasil; perubahan dokumentasi audit setelah baseline tetap harus melewati CI baru.
+**Status audit:** pembaruan dikerjakan langsung di `main`; periksa hasil Actions terbaru pada commit yang hendak dipakai. Tes utama kini mengunci versi bahasa/paket, alias, fixture konformansi, benchmark retrieval, serta batas klaim rilis.
 
 > **Kesimpulan utama:** PusingCuk adalah bahasa pemrograman eksperimental dengan jalur Python referensi dan runtime native C yang diuji untuk subset fitur. PusingCuk AI adalah aplikasi/orchestrator MVP di atas model provider yang dapat diganti, bukan model dasar yang dilatih sendiri. Supabase Free sudah memiliki skema catatan proyek pribadi dengan RLS yang diuji di database, tetapi runtime aplikasi PusingCuk masih belum terhubung.
 
@@ -182,7 +182,7 @@ Nama `CORE` pada file historis seperti `docs/integrations/CORE_TOOL_CONTRACT.md`
 
 Jangan menyebut bahasa stabil, AI akurat, service produksi, database terhubung, atau deployment Android tervalidasi kecuali bukti yang sesuai tersedia.
 
-1. CI utama dan build paket lulus pada commit yang dirilis.
+1. CI utama, evaluasi retrieval offline, dan build paket lulus pada commit yang dirilis.
 2. Matriks konformansi mencerminkan fixture yang benar-benar lulus.
 3. Benchmark AI mempunyai fixture, metrik, serta hasil yang dapat ditinjau.
 4. Secret scan dan review keamanan selesai untuk perubahan yang menyentuh provider, memori, database, dan tool.

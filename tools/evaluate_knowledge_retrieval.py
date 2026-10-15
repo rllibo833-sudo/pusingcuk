@@ -20,6 +20,12 @@ def evaluate() -> dict:
         ids = [doc["id"] for doc in rank_knowledge(documents, case["query"], limit=3)]
         top1 += bool(ids and ids[0] == case["expected_top_id"])
         top3 += case["expected_top_id"] in ids
+    adversarial_answerable = [case for case in adversarial["cases"] if case["expected_top_id"] is not None]
+    adversarial_top1 = adversarial_top3 = 0
+    for case in adversarial_answerable:
+        ids = [doc["id"] for doc in rank_knowledge(documents, case["query"], limit=3)]
+        adversarial_top1 += bool(ids and ids[0] == case["expected_top_id"])
+        adversarial_top3 += case["expected_top_id"] in ids
     trusted = documents[0]
     fake = {**trusted, "url": "https://attacker.example/fake"}
     answer = append_citations("Jawaban [tautan](https://attacker.example/fake)", [trusted, fake])
@@ -34,6 +40,8 @@ def evaluate() -> dict:
         "retrieval_top1": {"correct": top1, "total": len(baseline["cases"]), "rate": top1 / max(1, len(baseline["cases"]))},
         "retrieval_top3": {"correct": top3, "total": len(baseline["cases"]), "rate": top3 / max(1, len(baseline["cases"]))},
         "adversarial_cases": len(adversarial["cases"]),
+        "adversarial_retrieval_top1": {"correct": adversarial_top1, "total": len(adversarial_answerable), "rate": adversarial_top1 / max(1, len(adversarial_answerable))},
+        "adversarial_retrieval_top3": {"correct": adversarial_top3, "total": len(adversarial_answerable), "rate": adversarial_top3 / max(1, len(adversarial_answerable))},
         "citation_precision_structural_test": {"correct_trusted_urls": sum(url == trusted["url"] for url in emitted), "emitted_urls": len(emitted), "rate": citation_precision},
         "prompt_injection_tools_fail_closed": {"blocked": fail_closed, "total": len(injections)},
         "expected_abstention_policy_cases": len(abstention),

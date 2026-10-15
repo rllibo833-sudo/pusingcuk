@@ -1,7 +1,7 @@
 # Supabase project map for PusingCuk
 
 **Last verified:** 2026-10-15  
-**Status:** project selected; application integration not yet implemented.
+**Status:** schema applied and SQL RLS smoke passed; application integration not yet implemented.
 
 ## Project assignments
 
@@ -22,11 +22,11 @@ This is intentional until a specific application data use-case and access model 
 
 Selected use case: a signed-in user explicitly saves project notes and can retrieve them from another device. This does **not** mirror chat history or the local SQLite database. The versioned schema is `supabase/migrations/20261015002334_pusingcuk_project_notes_v1.sql`. Each note references `auth.users`; RLS is enabled and forced, and separate select/insert/update/delete policies limit access to `auth.uid()`. Table privileges are revoked from `anon`, `public`, and `service_role`; only `authenticated` receives row-operation grants.
 
-The rollback smoke script is `supabase/tests/20261015002334_pusingcuk_project_notes_smoke.sql`. It simulates two authenticated identities and checks owner CRUD, spoofed insert denial, cross-user invisibility and blocked update/delete. This SQL role-level test is not a REST API or application-runtime integration test. Never publish privileged keys; this schema does not require a service-role key for end-user CRUD.
+The rollback smoke script is `supabase/tests/20261015002334_pusingcuk_project_notes_smoke.sql`. The external EXECUTE grants on the existing project-level `public.rls_auto_enable()` event-trigger function were also revoked by `supabase/migrations/20261015002509_restrict_public_rls_auto_enable_execution.sql`; the event trigger remains active and a temporary-table probe confirmed it still enables RLS. It simulates two authenticated identities and checks owner CRUD, spoofed insert denial, cross-user invisibility and blocked update/delete. This SQL role-level test is not a REST API or application-runtime integration test. Never publish privileged keys; this schema does not require a service-role key for end-user CRUD.
 
 **Database smoke status (2026-10-15):** migration version `20261015002334` was applied to `vcvejjpzklpvknxmymgy`. A live SQL transaction test passed owner insert/read/update, denied cross-user insert, hid owner rows from another user, denied cross-user update/delete, confirmed no `anon` table grant, and rolled back all test data. A temporary table probe also confirmed the project-level `ensure_rls` event trigger still enables RLS after its function's external EXECUTE grants were revoked. Supabase security and performance advisors returned zero lints after that change. **Application status:** still not connected; this does not prove REST/Auth integration from PusingCuk's runtime.
 
-## Safe integration checklist for a future feature
+## Safe integration checklist for the next feature
 
 1. Define the records and operations the feature needs; do not mirror the legacy CORE schema by default.
 2. Add a versioned migration under a clearly documented Supabase migration directory and test it against this dedicated PusingCuk project.
@@ -40,4 +40,4 @@ The rollback smoke script is `supabase/tests/20261015002334_pusingcuk_project_no
 - The project now has one application table (`pusingcuk_project_notes`) with owner-scoped RLS. No PusingCuk runtime/API adapter uses the table yet.
 - No database dump or restore rehearsal has been produced for the legacy project.
 - Existing CORE scheduled jobs were previously found inactive, but that does not prove old Edge Function endpoints have no callers.
-- No schema or data was changed by writing this document.
+- Editing this document did not mutate the database. The only PusingCuk schema change is the versioned migration listed above; the SQL smoke transaction was rolled back.

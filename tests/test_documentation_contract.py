@@ -99,6 +99,7 @@ class DocumentationContractTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         migration = (root / "supabase/migrations/20261015002334_pusingcuk_project_notes_v1.sql").read_text(encoding="utf-8").lower()
         smoke = (root / "supabase/tests/20261015002334_pusingcuk_project_notes_smoke.sql").read_text(encoding="utf-8").lower()
+        access_fix = (root / "supabase/migrations/20261015002509_restrict_public_rls_auto_enable_execution.sql").read_text(encoding="utf-8").lower()
         status = (root / "docs/integrations/SUPABASE_PROJECTS.md").read_text(encoding="utf-8").lower()
         self.assertIn("references auth.users(id) on delete cascade", migration)
         self.assertIn("enable row level security", migration)
@@ -114,6 +115,24 @@ class DocumentationContractTests(unittest.TestCase):
         self.assertIn("rls_cross_user_delete_allowed", smoke)
         self.assertIn("not a rest api or application-runtime integration test", status)
         self.assertNotIn("service_role key is required", status)
+        self.assertIn("revoke all on function public.rls_auto_enable()", access_fix)
+
+    def test_release_claims_remain_proportional_to_evidence(self):
+        root = Path(__file__).resolve().parents[1]
+        readme = (root / "README.md").read_text(encoding="utf-8").lower()
+        readiness = (root / "docs/AI_ENGINE_READINESS.md").read_text(encoding="utf-8").lower()
+        status = (root / "docs/PROJECT_STATUS_AND_ROADMAP.md").read_text(encoding="utf-8").lower()
+        supabase = (root / "docs/integrations/SUPABASE_PROJECTS.md").read_text(encoding="utf-8").lower()
+        package = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
+
+        self.assertIn("experimental", readme)
+        self.assertIn("not a foundation model trained by pusingcuk", readiness)
+        self.assertIn("not a claim that a production service is deployed", readiness)
+        self.assertIn("jangan menyebut bahasa stabil, ai akurat, service produksi", status)
+        self.assertIn("application status:** still not connected", supabase)
+        self.assertEqual(package["project"]["classifiers"][0], "Development Status :: 3 - Alpha")
+        self.assertNotIn("supabase sync active", status)
+        self.assertNotIn("apk has been tested on physical android devices", status)
 
 if __name__ == "__main__":
     unittest.main()
