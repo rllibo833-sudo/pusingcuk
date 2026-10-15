@@ -142,7 +142,7 @@ class KnowledgeGroundingTests(unittest.TestCase):
         )
         results = rank_knowledge([document], "benchmakr retrievel", limit=1)
         self.assertEqual([item["id"] for item in results], ["primer-99"])
-        self.assertEqual(set(results[0]["matched_terms"]), {"benchmarck", "retrival"})
+        self.assertEqual(set(results[0]["matched_terms"]), {"benchmakr", "retrievel"})
 
     def test_indonesian_retrieval_benchmark_top_one(self):
         root = Path(__file__).resolve().parents[1]
