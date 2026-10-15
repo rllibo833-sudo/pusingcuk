@@ -138,7 +138,7 @@ class JavaScriptBackendTests(unittest.TestCase):
             "hedeh teks(benar)\n"
             "hedeh teks(salah)\n"
             "hedeh bilangan(42.9)\n"
-            "hedeh bilangan(\\"-42\\")\n"
+            'hedeh bilangan("-42")\n'
             "selesai jancuk"
         )
         self.assertEqual(result.returncode, 0, result.stderr)
