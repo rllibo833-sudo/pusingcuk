@@ -1,4 +1,5 @@
 """Regression tests for PusingCuk's local-first RAG and tool orchestration."""
+import hashlib
 import json
 import unittest
 from pathlib import Path
