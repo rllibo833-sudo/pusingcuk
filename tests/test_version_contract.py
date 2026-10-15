@@ -85,7 +85,7 @@ class VersionContractTests(unittest.TestCase):
         self.assertEqual(python_aliases, all_aliases)
 
         native_start = native_source.index("static const struct { const char *alias, *canonical; } aliases[] = {")
-        native_body = native_source[native_start:].split("\n    };", 1)[0].split("{", 1)[2]
+        native_body = native_source[native_start:].split("\n    };", 1)[0].split("aliases[] = {", 1)[1]
         native_aliases = {}
         for line in native_body.splitlines():
             line = line.strip().rstrip(",")
