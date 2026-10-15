@@ -3,7 +3,51 @@ name: Tes Pusingcuk
 on:
   push:
     branches: [main, "audit/**"]
+    paths:
+      - ".github/workflows/tests.yml"
+      - "pusingcuk_new.py"
+      - "evaluator.py"
+      - "lexer.py"
+      - "parser.py"
+      - "ast_nodes.py"
+      - "compiler/**"
+      - "library/**"
+      - "native/**"
+      - "tests/**"
+      - "tools/**"
+      - "examples/**/*.cuk"
+      - "examples/**/*.pusingcuk"
+      - "examples/**/*.py"
+      - "halo.cuk"
+      - "Makefile"
+      - "pyproject.toml"
+      - "setup.py"
+      - "setup.cfg"
+      - "requirements.txt"
+      - "pusingcuk.spec"
   pull_request:
+    paths:
+      - ".github/workflows/tests.yml"
+      - "pusingcuk_new.py"
+      - "evaluator.py"
+      - "lexer.py"
+      - "parser.py"
+      - "ast_nodes.py"
+      - "compiler/**"
+      - "library/**"
+      - "native/**"
+      - "tests/**"
+      - "tools/**"
+      - "examples/**/*.cuk"
+      - "examples/**/*.pusingcuk"
+      - "examples/**/*.py"
+      - "halo.cuk"
+      - "Makefile"
+      - "pyproject.toml"
+      - "setup.py"
+      - "setup.cfg"
+      - "requirements.txt"
+      - "pusingcuk.spec"
   workflow_dispatch:
 
 permissions:
