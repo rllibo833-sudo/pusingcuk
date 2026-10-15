@@ -92,7 +92,7 @@ class DocumentationContractTests(unittest.TestCase):
         self.assertNotIn("16-case exact-top-1 retrieval benchmark", readiness)
         self.assertNotIn("16 source records", ledger)
         self.assertIn("20 dokumen sumber terkurasi", status)
-        self.assertIn("20 kasus benchmark", status)
+        self.assertIn("20 kasus baseline menghasilkan top-1", status)
         self.assertIn("5/8 (62,5%)", status)
         self.assertIn("6/8 (75%)", status)
         self.assertIn("66 fixture", status)
