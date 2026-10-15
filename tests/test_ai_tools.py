@@ -211,83 +211,68 @@ class ToolInputContractTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         dataset_path = root / "tests" / "fixtures" / "cukaccount_financial_acceptance.json"
         dataset = json.loads(dataset_path.read_text(encoding="utf-8"))
-        expected = dataset["expected"]["closing_journal_lines"]
-        income = dataset["expected"]["profit_and_loss"]["total_income"]
-        expense = dataset["expected"]["profit_and_loss"]["total_expenses"]
+        expected = dataset["expected"]
+        cases = expected["period_close_cases"]
+        self.assertEqual({case["id"] for case in cases}, {"profit", "loss", "zero"})
 
-        result = self.registry.execute(
-            "period_close_plan",
-            {"income_total": income, "expense_total": expense},
-        )
-        self.assertTrue(result["ok"], result)
-        self.assertEqual(result["program_id"], "period.close.plan.v1")
-        self.assertEqual(result["result"], "PENUTUPAN_LABA")
-        self.assertEqual(result["net_result_minor_units"], 150000)
-        self.assertEqual(result["debit_total"], result["credit_total"])
-        self.assertEqual(
-            result["closing_lines"],
-            [
-                {"role": "income", "debit_minor_units": 250000, "credit_minor_units": 0},
-                {"role": "expense", "debit_minor_units": 0, "credit_minor_units": 100000},
-                {"role": "retained_earnings", "debit_minor_units": 0, "credit_minor_units": 150000},
-            ],
-        )
-        self.assertEqual(
-            [(line["debit"], line["credit"]) for line in expected],
-            [(250000, 0), (0, 100000), (0, 150000)],
-        )
-
-    def test_period_close_plan_handles_loss_zero_and_invalid_values(self):
-        cases = (
-            (250000, 100000, "PENUTUPAN_LABA", 150000, 250000),
-            (100000, 250000, "PENUTUPAN_RUGI", -150000, 250000),
-            (100000, 100000, "PENUTUPAN_NOL", 0, 100000),
-            (0, 0, "PENUTUPAN_NOL", 0, 0),
-        )
-        for income, expense, expected, net, total in cases:
-            with self.subTest(income=income, expense=expense):
-                result = self.registry.execute(
-                    "period_close_plan",
-                    {"income_total": income, "expense_total": expense},
-                )
+        for case in cases:
+            arguments = {
+                "income_total": case["income_total"],
+                "expense_total": case["expense_total"],
+            }
+            with self.subTest(case=case["id"]):
+                result = self.registry.execute("period_close_plan", arguments)
                 self.assertTrue(result["ok"], result)
-                self.assertEqual(result["result"], expected)
-                self.assertEqual(result["net_result_minor_units"], net)
-                self.assertEqual(result["debit_total"], total)
-                self.assertEqual(result["credit_total"], total)
-        for arguments in (
-            {"income_total": -1, "expense_total": 0},
-            {"income_total": 0, "expense_total": 1_000_000_000_001},
-            {"income_total": True, "expense_total": 1},
-        ):
-            with self.subTest(arguments=arguments):
+                self.assertEqual(result["program_id"], "period.close.plan.v1")
+                self.assertEqual(result["result"], case["result"])
+                self.assertEqual(result["net_result_minor_units"], case["net_result_minor_units"])
+                self.assertEqual(result["debit_total"], case["debit_total"])
+                self.assertEqual(result["credit_total"], case["credit_total"])
+                self.assertEqual(result["debit_total"], result["credit_total"])
+                self.assertEqual(result["closing_lines"], case["closing_lines"])
+
+        profit = next(case for case in cases if case["id"] == "profit")
+        expected_account_lines = expected["closing_journal_lines"]
+        self.assertEqual(
+            [(line["debit"], line["credit"]) for line in expected_account_lines],
+            [(line["debit_minor_units"], line["credit_minor_units"]) for line in profit["closing_lines"]],
+        )
+
+    def test_period_close_plan_rejects_invalid_values_from_shared_fixture(self):
+        root = Path(__file__).resolve().parents[1]
+        fixture_path = root / "tests" / "fixtures" / "cukaccount_financial_acceptance.json"
+        fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+        cases = fixture["expected"]["period_close_invalid_inputs"]
+        for case in cases:
+            with self.subTest(input=case["input"]):
+                result = self.registry.execute("period_close_plan", case["input"])
                 self.assertEqual(
-                    self.registry.execute("period_close_plan", arguments),
-                    {"ok": False, "error": "RULE_INPUT_INVALID"},
+                    result,
+                    {"ok": False, "error": case["error"]},
                 )
 
     @unittest.skipUnless(NODE, "Node.js tidak tersedia")
-    def test_period_close_rule_matches_compiled_javascript(self):
+    def test_period_close_rule_matches_compiled_javascript_and_shared_cases(self):
+        root = Path(__file__).resolve().parents[1]
+        fixture_path = root / "tests" / "fixtures" / "cukaccount_financial_acceptance.json"
+        fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+        cases = fixture["expected"]["period_close_cases"]
         rule = _REGISTERED_RULES["period.close.plan.v1"]
         source = _load_rule_source(rule)
         generated = generate(from_source(source.decode("utf-8"), rule["source_file"]))
         with tempfile.TemporaryDirectory(prefix="pusingcuk-period-close-") as temp:
             artifact = Path(temp) / "period-close.js"
             artifact.write_text(generated, encoding="utf-8")
-            for income, expense, expected in (
-                (250000, 100000, "PENUTUPAN_LABA"),
-                (100000, 250000, "PENUTUPAN_RUGI"),
-                (100000, 100000, "PENUTUPAN_NOL"),
-            ):
-                with self.subTest(income=income, expense=expense):
+            for case in cases:
+                with self.subTest(case=case["id"]):
                     compiled = subprocess.run(
                         [NODE, str(artifact)],
-                        input=f"{income}\n{expense}\n",
+                        input=f'{case["income_total"]}\n{case["expense_total"]}\n',
                         text=True, encoding="utf-8", capture_output=True,
                         timeout=15, check=False,
                     )
                     self.assertEqual(compiled.returncode, 0, compiled.stderr)
-                    self.assertEqual(compiled.stdout, expected + "\n")
+                    self.assertEqual(compiled.stdout, case["result"] + "\n")
 
     def test_journal_balance_rule_rejects_invalid_arguments(self):
         cases = (

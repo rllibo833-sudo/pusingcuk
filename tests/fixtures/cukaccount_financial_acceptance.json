@@ -215,6 +215,104 @@
         },
         "result": "KLASIFIKASI_LAPORAN_BELUM_LENGKAP"
       }
-    }
+    },
+    "period_close_cases": [
+      {
+        "id": "profit",
+        "income_total": 250000,
+        "expense_total": 100000,
+        "result": "PENUTUPAN_LABA",
+        "net_result_minor_units": 150000,
+        "debit_total": 250000,
+        "credit_total": 250000,
+        "closing_lines": [
+          {
+            "role": "income",
+            "debit_minor_units": 250000,
+            "credit_minor_units": 0
+          },
+          {
+            "role": "expense",
+            "debit_minor_units": 0,
+            "credit_minor_units": 100000
+          },
+          {
+            "role": "retained_earnings",
+            "debit_minor_units": 0,
+            "credit_minor_units": 150000
+          }
+        ]
+      },
+      {
+        "id": "loss",
+        "income_total": 100000,
+        "expense_total": 250000,
+        "result": "PENUTUPAN_RUGI",
+        "net_result_minor_units": -150000,
+        "debit_total": 250000,
+        "credit_total": 250000,
+        "closing_lines": [
+          {
+            "role": "income",
+            "debit_minor_units": 100000,
+            "credit_minor_units": 0
+          },
+          {
+            "role": "expense",
+            "debit_minor_units": 0,
+            "credit_minor_units": 250000
+          },
+          {
+            "role": "retained_earnings",
+            "debit_minor_units": 150000,
+            "credit_minor_units": 0
+          }
+        ]
+      },
+      {
+        "id": "zero",
+        "income_total": 100000,
+        "expense_total": 100000,
+        "result": "PENUTUPAN_NOL",
+        "net_result_minor_units": 0,
+        "debit_total": 100000,
+        "credit_total": 100000,
+        "closing_lines": [
+          {
+            "role": "income",
+            "debit_minor_units": 100000,
+            "credit_minor_units": 0
+          },
+          {
+            "role": "expense",
+            "debit_minor_units": 0,
+            "credit_minor_units": 100000
+          }
+        ]
+      }
+    ],
+    "period_close_invalid_inputs": [
+      {
+        "input": {
+          "income_total": -1,
+          "expense_total": 0
+        },
+        "error": "RULE_INPUT_INVALID"
+      },
+      {
+        "input": {
+          "income_total": 0,
+          "expense_total": 1000000000001
+        },
+        "error": "RULE_INPUT_INVALID"
+      },
+      {
+        "input": {
+          "income_total": true,
+          "expense_total": 1
+        },
+        "error": "RULE_INPUT_INVALID"
+      }
+    ]
   }
 }
