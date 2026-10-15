@@ -39,4 +39,36 @@ njir batas_aturan == 1000000000000
 kampret
     hedeh "CUKACCOUNT_BOUNDARY_MAX_FAILED"
 selesai njir
+# Period-close formula regressions. Success is silent; any mismatch adds a failure marker.
+lah pendapatan_tutup = 250000
+lah beban_tutup = 100000
+lah laba_tutup = pendapatan_tutup - beban_tutup
+lah debit_tutup_laba = pendapatan_tutup
+lah kredit_tutup_laba = beban_tutup + laba_tutup
+njir laba_tutup == 150000 dan debit_tutup_laba == kredit_tutup_laba
+    lah tutup_laba_ok = 1
+kampret
+    hedeh "CUKACCOUNT_PERIOD_CLOSE_PROFIT_FAILED"
+selesai njir
+
+lah pendapatan_rugi = 100000
+lah beban_rugi = 250000
+lah hasil_rugi = pendapatan_rugi - beban_rugi
+lah debit_tutup_rugi = pendapatan_rugi + (0 - hasil_rugi)
+lah kredit_tutup_rugi = beban_rugi
+njir hasil_rugi == -150000 dan debit_tutup_rugi == kredit_tutup_rugi
+    lah tutup_rugi_ok = 1
+kampret
+    hedeh "CUKACCOUNT_PERIOD_CLOSE_LOSS_FAILED"
+selesai njir
+
+lah pendapatan_nol = 100000
+lah beban_nol = 100000
+lah hasil_nol = pendapatan_nol - beban_nol
+njir hasil_nol == 0 dan pendapatan_nol == beban_nol
+    lah tutup_nol_ok = 1
+kampret
+    hedeh "CUKACCOUNT_PERIOD_CLOSE_ZERO_FAILED"
+selesai njir
+
 selesai jancuk
