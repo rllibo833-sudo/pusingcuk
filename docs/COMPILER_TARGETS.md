@@ -48,6 +48,8 @@ node program.js
 
 Importer menggunakan struktur sintaks Python, lalu menghasilkan sumber Pusingcuk. Cakupan mencakup variabel, fungsi dasar, koleksi, kondisi termasuk `elif`, loop, builtin numerik `abs/round/min/max`, dan subset modul standar `math`: `sqrt/floor/ceil/fabs/pow/sin/cos` serta `pi/e`. Builtin math tambahan diuji pada backend JavaScript dan HTML (HTML menyematkan runtime JavaScript yang sama). Ini **hanya subset**, bukan kompatibilitas penuh Python; modul eksternal, API math yang tidak terdaftar, kelas, exception handling, comprehension, dan sejumlah konstruksi lain ditolak dengan pesan jelas. Lihat [cakupan dan batas importer](IMPORT_PYTHON.md).
 
+Blok `coba ... ketangkep ... akhirnya ... selesai coba` saat ini diterjemahkan oleh target JavaScript dan Python untuk penanganan exception runtime; variabel `ketangkep` berisi pesan error dan `akhirnya` dijalankan ketika blok selesai maupun saat error diteruskan. Backend C native tetap tidak mendukung `Try`, sesuai batas subset yang dinyatakan pada SPEC. Tes target tidak menyatakan semua diagnostik runtime identik byte-per-byte.
+
 Backend menolak konstruksi yang belum dikenali alih-alih diam-diam menerjemahkannya secara keliru. Target yang berbeda belum menjamin kesetaraan penuh semua semantik; cakupan tiap backend harus diperluas lewat tes konformansi.
 
 ## Jalur pengembangan
