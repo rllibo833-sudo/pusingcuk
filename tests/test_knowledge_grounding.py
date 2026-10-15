@@ -125,6 +125,14 @@ class KnowledgeGroundingTests(unittest.TestCase):
             ["bagaimana", "menjelaskan", "cara", "menangani", "masalah", "tidak", "mengarang"],
         )
 
+    def test_common_repository_typos_normalize_for_retrieval(self):
+        from library.knowledge_grounding import tokenize
+
+        self.assertEqual(
+            tokenize("supabse benchmarck retrival"),
+            ["supabase", "benchmark", "retrieval"],
+        )
+
     def test_typo_tolerance_recovers_long_query_terms(self):
         document = source(
             99,

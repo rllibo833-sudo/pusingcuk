@@ -46,6 +46,10 @@ _INDONESIAN_QUERY_ALIASES = {
     "gak": "tidak",
     "nggak": "tidak",
     "enggak": "tidak",
+    # Frequent typos seen in repository and benchmark queries.
+    "supabse": "supabase",
+    "benchmarck": "benchmark",
+    "retrival": "retrieval",
 }
 
 

@@ -170,6 +170,46 @@ class AssistantTests(unittest.TestCase):
         self.assertEqual(result["program_id"], "budget.threshold.v1")
         self.assertEqual(result["capabilities"], [])
 
+    def test_registered_budget_rule_boundary_cases_execute_with_verified_sources(self):
+        class BudgetToolProvider:
+            def __init__(self, nominal, batas):
+                self.nominal = nominal
+                self.batas = batas
+                self.calls = 0
+
+            def generate_turn(self, messages, *, system_prompt=None, tools=None):
+                self.calls += 1
+                if self.calls == 1:
+                    return {
+                        "content": "",
+                        "tool_calls": [{
+                            "id": "budget-boundary",
+                            "name": "budget_threshold",
+                            "arguments": {"nominal": self.nominal, "batas": self.batas},
+                        }],
+                    }
+                return {"content": "Aturan anggaran lokal selesai.", "tool_calls": []}
+
+        cases = [
+            (0, 0, "DALAM_BATAS"),
+            (100, 100, "DALAM_BATAS"),
+            (101, 100, "PERLU_PERSETUJUAN"),
+            (1_000_000_000_000, 1_000_000_000_000, "DALAM_BATAS"),
+        ]
+        for nominal, batas, expected in cases:
+            with self.subTest(nominal=nominal, batas=batas):
+                provider = BudgetToolProvider(nominal, batas)
+                assistant = PusingCukAssistant(provider, self.documents)
+                answer = assistant.ask(f"Periksa anggaran {nominal} dengan batas {batas}.")
+                self.assertEqual(provider.calls, 2)
+                self.assertIn("Aturan anggaran lokal selesai", answer)
+                self.assertIn("Sumber rujukan", answer)
+                urls = __import__("re").findall(r"\]\((https://[^)]+)\)", answer)
+                self.assertTrue(urls)
+                known_urls = {doc["url"] for doc in self.documents}
+                self.assertTrue(set(urls) <= known_urls)
+                self.assertNotIn("untrusted", answer.lower())
+
     def test_budget_rule_assistant_tool_call_uses_internal_registry_binding(self):
         class BudgetToolProvider:
             def __init__(self):

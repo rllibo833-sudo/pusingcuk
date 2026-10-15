@@ -117,7 +117,13 @@
         "program terdaftar",
         "sha256",
         "isolasi",
-        "tanpa jaringan"
+        "tanpa jaringan",
+        "prompt injection",
+        "ignore previous instructions",
+        "shell command",
+        "jalankan shell",
+        "eksekusi kode acak",
+        "tool tidak terdaftar"
       ],
       "summary": "Eksekusi aturan harus terbatas pada program terdaftar dengan hash dan input tervalidasi. Runner lokal merupakan prototipe dan bukan isolasi OS universal; source arbitrer dari model tidak boleh dijalankan.",
       "excerpt": "Akses filesystem, jaringan, database, proses, environment, dan secret harus ditolak secara default untuk program bahasa."
@@ -249,7 +255,12 @@
       "keywords": [
         "cari dokumen knowledge retrieval ranking metadata",
         "pencarian dokumen",
-        "ranking leksikal"
+        "ranking leksikal",
+        "benchmark",
+        "benchmark retrieval",
+        "evaluasi retrieval bahasa indonesia",
+        "retrival",
+        "typo retrieval"
       ],
       "summary": "Pencarian pengetahuan PusingCuk memberi bobot deterministik pada judul, topik, kata kunci, ringkasan, dan cuplikan. Teks hasil pencarian diperlakukan sebagai data tidak tepercaya, bukan instruksi sistem.",
       "excerpt": "Retrieval saat ini bersifat leksikal dengan indeks kecil yang ditinjau manual, bukan vector search atau pelatihan model."
@@ -556,7 +567,12 @@
         "API order",
         "Auth user",
         "backup restore",
-        "caller"
+        "caller",
+        "supabase",
+        "supabase integration",
+        "menghubungkan supabase",
+        "supabse",
+        "koneksi supabase"
       ],
       "summary": "Memuat pemetaan aset Founder-OS/CORE ke PusingCuk, snapshot live Supabase, status job 8 dan 10, sepuluh Edge Function yang masih ACTIVE, serta gerbang penutupan. Menonaktifkan cron tidak mematikan endpoint dan tidak membuktikan backup sudah bisa dipulihkan.",
       "excerpt": "Pada pemeriksaan 2026-10-15, dua cron yang diketahui tidak aktif; sepuluh Edge Function tetap ACTIVE. Audit ini hanya menghitung data, bukan mengekspor atau memulihkan database. Setiap endpoint, caller, webhook, dan data wajib punya keputusan migrate/retire dan bukti."

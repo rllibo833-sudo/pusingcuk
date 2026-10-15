@@ -51,9 +51,9 @@ class RetrievalEvaluationTests(unittest.TestCase):
                  and results[0]["id"] == case["expected_top_id"])
             for case in answerable
         )
-        # This small regression floor is not a claim of general language understanding.
-        self.assertGreaterEqual(correct, 5)
+        # These are curated regression queries, not proof of general language understanding.
         self.assertEqual(len(answerable), 8)
+        self.assertEqual(correct, len(answerable))
 
     def test_citation_precision_is_measured_on_untrusted_model_links(self):
         trusted = self.documents[0]
