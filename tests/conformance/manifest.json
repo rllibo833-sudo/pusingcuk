@@ -1304,6 +1304,28 @@
         "reference": "required",
         "native": "required"
       }
+    },
+    {
+      "id": "cukaccount.financial-input-boundaries",
+      "source": "cukaccount_financial_cases.cuk",
+      "profile": "core",
+      "requires": [
+        "variables",
+        "integer-arithmetic",
+        "comparisons",
+        "logical-operators",
+        "conditional",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "CUKACCOUNT_VALID_BALANCED\nCUKACCOUNT_INVALID_UNBALANCED\nCUKACCOUNT_INVALID_ZERO\nCUKACCOUNT_INVALID_NEGATIVE\nCUKACCOUNT_BOUNDARY_MAX\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
     }
   ]
 }

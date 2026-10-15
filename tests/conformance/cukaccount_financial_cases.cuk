@@ -1,0 +1,42 @@
+# Synthetic cross-runtime acceptance fixture for CukAccount.
+# Integer IDR values only; this rule is a secondary check, never a posting engine.
+jancuk
+lah debit_valid = 1600000
+lah kredit_valid = 1600000
+njir debit_valid == kredit_valid
+    hedeh "CUKACCOUNT_VALID_BALANCED"
+kampret
+    hedeh "CUKACCOUNT_VALID_BALANCED_FAILED"
+selesai njir
+
+lah debit_tidak_seimbang = 1600000
+lah kredit_tidak_seimbang = 1600001
+njir debit_tidak_seimbang == kredit_tidak_seimbang
+    hedeh "CUKACCOUNT_INVALID_UNBALANCED_FAILED"
+kampret
+    hedeh "CUKACCOUNT_INVALID_UNBALANCED"
+selesai njir
+
+lah debit_nol = 0
+lah kredit_nol = 0
+njir debit_nol > 0 dan kredit_nol > 0
+    hedeh "CUKACCOUNT_INVALID_ZERO_FAILED"
+kampret
+    hedeh "CUKACCOUNT_INVALID_ZERO"
+selesai njir
+
+lah debit_negatif = -1
+lah kredit_positif = 1
+njir debit_negatif > 0 dan kredit_positif > 0
+    hedeh "CUKACCOUNT_INVALID_NEGATIVE_FAILED"
+kampret
+    hedeh "CUKACCOUNT_INVALID_NEGATIVE"
+selesai njir
+
+lah batas_aturan = 1000000000000
+njir batas_aturan == 1000000000000
+    hedeh "CUKACCOUNT_BOUNDARY_MAX"
+kampret
+    hedeh "CUKACCOUNT_BOUNDARY_MAX_FAILED"
+selesai njir
+selesai jancuk

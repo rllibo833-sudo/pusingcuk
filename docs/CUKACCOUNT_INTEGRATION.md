@@ -29,3 +29,19 @@ Acceptance for stronger integration requires evidence that a `.cuk` rule's expec
 
 ## Safety
 Do not put real customer names, account numbers, balances, credentials, or private company data in fixtures or the public knowledge index. Use synthetic examples only.
+
+## Financial conformance fixture and expected output
+
+`tests/conformance/cukaccount_financial_cases.cuk` is a shared, synthetic cross-runtime fixture. Its exact stdout contract is:
+
+```text
+CUKACCOUNT_VALID_BALANCED
+CUKACCOUNT_INVALID_UNBALANCED
+CUKACCOUNT_INVALID_ZERO
+CUKACCOUNT_INVALID_NEGATIVE
+CUKACCOUNT_BOUNDARY_MAX
+```
+
+Both the reference interpreter and native C runtime must match that output. The registered local-AI tool `journal_balance_check` has a separate schema-level contract: integer IDR totals from 0 through Rp1,000,000,000,000 are accepted as inputs; negatives, over-limit values, booleans, floats, strings, nulls, collections, missing fields, and extra fields are rejected without coercion. The .cuk fixture tests language semantics; the registered-tool tests check input validation and rule execution. Neither is a replacement for CukAccount's Dart/SQLite posting and report tests.
+
+CukAccount CI should run this exact fixture from its pinned PusingCuk checkout, compare the complete stdout to the expected lines above, and run the registered-rule regression suite. The independent Dart/SQLite regression suite remains the source of truth for actual journal and report outcomes.
