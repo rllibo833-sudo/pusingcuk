@@ -177,7 +177,15 @@ class OllamaChatProvider:
         except LocalAIProviderError:
             raise
         except HTTPError as exc:
-            raise LocalAIProviderError(f"AI_HTTP_{exc.code}") from None
+            if exc.code == 429:
+                raise LocalAIProviderError("AI_PROVIDER_RATE_LIMITED") from None
+            if exc.code in (401, 403):
+                raise LocalAIProviderError("AI_PROVIDER_AUTH_FAILED") from None
+            if exc.code == 404:
+                raise LocalAIProviderError("AI_MODEL_NOT_FOUND") from None
+            if exc.code >= 500:
+                raise LocalAIProviderError("AI_PROVIDER_UNAVAILABLE") from None
+            raise LocalAIProviderError("AI_PROVIDER_HTTP_ERROR") from None
         except (URLError, TimeoutError, OSError) as exc:
             if isinstance(exc, TimeoutError) or "timed out" in str(exc).casefold():
                 raise LocalAIProviderError("AI_TIMEOUT") from None

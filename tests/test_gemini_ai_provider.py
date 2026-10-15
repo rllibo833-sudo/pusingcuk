@@ -2,7 +2,7 @@
 import json
 import unittest
 from unittest.mock import patch
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
 
 from library.gemini_ai_provider import GeminiGenerateContentProvider
 from library.local_ai_provider import LocalAIProviderError
@@ -98,6 +98,30 @@ class GeminiProviderTests(unittest.TestCase):
             with self.assertRaisesRegex(LocalAIProviderError, "PROVIDER_UNAVAILABLE") as error:
                 self.provider.generate(self.messages)
         self.assertNotIn("private endpoint detail", str(error.exception))
+
+
+    def test_rate_limit_is_normalized_and_provider_body_is_not_exposed(self):
+        failure = HTTPError("https://provider.invalid", 429, "quota exceeded - private detail", None, None)
+        with patch("library.gemini_ai_provider.build_opener") as builder:
+            builder.return_value.open.side_effect = failure
+            with self.assertRaisesRegex(LocalAIProviderError, "AI_PROVIDER_RATE_LIMITED") as error:
+                self.provider.generate(self.messages)
+        self.assertNotIn("private detail", str(error.exception))
+
+    def test_timeout_is_normalized(self):
+        with patch("library.gemini_ai_provider.build_opener") as builder:
+            builder.return_value.open.side_effect = TimeoutError("sensitive timeout detail")
+            with self.assertRaisesRegex(LocalAIProviderError, "AI_TIMEOUT") as error:
+                self.provider.generate(self.messages)
+        self.assertNotIn("sensitive", str(error.exception))
+
+    def test_provider_auth_error_has_stable_code(self):
+        failure = HTTPError("https://provider.invalid", 403, "private auth details", None, None)
+        with patch("library.gemini_ai_provider.build_opener") as builder:
+            builder.return_value.open.side_effect = failure
+            with self.assertRaisesRegex(LocalAIProviderError, "AI_PROVIDER_AUTH_FAILED") as error:
+                self.provider.generate(self.messages)
+        self.assertNotIn("private auth details", str(error.exception))
 
 
 if __name__ == "__main__":
