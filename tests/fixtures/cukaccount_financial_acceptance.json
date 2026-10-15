@@ -186,6 +186,35 @@
         "debit": 0,
         "credit": 150000
       }
-    ]
+    ],
+    "report_classification": {
+      "complete": {
+        "input": {
+          "jumlah_kas": 5,
+          "kas_tanpa_kategori": 0,
+          "jumlah_ekuitas": 2,
+          "ekuitas_tanpa_kategori": 0
+        },
+        "result": "KLASIFIKASI_LAPORAN_LENGKAP"
+      },
+      "missing_cash_category": {
+        "input": {
+          "jumlah_kas": 5,
+          "kas_tanpa_kategori": 1,
+          "jumlah_ekuitas": 2,
+          "ekuitas_tanpa_kategori": 0
+        },
+        "result": "KLASIFIKASI_LAPORAN_BELUM_LENGKAP"
+      },
+      "missing_equity_category": {
+        "input": {
+          "jumlah_kas": 5,
+          "kas_tanpa_kategori": 0,
+          "jumlah_ekuitas": 2,
+          "ekuitas_tanpa_kategori": 1
+        },
+        "result": "KLASIFIKASI_LAPORAN_BELUM_LENGKAP"
+      }
+    }
   }
 }
