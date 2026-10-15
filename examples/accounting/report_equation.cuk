@@ -1,0 +1,20 @@
+# Synthetic example: calculate profit and verify the accounting equation.
+# All values are integer rupiah amounts; no real customer data is used.
+jancuk
+lah pendapatan = 2500000
+lah beban = 1500000
+lah aset = 11000000
+lah liabilitas = 0
+lah ekuitas_awal = 10000000
+fungsi hitung_laba(pendapatan, beban)
+    balek pendapatan - beban
+selesai fungsi
+lah laba = hitung_laba(pendapatan, beban)
+lah ekuitas_akhir = ekuitas_awal + laba
+lah selisih = aset - liabilitas - ekuitas_akhir
+njir selisih == 0
+    hedeh "CUKACCOUNT_REPORT_EQUATION_BALANCED"
+kampret
+    hedeh "CUKACCOUNT_REPORT_EQUATION_UNBALANCED"
+selesai njir
+selesai jancuk
