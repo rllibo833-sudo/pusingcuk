@@ -20,7 +20,7 @@ class ParserDiagnosticTests(unittest.TestCase):
 
     def test_lexer_errors_keep_their_actual_cause_and_source_location(self):
         cases = (
-            ('jancuk\nhedeh "belum tutup\nselesai jancuk', "string belum ditutup"),
+            ('jancuk\nhedeh "belum tutup\nselesai jancuk', "string tidak boleh melewati baris"),
             ('jancuk\nhedeh "salah\\q"\nselesai jancuk', "escape tidak dikenal"),
             ("jancuk\nlah x = 1e+\nselesai jancuk", "eksponen angka tidak valid"),
         )
