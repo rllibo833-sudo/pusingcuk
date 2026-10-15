@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import os
 import shutil
+import sys
 import subprocess
 import tempfile
 import unittest
@@ -157,6 +158,53 @@ class ToolInputContractTests(unittest.TestCase):
                     result["execution_boundary"],
                     "fixed-hash-local-rule-not-os-sandbox",
                 )
+
+    def test_cukaccount_period_close_fixture_is_ai_regression_input(self):
+        root = Path(__file__).resolve().parents[1]
+        fixture = root / "tests" / "conformance" / "cukaccount_financial_cases.cuk"
+        completed = subprocess.run(
+            [sys.executable, str(root / "pusingcuk_new.py"), str(fixture)],
+            cwd=root,
+            text=True,
+            encoding="utf-8",
+            capture_output=True,
+            timeout=10,
+            check=False,
+        )
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertEqual(
+            completed.stdout,
+            "\\n".join(
+                (
+                    "CUKACCOUNT_VALID_BALANCED",
+                    "CUKACCOUNT_INVALID_UNBALANCED",
+                    "CUKACCOUNT_INVALID_ZERO",
+                    "CUKACCOUNT_INVALID_NEGATIVE",
+                    "CUKACCOUNT_BOUNDARY_MAX",
+                )
+            ) + "\\n",
+        )
+        self.assertNotIn("CUKACCOUNT_PERIOD_CLOSE_", completed.stdout)
+
+        # Feed the same synthetic closing totals through the AI's fixed .cuk rule.
+        for debit_total, credit_total in (
+            (250000, 250000),  # profit close
+            (250000, 250000),  # loss close
+            (100000, 100000),  # zero-result close
+        ):
+            result = self.registry.execute(
+                "journal_balance_check",
+                {"debit_total": debit_total, "kredit_total": credit_total},
+            )
+            self.assertTrue(result["ok"], result)
+            self.assertEqual(result["result"], "JURNAL_SEIMBANG")
+
+        mismatch = self.registry.execute(
+            "journal_balance_check",
+            {"debit_total": 250000, "kredit_total": 249999},
+        )
+        self.assertTrue(mismatch["ok"], mismatch)
+        self.assertEqual(mismatch["result"], "JURNAL_TIDAK_SEIMBANG")
 
     def test_journal_balance_rule_rejects_invalid_arguments(self):
         cases = (
