@@ -115,5 +115,24 @@ class IRTests(unittest.TestCase):
         document = from_source(SOURCE, source_name)
         self.assertEqual(document["source_name"], "project.pusingcuk")
 
+    def test_try_node_is_serialized_and_advertises_error_handling(self):
+        source = (
+            "jancuk\n"
+            "coba\n"
+            "    hedeh 1 // 0\n"
+            "ketangkep pesan\n"
+            "    hedeh pesan\n"
+            "akhirnya\n"
+            "    hedeh \"selesai\"\n"
+            "selesai coba\n"
+            "selesai jancuk"
+        )
+        document = from_source(source)
+        self.assertIn("error-handling", document["features"])
+        try_node = document["program"]["fields"]["body"][0]
+        self.assertEqual(try_node["kind"], "Try")
+        self.assertEqual(set(try_node["fields"]), {"body", "handler_name", "handler", "final"})
+        self.assertEqual(try_node["fields"]["handler_name"], "pesan")
+
 if __name__ == "__main__":
     unittest.main()
