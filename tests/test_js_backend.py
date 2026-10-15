@@ -203,5 +203,31 @@ class JavaScriptBackendTests(unittest.TestCase):
         self.assertEqual(result.stdout, "Nama? Budi\n")
 
 
+    def test_try_catches_runtime_error_and_runs_finally_without_leaking_handler_name(self):
+        result = self.run_source(
+            "jancuk\n"
+            "lah pesan = \"luar\"\n"
+            "coba\n"
+            "    hedeh 1 // 0\n"
+            "ketangkep pesan\n"
+            "    hedeh pesan\n"
+            "akhirnya\n"
+            "    hedeh \"akhir\"\n"
+            "selesai coba\n"
+            "hedeh pesan\n"
+            "selesai jancuk"
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "pembagian dengan nol\\nakhir\\nluar\\n")
+
+    def test_try_finally_runs_when_error_is_not_caught(self):
+        result = self.run_source(
+            "jancuk\ncoba\n    hedeh 1 // 0\nakhirnya\n"
+            "    hedeh \"akhir\"\nselesai coba\nselesai jancuk"
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, "akhir\\n")
+        self.assertIn("pembagian dengan nol", result.stderr)
+
 if __name__ == "__main__":
     unittest.main()
