@@ -108,21 +108,20 @@ const pcLength = (v) => {
   throw new Error("panjang() membutuhkan teks, daftar, atau kamus");
 };
 const pcText = (value) => {
+  const repr = (item) => {
+    if (typeof item === "string") return "'" + item.replaceAll("\\", "\\\\").replaceAll("'", "\\'") + "'";
+    if (item === null) return "None";
+    if (item === true) return "True";
+    if (item === false) return "False";
+    if (Array.isArray(item)) return "[" + item.map(repr).join(", ") + "]";
+    if (item instanceof Map)
+      return "{" + Array.from(item.entries()).map(([key, val]) => repr(key) + ": " + repr(val)).join(", ") + "}";
+    return String(item);
+  };
   if (value === true) return "okelah";
   if (value === false) return "tidak";
   if (value === null) return "None";
-  if (Array.isArray(value)) {
-    const repr = (item) => {
-      if (typeof item === "string") return "'" + item.replaceAll("\\", "\\\\").replaceAll("'", "\\'") + "'";
-      if (item === null) return "None";
-      if (item === true) return "True";
-      if (item === false) return "False";
-      if (Array.isArray(item)) return "[" + item.map(repr).join(", ") + "]";
-      return String(item);
-    };
-    return "[" + value.map(repr).join(", ") + "]";
-  }
-  if (value instanceof Map) return "{kamus}";
+  if (Array.isArray(value) || value instanceof Map) return repr(value);
   return String(value);
 };
 const pcInteger = (value) => {
