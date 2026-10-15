@@ -51,7 +51,7 @@ class ExitCodeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "lexer.cuk"
             source.write_text(
-                'jancuk\\nhedeh "belum tutup\\nselesai jancuk\\n',
+                'jancuk\nhedeh "belum tutup\nselesai jancuk\n',
                 encoding="utf-8",
             )
             result = self.run_cli(source)
@@ -65,8 +65,8 @@ class ExitCodeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             valid = Path(directory) / "valid.cuk"
             invalid = Path(directory) / "invalid.cuk"
-            valid.write_text("jancuk\\nhedeh 1\\nselesai jancuk\\n", encoding="utf-8")
-            invalid.write_text("jancuk\\nhedeh 1 +\\nselesai jancuk\\n", encoding="utf-8")
+            valid.write_text("jancuk\nhedeh 1\nselesai jancuk\n", encoding="utf-8")
+            invalid.write_text("jancuk\nhedeh 1 +\nselesai jancuk\n", encoding="utf-8")
             valid_result = subprocess.run(
                 [sys.executable, str(CLI), "--check", str(valid)],
                 cwd=ROOT, text=True, capture_output=True, check=False,
