@@ -27,6 +27,33 @@ class ToolInputContractTests(unittest.TestCase):
     def setUp(self):
         self.registry = ToolRegistry([])
 
+    def test_cuk_compile_check_compiles_without_executing_or_persisting_source(self):
+        source = "jancuk\\nlah angka = 40 + 2\\nhedeh angka\\nselesai jancuk\\n"
+        result = self.registry.execute("cuk_compile_check", {"source": source})
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(result["operation"], "compile_check")
+        self.assertEqual(result["target"], "javascript")
+        self.assertEqual(result["source_sha256"], hashlib.sha256(source.encode("utf-8")).hexdigest())
+        self.assertGreater(result["artifact_bytes"], 0)
+        self.assertEqual(len(result["artifact_sha256"]), 64)
+        self.assertIs(result["executed"], False)
+        self.assertIs(result["artifact_saved"], False)
+        definition = next(item["function"] for item in self.registry.definitions
+                          if item["function"]["name"] == "cuk_compile_check")
+        self.assertEqual(definition["parameters"]["required"], ["source"])
+        self.assertIs(definition["parameters"]["additionalProperties"], False)
+
+    def test_cuk_compile_check_rejects_invalid_and_oversized_source(self):
+        invalid = self.registry.execute("cuk_compile_check", {"source": "jancuk\\nhedeh fungsi_tidak_ada(1)\\nselesai jancuk"})
+        self.assertFalse(invalid["ok"])
+        self.assertEqual(invalid["error"], "CUK_COMPILE_FAILED")
+        oversized = self.registry.execute("cuk_compile_check", {"source": "x" * (16 * 1024 + 1)})
+        self.assertEqual(oversized, {"ok": False, "error": "CUK_SOURCE_TOO_LARGE"})
+        self.assertEqual(
+            self.registry.execute("cuk_compile_check", {"source": "jancuk", "target": "shell"}),
+            {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"},
+        )
+
     def test_tool_binding_resolves_to_named_registered_rule(self):
         self.assertEqual(_TOOL_RULE_BINDINGS["budget_threshold"], "budget.threshold.v1")
         names = [item["function"]["name"] for item in self.registry.definitions]

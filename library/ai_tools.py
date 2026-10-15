@@ -11,6 +11,10 @@ from pathlib import Path
 from typing import Any
 
 from library.knowledge_grounding import rank_knowledge
+from compiler.ir import from_source
+from compiler.js_backend import generate
+
+_MAX_CUK_SOURCE_BYTES = 16 * 1024
 
 _MAX_RULE_INPUT = 1_000_000_000_000
 _MAX_RULE_INPUT_BYTES = 128
@@ -91,6 +95,25 @@ class ToolRegistry:
                 },
             }
         ]
+        self.definitions.append({
+            "type": "function",
+            "function": {
+                "name": "cuk_compile_check",
+                "description": (
+                    "Periksa apakah source .cuk yang diberikan dapat dikompilasi ke JavaScript "
+                    "oleh backend saat ini. Hanya kompilasi: tidak menjalankan source, tidak "
+                    "menyimpan artefak, dan tidak menjamin kesetaraan semua target."
+                ),
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "source": {"type": "string", "minLength": 1, "maxLength": 16000}
+                    },
+                    "required": ["source"],
+                    "additionalProperties": False,
+                },
+            },
+        })
         for tool_name, rule_id in _TOOL_RULE_BINDINGS.items():
             rule = _REGISTERED_RULES[rule_id]
             self.definitions.append({
@@ -132,6 +155,41 @@ class ToolRegistry:
                 "claim_status": item["claim_status"],
             } for item in ranked]
             return {"ok": True, "result_count": len(results), "results": results}
+
+        if name == "cuk_compile_check":
+            if set(arguments) != {"source"}:
+                return {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"}
+            source = arguments.get("source")
+            if not isinstance(source, str) or not source.strip():
+                return {"ok": False, "error": "CUK_SOURCE_INVALID"}
+            if "\\x00" in source:
+                return {"ok": False, "error": "CUK_SOURCE_INVALID"}
+            try:
+                source_bytes = source.encode("utf-8")
+            except UnicodeEncodeError:
+                return {"ok": False, "error": "CUK_SOURCE_INVALID"}
+            if len(source_bytes) > _MAX_CUK_SOURCE_BYTES:
+                return {"ok": False, "error": "CUK_SOURCE_TOO_LARGE"}
+            try:
+                generated = generate(from_source(source, "ai_input.cuk"))
+            except (SyntaxError, ValueError, TypeError, UnicodeError) as exc:
+                return {
+                    "ok": False,
+                    "error": "CUK_COMPILE_FAILED",
+                    "diagnostic": str(exc)[:500],
+                    "target": "javascript",
+                }
+            return {
+                "ok": True,
+                "operation": "compile_check",
+                "target": "javascript",
+                "language_version": "0.5-dev",
+                "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
+                "artifact_sha256": hashlib.sha256(generated.encode("utf-8")).hexdigest(),
+                "artifact_bytes": len(generated.encode("utf-8")),
+                "executed": False,
+                "artifact_saved": False,
+            }
 
         rule_id = _TOOL_RULE_BINDINGS.get(name)
         if rule_id is not None:
