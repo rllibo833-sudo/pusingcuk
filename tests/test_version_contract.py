@@ -57,23 +57,48 @@ class VersionContractTests(unittest.TestCase):
         lexer_source = (ROOT / "lexer.py").read_text(encoding="utf-8")
         native_source = (ROOT / "native" / "pusingcuk.c").read_text(encoding="utf-8")
         vocabulary = json.loads((ROOT / "library" / "kosakata.json").read_text(encoding="utf-8"))
+
         section = spec[spec.index("## 16. Alias kosakata"):spec.index("## 17.")]
-        core_section = section.split("### Alias API tambahan")[0]
-        api_section = section.split("### Alias API tambahan")[1]
-        parse = lambda text: dict(re.findall(r"^- `([^`]+)` → `([^`]+)`", text, re.MULTILINE))
-        core_aliases = parse(core_section)
-        all_aliases = {**core_aliases, **parse(api_section)}
-        lexer_block = re.search(r"KEYWORD_ALIASES\\s*=\\s*\\{([\\s\\S]*?)\\n\\}", lexer_source)
-        self.assertIsNotNone(lexer_block, "lexer.py must expose KEYWORD_ALIASES")
-        python_aliases = dict(re.findall(r'^\\s*"([^"]+)"\\s*:\\s*"([^"]+)"\\s*,?\\s*
-    unittest.main()
-, lexer_block.group(1), re.MULTILINE))
+        core_section, api_section = section.split("### Alias API tambahan", 1)
+
+        def parse_spec_aliases(text):
+            aliases = {}
+            for line in text.splitlines():
+                if line.startswith("- `") and "` → `" in line:
+                    alias = line.split("`", 2)[1]
+                    canonical = line.split("` → `", 1)[1].split("`", 1)[0]
+                    aliases[alias] = canonical
+            return aliases
+
+        core_aliases = parse_spec_aliases(core_section)
+        all_aliases = {**core_aliases, **parse_spec_aliases(api_section)}
+
+        lexer_start = lexer_source.index("KEYWORD_ALIASES = {")
+        lexer_body = lexer_source[lexer_start:].split("\n}", 1)[0].split("{", 1)[1]
+        python_aliases = {}
+        for line in lexer_body.splitlines():
+            line = line.strip().rstrip(",")
+            if not line:
+                continue
+            alias, canonical = line.split(":", 1)
+            python_aliases[alias.strip().strip('"')] = canonical.strip().strip('"')
         self.assertEqual(python_aliases, all_aliases)
-        native_block = re.search(r"static const struct \\{ const char \\*alias, \\*canonical; \\} aliases\\[\\] = \\{([\\s\\S]*?)\\n    \\};", native_source)
-        self.assertIsNotNone(native_block, "native C must expose its claimed alias table")
-        native_aliases = dict(re.findall(r'\\{"([^"]+)", "([^"]+)"\\}', native_block.group(1)))
+
+        native_start = native_source.index("static const struct { const char *alias, *canonical; } aliases[] = {")
+        native_body = native_source[native_start:].split("\n    };", 1)[0].split("{", 1)[2]
+        native_aliases = {}
+        for line in native_body.splitlines():
+            line = line.strip().rstrip(",")
+            if line.startswith('{"') and line.endswith("}"):
+                alias, canonical = line[1:-1].split(",", 1)
+                native_aliases[alias.strip().strip('"')] = canonical.strip().strip('"')
         self.assertEqual(native_aliases, core_aliases)
-        metadata_aliases = {alias: item["word"] for item in vocabulary["keywords"] for alias in item.get("aliases", [])}
+
+        metadata_aliases = {
+            alias: item["word"]
+            for item in vocabulary["keywords"]
+            for alias in item.get("aliases", [])
+        }
         self.assertEqual(metadata_aliases, all_aliases)
         self.assertEqual((len(all_aliases), len(core_aliases)), (23, 12))
 
