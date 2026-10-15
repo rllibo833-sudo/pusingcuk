@@ -50,8 +50,8 @@ A release must not skip gates or turn a prototype into a production claim just b
 
 ### Gate 1 — measurable answer quality and reliability
 
-- The current 20-case exact-top-1 retrieval benchmark is still a small regression baseline; expand it in small reviewed increments: ordinary Indonesian, colloquial wording/typos, ambiguous queries, questions outside the corpus, and security/policy questions.
-- Record expected source IDs and whether a question is answerable. Measure retrieval top-1/top-3, unsupported-claim rate, citation precision, refusal behavior, and provider failure handling; publish the fixture set and result rather than saying "accurate" without evidence.
+- The 20-case baseline currently yields top-1 20/20 and top-3 20/20 on its curated expected-source queries. On the 8 answerable adversarial cases, lexical retrieval yields top-1 5/8 and top-3 6/8. These small fixture metrics do not measure general answer quality or live-model behavior.
+- Record expected source IDs and whether a question is answerable. The offline evaluator also tests structural citation precision (1/1 in its deliberately small link-injection test) and registry fail-closed response (2/2 prompt-injection tool requests blocked). Four adversarial cases are labeled as needing clarification/off-topic; actual live-model refusal remains unmeasured. Do not present these fixture metrics as broad accuracy.
 - Add regressions for prompt injection inside retrieved documents, fabricated URLs, malformed/oversized provider responses, timeouts, quota/rate-limit responses, and repeated/invalid tool calls.
 - Model output is not proof that a requested tool ran. Tool outcomes must come from validated tool responses and their citations must retain the trusted source envelope.
 
@@ -132,4 +132,4 @@ For PusingCuk development, the target state is no runtime/API-key/repository dep
 
 ## Immediate acceptance target
 
-Keep the 20-source curated index and 20-case Indonesian retrieval regression aligned by automated test. Maintain a non-contradictory grounding contract, run local-only source and tool assertions, and document release gates. This is evidence-based progress, not a claim that the AI Engine is production-ready.
+Keep the 20-source curated index, 20-case baseline and 12-case adversarial corpus aligned by automated test. CI prints reproducible top-1/top-3 and structural safety metrics with `python tools/evaluate_knowledge_retrieval.py`. Maintain a non-contradictory grounding contract and document release gates. Live-model refusal and general response quality remain unmeasured; the AI Engine is not claimed production-ready.

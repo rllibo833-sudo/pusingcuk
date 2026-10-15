@@ -26,7 +26,7 @@
 - **Versi bahasa kontraktual:** `0.5-dev`.
 - **Versi paket Python:** `0.8.0.dev0`. Ini metadata paket, bukan versi bahasa.
 - **Kontrak built-in:** 21 built-in terkontrak; 17 berstatus didukung oleh native C sebagai built-in penuh. Beberapa konversi skalar memiliki cakupan terbatas; lihat matriks resmi, jangan menghitung semuanya sebagai paritas.
-- **Fixture konformansi:** 66 fixture memiliki hasil referensi yang wajib; 59 berstatus wajib pada native C dan 5 secara eksplisit tidak didukung native. Status ini bukan klaim bahwa setiap backend mendukung semua fitur.
+- **Fixture konformansi:** 66 fixture: 66 wajib pada interpreter referensi Python, 61 wajib pada native C, dan 5 secara eksplisit tidak didukung native. Status ini bukan klaim bahwa setiap backend mendukung semua fitur.
 - **Jalur yang dipelihara:** `lexer.py → parser.py → ast_nodes.py → evaluator.py` dan runtime `native/pusingcuk.c`.
 - **Targets eksperimental:** `compiler/`, `src/`, VM/PVM, dan aplikasi `android-studio/`. Folder atau workflow yang ada bukan bukti rilis stabil.
 
@@ -73,7 +73,7 @@ pusingcuk-ai CLI / adapter HTTP lokal
 - **Provider lokal:** adapter Ollama, default model `qwen3:4b`, endpoint `127.0.0.1:11434`. Model dan runtime Ollama harus dipasang terpisah dan berjalan pada mesin yang sama. Model Qwen3 4B yang tercantum di Ollama memerlukan unduhan sekitar 2,5 GB; RAM, kecepatan, dan kualitas hasil bergantung perangkat serta konfigurasi.
 - **Provider alternatif:** Gemini GenerateContent API, dipilih eksplisit dengan `--provider gemini` dan `GEMINI_API_KEY`. Provider ini mengirim prompt/konteks ke layanan pihak ketiga dan bergantung pada model yang tersedia, kuota, ketentuan akun, serta biaya yang berlaku.
 - **Grounding:** indeks berisi **20 dokumen sumber terkurasi**. Seluruh entri tercatat milik repositori PusingCuk, memakai visibility `public-safe`, dan mematok path/commit. Runtime tidak melakukan crawl otomatis terhadap repo lain.
-- **Benchmark retrieval:** terdapat **20 kasus benchmark** bahasa Indonesia dengan sumber teratas yang diharapkan. Ini regression set kecil, bukan bukti akurasi umum atau benchmark semantik yang luas.
+- **Benchmark retrieval:** 20 kasus baseline menghasilkan top-1 **20/20 (100%)** dan top-3 **20/20 (100%)** pada kueri terkurasi. Pada 8 dari 12 kasus adversarial yang memiliki expected source, top-1 **5/8 (62,5%)** dan top-3 **6/8 (75%)**. Metrik ini menilai retrieval leksikal atas fixture kecil, bukan akurasi jawaban model.
 - **Sitasi:** URL yang ditempel ke jawaban diambil dari sumber tervalidasi, bukan dipercaya dari teks model. Sitasi membuktikan asal sumber, bukan otomatis kebenaran seluruh klaim.
 - **Tool:** `knowledge_search` untuk pencarian read-only dan `budget_threshold` untuk menjalankan artefak `.cuk` tetap yang di-hash. Model tidak diberi akses bebas untuk mengirim source code, shell command, path, atau capability arbitrer.
 - **Memori:** konteks percakapan aktif bersifat sementara. Catatan proyek harus disimpan secara eksplisit oleh pengguna di penyimpanan lokal; chat tidak otomatis dipersistenkan ke Supabase.
@@ -91,7 +91,7 @@ pusingcuk-ai CLI / adapter HTTP lokal
 
 1. **Bukan model foundation yang dilatih oleh PusingCuk.** PusingCuk mengatur model pihak lain/terinstal, retrieval, memori, sitasi dan tool.
 2. Retrieval saat ini adalah pencarian leksikal deterministik, bukan embeddings/vector search. Typo, pertanyaan ambigu, dan paraphrase dapat menurunkan relevansi.
-3. 20 kasus benchmark terlalu kecil untuk mengklaim jawaban Indonesia selalu tepat. Butuh evaluasi top-1/top-3, citation precision, penolakan pertanyaan di luar korpus, dan unsupported-claim rate.
+3. Benchmark masih kecil. Evaluator offline saat ini mendapatkan citation precision struktural **1/1 (100%)** pada satu kasus uji tautan berbahaya dan menolak tool injection **2/2**. Empat kasus ditandai sebagai perlu klarifikasi/off-topic, tetapi **live model refusal rate belum diukur**; jangan simpulkan model benar-benar menolak tanpa tes provider/model nyata.
 4. Keberhasilan CI provider tiruan tidak membuktikan kualitas hasil model Ollama/Gemini yang benar-benar dijalankan di perangkat.
 5. Model lokal memerlukan storage/RAM dan runtime tersendiri; belum ada bukti kinerja atau kenyamanan menjalankan model pada setiap HP Android.
 6. Adapter HTTP saat ini bukan service publik: belum memiliki identitas per pengguna, TLS terminasi, quota multi-user, observabilitas produksi, incident response, atau mekanisme backup/restore untuk service state.
@@ -103,7 +103,7 @@ pusingcuk-ai CLI / adapter HTTP lokal
 
 | Peran | Project ref | Status saat audit | Keadaan aplikasi |
 |---|---|---|---|
-| Catatan proyek pribadi (DB schema applied) | `vcvejjpzklpvknxmymgy` | `ACTIVE_HEALTHY`, region `ap-southeast-2` | Tidak ditemukan tabel aplikasi, migration history, atau Edge Function pada pemeriksaan terakhir. |
+| Catatan proyek pribadi (schema applied) | `vcvejjpzklpvknxmymgy` | `ACTIVE_HEALTHY`, region `ap-southeast-2` | `pusingcuk_project_notes` diterapkan; empat policy RLS, smoke SQL lulus, zero advisor lints setelah hardening helper. Runtime belum terhubung. |
 | Data lama Kawasan Masjid/CORE | `lnpzgrodwnhthcwudebk` | `ACTIVE_HEALTHY`, region `ap-southeast-2` | Database lama memiliki schema/records dan tidak boleh dianggap sudah dimigrasikan ke project PusingCuk. |
 
 Keduanya tetap merupakan database project terpisah meskipun berada dalam organisasi Supabase yang sama. Organisasi terpisah bernama `Pusingcuk` yang muncul pada koneksi akun lain tidak perlu dipakai agar kedua project tetap terisolasi.
@@ -125,7 +125,7 @@ Sumber primer: [Pricing Supabase](https://supabase.com/pricing), [Billing dan ku
 - Supabase dapat dipakai kelak untuk persistensi terpusat, autentikasi, sinkronisasi lintas perangkat, atau data service setelah kasus penggunaan dan model izinnya ditetapkan.
 - Supabase **bukan model AI**, bukan tempat menjalankan Ollama, dan bukan metode melatih model.
 - Saat ini aplikasi PusingCuk masih memakai adapter SQLite lokal untuk database abstraction. Project Supabase PusingCuk belum terhubung ke runtime; belum ada data chat/user lokal yang otomatis tersinkron.
-- Jangan membuat tabel generik tanpa kebutuhan produk. Untuk fitur pertama, tentukan data minimum, aktor, izin baca/tulis, retensi/penghapusan, lalu buat migration versioned dan kebijakan RLS yang sesuai.
+- Schema versioned `pusingcuk_project_notes` untuk catatan pribadi lintas perangkat sudah diterapkan dan diuji pada tingkat SQL/RLS. Tahap berikutnya adalah klien autentikasi/API yang aman, uji REST end-to-end menggunakan user sungguhan, lalu integrasi opt-in ke aplikasi; runtime SQLite belum tersambung.
 - Jangan pernah menaruh password database, service-role key, atau secret Supabase di repo publik, browser JavaScript, APK, CLI, atau log. Browser hanya boleh memakai publishable key bersama auth/RLS yang benar.
 - Project Kawasan/CORE jangan dihapus sebagai efek samping dari integrasi PusingCuk. Pemindahan atau penghapusan repo GitHub tidak dengan sendirinya mematikan Edge Function, cron, database atau webhook yang pernah dideploy.
 

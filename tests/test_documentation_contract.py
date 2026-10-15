@@ -93,6 +93,8 @@ class DocumentationContractTests(unittest.TestCase):
         self.assertNotIn("16 source records", ledger)
         self.assertIn("20 dokumen sumber terkurasi", status)
         self.assertIn("20 kasus benchmark", status)
+        self.assertIn("5/8 (62,5%)", status)
+        self.assertIn("6/8 (75%)", status)
         self.assertIn("66 fixture", status)
 
     def test_supabase_notes_migration_has_owner_only_rls_and_no_client_secret(self):
