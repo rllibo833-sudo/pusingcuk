@@ -254,6 +254,54 @@ class AssistantTests(unittest.TestCase):
             {"ok": False, "error": "TOOL_NOT_ALLOWLISTED"},
         )
 
+    def test_ai_repairs_cuk_from_compiler_diagnostic_and_receives_full_artifact(self):
+        class RepairingProvider:
+            def __init__(self):
+                self.calls = []
+
+            def generate_turn(self, messages, *, system_prompt=None, tools=None):
+                self.calls.append({"messages": messages, "system_prompt": system_prompt})
+                if len(self.calls) == 1:
+                    self.assert_tool_names = [item["function"]["name"] for item in tools]
+                    return {
+                        "content": "",
+                        "tool_calls": [{
+                            "id": "compile-bad",
+                            "name": "cuk_compile_check",
+                            "arguments": {"source": "jancuk\\nhedeh fungsi_tidak_ada(1)\\nselesai jancuk"},
+                        }],
+                    }
+                if len(self.calls) == 2:
+                    prior = [m for m in messages if m.get("role") == "tool"][-1]
+                    self.first_result = json.loads(prior["content"])
+                    return {
+                        "content": "",
+                        "tool_calls": [{
+                            "id": "compile-fixed",
+                            "name": "cuk_compile_check",
+                            "arguments": {"source": "jancuk\\nhedeh 42\\nselesai jancuk"},
+                        }],
+                    }
+                prior = [m for m in messages if m.get("role") == "tool"][-1]
+                self.second_result = json.loads(prior["content"])
+                return {"content": "Source .cuk sudah berhasil dikompilasi.", "tool_calls": []}
+
+        provider = RepairingProvider()
+        assistant = PusingCukAssistant(provider, self.documents)
+        answer = assistant.ask("Buat program .cuk sederhana dan pastikan lolos compiler.")
+        self.assertIn("diagnostic", provider.first_result)
+        self.assertFalse(provider.first_result["ok"])
+        self.assertTrue(provider.second_result["ok"], provider.second_result)
+        self.assertIn('"use strict";', provider.second_result["artifact"])
+        self.assertEqual(
+            hashlib.sha256(provider.second_result["artifact"].encode("utf-8")).hexdigest(),
+            provider.second_result["artifact_sha256"],
+        )
+        self.assertIn("knowledge_search", provider.assert_tool_names)
+        self.assertIn("cuk_compile_check", provider.assert_tool_names)
+        self.assertIn("perbaiki berdasarkan diagnostik compiler", provider.calls[0]["system_prompt"])
+        self.assertIn("berhasil dikompilasi", answer)
+
 
 if __name__ == "__main__":
     unittest.main()
