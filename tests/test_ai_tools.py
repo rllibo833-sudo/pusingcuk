@@ -79,11 +79,11 @@ class ToolInputContractTests(unittest.TestCase):
             for nominal, batas, expected in cases:
                 with self.subTest(nominal=nominal, batas=batas):
                     result = self.registry.execute("budget_threshold", {"nominal": nominal, "batas": batas})
-                    compiled = subprocess.run([NODE, str(artifact)], input=f"{nominal}\\n{batas}\\n", text=True, encoding="utf-8", capture_output=True, timeout=15, check=False)
+                    compiled = subprocess.run([NODE, str(artifact)], input=f"{nominal}\n{batas}\n", text=True, encoding="utf-8", capture_output=True, timeout=15, check=False)
                     self.assertTrue(result["ok"], result)
                     self.assertEqual(result["result"], expected)
                     self.assertEqual(compiled.returncode, 0, compiled.stderr)
-                    self.assertEqual(compiled.stdout, expected + "\\n")
+                    self.assertEqual(compiled.stdout, expected + "\n")
 
     def test_tampered_artifact_fails_closed_before_execution(self):
         with patch("library.ai_tools._load_rule_source", return_value=b"tampered"):
