@@ -131,8 +131,8 @@ class JavaScriptBackendTests(unittest.TestCase):
 
     def test_accounting_source_exports_callable_javascript_module(self):
         root = Path(__file__).resolve().parents[1]
-        source = (root / "examples" / "accounting" / "rekap_keuangan.cuk").read_text(encoding="utf-8")
-        generated = generate(from_source(source, "rekap_keuangan.cuk"), as_module=True)
+        source = (root / "examples" / "accounting" / "aturan_ringkasan.cuk").read_text(encoding="utf-8")
+        generated = generate(from_source(source, "aturan_ringkasan.cuk"), as_module=True)
         with tempfile.TemporaryDirectory(prefix="pusingcuk-rules-") as temp:
             path = Path(temp) / "rules.cjs"
             path.write_text(generated, encoding="utf-8")

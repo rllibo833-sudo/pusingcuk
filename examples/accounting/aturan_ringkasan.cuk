@@ -1,0 +1,10 @@
+# Aturan akuntansi yang diekspor untuk integrasi aplikasi.
+# Hasil: [laba periode, ekuitas akhir, selisih persamaan akuntansi].
+jancuk
+fungsi hitung_ringkasan(pendapatan, beban, aset, liabilitas, ekuitas)
+    lah laba = pendapatan - beban
+    lah ekuitas_akhir = ekuitas + laba
+    lah selisih_posisi = aset - liabilitas - ekuitas_akhir
+    balek [laba, ekuitas_akhir, selisih_posisi]
+selesai fungsi
+selesai jancuk

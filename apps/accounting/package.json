@@ -5,7 +5,7 @@
   "private": true,
   "main": "main.cjs",
   "scripts": {
-    "build:rules": "cd ../.. && python -m compiler.js_backend examples/accounting/rekap_keuangan.cuk --module -o apps/accounting/accounting-rules.generated.js",
+    "build:rules": "cd ../.. && python -m compiler.js_backend examples/accounting/aturan_ringkasan.cuk --module -o apps/accounting/accounting-rules.generated.js",
     "prestart": "npm run build:rules",
     "pretest:core": "npm run build:rules",
     "start": "electron .",
