@@ -43,7 +43,7 @@ class KnowledgeGroundingTests(unittest.TestCase):
         index = {"schema_version": "pusingcuk.knowledge-index.v1", "documents": self.documents}
         self.assertEqual(len(validate_index(index)), 14)
 
-    def test_real_curated_index_contains_twenty_locally_owned_sources(self):
+    def test_real_curated_index_contains_twenty_one_locally_owned_sources(self):
         index_path = Path(__file__).resolve().parents[1] / "library" / "knowledge_index.json"
         documents = load_index(index_path)
         self.assertEqual(len(documents), 21)

@@ -1,6 +1,6 @@
 {
   "schema_version": "pusingcuk.knowledge-index.v1",
-  "index_version": 2,
+  "index_version": 3,
   "purpose": "Indeks pengetahuan primer milik PusingCuk AI. Ringkasan ditulis untuk indeks ini; sumber merujuk ke snapshot immutable PusingCuk yang telah memuat indeks lokal-only dan kebijakan grounding yang berlaku.",
   "policy": {
     "max_documents": 100,
@@ -614,6 +614,38 @@
       ],
       "summary": "Kawasan Masjid 1.000 Ha adalah konsep ekosistem berbasis masjid yang menghubungkan ibadah, pendidikan, pangan, lingkungan, air, energi, ekonomi, dan teknologi. Fase awal mengutamakan produk digital kecil untuk masalah nyata, bukti penggunaan, pilot, penerimaan, pembayaran, dan keputusan berhenti atau berkembang.",
       "excerpt": "Skala lahan 1.000 Ha masih konseptual. Perizinan, kepemilikan lahan, konstruksi, mitra, pengguna, dan pendapatan tidak boleh diklaim tanpa bukti. Gunakan riset first, pilot before scale, Founder Gate, dan keputusan berbasis evidence."
+    },
+    {
+      "id": "pusingcuk-journal-balance-cross-check",
+      "title": "Aturan .cuk untuk pemeriksaan total jurnal",
+      "path": "library/journal_balance_check.cuk",
+      "url": "https://github.com/rllibo833-sudo/pusingcuk/blob/868356a9b893f135e952d044f086f934e3ab60e3/library/journal_balance_check.cuk",
+      "source_repository": "rllibo833-sudo/pusingcuk",
+      "source_commit": "868356a9b893f135e952d044f086f934e3ab60e3",
+      "authority": "PUSINGCUK",
+      "evidence_type": "registered-tool-source",
+      "claim_status": "secondary-journal-total-check-only",
+      "visibility": "public-safe",
+      "topics": [
+        "CukAccount",
+        "PusingCuk AI",
+        "akuntansi",
+        "jurnal",
+        "debit kredit",
+        "aturan .cuk"
+      ],
+      "keywords": [
+        "cukaccount",
+        "pusingcuk ai",
+        "jurnal",
+        "debit",
+        "kredit",
+        "seimbang",
+        "total",
+        "journal_balance_check"
+      ],
+      "summary": "Artefak .cuk terdaftar untuk pemeriksaan sekunder atas dua total debit dan kredit positif. Pemeriksaan ini tidak membaca buku, tidak memposting jurnal, dan bukan pengganti mesin akuntansi deterministik CukAccount.",
+      "excerpt": "JURNAL_SEIMBANG hanya berarti dua total yang diberikan sama. Hasil ini tidak membuktikan jurnal lengkap, klasifikasi akun benar, atau kepatuhan standar."
     }
   ]
 }

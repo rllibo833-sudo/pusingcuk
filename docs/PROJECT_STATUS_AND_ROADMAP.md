@@ -63,7 +63,7 @@ pusingcuk-ai CLI / adapter HTTP lokal
        /        |        \
   provider   retrieval   ToolRegistry
     |            |         |
-  Ollama      indeks 20    aturan .cuk tetap
+  Ollama      indeks 21    aturan .cuk tetap
     |          sumber      budget_threshold
  lokal / loopback
                  |
@@ -73,9 +73,9 @@ pusingcuk-ai CLI / adapter HTTP lokal
 - **Provider lokal:** adapter Ollama, default model `qwen3:4b`, endpoint `127.0.0.1:11434`. Model dan runtime Ollama harus dipasang terpisah dan berjalan pada mesin yang sama. Model Qwen3 4B yang tercantum di Ollama memerlukan unduhan sekitar 2,5 GB; RAM, kecepatan, dan kualitas hasil bergantung perangkat serta konfigurasi.
 - **Provider alternatif:** Gemini GenerateContent API, dipilih eksplisit dengan `--provider gemini` dan `GEMINI_API_KEY`. Provider ini mengirim prompt/konteks ke layanan pihak ketiga dan bergantung pada model yang tersedia, kuota, ketentuan akun, serta biaya yang berlaku.
 - **Grounding:** indeks berisi **21 dokumen sumber terkurasi**. Seluruh entri tercatat milik repositori PusingCuk, memakai visibility `public-safe`, dan mematok path/commit. Runtime tidak melakukan crawl otomatis terhadap repo lain.
-- **Benchmark retrieval:** 21 kasus baseline menghasilkan top-1 **20/20 (100%)** dan top-3 **20/20 (100%)** pada kueri terkurasi. Pada 8 dari 12 kasus adversarial yang memiliki expected source, top-1 **5/8 (62,5%)** dan top-3 **6/8 (75%)**. Metrik ini menilai retrieval leksikal atas fixture kecil, bukan akurasi jawaban model.
+- **Benchmark retrieval:** 21 kasus baseline menghasilkan top-1 **21/21 (100%)** dan top-3 **21/21 (100%)** pada kueri terkurasi. Pada 8 dari 12 kasus adversarial yang memiliki expected source, top-1 **5/8 (62,5%)** dan top-3 **6/8 (75%)**. Metrik ini menilai retrieval leksikal atas fixture kecil, bukan akurasi jawaban model.
 - **Sitasi:** URL yang ditempel ke jawaban diambil dari sumber tervalidasi, bukan dipercaya dari teks model. Sitasi membuktikan asal sumber, bukan otomatis kebenaran seluruh klaim.
-- **Tool:** `knowledge_search` untuk pencarian read-only dan `budget_threshold` untuk menjalankan artefak `.cuk` tetap yang di-hash. Model tidak diberi akses bebas untuk mengirim source code, shell command, path, atau capability arbitrer.
+- **Tool:** `knowledge_search` untuk pencarian read-only dan `budget_threshold` untuk aturan anggaran dan `journal_balance_check` untuk pemeriksaan sekunder total debit/kredit dari artefak `.cuk` tetap yang di-hash. Pemeriksaan jurnal tidak membaca atau memposting buku; model tidak diberi akses bebas ke source code, shell command, path, atau capability arbitrer.
 - **Memori:** konteks percakapan aktif bersifat sementara. Catatan proyek harus disimpan secara eksplisit oleh pengguna di penyimpanan lokal; chat tidak otomatis dipersistenkan ke Supabase.
 - **HTTP lokal:** adapter loopback dengan bearer token dan batas input/sesi/konkurensi. `/healthz` hanya membuktikan proses hidup, bukan model siap melayani.
 
