@@ -179,3 +179,18 @@ Do not run code or bytecode from an untrusted source with access to important fi
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Integrasi CukAccount dan siklus evaluasi AI — 16 Oktober 2026
+
+CukAccount menggunakan PusingCuk sebagai runtime ber-pin untuk menjalankan fixture keuangan sintetis di CI. Pin yang didokumentasikan adalah `a90e4c9047584f16b02d650550faf912b21c55c6`; perubahan versi harus diikuti pengujian ulang bridge dan pembaruan kontrak pada kedua repositori. Jangan menganggap output fixture sebagai posting transaksi atau sumber kebenaran ledger.
+
+Siklus peningkatan PusingCuk AI yang dapat diverifikasi:
+1. Gunakan dokumentasi terkurasi dan contoh finansial sintetis, bukan data keuangan pribadi.
+2. Minta AI menjelaskan aturan atau mengusulkan contoh .cuk; jangan jalankan kode yang dihasilkan tanpa tinjauan.
+3. Jalankan `--check`, tes interpreter referensi, serta konformansi native C bila fixture mengklaim dukungan lintas-runtime.
+4. Bandingkan output dan diagnostik dengan expected result, lalu simpan kegagalan yang direproduksi sebagai regresi.
+5. Nilai perubahan dengan suite yang sama sebelum mengubah kontrak bahasa atau pin integrasi.
+
+Ini adalah peningkatan berbasis konteks, aturan deterministik, dan evaluasi regresi—bukan bukti bahwa bobot model telah dilatih ulang. Bahasa masih eksperimental; native C, transpiler, dan VM memiliki cakupan yang berbeda. Eksekusi .cuk bukan sandbox OS, jadi jangan jalankan kode tak tepercaya.
+
+Acuan aplikasi: [CukAccount — spesifikasi dan roadmap](https://github.com/rllibo833-sudo/Cukaccount/blob/main/CUKACCOUNT_SPEC_AND_ROADMAP.md). Status APK CukAccount saat ini adalah APK uji, bukan rilis produksi.
