@@ -107,6 +107,43 @@ const pcLength = (v) => {
   if (v instanceof Map) return v.size;
   throw new Error("panjang() membutuhkan teks, daftar, atau kamus");
 };
+const pcText = (value) => {
+  if (value === true) return "okelah";
+  if (value === false) return "tidak";
+  if (value === null) return "None";
+  if (Array.isArray(value)) {
+    const repr = (item) => {
+      if (typeof item === "string") return "'" + item.replace(/\\\\/g, "\\\\\\\\").replace(/'/g, "\\\\'") + "'";
+      if (item === null) return "None";
+      if (item === true) return "True";
+      if (item === false) return "False";
+      if (Array.isArray(item)) return "[" + item.map(repr).join(", ") + "]";
+      return String(item);
+    };
+    return "[" + value.map(repr).join(", ") + "]";
+  }
+  if (value instanceof Map) return "{kamus}";
+  return String(value);
+};
+const pcInteger = (value) => {
+  let result;
+  if (typeof value === "boolean" || value === null)
+    throw new Error("bilangan() tidak menerima boolean atau None");
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) throw new Error("bilangan() membutuhkan angka finite");
+    result = Math.trunc(value);
+  } else if (typeof value === "string" && /^[+-]?\\d+$/.test(value.trim())) {
+    const parsed = BigInt(value.trim());
+    if (parsed > 9007199254740991n || parsed < -9007199254740991n)
+      throw new Error("bilangan() di luar rentang aman lintas target");
+    result = Number(parsed);
+  } else {
+    throw new Error("bilangan() membutuhkan angka atau teks integer");
+  }
+  if (!Number.isSafeInteger(result))
+    throw new Error("bilangan() di luar rentang aman lintas target");
+  return result;
+};
 const pcRange = (...args) => {
   if (args.length < 1 || args.length > 3 || args.some(v => !Number.isSafeInteger(v)))
     throw new Error("rentang() membutuhkan 1-3 integer aman");
