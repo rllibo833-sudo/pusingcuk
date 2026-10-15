@@ -130,7 +130,7 @@ class DocumentationContractTests(unittest.TestCase):
         self.assertIn("experimental", readme)
         self.assertIn("not a foundation model trained by pusingcuk", readiness)
         self.assertIn("not a claim that a production service is deployed", readiness)
-        self.assertIn("jangan menyebut bahasa stabil, ai akurat, service produksi", status)
+        self.assertIn("audit ini tidak menyatakan bahasa stabil atau ai akurat secara umum", status)
         self.assertIn("application status:** still not connected", supabase)
         self.assertEqual(package["project"]["classifiers"][0], "Development Status :: 3 - Alpha")
         self.assertNotIn("supabase sync active", status)
