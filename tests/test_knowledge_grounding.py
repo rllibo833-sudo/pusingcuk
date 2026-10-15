@@ -182,6 +182,20 @@ class KnowledgeGroundingTests(unittest.TestCase):
         bad["path"] = "docs/other.md"
         self.assertFalse(validate_source(bad))
 
+    def test_rejects_ambiguous_cross_platform_source_paths(self):
+        for path in (
+            r"docs\..\private.md",
+            "docs/../private.md",
+            "docs/./source.md",
+            "docs//source.md",
+            "docs/" + chr(0) + "source.md",
+        ):
+            bad = copy.deepcopy(self.documents[0])
+            bad["path"] = path
+            bad["url"] = f"https://github.com/example/project/blob/{COMMIT}/{path}"
+            with self.subTest(path=path):
+                self.assertFalse(validate_source(bad))
+
     def test_rejects_non_github_and_query_urls(self):
         for url in ("https://evil.example/x", self.documents[0]["url"] + "?raw=1"):
             bad = copy.deepcopy(self.documents[0])

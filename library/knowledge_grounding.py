@@ -77,7 +77,14 @@ def validate_source(source: Any) -> bool:
         return False
     if not isinstance(commit, str) or not _SHA_RE.fullmatch(commit):
         return False
-    if not isinstance(path, str) or not path or path.startswith("/") or ".." in Path(path).parts:
+    if (
+        not isinstance(path, str)
+        or not path
+        or path.startswith("/")
+        or "\\" in path
+        or any(part in {"", ".", ".."} for part in path.split("/"))
+        or any(ord(char) < 32 for char in path)
+    ):
         return False
     if not isinstance(url_text, str):
         return False
