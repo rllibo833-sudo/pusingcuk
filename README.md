@@ -141,6 +141,21 @@ python tests/conformance/runner.py
 
 CI tests the reference interpreter on Python 3.11 and 3.12 and builds the native runtime with GCC and Clang. The manifest distinguishes required, optional, and unsupported runtime behavior; unsupported features are not counted as parity.
 
+## Development status and next steps
+
+PusingCuk is still experimental. The current language contract is `0.5-dev`; the Python package version `0.8.0.dev0` is separate. The active conformance manifest contains **66 fixtures**: all 66 are required on the Python reference interpreter, 61 are required on native C, and 5 are explicitly unsupported on native C. Unsupported fixtures are not counted as passes or cross-runtime parity.
+
+Recent engineering work has added regression coverage for the local AI path from HTTP chat handling through the allowlisted tool registry and a registered `.cuk` rule to a generated JavaScript artifact. The automated checks validate expected results and source/artifact identity. This is focused integration evidence, not proof of general live-model quality or production readiness.
+
+The next work follows [the project vision](docs/VISION.md):
+
+1. Check parser diagnostics and boundary/error fixtures; add tests only where a real gap is found.
+2. Keep the AI tool path deterministic: allowlisted tools, validated inputs, pinned rule/artifact provenance, and trustworthy citations.
+3. Review Indonesian retrieval failures using the existing curated benchmark before changing ranking or expanding the index.
+4. Continue accounting-rule validation after the language and AI acceptance paths remain reproducible.
+
+The Python interpreter is the behavior reference; native C compatibility is claimed only for shared fixtures that pass on both. Transpilers and VM remain experimental. CI success means configured checks passed, not that every feature is supported or that the runtime is a security sandbox. See the [technical status and roadmap](docs/PROJECT_STATUS_AND_ROADMAP.md) for the broader component-by-component status.
+
 ## What is deliberately deferred
 
 Transpiler backends, PVM extensions, and Android Studio APK development are experimental and are not the current compatibility baseline. Existing code and design notes are retained for future work, but their presence does not mean production support. The current priority is to align the specification, vocabulary registry, Python interpreter, native C runtime, and executable conformance tests.
