@@ -50,7 +50,7 @@ class ToolInputContractTests(unittest.TestCase):
                     capture_output=True, timeout=15, check=False,
                 )
             self.assertEqual(executed.returncode, 0, executed.stderr)
-            self.assertEqual(executed.stdout, "42\\n")
+            self.assertEqual(executed.stdout, "42\n")
         self.assertIs(result["executed"], False)
         self.assertIs(result["artifact_saved"], False)
         definition = next(item["function"] for item in self.registry.definitions
