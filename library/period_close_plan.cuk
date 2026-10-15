@@ -1,0 +1,29 @@
+# Registered period-close planning rule for synthetic CukAccount totals.
+# The rule classifies the result; the registry expands the reviewed result into
+# a deterministic, role-based closing-line plan. It never posts accounting data.
+
+jancuk
+
+fungsi status_penutupan_periode(pendapatan_total, beban_total)
+    njir pendapatan_total < 0 atau beban_total < 0
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        njir pendapatan_total > beban_total
+            balek "PENUTUPAN_LABA"
+        kampret
+            njir pendapatan_total < beban_total
+                balek "PENUTUPAN_RUGI"
+            kampret
+                balek "PENUTUPAN_NOL"
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+tanya pendapatan_teks = ""
+tanya beban_teks = ""
+lah pendapatan_total = bilangan(pendapatan_teks)
+lah beban_total = bilangan(beban_teks)
+hedeh status_penutupan_periode(pendapatan_total, beban_total)
+
+selesai jancuk

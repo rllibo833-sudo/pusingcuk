@@ -82,6 +82,25 @@ _REGISTERED_RULES: dict[str, dict[str, Any]] = {
             "tetap. Pemeriksaan pendamping; bukan pengganti buku besar CukAccount."
         ),
     },
+    "period.close.plan.v1": {
+        "source_file": "period_close_plan.cuk",
+        "source_sha256": "a3a983a04dc6de3a15b8b1d115768728b92bbe03176a414302615a1929298e65",
+        "entrypoint": "status_penutupan_periode",
+        "language_version": "0.5-dev",
+        "input_fields": ("income_total", "expense_total"),
+        "properties": {
+            "income_total": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "expense_total": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+        },
+        "required": ("income_total", "expense_total"),
+        "allowed_outputs": ("PENUTUPAN_LABA", "PENUTUPAN_RUGI", "PENUTUPAN_NOL", "INPUT_TIDAK_VALID"),
+        "capabilities": (),
+        "description": (
+            "Rencanakan baris penutupan periode dari total pendapatan dan beban sintetis "
+            "menggunakan aturan .cuk terdaftar. Menghasilkan rencana peran-akun untuk "
+            "dibandingkan dengan CukAccount; tidak mem-posting jurnal."
+        ),
+    },
 }
 
 # Model-facing tool names map only to internal registered rule IDs.
@@ -89,6 +108,7 @@ _TOOL_RULE_BINDINGS = {
     "budget_threshold": "budget.threshold.v1",
     "journal_balance_check": "journal.balance.v1",
     "accounting_equation_check": "accounting.equation.v1",
+    "period_close_plan": "period.close.plan.v1",
 }
 
 
@@ -250,7 +270,41 @@ class ToolRegistry:
                     )
                 ):
                     return {"ok": False, "error": "RULE_INPUT_INVALID"}
-            return self._run_registered_rule(rule_id, arguments)
+            result = self._run_registered_rule(rule_id, arguments)
+            if result.get("ok") and rule_id == "period.close.plan.v1":
+                income = arguments["income_total"]
+                expense = arguments["expense_total"]
+                net_result = income - expense
+                closing_lines = []
+                if income:
+                    closing_lines.append({
+                        "role": "income",
+                        "debit_minor_units": income,
+                        "credit_minor_units": 0,
+                    })
+                if expense:
+                    closing_lines.append({
+                        "role": "expense",
+                        "debit_minor_units": 0,
+                        "credit_minor_units": expense,
+                    })
+                if net_result > 0:
+                    closing_lines.append({
+                        "role": "retained_earnings",
+                        "debit_minor_units": 0,
+                        "credit_minor_units": net_result,
+                    })
+                elif net_result < 0:
+                    closing_lines.append({
+                        "role": "retained_earnings",
+                        "debit_minor_units": -net_result,
+                        "credit_minor_units": 0,
+                    })
+                result["net_result_minor_units"] = net_result
+                result["closing_lines"] = closing_lines
+                result["debit_total"] = max(income, expense)
+                result["credit_total"] = max(income, expense)
+            return result
 
         return {"ok": False, "error": "TOOL_NOT_ALLOWLISTED"}
 

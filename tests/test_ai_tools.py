@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import shutil
 import sys
@@ -205,6 +206,88 @@ class ToolInputContractTests(unittest.TestCase):
         )
         self.assertTrue(mismatch["ok"], mismatch)
         self.assertEqual(mismatch["result"], "JURNAL_TIDAK_SEIMBANG")
+
+    def test_period_close_plan_matches_shared_cukaccount_acceptance_dataset(self):
+        root = Path(__file__).resolve().parents[1]
+        dataset_path = root / "tests" / "fixtures" / "cukaccount_financial_acceptance.json"
+        dataset = json.loads(dataset_path.read_text(encoding="utf-8"))
+        expected = dataset["expected"]["closing_journal_lines"]
+        income = dataset["expected"]["profit_and_loss"]["total_income"]
+        expense = dataset["expected"]["profit_and_loss"]["total_expenses"]
+
+        result = self.registry.execute(
+            "period_close_plan",
+            {"income_total": income, "expense_total": expense},
+        )
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(result["program_id"], "period.close.plan.v1")
+        self.assertEqual(result["result"], "PENUTUPAN_LABA")
+        self.assertEqual(result["net_result_minor_units"], 150000)
+        self.assertEqual(result["debit_total"], result["credit_total"])
+        self.assertEqual(
+            result["closing_lines"],
+            [
+                {"role": "income", "debit_minor_units": 250000, "credit_minor_units": 0},
+                {"role": "expense", "debit_minor_units": 0, "credit_minor_units": 100000},
+                {"role": "retained_earnings", "debit_minor_units": 0, "credit_minor_units": 150000},
+            ],
+        )
+        self.assertEqual(
+            [(line["debit"], line["credit"]) for line in expected],
+            [(250000, 0), (0, 100000), (0, 150000)],
+        )
+
+    def test_period_close_plan_handles_loss_zero_and_invalid_values(self):
+        cases = (
+            (250000, 100000, "PENUTUPAN_LABA", 150000, 250000),
+            (100000, 250000, "PENUTUPAN_RUGI", -150000, 250000),
+            (100000, 100000, "PENUTUPAN_NOL", 0, 100000),
+            (0, 0, "PENUTUPAN_NOL", 0, 0),
+        )
+        for income, expense, expected, net, total in cases:
+            with self.subTest(income=income, expense=expense):
+                result = self.registry.execute(
+                    "period_close_plan",
+                    {"income_total": income, "expense_total": expense},
+                )
+                self.assertTrue(result["ok"], result)
+                self.assertEqual(result["result"], expected)
+                self.assertEqual(result["net_result_minor_units"], net)
+                self.assertEqual(result["debit_total"], total)
+                self.assertEqual(result["credit_total"], total)
+        for arguments in (
+            {"income_total": -1, "expense_total": 0},
+            {"income_total": 0, "expense_total": 1_000_000_000_001},
+            {"income_total": True, "expense_total": 1},
+        ):
+            with self.subTest(arguments=arguments):
+                self.assertEqual(
+                    self.registry.execute("period_close_plan", arguments),
+                    {"ok": False, "error": "RULE_INPUT_INVALID"},
+                )
+
+    @unittest.skipUnless(NODE, "Node.js tidak tersedia")
+    def test_period_close_rule_matches_compiled_javascript(self):
+        rule = _REGISTERED_RULES["period.close.plan.v1"]
+        source = _load_rule_source(rule)
+        generated = generate(from_source(source.decode("utf-8"), rule["source_file"]))
+        with tempfile.TemporaryDirectory(prefix="pusingcuk-period-close-") as temp:
+            artifact = Path(temp) / "period-close.js"
+            artifact.write_text(generated, encoding="utf-8")
+            for income, expense, expected in (
+                (250000, 100000, "PENUTUPAN_LABA"),
+                (100000, 250000, "PENUTUPAN_RUGI"),
+                (100000, 100000, "PENUTUPAN_NOL"),
+            ):
+                with self.subTest(income=income, expense=expense):
+                    compiled = subprocess.run(
+                        [NODE, str(artifact)],
+                        input=f"{income}\n{expense}\n",
+                        text=True, encoding="utf-8", capture_output=True,
+                        timeout=15, check=False,
+                    )
+                    self.assertEqual(compiled.returncode, 0, compiled.stderr)
+                    self.assertEqual(compiled.stdout, expected + "\n")
 
     def test_journal_balance_rule_rejects_invalid_arguments(self):
         cases = (
