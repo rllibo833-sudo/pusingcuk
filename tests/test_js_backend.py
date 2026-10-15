@@ -129,6 +129,20 @@ class JavaScriptBackendTests(unittest.TestCase):
         self.assertNotEqual(invalid.returncode, 0)
         self.assertIn("rentang aman lintas target", invalid.stderr)
 
+    def test_accounting_source_exports_callable_javascript_module(self):
+        root = Path(__file__).resolve().parents[1]
+        source = (root / "examples" / "accounting" / "rekap_keuangan.cuk").read_text(encoding="utf-8")
+        generated = generate(from_source(source, "rekap_keuangan.cuk"), as_module=True)
+        with tempfile.TemporaryDirectory(prefix="pusingcuk-rules-") as temp:
+            path = Path(temp) / "rules.cjs"
+            path.write_text(generated, encoding="utf-8")
+            result = subprocess.run(
+                [NODE, "-e", "const r=require(process.argv[1]); process.stdout.write(JSON.stringify(r.hitung_ringkasan(1250000,300000,4450000,1500000,2000000)))", str(path)],
+                input="", text=True, capture_output=True, timeout=15, check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "[950000,2950000,0]")
+
     def test_rejects_integer_outside_javascript_safe_range(self):
         with self.assertRaisesRegex(JSBackendError, "rentang aman JavaScript"):
             generate(from_source("jancuk\nhedeh 9007199254740992\nselesai jancuk"))

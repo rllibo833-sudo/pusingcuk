@@ -1,31 +1,10 @@
-# Contoh edukasi rumus keuangan dasar menggunakan sintaks PusingCuk.
-# Input nominal berupa angka rupiah tanpa pemisah ribuan.
+# Aturan akuntansi bersama untuk aplikasi PusingCuk Accounting.
+# Hasil fungsi: [laba_periode, ekuitas_akhir, selisih_persamaan_akuntansi].
 jancuk
-tanya pendapatan_teks = "Pendapatan (Rp): "
-tanya beban_teks = "Total beban (Rp): "
-tanya aset_teks = "Total aset (Rp): "
-tanya liabilitas_teks = "Total liabilitas (Rp): "
-tanya ekuitas_teks = "Ekuitas sebelum laba periode (Rp): "
-lah pendapatan = bilangan(pendapatan_teks)
-lah beban = bilangan(beban_teks)
-lah aset = bilangan(aset_teks)
-lah liabilitas = bilangan(liabilitas_teks)
-lah ekuitas = bilangan(ekuitas_teks)
-fungsi hitung_laba(pendapatan, beban)
-    balek pendapatan - beban
+fungsi hitung_ringkasan(pendapatan, beban, aset, liabilitas, ekuitas)
+    lah laba = pendapatan - beban
+    lah ekuitas_akhir = ekuitas + laba
+    lah selisih_posisi = aset - liabilitas - ekuitas_akhir
+    balek [laba, ekuitas_akhir, selisih_posisi]
 selesai fungsi
-lah laba = hitung_laba(pendapatan, beban)
-lah ekuitas_akhir = ekuitas + laba
-lah selisih_posisi = aset - liabilitas - ekuitas_akhir
-hedeh "=== Ringkasan Akuntansi (Rp) ==="
-hedeh "Pendapatan: " + teks(pendapatan)
-hedeh "Beban: " + teks(beban)
-hedeh "Laba/(rugi): " + teks(laba)
-hedeh "Ekuitas akhir: " + teks(ekuitas_akhir)
-hedeh "Selisih posisi keuangan: " + teks(selisih_posisi)
-njir selisih_posisi == 0
-    hedeh "Persamaan posisi keuangan seimbang."
-kampret
-    hedeh "Periksa data: posisi keuangan belum seimbang."
-selesai njir
 selesai jancuk

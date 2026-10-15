@@ -1,6 +1,12 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const core = require("./accounting-core.js");
+const rules = require("./accounting-rules.generated.js");
+
+test("aturan akuntansi yang dikompilasi dari .cuk dipakai sebagai modul JavaScript", () => {
+  assert.deepEqual(rules.hitung_ringkasan(1250000, 300000, 4450000, 1500000, 2000000), [950000, 2950000, 0]);
+  assert.deepEqual(rules.hitung_ringkasan(100, 125, 1000, 400, 300), [-25, 275, 325]);
+});
 
 test("menerima transaksi berpasangan yang seimbang", () => {
   const result = core.groupTransactions([{ transactionId: "TX-1", d: 1500, c: 0 }, { transactionId: "TX-1", d: 0, c: 1500 }]);

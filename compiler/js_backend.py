@@ -211,7 +211,8 @@ const pcMedian = (value) => {
   if (values.length % 2) return values[middle];
   return pcStatResult("median", values[middle - 1] / 2 + values[middle] / 2);
 };
-const pcInputLines = (typeof process !== "undefined" && typeof require === "function")
+const pcInputLines = (typeof process !== "undefined" && typeof require === "function" &&
+  typeof module !== "undefined" && require.main === module)
   ? require("fs").readFileSync(0, "utf8").split(/\r?\n/)
   : [];
 let pcInputIndex = 0;
@@ -259,7 +260,7 @@ def _js_literal(value, line):
     raise JSBackendError(f"baris {line}: literal {type(value).__name__} tidak didukung")
 
 
-def generate(document: dict) -> str:
+def generate(document: dict, as_module: bool = False) -> str:
     validate(document)
     root_kind, root_fields, root_line = _node(document["program"], {"Program"})
     body = root_fields.get("body")
@@ -280,6 +281,12 @@ def generate(document: dict) -> str:
             ) or len(set(params)) != len(params):
                 raise JSBackendError(f"baris {line}: parameter fungsi tidak valid")
             functions[name] = statement
+
+    if as_module:
+        if not functions:
+            raise JSBackendError("modul JavaScript membutuhkan setidaknya satu fungsi")
+        if any(statement["kind"] != "Function" for statement in body):
+            raise JSBackendError("mode modul hanya menerima deklarasi fungsi tingkat teratas")
 
     def expr(node, names):
         kind, f, line = _node(node)
@@ -426,8 +433,16 @@ def generate(document: dict) -> str:
         output.extend(statements(f["body"], names, "  ", in_function=True) or ["  ;"])
         output.append("}")
         output.append("")
-    output.append("// Program utama")
-    output.extend(statements([s for s in body if s["kind"] != "Function"], {}) or [";"])
+    if as_module:
+        exports = ", ".join(
+            f"{json.dumps(name)}: pc_fn_{name}" for name in functions
+        )
+        output.append(f"const pcApi = Object.freeze({{ {exports} }});")
+        output.append("if (typeof module === \"object\" && module.exports) module.exports = pcApi;")
+        output.append("if (typeof globalThis === \"object\") globalThis.PusingCukAccountingRules = pcApi;")
+    else:
+        output.append("// Program utama")
+        output.extend(statements([s for s in body if s["kind"] != "Function"], {}) or [";"])
     return "\n".join(output) + "\n"
 
 
@@ -435,13 +450,17 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description="Kompilasi PusingCuk ke JavaScript untuk Node.js.")
     parser.add_argument("file", help="berkas sumber .pusingcuk")
     parser.add_argument("-o", "--output", help="berkas .js tujuan; default stdout")
+    parser.add_argument(
+        "--module", action="store_true",
+        help="hasilkan modul fungsi yang dapat dipanggil dari JavaScript/browser",
+    )
     args = parser.parse_args(argv)
     path = Path(args.file)
     if not path.is_file():
         print(f"Kesalahan: berkas tidak ditemukan: {path}", file=sys.stderr)
         return 2
     try:
-        js = generate(from_source(path.read_text(encoding="utf-8"), path.name))
+        js = generate(from_source(path.read_text(encoding="utf-8"), path.name), as_module=args.module)
         if args.output:
             Path(args.output).write_text(js, encoding="utf-8")
         else:

@@ -62,3 +62,4 @@ credentials.json
 pusingcuk-*.out
 pusingcuk-*.expected
 pusingcuk-*.actual
+/apps/accounting/accounting-rules.generated.js
