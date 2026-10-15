@@ -46,8 +46,8 @@ class KnowledgeGroundingTests(unittest.TestCase):
     def test_real_curated_index_contains_twenty_one_locally_owned_sources(self):
         index_path = Path(__file__).resolve().parents[1] / "library" / "knowledge_index.json"
         documents = load_index(index_path)
-        self.assertEqual(len(documents), 21)
-        self.assertEqual(len({doc["id"] for doc in documents}), 21)
+        self.assertEqual(len(documents), 22)
+        self.assertEqual(len({doc["id"] for doc in documents}), 22)
         # All runtime retrieval records are locally owned. Each URL must match its
         # exact immutable source commit/path; the index's own citation deliberately
         # points to the earlier 14-record local-only normalization snapshot.
@@ -148,7 +148,7 @@ class KnowledgeGroundingTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         documents = load_index(root / "library" / "knowledge_index.json")
         cases = json.loads((root / "tests" / "fixtures" / "knowledge_retrieval_cases.json").read_text(encoding="utf-8"))["cases"]
-        self.assertEqual(len(cases), 21)
+        self.assertEqual(len(cases), 22)
         correct = 0
         for case in cases:
             with self.subTest(case=case["id"]):

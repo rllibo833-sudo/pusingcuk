@@ -26,7 +26,7 @@
 - **Versi bahasa kontraktual:** `0.5-dev`.
 - **Versi paket Python:** `0.8.0.dev0`. Ini metadata paket, bukan versi bahasa.
 - **Kontrak built-in:** 21 built-in terkontrak; 17 berstatus didukung oleh native C sebagai built-in penuh. Beberapa konversi skalar memiliki cakupan terbatas; lihat matriks resmi, jangan menghitung semuanya sebagai paritas.
-- **Fixture konformansi:** 66 fixture: 66 wajib pada interpreter referensi Python, 61 wajib pada native C, dan 5 secara eksplisit tidak didukung native. Status ini bukan klaim bahwa setiap backend mendukung semua fitur.
+- **Fixture konformansi:** 67 fixture: 67 wajib pada interpreter referensi Python, 62 wajib pada native C, dan 5 secara eksplisit tidak didukung native. Status ini bukan klaim bahwa setiap backend mendukung semua fitur.
 - **Jalur yang dipelihara:** `lexer.py → parser.py → ast_nodes.py → evaluator.py` dan runtime `native/pusingcuk.c`.
 - **Targets eksperimental:** `compiler/`, `src/`, VM/PVM, dan aplikasi `android-studio/`. Folder atau workflow yang ada bukan bukti rilis stabil.
 
@@ -72,8 +72,8 @@ pusingcuk-ai CLI / adapter HTTP lokal
 
 - **Provider lokal:** adapter Ollama, default model `qwen3:4b`, endpoint `127.0.0.1:11434`. Model dan runtime Ollama harus dipasang terpisah dan berjalan pada mesin yang sama. Model Qwen3 4B yang tercantum di Ollama memerlukan unduhan sekitar 2,5 GB; RAM, kecepatan, dan kualitas hasil bergantung perangkat serta konfigurasi.
 - **Provider alternatif:** Gemini GenerateContent API, dipilih eksplisit dengan `--provider gemini` dan `GEMINI_API_KEY`. Provider ini mengirim prompt/konteks ke layanan pihak ketiga dan bergantung pada model yang tersedia, kuota, ketentuan akun, serta biaya yang berlaku.
-- **Grounding:** indeks berisi **21 dokumen sumber terkurasi**. Seluruh entri tercatat milik repositori PusingCuk, memakai visibility `public-safe`, dan mematok path/commit. Runtime tidak melakukan crawl otomatis terhadap repo lain.
-- **Benchmark retrieval:** 21 kasus baseline menghasilkan top-1 **21/21 (100%)** dan top-3 **21/21 (100%)** pada kueri terkurasi. Pada 8 dari 12 kasus adversarial yang memiliki expected source, top-1 **5/8 (62,5%)** dan top-3 **6/8 (75%)**. Metrik ini menilai retrieval leksikal atas fixture kecil, bukan akurasi jawaban model.
+- **Grounding:** indeks berisi **22 dokumen sumber terkurasi**. Seluruh entri tercatat milik repositori PusingCuk, memakai visibility `public-safe`, dan mematok path/commit. Runtime tidak melakukan crawl otomatis terhadap repo lain.
+- **Benchmark retrieval:** 22 kasus baseline menghasilkan top-1 **21/21 (100%)** dan top-3 **21/21 (100%)** pada kueri terkurasi. Pada 8 dari 12 kasus adversarial yang memiliki expected source, top-1 **5/8 (62,5%)** dan top-3 **6/8 (75%)**. Metrik ini menilai retrieval leksikal atas fixture kecil, bukan akurasi jawaban model.
 - **Sitasi:** URL yang ditempel ke jawaban diambil dari sumber tervalidasi, bukan dipercaya dari teks model. Sitasi membuktikan asal sumber, bukan otomatis kebenaran seluruh klaim.
 - **Tool:** `knowledge_search` untuk pencarian read-only dan `budget_threshold` untuk aturan anggaran dan `journal_balance_check` untuk pemeriksaan sekunder total debit/kredit dari artefak `.cuk` tetap yang di-hash. Pemeriksaan jurnal tidak membaca atau memposting buku; model tidak diberi akses bebas ke source code, shell command, path, atau capability arbitrer.
 - **Memori:** konteks percakapan aktif bersifat sementara. Catatan proyek harus disimpan secara eksplisit oleh pengguna di penyimpanan lokal; chat tidak otomatis dipersistenkan ke Supabase.

@@ -8,7 +8,7 @@ The maintained AI entry point is an experimental local-first CLI. It delegates i
 
 This is an application/orchestrator, not a foundation model trained by PusingCuk. An authenticated loopback-only HTTP adapter now serves local clients, but there is no externally hosted production API or per-user identity/authorization yet. The language runtimes are not OS security sandboxes. Passing CI is evidence for tested contracts only; it is not proof of production availability, general answer quality, or safe execution of arbitrary programs.
 
-The current runtime index (`library/knowledge_index.json`) contains **21 curated source records**, and the Indonesian retrieval regression contains **21 cases**. This small benchmark is regression evidence, not a broad accuracy score.
+The current runtime index (`library/knowledge_index.json`) contains **22 curated source records**, and the Indonesian retrieval regression contains **22 cases**. This small benchmark is regression evidence, not a broad accuracy score.
 
 ## Local integration service now available
 
@@ -50,7 +50,7 @@ A release must not skip gates or turn a prototype into a production claim just b
 
 ### Gate 1 — measurable answer quality and reliability
 
-- The 21-case baseline currently yields top-1 21/21 and top-3 21/21 on its curated expected-source queries. On the 8 answerable adversarial cases, lexical retrieval yields top-1 5/8 and top-3 6/8. These small fixture metrics do not measure general answer quality or live-model behavior. `python tools/evaluate_live_ai.py --provider ollama` runs the same 12-case suite against an actual local model and prints heuristic clarification/refusal and structural citation metrics; `--provider gemini` requires `GEMINI_API_KEY`. The live script is opt-in and was not run as part of CI.
+- The 22-case baseline currently yields top-1 21/21 and top-3 21/21 on its curated expected-source queries. On the 8 answerable adversarial cases, lexical retrieval yields top-1 5/8 and top-3 6/8. These small fixture metrics do not measure general answer quality or live-model behavior. `python tools/evaluate_live_ai.py --provider ollama` runs the same 12-case suite against an actual local model and prints heuristic clarification/refusal and structural citation metrics; `--provider gemini` requires `GEMINI_API_KEY`. The live script is opt-in and was not run as part of CI.
 - Record expected source IDs and whether a question is answerable. The offline evaluator also tests structural citation precision (1/1 in its deliberately small link-injection test) and registry fail-closed response (2/2 prompt-injection tool requests blocked). Four adversarial cases are labeled as needing clarification/off-topic; actual live-model refusal remains unmeasured. Do not present these fixture metrics as broad accuracy.
 - Add regressions for prompt injection inside retrieved documents, fabricated URLs, malformed/oversized provider responses, timeouts, quota/rate-limit responses, and repeated/invalid tool calls.
 - Model output is not proof that a requested tool ran. Tool outcomes must come from validated tool responses and their citations must retain the trusted source envelope.

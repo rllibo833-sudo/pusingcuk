@@ -155,7 +155,7 @@ CI tests the reference interpreter on Python 3.11 and 3.12 and builds the native
 
 ## Development status and next steps
 
-PusingCuk is still experimental. The current language contract is `0.5-dev`; the Python package version `0.8.0.dev0` is separate. The active conformance manifest contains **66 fixtures**: all 66 are required on the Python reference interpreter, 61 are required on native C, and 5 are explicitly unsupported on native C. Unsupported fixtures are not counted as passes or cross-runtime parity.
+PusingCuk is still experimental. The current language contract is `0.5-dev`; the Python package version `0.8.0.dev0` is separate. The active conformance manifest contains **67 fixtures**: all 67 are required on the Python reference interpreter, 62 are required on native C, and 5 are explicitly unsupported on native C. Unsupported fixtures are not counted as passes or cross-runtime parity.
 
 Recent engineering work has added regression coverage for the local AI path from HTTP chat handling through the allowlisted tool registry and a registered `.cuk` rule to a generated JavaScript artifact. The automated checks validate expected results and source/artifact identity. This is focused integration evidence, not proof of general live-model quality or production readiness.
 
