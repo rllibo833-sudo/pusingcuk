@@ -65,7 +65,7 @@ _REGISTERED_RULES: dict[str, dict[str, Any]] = {
     },
     "accounting.equation.v1": {
         "source_file": "accounting_equation_check.cuk",
-        "source_sha256": "16146240a8eaadbecf0afac0e40a20314f85c8d56f9232741be3378a370a7f8f",
+        "source_sha256": "aa2f46e3fb3ac65adc763de5f4818ccda251e2f316a6a91e16e41095890b35bc",
         "entrypoint": "cek_persamaan_akuntansi",
         "language_version": "0.5-dev",
         "input_fields": ("aset", "liabilitas", "ekuitas"),
