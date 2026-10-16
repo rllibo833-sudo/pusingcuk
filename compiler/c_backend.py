@@ -14,7 +14,7 @@ C_RUNTIME = r'''#include <inttypes.h>
 #include <string.h>
 #include <limits.h>
 static unsigned int pc_call_depth = 0;
-static const char *pc_concat(const char *a, const char *b) {
+const char *pc_concat(const char *a, const char *b) {
     size_t na = strlen(a), nb = strlen(b);
     if (na > SIZE_MAX - nb - 1) { fputs("Pusingcuk C backend: string too large\\n", stderr); exit(EXIT_FAILURE); }
     char *out = (char *)malloc(na + nb + 1);
