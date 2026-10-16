@@ -420,7 +420,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "unsupported"
+        "native": "required"
       }
     },
     {
