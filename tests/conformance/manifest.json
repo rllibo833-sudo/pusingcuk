@@ -1426,6 +1426,46 @@
         "reference": "required",
         "native": "required"
       }
+    },
+    {
+      "id": "collections.range-index-out-of-range",
+      "source": "range_index_out_of_range.cuk",
+      "profile": "core",
+      "requires": [
+        "ranges",
+        "indexing",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 3
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "collections.range-index-negative",
+      "source": "range_index_negative.cuk",
+      "profile": "core",
+      "requires": [
+        "ranges",
+        "indexing",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 3
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
     }
   ]
 }
