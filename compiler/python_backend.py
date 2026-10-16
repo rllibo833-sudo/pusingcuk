@@ -166,6 +166,10 @@ def pc_numeric(name, value):
     if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
         raise TypeError(name + " membutuhkan angka finite")
     return value
+def pc_safe_integer_result(name, value):
+    if abs(value) > 9007199254740991:
+        raise ValueError(name + ": hasil integer di luar rentang aman lintas target")
+    return value
 def pc_abs(value): return abs(pc_numeric("mutlak", value))
 def pc_min(a, b): return min(pc_numeric("minimum", a), pc_numeric("minimum", b))
 def pc_max(a, b): return max(pc_numeric("maksimum", a), pc_numeric("maksimum", b))
@@ -173,9 +177,10 @@ def pc_round(value):
     value = pc_numeric("bulatkan", value)
     lower = math.floor(value)
     fraction = value - lower
-    if fraction < 0.5: return lower
-    if fraction > 0.5: return lower + 1
-    return lower if lower % 2 == 0 else lower + 1
+    if fraction < 0.5: result = lower
+    elif fraction > 0.5: result = lower + 1
+    else: result = lower if lower % 2 == 0 else lower + 1
+    return pc_safe_integer_result("bulatkan", result)
 def pc_math_result(name, value):
     if not math.isfinite(value): raise ValueError(name + " menghasilkan angka di luar domain atau non-finite")
     return value
@@ -183,8 +188,8 @@ def pc_sqrt(value):
     value = pc_numeric("akar", value)
     if value < 0: raise ValueError("akar() domain tidak valid: angka harus non-negatif")
     return pc_math_result("akar", math.sqrt(value))
-def pc_floor(value): return math.floor(pc_numeric("bawah", value))
-def pc_ceil(value): return math.ceil(pc_numeric("atas", value))
+def pc_floor(value): return pc_safe_integer_result("bawah", math.floor(pc_numeric("bawah", value)))
+def pc_ceil(value): return pc_safe_integer_result("atas", math.ceil(pc_numeric("atas", value)))
 def pc_pow(a, b): return pc_math_result("pangkat", math.pow(pc_numeric("pangkat", a), pc_numeric("pangkat", b)))
 def pc_sin(value): return pc_math_result("sinus", math.sin(pc_numeric("sinus", value)))
 def pc_cos(value): return pc_math_result("kosinus", math.cos(pc_numeric("kosinus", value)))

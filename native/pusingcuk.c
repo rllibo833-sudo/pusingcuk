@@ -60,6 +60,14 @@ static Val checked_num(double x, const char *message) {
     if (!isfinite(x)) { fail(message); return num(0); }
     return num(x);
 }
+static Val checked_safe_integer(double x, const char *invalid_message, const char *unsafe_message) {
+    if (!isfinite(x)) { fail(invalid_message); return num(0); }
+    if (floor(x) == x && fabs(x) > 9007199254740991.0) {
+        fail(unsafe_message);
+        return num(0);
+    }
+    return num(x);
+}
 static List *new_list(void) {
     if (allocated_list_count >= MAX_LIST_ALLOCATIONS) {
         fail("batas alokasi list native terlampaui"); return NULL;
@@ -450,11 +458,11 @@ static Val call_native_numeric_builtin(const char *name, Val *args, int argc, in
     if (!strcmp(name, "maksimum"))
         return args[1].n > args[0].n ? args[1] : args[0];
     if (!strcmp(name, "bulatkan"))
-        return checked_num(round_ties_even(args[0].n), "bulatkan() menghasilkan angka tidak valid");
+        return checked_safe_integer(round_ties_even(args[0].n), "bulatkan: operasi angka non-finite", "bulatkan: hasil integer di luar rentang aman lintas target");
     if (!strcmp(name, "bawah"))
-        return checked_num(floor(args[0].n), "bawah() menghasilkan angka tidak valid");
+        return checked_safe_integer(floor(args[0].n), "bawah: operasi angka non-finite", "bawah: hasil integer di luar rentang aman lintas target");
     if (!strcmp(name, "atas"))
-        return checked_num(ceil(args[0].n), "atas() menghasilkan angka tidak valid");
+        return checked_safe_integer(ceil(args[0].n), "atas: operasi angka non-finite", "atas: hasil integer di luar rentang aman lintas target");
     if (!strcmp(name, "akar")) {
         if (args[0].n < 0.0) {
             fail("akar() domain tidak valid: angka harus non-negatif");

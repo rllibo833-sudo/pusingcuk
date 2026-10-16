@@ -1306,6 +1306,26 @@
       }
     },
     {
+      "id": "runtime.round-rejects-unsafe-result",
+      "source": "round_unsafe_result.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-boundary",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
       "id": "cukaccount.financial-input-boundaries",
       "source": "cukaccount_financial_cases.cuk",
       "profile": "core",
