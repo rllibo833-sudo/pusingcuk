@@ -85,7 +85,7 @@ _REGISTERED_RULES: dict[str, dict[str, Any]] = {
     },
     "period.close.plan.v1": {
         "source_file": "period_close_plan.cuk",
-        "source_sha256": "a03516b7809b5e37b443664cdf4e5c9f5af283b0e4767b928b40ed1385a61e86",
+        "source_sha256": "ddd1bf005106d7defe4a64cb9694eb8b7fca1f03b9d4814ad04d08ac8e0b6ef5",
         "entrypoint": "status_penutupan_periode",
         "language_version": "0.5-dev",
         "input_fields": ("income_total", "expense_total"),
