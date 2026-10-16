@@ -638,6 +638,18 @@ static Val primary(void) {
                 return string(ch);
             }
             if (value.t == DICT) return dict_get(value.dict,idx);
+            if (value.t == RANGE) {
+                double length = range_length(value);
+                if (idx.t != NUM || !isfinite(idx.n) || idx.n < 0 ||
+                    idx.n != trunc(idx.n) || idx.n >= length) {
+                    fail("indeks rentang di luar batas atau bukan bilangan bulat");
+                    return num(0);
+                }
+                return checked_safe_integer(
+                    value.range_start + idx.n * value.range_step,
+                    "indeks rentang menghasilkan angka tidak valid",
+                    "indeks rentang di luar rentang aman lintas target");
+            }
             size_t at=0;
             if (!list_index(value,idx,&at)) return num(0);
             return value.list->items[at];
