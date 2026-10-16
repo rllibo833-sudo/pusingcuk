@@ -416,12 +416,36 @@ class ToolRegistry:
                     and fixture["runtimes"].get("reference") == "required"
                     and fixture["runtimes"].get("native") == "unsupported"
                 ]
+                # Turn semantic priorities into repository-grounded coverage hints.
+                # A missing shared fixture is a coverage gap to investigate, not
+                # proof that an implementation is broken or unsupported.
+                priority_requirements = [
+                    "numeric-types", "numeric-range", "safe-integer-range",
+                    "ordered-accumulation", "collection-types", "runtime-diagnostics",
+                    "short-circuit", "floor-division", "modulo",
+                ]
+                shared_by_requirement = {
+                    requirement: [
+                        fixture["id"] for fixture in shared
+                        if requirement in fixture.get("requires", [])
+                    ]
+                    for requirement in priority_requirements
+                }
                 result = {
                     "purpose": "Use PusingCuk AI to improve .cuk semantics from repository evidence, not from guesses or compile-only success.",
                     "source_of_truth": ["SPEC.md", "docs/SEMANTIC_CONTRACT.md", "library/builtin_contract.json", "tests/conformance/manifest.json"],
                     "baseline": "Python reference behavior is authoritative; native C is the second runtime only for the shared required subset.",
                     "shared_required_fixture_count": len(shared),
                     "shared_required_fixture_ids": [fixture["id"] for fixture in shared],
+                    "priority_requirement_coverage": {
+                        requirement: {
+                            "shared_fixture_count": len(fixture_ids),
+                            "shared_fixture_ids": fixture_ids,
+                            "coverage_status": "fixture-backed" if fixture_ids else "no-shared-fixture-found",
+                        }
+                        for requirement, fixture_ids in shared_by_requirement.items()
+                    },
+                    "coverage_warning": "No shared fixture means investigate the contract and both implementations before editing; absence of coverage alone does not prove a runtime bug.",
                     "reference_only_fixture_count": len(reference_only),
                     "reference_only_fixture_ids": [fixture["id"] for fixture in reference_only],
                     "next_actions": [
