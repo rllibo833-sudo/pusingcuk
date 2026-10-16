@@ -1407,6 +1407,25 @@
         "reference": "required",
         "native": "required"
       }
+    },
+    {
+      "id": "collections.range-index",
+      "source": "range_index.cuk",
+      "profile": "core",
+      "requires": [
+        "ranges",
+        "indexing",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "3\n1\n3\n5\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
     }
   ]
 }
