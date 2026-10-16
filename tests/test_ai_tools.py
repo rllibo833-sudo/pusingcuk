@@ -36,6 +36,8 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertTrue(result["ok"], result)
         self.assertEqual(result["operation"], "compile_check")
         self.assertEqual(result["evidence_status"], "KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI")
+        self.assertEqual(result["failure_category"], "none")
+        self.assertIn("runtime belum diuji", result["repair_hint"])
         self.assertEqual(result["target"], "javascript")
         self.assertEqual(result["language_version"], LANGUAGE_VERSION)
         self.assertEqual(result["source_sha256"], hashlib.sha256(source.encode("utf-8")).hexdigest())
@@ -68,6 +70,8 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertFalse(invalid["ok"])
         self.assertEqual(invalid["error"], "CUK_COMPILE_FAILED")
         self.assertEqual(invalid["evidence_status"], "SOURCE_DITOLAK_COMPILER")
+        self.assertIn(invalid["failure_category"], {"syntax_error", "compiler_error"})
+        self.assertTrue(invalid["repair_hint"])
         empty = self.registry.execute("cuk_compile_check", {"source": "  "})
         self.assertEqual(empty, {
             "ok": False, "error": "CUK_SOURCE_INVALID",
@@ -107,6 +111,16 @@ class ToolInputContractTests(unittest.TestCase):
                     },
                 )
 
+    def test_cuk_compile_check_returns_consistent_syntax_category_location_and_hint(self):
+        source = "jancuk\\nhedeh 1 +\\nselesai jancuk\\n"
+        result = self.registry.execute("cuk_compile_check", {"source": source})
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["failure_category"], "syntax_error")
+        self.assertEqual(result["diagnostic_type"], "ParserError")
+        self.assertIsInstance(result["diagnostic_location"]["line"], int)
+        self.assertIsInstance(result["diagnostic_location"]["column"], int)
+        self.assertIn("SPEC.md", result["repair_hint"])
+
     def test_cuk_compile_check_enforces_source_size_in_utf8_bytes(self):
         # The limit is measured in encoded bytes, not Unicode character count.
         at_limit = "a" * (16 * 1024)
@@ -133,6 +147,8 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertEqual(result["error"], "CUK_COMPILER_INTERNAL_ERROR")
         self.assertEqual(result["semantic_review"]["status"], "compiler_internal_error")
         self.assertEqual(result["evidence_status"], "STATUS_KOMPILASI_TIDAK_VALID")
+        self.assertEqual(result["failure_category"], "compiler_internal_error")
+        self.assertIn("kesalahan internal", result["repair_hint"].lower())
         self.assertNotIn("internal detail", result["diagnostic"])
         self.assertIs(result["executed"], False)
 
