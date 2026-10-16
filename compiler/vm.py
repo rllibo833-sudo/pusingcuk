@@ -7,6 +7,7 @@ from pathlib import Path
 
 from compiler.bytecode import BytecodeError, validate_bytecode
 from evaluator import PusingDict, language_equal
+from library.builtin_contract import BUILTIN_BY_NAME
 
 
 class VMError(RuntimeError):
@@ -227,6 +228,8 @@ class VirtualMachine:
                         self.fail(line, f"{name} menghasilkan angka non-finite")
                     if isinstance(result, float) and result.is_integer() and abs(result) <= 9007199254740991:
                         result = int(result)
+                elif name in BUILTIN_BY_NAME:
+                    self.fail(line, f"built-in '{name}' belum didukung di VM")
                 else:
                     fn = self.functions.get(name)
                     if fn is None: self.fail(line, f"fungsi '{name}' tidak dikenal")
