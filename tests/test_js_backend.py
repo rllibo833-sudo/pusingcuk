@@ -189,7 +189,7 @@ class JavaScriptBackendTests(unittest.TestCase):
     def test_arithmetic_rejects_unsafe_integer_results_consistently(self):
         for expression in (
             "9007199254740991 + 1",
-            "0 - 9007199254740992",
+            "-9007199254740991 - 1",
             "9007199254740991 * 2",
             "9007199254740991 // 0.5",
         ):
