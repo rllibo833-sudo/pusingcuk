@@ -16,6 +16,7 @@ def generate(document, package_name="org.pusingcuk.generated",
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", class_name):
         raise AndroidBackendError("nama class tidak valid")
     variables, lines = {}, []
+    inputs = []
 
     def expression(node):
         kind, f, line = node["kind"], node["fields"], node.get("line", 0)
@@ -80,6 +81,17 @@ def generate(document, package_name="org.pusingcuk.generated",
                 if name in variables:
                     raise AndroidBackendError(f"baris {item.get('line', 0)}: deklarasi variabel {name!r} duplikat")
                 variables[name] = "pcv_" + name
+            elif kind == "Input":
+                name = fields["name"]
+                prompt = fields["prompt"]
+                if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+                    raise AndroidBackendError(f"baris {item.get('line', 0)}: nama input tidak valid")
+                if name in variables:
+                    raise AndroidBackendError(f"baris {item.get('line', 0)}: nama input {name!r} bertabrakan dengan variabel")
+                if not isinstance(prompt, dict) or prompt.get("kind") != "Literal" or not isinstance(prompt.get("fields", {}).get("value"), str):
+                    raise AndroidBackendError(f"baris {item.get('line', 0)}: prompt input Android harus berupa teks literal")
+                variables[name] = "pcv_" + name
+                inputs.append({"name": name, "prompt": prompt["fields"]["value"]})
             elif kind == "If":
                 walk_statements(fields["then_body"])
                 walk_statements(fields["else_body"])
@@ -101,7 +113,9 @@ def generate(document, package_name="org.pusingcuk.generated",
     def emit(items, indent="            "):
         for node in items:
             kind, f, line = node["kind"], node["fields"], node.get("line", 0)
-            if kind == "Declare":
+            if kind == "Input":
+                pass  # Values are read from generated native fields before execution.
+            elif kind == "Declare":
                 lines.append(f"{indent}{variables[f['name']]} = {expression(f['value'])};")
             elif kind == "Assign":
                 name = f["name"]
@@ -137,12 +151,18 @@ def generate(document, package_name="org.pusingcuk.generated",
 
     emit.loop_id = 0
     emit(document["program"]["fields"]["body"])
+    input_fields_add = "\n".join(f"        inputFields.add(input{i});" for i in range(len(inputs)))
+    input_assignments = "\n".join(f"            {variables[item['name']]} = inputFields.get({i}).getText().toString();" for i, item in enumerate(inputs))
+    input_ui = "\n".join(f"        EditText input{i} = new EditText(this); input{i}.setSingleLine(true); input{i}.setHint({json.dumps(item['prompt'], ensure_ascii=True)}); layout.addView(input{i});" for i, item in enumerate(inputs))
     body = "\n".join(lines) or '            output.append("Program .cuk kosong");'
     return f'''package {package_name};
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.EditText;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import java.util.Objects;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -152,19 +172,32 @@ import java.util.Map;
 public final class {class_name} extends Activity {{
     @Override public void onCreate(Bundle state) {{
         super.onCreate(state);
-        StringBuilder output = new StringBuilder();
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        int pad = (int)(16 * getResources().getDisplayMetrics().density);
+        layout.setPadding(pad, pad, pad, pad);
+{input_ui}
+{input_fields_add}
+        Button run = new Button(this);
+        run.setText("Jalankan");
+        layout.addView(run);
         TextView screen = new TextView(this);
         screen.setTextSize(16);
         screen.setTextIsSelectable(true);
         ScrollView scroll = new ScrollView(this);
         scroll.addView(screen);
-        setContentView(scroll);
-        try {{
+        layout.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
+        setContentView(layout);
+        run.setOnClickListener(view -> {{
+            StringBuilder output = new StringBuilder();
+            try {{
 {body}
+{input_assignments}
+            }} catch (RuntimeException error) {{
+                output.append("Kesalahan .cuk: ").append(error.getMessage());
+            }}
             screen.setText(output.toString());
-        }} catch (RuntimeException error) {{
-            screen.setText(output.toString() + "\\nKesalahan .cuk: " + error.getMessage());
-        }}
+        }});
     }}
     private static boolean pcTruthy(Object value) {{
         if (value == null || Boolean.FALSE.equals(value)) return false;
