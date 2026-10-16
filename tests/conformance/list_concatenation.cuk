@@ -1,0 +1,9 @@
+jancuk
+lah kiri = [1, 2]
+lah kanan = [3, 4]
+lah gabung = kiri + kanan
+hedeh panjang(gabung)
+hedeh gabung[0]
+hedeh gabung[3]
+hedeh panjang(kiri)
+selesai jancuk
