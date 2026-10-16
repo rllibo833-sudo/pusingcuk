@@ -142,6 +142,50 @@ class ToolInputContractTests(unittest.TestCase):
                     self.assertEqual(compiled.returncode, 0, compiled.stderr)
                     self.assertEqual(compiled.stdout, expected + "\n")
 
+    @unittest.skipUnless(NODE, "Node.js tidak tersedia")
+    def test_registered_period_close_rule_matches_compiled_javascript_artifact(self):
+        """The AI's fixed .cuk closing rule must behave the same in Python and generated JS."""
+        rule = _REGISTERED_RULES["period.close.plan.v1"]
+        source = _load_rule_source(rule)
+        self.assertEqual(hashlib.sha256(source).hexdigest(), rule["source_sha256"])
+        generated = generate(from_source(source.decode("utf-8"), rule["source_file"]))
+
+        cases = (
+            ("250000", "100000", [
+                "PENUTUPAN_LABA", "150000", "250000", "0", "0", "100000", "0", "150000",
+            ]),
+            ("100000", "250000", [
+                "PENUTUPAN_RUGI", "-150000", "100000", "0", "0", "250000", "150000", "0",
+            ]),
+            ("100000", "100000", [
+                "PENUTUPAN_NOL", "0", "100000", "0", "0", "100000", "0", "0",
+            ]),
+            ("abc", "100", ["INPUT_TIDAK_VALID"]),
+        )
+        with tempfile.TemporaryDirectory(prefix="pusingcuk-period-close-js-") as temp:
+            artifact = Path(temp) / "period-close.js"
+            artifact.write_text(generated, encoding="utf-8")
+            for income, expense, expected_lines in cases:
+                with self.subTest(income=income, expense=expense):
+                    stdin_text = f"{income}\\n{expense}\\n"
+                    reference = subprocess.run(
+                        [sys.executable, str(ROOT / "pusingcuk_new.py"), str(ROOT / "library" / rule["source_file"])],
+                        input=stdin_text, text=True, encoding="utf-8",
+                        capture_output=True, timeout=10, cwd=ROOT, check=False,
+                    )
+                    compiled = subprocess.run(
+                        [NODE, str(artifact)], input=stdin_text, text=True, encoding="utf-8",
+                        capture_output=True, timeout=10, cwd=ROOT, check=False,
+                    )
+                    expected = "\\n".join(expected_lines) + "\\n"
+                    self.assertEqual(reference.returncode, 0, reference.stderr)
+                    self.assertEqual(compiled.returncode, 0, compiled.stderr)
+                    self.assertEqual(reference.stdout, expected)
+                    self.assertEqual(compiled.stdout, expected)
+                    self.assertEqual(compiled.stdout, reference.stdout)
+                    self.assertEqual(compiled.stderr, reference.stderr)
+
+
     def test_journal_balance_rule_is_hash_pinned_and_registered(self):
         rule = _REGISTERED_RULES["journal.balance.v1"]
         source = _load_rule_source(rule)
