@@ -33,6 +33,18 @@ jobs:
         uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
         with:
           gradle-version: "8.9"
+      - name: Kompilasi contoh .cuk menjadi executable Android
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m compiler examples/android_native_demo.cuk --target c --output /tmp/pusingcuk-android-demo.c
+          NDK_BIN="$ANDROID_HOME/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          for ABI in arm64-v8a armeabi-v7a; do
+            if [ "$ABI" = arm64-v8a ]; then CC="$NDK_BIN/aarch64-linux-android24-clang"; else CC="$NDK_BIN/armv7a-linux-androideabi24-clang"; fi
+            mkdir -p "android-studio/app/src/main/assets/bin/$ABI"
+            "$CC" -std=c11 -O2 -Wall -Wextra /tmp/pusingcuk-android-demo.c -lm -o "android-studio/app/src/main/assets/bin/$ABI/pusingcuk-compiled-demo"
+            chmod 755 "android-studio/app/src/main/assets/bin/$ABI/pusingcuk-compiled-demo"
+          done
       - name: Bangun runtime native Android ARM
         shell: bash
         run: |

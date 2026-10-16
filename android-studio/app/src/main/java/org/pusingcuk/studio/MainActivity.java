@@ -29,7 +29,7 @@ public final class MainActivity extends Activity {
     private EditText source, stdin;
     private TextView output, status;
     private Button runButton;
-    private File runtime, projectFile;
+    private File runtime, compiledDemo, projectFile;
 
     private int dp(float n) { return (int)(n * getResources().getDisplayMetrics().density + 0.5f); }
     private TextView label(String text, int size, int color) {
@@ -81,6 +81,7 @@ public final class MainActivity extends Activity {
         page.addView(label("Editor + runtime native · Android",13,Color.LTGRAY));
         LinearLayout actions = column(); actions.setPadding(0,dp(2),0,dp(2)); page.addView(actions);
         runButton = button("▶ Jalankan",actions,v->runProgram());
+        button("Jalankan demo .cuk hasil kompilasi native",actions,v->runCompiledDemo());
         button("Simpan proyek",actions,v->saveProject());
         button("Buka proyek lokal",actions,v->loadProject());
         button("Impor file publik dari GitHub",actions,v->showGitHubImport());
@@ -105,7 +106,15 @@ public final class MainActivity extends Activity {
             runtime = new File(getFilesDir(),"pusingcuk-native");
             try (OutputStream out = new FileOutputStream(runtime)) { byte[] b=new byte[8192]; int n; while((n=in.read(b))!=-1) out.write(b,0,n); }
             if (!runtime.setExecutable(true,true)) throw new IllegalStateException("Tidak dapat mengaktifkan runtime.");
-            status.setText("Runtime native siap · "+abi);
+            try (InputStream demoIn = getAssets().open("bin/"+abi+"/pusingcuk-compiled-demo")) {
+                compiledDemo = new File(getFilesDir(),"pusingcuk-compiled-demo");
+                try (OutputStream demoOut = new FileOutputStream(compiledDemo)) {
+                    byte[] chunk = new byte[8192]; int count;
+                    while ((count = demoIn.read(chunk)) != -1) demoOut.write(chunk,0,count);
+                }
+                if (!compiledDemo.setExecutable(true,true)) throw new IllegalStateException("Demo hasil kompilasi tidak dapat dijalankan.");
+            }
+            status.setText("Runtime native siap · "+abi+" · compiler C tersedia");
             source.setText("jancuk\nlah nama = \"Dunia\"\n\nfungsi tambah(a, b)\n    balek a + b\nselesai fungsi\n\nhedeh \"Halo, \" + nama\nhedeh tambah(20, 22)\nselesai jancuk");
         } catch(Exception e) { status.setText("Runtime gagal disiapkan: "+e.getMessage()); runButton.setEnabled(false); }
     }
@@ -159,6 +168,42 @@ public final class MainActivity extends Activity {
                 });
             } catch(Exception e){String m=e.getMessage()==null?e.getClass().getSimpleName():e.getMessage();runOnUiThread(()->{status.setText("Eksekusi gagal");output.setText(m);runButton.setEnabled(true);});}
             finally{if(proc!=null&&proc.isAlive())proc.destroyForcibly();if(program!=null)program.delete();}
+        });
+    }
+
+
+    // Generated from examples/android_native_demo.cuk by the Android NDK build.
+    private void runCompiledDemo() {
+        if (compiledDemo == null || !compiledDemo.canExecute()) {
+            toastError("Demo hasil kompilasi .cuk belum tersedia di APK ini."); return;
+        }
+        runButton.setEnabled(false); status.setText("Menjalankan program .cuk hasil kompilasi native…"); output.setText("");
+        worker.execute(() -> {
+            Process proc = null;
+            BoundedOutputStream stdout = new BoundedOutputStream(), stderr = new BoundedOutputStream();
+            try {
+                proc = new ProcessBuilder(compiledDemo.getAbsolutePath()).directory(getFilesDir()).start();
+                final Process active = proc;
+                Thread outReader = new Thread(() -> copy(active.getInputStream(), stdout));
+                Thread errReader = new Thread(() -> copy(active.getErrorStream(), stderr));
+                outReader.start(); errReader.start();
+                boolean finished = proc.waitFor(3, TimeUnit.SECONDS);
+                if (!finished) { proc.destroyForcibly(); proc.waitFor(500, TimeUnit.MILLISECONDS); }
+                outReader.join(500); errReader.join(500);
+                final boolean timeout = !finished; final int exit = finished ? proc.exitValue() : -1;
+                final String outText = stdout.text(), errText = stderr.text();
+                runOnUiThread(() -> {
+                    String text = outText;
+                    if (!errText.isEmpty()) text += (text.isEmpty() ? "" : "\n") + "[stderr]\n" + errText;
+                    if (timeout) { text += (text.isEmpty() ? "" : "\n") + "Eksekusi dihentikan setelah 3 detik."; status.setText("Timeout"); }
+                    else status.setText(exit == 0 ? "Kompilasi native berhasil · exit 0" : "Program hasil kompilasi gagal · exit " + exit);
+                    output.setText(text.isEmpty() ? "(program selesai tanpa keluaran)" : text);
+                    runButton.setEnabled(true);
+                });
+            } catch (Exception e) {
+                String message = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
+                runOnUiThread(() -> { status.setText("Demo native gagal"); output.setText(message); runButton.setEnabled(true); });
+            } finally { if (proc != null && proc.isAlive()) proc.destroyForcibly(); }
         });
     }
 
