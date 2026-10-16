@@ -86,10 +86,8 @@ class DocumentationContractTests(unittest.TestCase):
         self.assertEqual(fixture_total, reference_required)
         self.assertEqual(fixture_total, native_required + native_unsupported)
 
-        count_summary = (
-            f"{fixture_total} fixtures" if fixture_total != 1 else "1 fixture"
-        )
         readme = (root / "README.md").read_text(encoding="utf-8")
+        status = (root / "docs/PROJECT_STATUS_AND_ROADMAP.md").read_text(encoding="utf-8")
         self.assertIn(
             f"**{fixture_total} fixtures**: all {reference_required} are required "
             f"on the Python reference interpreter, {native_required} are required "
@@ -106,7 +104,6 @@ class DocumentationContractTests(unittest.TestCase):
 
         readiness = (root / "docs/AI_ENGINE_READINESS.md").read_text(encoding="utf-8")
         ledger = (root / "docs/AI_ENGINE_MIGRATION_LEDGER.md").read_text(encoding="utf-8")
-        status = (root / "docs/PROJECT_STATUS_AND_ROADMAP.md").read_text(encoding="utf-8")
         self.assertIn("22-case baseline currently yields top-1", readiness)
         self.assertIn("22 curated source records", readiness)
         self.assertNotIn("16-case exact-top-1 retrieval benchmark", readiness)
