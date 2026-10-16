@@ -239,3 +239,12 @@ Dalam 25 run terbaru yang dikembalikan API: **13 success, 5 failure, 7 cancelled
 - `docs/PROJECT_STATUS_AND_ROADMAP.md` menjadi ringkasan status; `docs/VISION.md` tetap sumber tujuan produk/bahasa. `README.md` menjelaskan kemampuan runtime dengan batas yang eksplisit.
 - Runtime bahasa masih eksperimental: Python referensi dan native C merupakan jalur utama konformansi; JS/Python transpiler dan PVM memiliki subset/eksperimental. Tes lulus tidak berarti semua backend setara.
 - PusingCuk AI adalah aplikasi/orchestrator berbasis provider, bukan model foundation yang dilatih dari awal. Fixture dan aturan deterministik meningkatkan konteks/evaluasi, bukan bukti fine-tuning.
+
+
+## Perbaikan jalur bukti AI → compiler → runtime — 16 Oktober 2026
+
+Perubahan langsung pada `main` menambahkan tool `cuk_conformance_check`. Tool ini menerima hanya ID fixture yang terdaftar pada `tests/conformance/manifest.json`, lalu menjalankan fixture tepercaya tersebut pada runtime yang diwajibkan manifest dan membandingkan exit code, stdout, kelas diagnostik, serta nomor baris. Hasil mengembalikan status `RUNTIME_TERUJI` atau `RUNTIME_GAGAL`, hasil per-runtime, dan flag parity Python/native hanya jika kedua runtime diwajibkan dan lulus.
+
+`cuk_compile_check` tetap compile-only dan tidak mengeksekusi source model/pengguna. Prompt AI sekarang mengarahkan model dari diagnostik ke kontrak/fixture relevan, lalu ke pengujian fixture terdaftar; kegagalan harness tidak boleh dilabeli sebagai kegagalan source. Ini menutup jalur bukti untuk fixture yang sudah ada, **bukan** bukti runtime untuk source baru. Fixture baru harus ditambahkan secara reviewable setelah kegagalan semantik berulang direproduksi, dengan SPEC/kontrak, implementasi, dan target dukungan diperbarui bersama.
+
+Validasi otomatis yang ditambahkan: tes unit untuk eksekusi fixture nyata melalui registry, penolakan ID fixture yang tidak terdaftar, dan aliran hasil bukti runtime kembali ke provider AI. Status CI harus diperiksa pada HEAD terbaru sebelum perubahan ini dianggap tervalidasi.
