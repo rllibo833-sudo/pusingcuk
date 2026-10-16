@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import hashlib
-import io
 import os
 import re
 import subprocess
@@ -15,8 +14,6 @@ from typing import Any
 from library.knowledge_grounding import rank_knowledge
 from compiler.ir import LANGUAGE_VERSION, from_source
 from compiler.js_backend import generate
-from compiler.bytecode import compile_ir as compile_bytecode
-from compiler.vm import VirtualMachine, VMError
 
 _MAX_CUK_SOURCE_BYTES = 16 * 1024
 
@@ -189,9 +186,9 @@ class ToolRegistry:
                 "name": "cuk_compile_check",
                 "description": (
                     "Validasi dan kompilasi source .cuk dengan front-end/compiler PusingCuk, "
-                    "hasilkan artefak JavaScript, lalu jalankan bytecode hasil compiler melalui PVM "
-                    "dengan batas 10000 instruksi. Mengembalikan diagnostik atau stdout PVM serta "
-                    "hash artefak JavaScript. Ini bukan eksekusi artefak JavaScript dan bukan sandbox OS."
+                    "lalu kembalikan diagnostik atau artefak JavaScript beserta hash. Tidak "
+                    "menjalankan source atau artefak; keberhasilan kompilasi bukan bukti hasil "
+                    "runtime dan bukan sandbox OS."
                 ),
                 "parameters": {
                     "type": "object",
@@ -261,39 +258,25 @@ class ToolRegistry:
             try:
                 document = from_source(source, "ai_input.cuk")
                 generated = generate(document)
-                bytecode = compile_bytecode(document)
-                output = io.StringIO()
-                VirtualMachine(
-                    bytecode,
-                    input_stream=io.StringIO(""),
-                    output_stream=output,
-                    max_steps=10000,
-                ).run()
-            except (SyntaxError, ValueError, TypeError, UnicodeError, VMError, ArithmeticError) as exc:
+            except (SyntaxError, ValueError, TypeError, UnicodeError, ArithmeticError) as exc:
                 return {
                     "ok": False,
-                    "error": "CUK_COMPILE_OR_EXECUTION_FAILED",
+                    "error": "CUK_COMPILE_FAILED",
                     "diagnostic": str(exc)[:500],
-                    "target": "pvm+javascript",
+                    "target": "javascript",
                     "executed": False,
                 }
             artifact_bytes = generated.encode("utf-8")
             return {
                 "ok": True,
-                "operation": "compile_and_execute_check",
-                "target": "pvm+javascript",
+                "operation": "compile_check",
+                "target": "javascript",
                 "language_version": LANGUAGE_VERSION,
                 "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
                 "artifact_sha256": hashlib.sha256(artifact_bytes).hexdigest(),
                 "artifact_bytes": len(artifact_bytes),
                 "artifact": generated,
-                "execution": {
-                    "runtime": "pusingcuk-bytecode-vm",
-                    "stdout": output.getvalue()[:4000],
-                    "stdout_truncated": len(output.getvalue()) > 4000,
-                    "step_limit": 10000,
-                },
-                "executed": True,
+                "executed": False,
                 "artifact_saved": False,
             }
 
