@@ -287,7 +287,7 @@ class ToolRegistry:
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "topic": {"type": "string", "enum": ["general", "builtins", "js", "native", "formats", "fixtures", "semantics", "development"]}
+                        "topic": {"type": "string", "enum": ["general", "builtins", "js", "native", "formats", "fixtures", "semantics", "development", "independence"]}
                     },
                     "required": [],
                     "additionalProperties": False,
@@ -341,7 +341,7 @@ class ToolRegistry:
             if set(arguments) - {"topic"}:
                 return {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"}
             topic = arguments.get("topic", "general")
-            if topic not in {"general", "builtins", "js", "native", "formats", "fixtures", "semantics", "development"}:
+            if topic not in {"general", "builtins", "js", "native", "formats", "fixtures", "semantics", "development", "independence"}:
                 return {"ok": False, "error": "COMPILER_CONTEXT_TOPIC_INVALID"}
             entries = BUILTIN_CONTRACT["builtins"]
             try:
@@ -387,6 +387,51 @@ class ToolRegistry:
                     ],
                     "unsupported_fixture_ids": [fixture["id"] for fixture in native_fixtures if fixture["runtimes"].get("native") == "unsupported"],
                     "parity_rule": "Only shared_required_fixture_ids establish the Python/native parity baseline; unsupported is not a pass and reference-only features are not native parity.",
+                }
+            elif topic == "independence":
+                native_required = [
+                    fixture for fixture in fixtures
+                    if isinstance(fixture, dict)
+                    and isinstance(fixture.get("runtimes"), dict)
+                    and fixture["runtimes"].get("native") == "required"
+                ]
+                native_unsupported = [
+                    fixture for fixture in fixtures
+                    if isinstance(fixture, dict)
+                    and isinstance(fixture.get("runtimes"), dict)
+                    and fixture["runtimes"].get("native") == "unsupported"
+                ]
+                reference_only = [
+                    fixture for fixture in native_unsupported
+                    if fixture["runtimes"].get("reference") == "required"
+                ]
+                native_gaps = [
+                    {"name": entry["name"], "status": entry["backends"].get("native_c", {}).get("status", "missing")}
+                    for entry in entries
+                    if entry["backends"].get("native_c", {}).get("status") != "supported"
+                ]
+                result = {
+                    "goal": "Make .cuk useful without requiring the Python interpreter at program execution time, while keeping PusingCuk AI as a helper for language development.",
+                    "current_boundary": {
+                        "native_execution": "native/pusingcuk.c parses and executes .cuk without importing Python; building it requires a C compiler and libm.",
+                        "python_still_used_for": ["modular reference interpreter", "compiler and AI tooling", "conformance/test harness"],
+                        "important_distinction": "Native execution independence is not the same as removing Python from all developer tooling."
+                    },
+                    "evidence": {
+                        "native_required_fixture_count": len(native_required),
+                        "native_required_fixture_ids": [fixture["id"] for fixture in native_required],
+                        "native_unsupported_fixture_count": len(native_unsupported),
+                        "native_unsupported_fixture_ids": [fixture["id"] for fixture in native_unsupported],
+                        "reference_required_but_native_unsupported_ids": [fixture["id"] for fixture in reference_only],
+                        "builtins_not_claimed_supported_by_native": native_gaps
+                    },
+                    "next_actions": [
+                        "Choose one existing reference-required/native-unsupported fixture and inspect the contract before implementing its native C behavior.",
+                        "Prefer closing a small native C semantic gap over expanding experimental transpiler backends.",
+                        "Keep each change bounded and reuse existing conformance infrastructure; do not add a new document, issue, or CI workflow for a single gap.",
+                        "After implementation, run only the focused native fixture and the existing conformance command before claiming parity."
+                    ],
+                    "safety_note": "AI-generated code is a proposal, not proof. Do not change a fixture to hide a mismatch or mark a target supported before its behavior is implemented."
                 }
             elif topic == "formats":
                 names = {"json_teks", "json_baca", "html_aman", "csv_baris"}
