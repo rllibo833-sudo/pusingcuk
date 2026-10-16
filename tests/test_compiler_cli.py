@@ -19,6 +19,12 @@ class MultiTargetCompilerTests(unittest.TestCase):
         self.assertIn("PusingCuk JavaScript backend runtime", result)
         self.assertIn("pcOut(42)", result)
 
+    def test_c_target_emits_standalone_c_source(self):
+        result = compile_source(SOURCE, "demo.cuk", "c")
+        self.assertIn("#include <inttypes.h>", result)
+        self.assertIn("int main(void)", result)
+        self.assertIn("pc_out", result) if "pc_out" in result else self.assertIn("printf", result)
+
     def test_python_target_emits_python_source(self):
         result = compile_source(SOURCE, "demo.pusingcuk", "python")
         compile(result, "demo.py", "exec")

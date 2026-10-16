@@ -7,6 +7,11 @@ Compiler CLI mengubah satu sumber PusingCuk melalui parser dan IR v1 menjadi art
 ## Perintah
 
 ```sh
+# C11 native untuk kompilasi menjadi executable tanpa interpreter Python saat runtime
+python -m compiler program.cuk --target c --output program.c
+cc -std=c11 -O2 -Wall -Wextra -Werror program.c -lm -o program
+./program
+
 # JavaScript untuk Node.js
 python -m compiler program.pusingcuk --target js --output program.js
 node program.js
@@ -30,6 +35,7 @@ Target default adalah `js`. Tanpa `--output`, hasil ditulis ke stdout.
 
 ## Arti target keluar
 
+- **c**: source C11 untuk subset yang didukung backend native. Compiler saat build masih dijalankan dengan Python; setelah source C dikompilasi menjadi executable, program hasilnya tidak membutuhkan interpreter Python. Fitur di luar subset C ditolak dengan diagnostik, bukan dijalankan lewat fallback Python.
 - **js**: source JavaScript yang dapat dijalankan Node.js; input terminal memakai stdin dan di browser memakai prompt.
 - **python**: source Python mandiri untuk subset bahasa yang didukung backend Python.
 - **html**: halaman browser dengan JavaScript tersemat dan panel output. Ini bukan framework frontend dan belum menyediakan DOM bindings PusingCuk.

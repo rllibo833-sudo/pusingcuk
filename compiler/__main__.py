@@ -15,6 +15,9 @@ def compile_source(source, source_name, target):
     if target == "vm":
         from compiler.bytecode import compile_ir
         return json.dumps(compile_ir(ir), ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    if target == "c":
+        from compiler.c_backend import generate
+        return generate(ir)
     if target == "js":
         from compiler.js_backend import generate
         return generate(ir)
@@ -56,7 +59,7 @@ console.log = (...values) => { pcOutput.textContent += values.join(" ") + "\\n";
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Compiler multi-target PusingCuk")
     parser.add_argument("file", help="file sumber .pusingcuk")
-    parser.add_argument("-t", "--target", choices=("js", "python", "json", "html", "vm"), default="js")
+    parser.add_argument("-t", "--target", choices=("js", "python", "c", "json", "html", "vm"), default="js")
     parser.add_argument("-o", "--output", help="file keluaran; default stdout")
     args = parser.parse_args(argv)
     source_path = Path(args.file)
