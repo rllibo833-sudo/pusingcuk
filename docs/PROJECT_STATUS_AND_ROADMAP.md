@@ -265,3 +265,9 @@ Validasi otomatis yang ditambahkan: tes unit untuk eksekusi fixture nyata melalu
 1. Pada perubahan kode berikutnya, jalankan suite regresi Python dan konformansi native yang relevan; pastikan hasil tercatat pada commit kode yang sama.
 2. Bila kegagalan semantik berulang ditemukan, reproduksi terlebih dahulu sebagai fixture deterministik; perbarui spesifikasi/kontrak, implementasi target, dan fixture secara bersamaan.
 3. Jangan memperbarui klaim paritas atau integrasi lintas-repo berdasarkan dokumentasi saja; tuntut bukti tes pada pin yang sama.
+
+## Penguatan klasifikasi bukti compiler/runtime untuk AI — 16 Oktober 2026
+
+Jalur konformansi membedakan kategori observasi per runtime (`syntax_error`, `runtime_failure`, `semantic_mismatch`, `backend_unavailable`, `harness_timeout`, `harness_error`, atau `none`), lokasi diagnostik jika tersedia, dan petunjuk tindak lanjut. Kategori observasi terpisah dari status fixture: fixture negatif tetap lulus ketika kesalahan yang diperkirakan benar-benar terjadi.
+
+Tes regresi mengikat kasus sintaks rusak dan kesalahan domain runtime ke fixture terdaftar serta memastikan ID yang tidak dikenal dilaporkan sebagai masalah registry, bukan kesalahan source. Perubahan ini tidak menambah semantik bahasa baru atau memperluas matriks dukungan target. CI pada commit perubahan tetap menjadi gerbang penerimaan.
