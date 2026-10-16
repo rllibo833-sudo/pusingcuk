@@ -95,7 +95,9 @@ const pcMul = (a, b) => {
       throw new Error("hasil perkalian terlalu besar (maksimal 100000 elemen)");
     if (typeof value === "string") return value.repeat(amount);
     const result = [];
-    for (let i = 0; i < amount; i++) result.push(...value);
+    for (let i = 0; i < amount; i++) {
+      for (const item of value) result.push(item);
+    }
     return result;
   };
   if (typeof a === "string" && Number.isSafeInteger(b)) return repeat(a, b);
