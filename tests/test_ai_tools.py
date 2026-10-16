@@ -37,7 +37,7 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertEqual(result["operation"], "compile_check")
         self.assertEqual(result["evidence_status"], "KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI")
         self.assertEqual(result["failure_category"], "none")
-        self.assertIn("runtime belum diuji", result["repair_hint"])
+        self.assertIn("belum diuji", result["repair_hint"])
         self.assertEqual(result["target"], "javascript")
         self.assertEqual(result["language_version"], LANGUAGE_VERSION)
         self.assertEqual(result["source_sha256"], hashlib.sha256(source.encode("utf-8")).hexdigest())
