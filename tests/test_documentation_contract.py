@@ -19,7 +19,7 @@ class DocumentationContractTests(unittest.TestCase):
         self.assertEqual(contract["language_version"], language)
         self.assertEqual(contract["contract_version"], language)
         self.assertEqual((language, package_version, total, native),
-                         ("0.5-dev", "0.8.0.dev0", 21, 17))
+                         ("0.5-dev", "0.8.0.dev0", 25, 17))
         expectations = {
             "docs/COMPATIBILITY.md": [f"`{language}`", f"{total} built-in", f"{native} built-in"],
             "docs/VISION.md": [f"`{language}`", f"`{package_version}`"],
@@ -79,10 +79,10 @@ class DocumentationContractTests(unittest.TestCase):
             for runtime, status in fixture["runtimes"].items():
                 key = f"{runtime}:{status}"
                 counts[key] = counts.get(key, 0) + 1
-        self.assertEqual(len(manifest["fixtures"]), 67)
-        self.assertEqual(counts["reference:required"], 67)
+        self.assertEqual(len(manifest["fixtures"]), 69)
+        self.assertEqual(counts["reference:required"], 69)
         self.assertEqual(counts["native:required"], 62)
-        self.assertEqual(counts["native:unsupported"], 5)
+        self.assertEqual(counts["native:unsupported"], 7)
 
         readiness = (root / "docs/AI_ENGINE_READINESS.md").read_text(encoding="utf-8")
         ledger = (root / "docs/AI_ENGINE_MIGRATION_LEDGER.md").read_text(encoding="utf-8")
@@ -95,7 +95,7 @@ class DocumentationContractTests(unittest.TestCase):
         self.assertIn("22 kasus baseline menghasilkan top-1", status)
         self.assertIn("5/8 (62,5%)", status)
         self.assertIn("6/8 (75%)", status)
-        self.assertIn("67 fixture", status)
+        self.assertIn("69 fixture", status)
 
     def test_supabase_notes_migration_has_owner_only_rls_and_no_client_secret(self):
         root = Path(__file__).resolve().parents[1]

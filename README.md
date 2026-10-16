@@ -155,7 +155,7 @@ CI tests the reference interpreter on Python 3.11 and 3.12 and builds the native
 
 ## Development status and next steps
 
-PusingCuk is still experimental. The current language contract is `0.5-dev`; the Python package version `0.8.0.dev0` is separate. The active conformance manifest contains **67 fixtures**: all 67 are required on the Python reference interpreter, 62 are required on native C, and 5 are explicitly unsupported on native C. Unsupported fixtures are not counted as passes or cross-runtime parity.
+PusingCuk is still experimental. The current language contract is `0.5-dev`; the Python package version `0.8.0.dev0` is separate. The active conformance manifest contains **69 fixtures**: all 69 are required on the Python reference interpreter, 62 are required on native C, and 7 are explicitly unsupported on native C. Unsupported fixtures are not counted as passes or cross-runtime parity.
 
 Recent engineering work has added regression coverage for the local AI path from HTTP chat handling through the allowlisted tool registry and a registered `.cuk` rule to a generated JavaScript artifact. The CukAccount shared synthetic acceptance dataset now feeds both the Dart/SQLite report-and-close tests and the registered `period_close_plan` rule. That rule classifies profit/loss/zero and returns a deterministic role-based closing-line plan for comparison with SQLite's actual closing journal; it never posts transactions. These deterministic checks do not post real transactions and are not proof of general live-model quality or production readiness.
 

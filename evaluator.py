@@ -534,7 +534,7 @@ class Evaluator:
                     if idx < 0 or idx >= len(obj):
                         self.fail(line, "indeks di luar batas")
                     return obj[idx]
-                if isinstance(obj, PusingDict):
+                if isinstance(obj, (PusingDict, dict)):
                     try:
                         return obj[idx]
                     except (KeyError, TypeError):
@@ -796,7 +796,7 @@ class Evaluator:
             obj = self.expr(target, env, depth)
         else:
             self.fail(line, "target indeks tidak valid")
-        if not isinstance(obj, (list, PusingDict)):
+        if not isinstance(obj, (list, PusingDict, dict)):
             self.fail(line, "assignment indeks hanya mendukung daftar atau kamus")
         return obj
 
@@ -824,7 +824,7 @@ class Evaluator:
                     if idx < 0 or idx >= len(obj):
                         self.fail(line, "indeks daftar di luar batas")
                     obj[idx] = value
-                elif isinstance(obj, PusingDict):
+                elif isinstance(obj, (PusingDict, dict)):
                     try:
                         obj[idx] = value
                     except TypeError:

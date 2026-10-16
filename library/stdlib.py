@@ -1,6 +1,7 @@
 """Dependency-free Pusingcuk builtin registry backed by the shared contract."""
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 import math
 import html
@@ -62,7 +63,7 @@ def _json_validate(value: Any, path: str = "$") -> Any:
         return value
     if isinstance(value, list):
         return [_json_validate(item, f"{path}[{index}]") for index, item in enumerate(value)]
-    if isinstance(value, dict):
+    if isinstance(value, Mapping):
         if any(not isinstance(key, str) for key in value):
             raise TypeError(f"kunci objek JSON harus teks: {path}")
         return {key: _json_validate(item, f"{path}.{key}") for key, item in value.items()}

@@ -145,6 +145,10 @@ class BuiltinContractTests(unittest.TestCase):
             "rata_rata": (([1, 2, 3],), 2),
             "median": (([1, 2, 3, 4],), 2.5),
             "jumlah": (([1, 2, 6],), 9),
+            "json_teks": (({"nama": "Budi", "aktif": True},), '{"nama":"Budi","aktif":true}'),
+            "json_baca": (('{"nama":"Budi","aktif":true}',), {"nama": "Budi", "aktif": True}),
+            "html_aman": (("<b>&\"'",), "&lt;b&gt;&amp;&quot;&#x27;"),
+            "csv_baris": ((["Budi", "kopi, susu", 'dia bilang "hai"'],), 'Budi,"kopi, susu","dia bilang ""hai"""'),
         }
         self.assertEqual(set(examples), set(BUILTIN_NAMES))
         for name, (args, expected) in examples.items():

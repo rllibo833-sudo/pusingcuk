@@ -19,7 +19,7 @@ class FormatBuiltinTests(unittest.TestCase):
         value = {"nama": "Budi", "aktif": True}
         self.assertEqual(call_builtin("json_teks", value), '{"nama":"Budi","aktif":true}')
         self.assertEqual(call_builtin("json_baca", '{"nama":"Budi","aktif":true}'), value)
-        self.assertEqual(call_builtin("html_aman", '<b>&"\\''), "&lt;b&gt;&amp;&quot;&#x27;")
+        self.assertEqual(call_builtin("html_aman", "<b>&\"'"), "&lt;b&gt;&amp;&quot;&#x27;")
         self.assertEqual(call_builtin("csv_baris", ["Budi", "kopi, susu", 'dia bilang "hai"']),
                          'Budi,"kopi, susu","dia bilang ""hai"""')
 
