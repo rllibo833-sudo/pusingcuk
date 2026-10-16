@@ -86,3 +86,17 @@ IR v1 merupakan AST-preserving interchange format yang berversi, deterministik, 
 ## Shared builtin metadata
 
 `library/builtin_contract.json` is the canonical metadata source for builtin names, arity, importer allow-lists, backend helper mappings, and target support. Do not copy builtin-name tables into new importer/backend/test code. Runtime implementations remain target-specific, and every `supported` declaration must have executable tests.
+
+## Diagnostik dan bukti AI berbasis fixture
+
+Compiler/CLI dan tool AI harus membedakan kategori berikut:
+- `syntax_error`: source ditolak parser/lexer; sertakan lokasi dan saran jika tersedia.
+- `runtime_failure`: program gagal saat evaluasi; gunakan baris diagnostik aktual bila tersedia.
+- `semantic_mismatch`: runtime selesai tetapi exit code, stdout, kelas diagnostik, atau lokasi tidak cocok dengan manifest.
+- `backend_unavailable`: backend wajib tidak dapat dibangun/dijalankan; ini bukan bukti source salah.
+- `harness_timeout` / `harness_error`: kegagalan infrastruktur pengujian, bukan kegagalan semantik otomatis.
+- `none`: seluruh perilaku yang diwajibkan fixture cocok dengan kontrak.
+
+Kategori observasi harus dipisahkan dari status fixture. Fixture negatif yang mengharapkan kesalahan sintaks/runtime tetap dapat berstatus `RUNTIME_TERUJI` bila hasil aktual cocok dengan manifest. Tool AI wajib menyampaikan hasil aktual dan petunjuk sesuai kategori tanpa mengubah kegagalan harness menjadi kesalahan source. Kolom hanya ditampilkan bila runtime benar-benar mengeluarkannya; lokasi tidak boleh dikarang.
+
+Semantik baru tetap memerlukan reproduksi deterministik, pembaruan `SPEC.md` dan kontrak ini, implementasi pada setiap target yang diklaim, fixture positif/negatif dengan hasil yang diharapkan, serta dokumentasi status dukungan backend. Jalankan suite Python, `make test-native`, dan `python tools/conformance.py` pada commit kode yang sama.
