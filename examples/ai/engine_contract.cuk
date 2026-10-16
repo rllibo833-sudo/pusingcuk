@@ -24,7 +24,13 @@ selesai fungsi
 # Status bukti kode .cuk: kompilasi saja tidak membuktikan perilaku runtime.
 # Nilai status berasal dari host/test runner; fungsi ini tidak mengeksekusi kode.
 fungsi status_bukti_kode(status_kompilasi, status_runtime)
-    njir status_kompilasi == "ditolak"
+    njir status_kompilasi == "input_tidak_valid"
+        balek "SOURCE_INPUT_TIDAK_VALID"
+    kampret
+        njir status_kompilasi == "terlalu_besar"
+            balek "SOURCE_MELEBIHI_BATAS"
+        kampret
+            njir status_kompilasi == "ditolak"
         balek "SOURCE_DITOLAK_COMPILER"
     kampret
         njir status_kompilasi != "lulus"
@@ -45,6 +51,8 @@ fungsi status_bukti_kode(status_kompilasi, status_runtime)
             selesai njir
         selesai njir
     selesai njir
+        selesai njir
+    selesai njir
 selesai fungsi
 
 # Data ini adalah deklarasi, bukan keyword bahasa baru.
@@ -57,6 +65,8 @@ lah rule_definisi = {"id": "assistant.output-review.v1", "entrypoint": "status_k
 lah tool_knowledge_search = {"id": "knowledge_search", "handler": "host:knowledge_search", "input_fields": ["query", "limit"], "capabilities": ["knowledge:read"], "max_query_chars": 300, "max_results": 3}
 
 hedeh status_keluaran("Jawaban berbasis sumber.")
+hedeh status_bukti_kode("input_tidak_valid", "belum_dijalankan")
+hedeh status_bukti_kode("terlalu_besar", "belum_dijalankan")
 hedeh status_bukti_kode("lulus", "belum_dijalankan")
 hedeh status_bukti_kode("lulus", "lulus")
 hedeh status_bukti_kode("ditolak", "belum_dijalankan")

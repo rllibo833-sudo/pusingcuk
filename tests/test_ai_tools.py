@@ -68,8 +68,13 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertFalse(invalid["ok"])
         self.assertEqual(invalid["error"], "CUK_COMPILE_FAILED")
         self.assertEqual(invalid["evidence_status"], "SOURCE_DITOLAK_COMPILER")
+        empty = self.registry.execute("cuk_compile_check", {"source": "  "})
+        self.assertEqual(empty, {
+            "ok": False, "error": "CUK_SOURCE_INVALID",
+            "evidence_status": "SOURCE_INPUT_TIDAK_VALID",
+        })
         oversized = self.registry.execute("cuk_compile_check", {"source": "x" * (16 * 1024 + 1)})
-        self.assertEqual(oversized, {"ok": False, "error": "CUK_SOURCE_TOO_LARGE"})
+        self.assertEqual(oversized, {"ok": False, "error": "CUK_SOURCE_TOO_LARGE", "evidence_status": "SOURCE_MELEBIHI_BATAS"})
         self.assertEqual(
             self.registry.execute("cuk_compile_check", {"source": "jancuk", "target": "shell"}),
             {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"},

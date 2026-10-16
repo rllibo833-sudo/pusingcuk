@@ -530,7 +530,7 @@ class ToolRegistry:
                 return {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"}
             source = arguments.get("source")
             if not isinstance(source, str) or not source.strip():
-                return {"ok": False, "error": "CUK_SOURCE_INVALID"}
+                return {"ok": False, "error": "CUK_SOURCE_INVALID", "evidence_status": "SOURCE_INPUT_TIDAK_VALID"}
             if "\x00" in source:
                 return {"ok": False, "error": "CUK_SOURCE_INVALID"}
             try:
@@ -538,7 +538,7 @@ class ToolRegistry:
             except UnicodeEncodeError:
                 return {"ok": False, "error": "CUK_SOURCE_INVALID"}
             if len(source_bytes) > _MAX_CUK_SOURCE_BYTES:
-                return {"ok": False, "error": "CUK_SOURCE_TOO_LARGE"}
+                return {"ok": False, "error": "CUK_SOURCE_TOO_LARGE", "evidence_status": "SOURCE_MELEBIHI_BATAS"}
             language_identity = {
                 "opening_form": "jancuk",
                 "closing_form": "selesai jancuk",
