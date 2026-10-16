@@ -374,7 +374,7 @@ class ToolRegistry:
                     "error": "CONFORMANCE_CHECK_INTERNAL_ERROR",
                     "detail": type(exc).__name__,
                     "fixture_id": fixture_id,
-                    "evidence_status": "STATUS_KOMPILASI_TIDAK_VALID",
+                    "runtime_evidence_available": False,
                 }
 
         if name == "cuk_compiler_context":
