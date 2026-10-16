@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import os
 import re
 import subprocess
@@ -14,6 +15,8 @@ from typing import Any
 from library.knowledge_grounding import rank_knowledge
 from compiler.ir import LANGUAGE_VERSION, from_source
 from compiler.js_backend import generate
+from compiler.bytecode import compile_ir as compile_bytecode
+from compiler.vm import VirtualMachine, VMError
 
 _MAX_CUK_SOURCE_BYTES = 16 * 1024
 
@@ -255,24 +258,41 @@ class ToolRegistry:
             if len(source_bytes) > _MAX_CUK_SOURCE_BYTES:
                 return {"ok": False, "error": "CUK_SOURCE_TOO_LARGE"}
             try:
-                generated = generate(from_source(source, "ai_input.cuk"))
-            except (SyntaxError, ValueError, TypeError, UnicodeError) as exc:
+                document = from_source(source, "ai_input.cuk")
+                generated = generate(document)
+                bytecode = compile_bytecode(document)
+                output = io.StringIO()
+                VirtualMachine(
+                    bytecode,
+                    input_stream=io.StringIO(""),
+                    output_stream=output,
+                    max_steps=10000,
+                ).run()
+            except (SyntaxError, ValueError, TypeError, UnicodeError, VMError, ArithmeticError) as exc:
                 return {
                     "ok": False,
-                    "error": "CUK_COMPILE_FAILED",
+                    "error": "CUK_COMPILE_OR_EXECUTION_FAILED",
                     "diagnostic": str(exc)[:500],
-                    "target": "javascript",
+                    "target": "pvm+javascript",
+                    "executed": False,
                 }
+            artifact_bytes = generated.encode("utf-8")
             return {
                 "ok": True,
-                "operation": "compile_check",
-                "target": "javascript",
+                "operation": "compile_and_execute_check",
+                "target": "pvm+javascript",
                 "language_version": LANGUAGE_VERSION,
                 "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
-                "artifact_sha256": hashlib.sha256(generated.encode("utf-8")).hexdigest(),
-                "artifact_bytes": len(generated.encode("utf-8")),
+                "artifact_sha256": hashlib.sha256(artifact_bytes).hexdigest(),
+                "artifact_bytes": len(artifact_bytes),
                 "artifact": generated,
-                "executed": False,
+                "execution": {
+                    "runtime": "pusingcuk-bytecode-vm",
+                    "stdout": output.getvalue()[:4000],
+                    "stdout_truncated": len(output.getvalue()) > 4000,
+                    "step_limit": 10000,
+                },
+                "executed": True,
                 "artifact_saved": False,
             }
 
