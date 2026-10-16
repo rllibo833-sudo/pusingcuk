@@ -427,7 +427,8 @@ class ToolRegistry:
                     },
                     "next_actions": [
                         "Choose one existing reference-required/native-unsupported fixture and inspect the contract before implementing its native C behavior.",
-                        "Prefer closing a small native C semantic gap over expanding experimental transpiler backends.",
+                        "Prefer closing a small native C semantic gap in core language semantics (types, operators, collections, built-ins, diagnostics) over expanding experimental transpiler backends.",
+                        "Do not propose JSON, HTML, or CSV implementation or support expansion as part of native-runtime independence work.",
                         "Keep each change bounded and reuse existing conformance infrastructure; do not add a new document, issue, or CI workflow for a single gap.",
                         "After implementation, run only the focused native fixture and the existing conformance command before claiming parity."
                     ],
