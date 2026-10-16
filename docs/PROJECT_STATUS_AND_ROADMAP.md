@@ -206,3 +206,36 @@ Audit ini tidak menyatakan bahasa stabil atau AI akurat secara umum. Database Su
 - Tes upstream pada pin saat ini: [run 38826340175](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38826340175) sukses.
 - Status UI CukAccount pada `d86a665e3e404fc7aff02548c12b5872158078b6`: belum terverifikasi lulus; kegagalan `dart format` harus dibereskan sebelum mengklaim integrasi penuh.
 - Siklus penerimaan tetap: fixture akuntansi sintetis dari CukAccount → aturan `.cuk`/ToolRegistry → perbandingan output penuh → fixture regresi yang sama kembali di CukAccount. Sukses tes upstream saja tidak menutup siklus.
+
+
+## Audit branch dan bukti CI lintas-repo — 16 Oktober 2026
+
+### Branch PusingCuk yang ditemukan
+
+| Branch | Head (singkat) | Catatan audit |
+|---|---|---|
+| `main` | `cb6b71b2` | Baseline branch utama; tidak sama dengan branch integrasi yang diminta. |
+| `in-this-economy` | `09f67d9d` | Branch integrasi yang diaudit; berisi 35 commit di depan `main`, tidak tertinggal menurut GitHub compare. |
+| `cukaccount-bridge` | `cb6b71b2` | Head sama dengan `main`; tidak ada perubahan unik pada head saat ini. |
+| `audit/cukaccount-bridge` | `d5f60791` | Branch audit terpisah yang masih ada; perlu dipertimbangkan untuk dibersihkan oleh pemilik, bukan dihapus otomatis. |
+| `feat/accounting-student-app` | `d6db591c` | Branch fitur terpisah; jangan diasumsikan terintegrasi. |
+| `integration/core-tool-contract-20261014` | `b87d7859` | Branch integrasi lama yang masih ada; jangan diasumsikan terintegrasi. |
+
+Tidak ada branch baru yang dibuat oleh audit ini. Branch tambahan yang sudah ada menunjukkan riwayat pekerjaan paralel; jangan menggabungkan atau menghapusnya tanpa membandingkan perubahan dan keputusan pemilik.
+
+### Hasil CI branch `in-this-economy`
+
+Dalam 25 run terbaru yang dikembalikan API: **13 success, 5 failure, 7 cancelled**. Run terbaru yang sukses adalah [38826340175](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38826340175) pada commit `862402c1e8243394ecbc3d3c469a15a5e19a0c95`. Job Python 3.11/3.12 dan native gcc/clang melaporkan sukses, tetapi langkah integrasi aplikasi akuntansi pada job Python 3.11 dan pemeriksaan keamanan PVM berstatus **skipped**. Maka run ini bukan bukti bahwa seluruh bridge CukAccount sudah dijalankan.
+
+### Sinkronisasi dengan CukAccount
+
+- Workflow CukAccount mem-pin PusingCuk `862402c1e8243394ecbc3d3c469a15a5e19a0c95`.
+- Run Flutter [38829220078](https://github.com/rllibo833-sudo/Cukaccount/actions/runs/38829220078) dan APK [38829220101](https://github.com/rllibo833-sudo/Cukaccount/actions/runs/38829220101) gagal pada commit UI `d86a665e3e404fc7aff02548c12b5872158078b6`, sebelum tahap lanjutan yang relevan. Karena itu, status UI/bridge pada head terbaru adalah **belum lulus**, walaupun beberapa tes lama pernah lulus.
+- Prioritas P0: pulihkan format UI dalam satu perubahan koheren, jalankan Flutter checks, dan pastikan bridge dieksekusi (tidak skipped). Baru setelah bukti tersebut ada, naikkan pin PusingCuk atau centang penerimaan end-to-end.
+
+### Audit dokumentasi dan scope
+
+- `docs/CUKACCOUNT_INTEGRATION.md` dan `docs/integrations/CUKACCOUNT.md` tumpang tindih: keduanya menjelaskan bridge, tetapi detail/tingkat cakupannya berbeda. Pertahankan satu dokumen kontrak kanonis pada perubahan berikutnya; jangan menambah dokumen ketiga.
+- `docs/PROJECT_STATUS_AND_ROADMAP.md` menjadi ringkasan status; `docs/VISION.md` tetap sumber tujuan produk/bahasa. `README.md` menjelaskan kemampuan runtime dengan batas yang eksplisit.
+- Runtime bahasa masih eksperimental: Python referensi dan native C merupakan jalur utama konformansi; JS/Python transpiler dan PVM memiliki subset/eksperimental. Tes lulus tidak berarti semua backend setara.
+- PusingCuk AI adalah aplikasi/orchestrator berbasis provider, bukan model foundation yang dilatih dari awal. Fixture dan aturan deterministik meningkatkan konteks/evaluasi, bukan bukti fine-tuning.
