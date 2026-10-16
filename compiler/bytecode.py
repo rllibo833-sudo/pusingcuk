@@ -1,6 +1,7 @@
 """Portable stack bytecode compiler for PusingCuk IR v1."""
 import json
 from compiler.ir import validate
+from library.builtin_contract import BUILTIN_BY_NAME
 
 
 FORMAT = "pusingcuk-bytecode"
@@ -138,7 +139,7 @@ class Compiler:
         for stmt in body:
             if stmt["kind"] != "Function": continue
             name = stmt["fields"]["name"]
-            if name in functions or name in ("panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan"):
+            if name in functions or name in BUILTIN_BY_NAME:
                 raise BytecodeError(f"fungsi duplikat atau nama bawaan: {name}")
             functions[name] = self.compile_function(stmt)
         self.statements([s for s in body if s["kind"] != "Function"])
