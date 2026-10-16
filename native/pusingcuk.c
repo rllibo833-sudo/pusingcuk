@@ -696,7 +696,15 @@ static Val add(void) {
                 memcpy(tmp + a_len, b.s, b_len + 1);
                 a = string(tmp);
             } else if (a.t==NUM && b.t==NUM) a=checked_num(a.n+b.n,"hasil angka desimal terlalu besar atau tidak valid");
-            else { fail("'+' membutuhkan dua angka atau dua string"); return num(0); }
+            else if (a.t==LIST && b.t==LIST) {
+                List *combined = new_list();
+                if (!combined) return listval(NULL);
+                for (size_t i=0; a.list && i<a.list->len; i++)
+                    if (!append_list(combined, a.list->items[i])) return listval(combined);
+                for (size_t i=0; b.list && i<b.list->len; i++)
+                    if (!append_list(combined, b.list->items[i])) return listval(combined);
+                a = listval(combined);
+            } else { fail("'+' membutuhkan dua angka, dua teks, atau dua daftar"); return num(0); }
         } else if (take("-")) {
             Val b=mul();
             if (a.t!=NUM || b.t!=NUM) { fail("'-' membutuhkan angka"); return num(0); }
