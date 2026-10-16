@@ -17,6 +17,7 @@ from compiler.ir import LANGUAGE_VERSION, from_source
 from compiler.js_backend import generate
 from library.builtin_contract import BUILTIN_CONTRACT
 from lexer import KEYWORD_ALIASES
+from tools.conformance import evaluate_fixture
 
 _MAX_CUK_SOURCE_BYTES = 16 * 1024
 
@@ -295,6 +296,28 @@ class ToolRegistry:
             },
         })
 
+        self.definitions.append({
+            "type": "function",
+            "function": {
+                "name": "cuk_conformance_check",
+                "description": (
+                    "Jalankan satu fixture .cuk tepercaya yang sudah terdaftar pada manifest "
+                    "konformansi, menggunakan runtime yang diwajibkan fixture. Menghasilkan "
+                    "bukti runtime aktual, diagnostik terstruktur, dan status parity bila Python "
+                    "serta native C sama-sama diwajibkan dan lulus. Tidak menerima atau menjalankan "
+                    "source buatan model/pengguna; bukan sandbox."
+                ),
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "fixture_id": {"type": "string", "minLength": 1, "maxLength": 120}
+                    },
+                    "required": ["fixture_id"],
+                    "additionalProperties": False,
+                },
+            },
+        })
+
         for tool_name, rule_id in _TOOL_RULE_BINDINGS.items():
             rule = _REGISTERED_RULES[rule_id]
             self.definitions.append({
@@ -336,6 +359,23 @@ class ToolRegistry:
                 "claim_status": item["claim_status"],
             } for item in ranked]
             return {"ok": True, "result_count": len(results), "results": results}
+
+        if name == "cuk_conformance_check":
+            if set(arguments) != {"fixture_id"}:
+                return {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"}
+            fixture_id = arguments.get("fixture_id")
+            if not isinstance(fixture_id, str) or not fixture_id.strip() or len(fixture_id) > 120:
+                return {"ok": False, "error": "CONFORMANCE_FIXTURE_ID_INVALID"}
+            try:
+                return evaluate_fixture(fixture_id)
+            except Exception as exc:
+                return {
+                    "ok": False,
+                    "error": "CONFORMANCE_CHECK_INTERNAL_ERROR",
+                    "detail": type(exc).__name__,
+                    "fixture_id": fixture_id,
+                    "evidence_status": "STATUS_KOMPILASI_TIDAK_VALID",
+                }
 
         if name == "cuk_compiler_context":
             if set(arguments) - {"topic"}:
