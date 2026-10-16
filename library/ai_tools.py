@@ -52,6 +52,45 @@ def _cuk_language_identity(source: str) -> dict[str, Any]:
         "aliases_used": aliases_used,
     }
 
+
+def _cuk_semantic_review(
+    features: list[str],
+    *,
+    compile_ok: bool,
+    diagnostic_type: str | None = None,
+    diagnostic_location: dict[str, int] | None = None,
+) -> dict[str, Any]:
+    """Return a conservative, contract-grounded review summary for the AI."""
+    if not compile_ok:
+        return {
+            "status": "compiler_rejected",
+            "evidence": ["front_end_or_backend_rejected_source"],
+            "diagnostic_type": diagnostic_type,
+            "diagnostic_location": diagnostic_location,
+            "next_step": (
+                "Periksa diagnostik dan lokasi sumber; jangan menyimpulkan masalah "
+                "runtime atau mengubah semantik sebelum penyebabnya terkonfirmasi."
+            ),
+        }
+    return {
+        "status": "compile_only",
+        "evidence": ["parser_ir_validation", "javascript_generation"],
+        "features_detected": sorted(set(features)),
+        "not_verified": [
+            "runtime_output",
+            "cross_runtime_semantic_parity",
+            "native_c_behavior",
+            "pvm_behavior",
+            "type_correctness_beyond_front_end_checks",
+        ],
+        "next_step": (
+            "Gunakan docs/SEMANTIC_CONTRACT.md dan fixture yang sudah ada untuk "
+            "memeriksa klaim semantik terkait fitur; jangan menyebutnya terbukti "
+            "hanya karena kompilasi berhasil."
+        ),
+    }
+
+
 _MAX_RULE_INPUT = 1_000_000_000_000
 _MAX_RULE_INPUT_BYTES = 128
 _MAX_RULE_OUTPUT_BYTES = 1024
@@ -306,6 +345,12 @@ class ToolRegistry:
                     "diagnostic": str(exc)[:500],
                     "diagnostic_type": type(exc).__name__,
                     "diagnostic_location": _cuk_diagnostic_location(str(exc)),
+                    "semantic_review": _cuk_semantic_review(
+                        [],
+                        compile_ok=False,
+                        diagnostic_type=type(exc).__name__,
+                        diagnostic_location=_cuk_diagnostic_location(str(exc)),
+                    ),
                     "target": "javascript",
                     "language_version": LANGUAGE_VERSION,
                     "language_identity": language_identity,
@@ -319,6 +364,10 @@ class ToolRegistry:
                 "language_version": LANGUAGE_VERSION,
                 "language_identity": language_identity,
                 "features": document.get("features", []),
+                "semantic_review": _cuk_semantic_review(
+                    document.get("features", []),
+                    compile_ok=True,
+                ),
                 "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
                 "artifact_sha256": hashlib.sha256(artifact_bytes).hexdigest(),
                 "artifact_bytes": len(artifact_bytes),
