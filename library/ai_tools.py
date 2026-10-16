@@ -296,6 +296,7 @@ class ToolRegistry:
                     "ok": False,
                     "error": "CUK_COMPILE_FAILED",
                     "diagnostic": str(exc)[:500],
+                    "diagnostic_type": type(exc).__name__,
                     "target": "javascript",
                     "language_version": LANGUAGE_VERSION,
                     "language_identity": language_identity,
