@@ -160,3 +160,17 @@ Pusingcuk ingin menjadi ruang belajar dan eksperimen bahasa pemrograman yang ter
 Gaya Gen Z/Gen Alpha dan slang lokal adalah identitas, bukan syarat untuk ikut. Setiap kata harus punya arti yang jelas dan tes. Istilah lokal bisa punya arti berbeda di wilayah lain, jadi masukan budaya harus diterima dengan hormat. Profil kosakata daerah yang bisa dipilih masih berupa gagasan masa depan, bukan fitur yang sudah tersedia.
 
 Kontribusi tidak harus berupa kode. Orang bisa membantu lewat dokumentasi, contoh, terjemahan, laporan bug, tes, dan kritik desain. Perubahan teknis tetap perlu bukti, tes, dan peninjauan. Pusingcuk harus jujur soal fitur yang sudah berjalan, eksperimental, direncanakan, dan belum tersedia.
+
+## Offline Android application target
+
+The long-term target includes building Android applications whose core behavior is written in `.cuk` and continues to work without a network connection. This is a product goal, not a claim that a complete APK toolchain exists today.
+
+The intended path is incremental:
+
+1. **Define the offline boundary.** Core screens, local calculations, validation, and local data access must not require PusingCuk AI, an API key, a server, or a Python installation on the device. AI assistance and sync are optional online features.
+2. **Compile ahead of time.** The build process should translate supported `.cuk` source into a packaged native artifact or another explicitly supported target. The current C backend supports only a narrow subset; unsupported constructs must fail clearly rather than silently fall back to Python.
+3. **Package a real Android app.** Use an Android build toolchain to package the compiled program, UI, and local storage into an APK. Build-time tools may initially run on a development/CI machine; the installed app must not need Python merely to execute its compiled core.
+4. **Prove behavior on the target.** Reuse shared `.cuk` conformance fixtures, then verify install, launch, core operations, persistence after restart, and airplane-mode operation on Android. Host GCC/Clang success alone does not prove APK readiness.
+5. **Expand language support from evidence.** Add runtime/backend capabilities only when a concrete app requirement needs them, and keep Python reference behavior, native behavior, and fixtures aligned. Do not claim general-purpose APK generation until representative programs compile and run on-device.
+
+The first milestone is therefore not a polished app store release. It is a small offline `.cuk` program compiled into an Android-packaged artifact and shown to run without Python or network access. Keep PusingCuk AI outside that runtime-critical path so an AI outage cannot stop the app from opening or processing local data.

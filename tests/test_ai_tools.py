@@ -76,7 +76,7 @@ class ToolInputContractTests(unittest.TestCase):
         with patch("library.ai_tools.generate", side_effect=RuntimeError("internal detail")):
             result = self.registry.execute(
                 "cuk_compile_check",
-                {"source": "jancuk\\nhedeh 42\\nselesai jancuk\\n"},
+                {"source": "jancuk\nhedeh 42\nselesai jancuk\n"},
             )
         self.assertFalse(result["ok"])
         self.assertEqual(result["error"], "CUK_COMPILER_INTERNAL_ERROR")
