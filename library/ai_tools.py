@@ -537,6 +537,10 @@ class ToolRegistry:
                     "error": "CUK_SOURCE_INVALID",
                     "evidence_status": "SOURCE_INPUT_TIDAK_VALID",
                 }
+            # Character count is a cheap lower bound for UTF-8 byte length.
+            # Reject obviously oversized text before allocating an encoded copy.
+            if len(source) > _MAX_CUK_SOURCE_BYTES:
+                return {"ok": False, "error": "CUK_SOURCE_TOO_LARGE", "evidence_status": "SOURCE_MELEBIHI_BATAS"}
             try:
                 source_bytes = source.encode("utf-8")
             except UnicodeEncodeError:

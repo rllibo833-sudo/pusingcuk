@@ -74,7 +74,14 @@ class ToolInputContractTests(unittest.TestCase):
             "evidence_status": "SOURCE_INPUT_TIDAK_VALID",
         })
         oversized = self.registry.execute("cuk_compile_check", {"source": "x" * (16 * 1024 + 1)})
-        self.assertEqual(oversized, {"ok": False, "error": "CUK_SOURCE_TOO_LARGE", "evidence_status": "SOURCE_MELEBIHI_BATAS"})
+        very_oversized = self.registry.execute("cuk_compile_check", {"source": "x" * (1024 * 1024)})
+        expected_too_large = {
+            "ok": False,
+            "error": "CUK_SOURCE_TOO_LARGE",
+            "evidence_status": "SOURCE_MELEBIHI_BATAS",
+        }
+        self.assertEqual(oversized, expected_too_large)
+        self.assertEqual(very_oversized, expected_too_large)
         self.assertEqual(
             self.registry.execute("cuk_compile_check", {"source": "jancuk", "target": "shell"}),
             {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"},
