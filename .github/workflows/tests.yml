@@ -81,6 +81,23 @@ jobs:
           node-version: "22"
       - name: Jalankan suite regresi Python
         run: python -m unittest discover -s tests -v
+      - name: Build and smoke-test standalone JS artifact from registered .cuk rule
+        if: matrix.python-version == '3.12'
+        run: |
+          set -euo pipefail
+          artifact="$RUNNER_TEMP/pusingcuk-period-close-plan.js"
+          python -m compiler.js_backend library/period_close_plan.cuk --output "$artifact"
+          output="$(printf '250000\n100000\n' | node "$artifact")"
+          expected="$(printf 'PENUTUPAN_LABA\n150000\n250000\n0\n0\n100000\n0\n150000')"
+          test "$output" = "$expected"
+      - name: Upload verified .cuk JavaScript artifact
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: pusingcuk-0.6-dev-period-close-plan-js
+          path: ${{ runner.temp }}/pusingcuk-period-close-plan.js
+          if-no-files-found: error
+          retention-days: 7
       - name: Uji integrasi aplikasi akuntansi dengan aturan .cuk
         if: matrix.python-version == '3.12'
         working-directory: apps/accounting
