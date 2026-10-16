@@ -9,30 +9,23 @@ fungsi status_penutupan_periode(pendapatan_total, beban_total)
     # Integer Rupiah only; keep the rule within the shared fixture's safe range.
     njir pendapatan_total < 0
         balek "INPUT_TIDAK_VALID"
-    kampret
-        njir beban_total < 0
-            balek "INPUT_TIDAK_VALID"
-        kampret
-            njir pendapatan_total > 1000000000000
-                balek "INPUT_TIDAK_VALID"
-            kampret
-                njir beban_total > 1000000000000
-                    balek "INPUT_TIDAK_VALID"
-                selesai njir
-            selesai njir
-        selesai njir
     selesai njir
-
+    njir beban_total < 0
+        balek "INPUT_TIDAK_VALID"
+    selesai njir
+    njir pendapatan_total > 1000000000000
+        balek "INPUT_TIDAK_VALID"
+    selesai njir
+    njir beban_total > 1000000000000
+        balek "INPUT_TIDAK_VALID"
+    selesai njir
     njir pendapatan_total > beban_total
-            balek "PENUTUPAN_LABA"
-        kampret
-            njir pendapatan_total < beban_total
-                balek "PENUTUPAN_RUGI"
-            kampret
-                balek "PENUTUPAN_NOL"
-            selesai njir
-        selesai njir
+        balek "PENUTUPAN_LABA"
     selesai njir
+    njir pendapatan_total < beban_total
+        balek "PENUTUPAN_RUGI"
+    selesai njir
+    balek "PENUTUPAN_NOL"
 selesai fungsi
 
 tanya pendapatan_teks = ""
