@@ -23,5 +23,5 @@ Catatan perubahan PusingCuk. Versi paket dan versi bahasa adalah dua identifier 
 
 ### Gate sebelum rilis
 
-- Verifikasi status seluruh 21 built-in melalui `library/builtin_contract.json`; 17 didukung pada native C, 14 pada transpiler JS, 14 pada transpiler Python/HTML, dan 6 pada VM eksperimental.
+- Verifikasi status seluruh 25 built-in melalui `library/builtin_contract.json`; 17 didukung pada native C, 14 pada transpiler JS, 14 pada transpiler Python/HTML, dan 6 pada VM eksperimental.
 - Jalankan `python -m pytest -q`, `make test`, serta workflow build Python dan native C. CI yang lulus hanya membuktikan cakupan pengujian yang dijalankan; tidak menutup risiko sandbox pada Issue #75.

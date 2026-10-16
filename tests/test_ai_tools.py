@@ -168,7 +168,7 @@ class ToolInputContractTests(unittest.TestCase):
             artifact.write_text(generated, encoding="utf-8")
             for income, expense, expected_lines in cases:
                 with self.subTest(income=income, expense=expense):
-                    stdin_text = f"{income}\\n{expense}\\n"
+                    stdin_text = f"{income}\n{expense}\n"
                     reference = subprocess.run(
                         [sys.executable, str(ROOT / "pusingcuk_new.py"), str(ROOT / "library" / rule["source_file"])],
                         input=stdin_text, text=True, encoding="utf-8",
@@ -178,7 +178,7 @@ class ToolInputContractTests(unittest.TestCase):
                         [NODE, str(artifact)], input=stdin_text, text=True, encoding="utf-8",
                         capture_output=True, timeout=10, cwd=ROOT, check=False,
                     )
-                    expected = "\\n".join(expected_lines) + "\\n"
+                    expected = "\n".join(expected_lines) + "\n"
                     self.assertEqual(reference.returncode, 0, reference.stderr)
                     self.assertEqual(compiled.returncode, 0, compiled.stderr)
                     self.assertEqual(reference.stdout, expected)

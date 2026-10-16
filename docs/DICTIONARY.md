@@ -56,7 +56,7 @@ A declaration creates a new variable; assignment updates an existing one. Redecl
 
 ## 4. Built-in functions
 
-The complete and test-checked list of 21 built-ins, argument counts, and per-target support is in the [built-in catalogue](language/BUILTINS.md). The native C runtime has fixture-backed support for seventeen full-contract built-ins, including `jumlah`, `rata_rata`, `median`, `sinus`, and `kosinus`; the four conversion built-ins have only scalar-subset coverage and are not claimed as fully equivalent to the reference interpreter. The examples below are a learner-friendly subset; an entry in a registry does not mean every target supports it.
+The complete and test-checked list of 25 built-ins, argument counts, and per-target support is in the [built-in catalogue](language/BUILTINS.md). The native C runtime has fixture-backed support for seventeen full-contract built-ins, including `jumlah`, `rata_rata`, `median`, `sinus`, and `kosinus`; the four conversion built-ins have only scalar-subset coverage and are not claimed as fully equivalent to the reference interpreter. The examples below are a learner-friendly subset; an entry in a registry does not mean every target supports it.
 
 | Function | Purpose | Example |
 |---|---|---|

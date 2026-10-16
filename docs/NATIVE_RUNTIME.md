@@ -17,7 +17,7 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 | Indeks teks berdasarkan code point UTF-8 | Teruji untuk teks UTF-8 valid |
 | Kondisi `njir` / `adooh` dan loop `mumet` | Teruji |
 | `untuk` pada list, teks, kamus (menghasilkan kunci), dan `rentang()` | Teruji |
-| 21 built-in terkontrak: `panjang`, `teks`, `bilangan`, `desimal`, `logika`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`, `logaritma`, `log10`, `sinus`, `kosinus`, `jumlah`, `rata_rata`, `median` | Teruji melalui fixture native; konversi menerima subset tipe skalar yang didefinisikan di `SPEC.md`. `teks()` native menolak koleksi agar tidak mengklaim kesetaraan format yang belum ada |
+| 25 built-in terkontrak: `panjang`, `teks`, `bilangan`, `desimal`, `logika`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`, `logaritma`, `log10`, `sinus`, `kosinus`, `jumlah`, `rata_rata`, `median` | Teruji melalui fixture native; konversi menerima subset tipe skalar yang didefinisikan di `SPEC.md`. `teks()` native menolak koleksi agar tidak mengklaim kesetaraan format yang belum ada |
 | `tanya nama = "Prompt"` dari stdin | Teruji melalui pipe dan CLI |
 | Literal kamus, kunci teks/angka/boolean, baca/ubah/tambah kunci | Teruji |
 | Batas kamus 256 entri dan penolakan entri ke-257 | Fixture native mengharapkan error |
