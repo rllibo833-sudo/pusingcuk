@@ -19,6 +19,14 @@ from lexer import KEYWORD_ALIASES
 _MAX_CUK_SOURCE_BYTES = 16 * 1024
 
 
+def _cuk_diagnostic_location(message: str) -> dict[str, int] | None:
+    """Extract a location only when it matches the compiler's explicit diagnostic format."""
+    match = re.search(r"(?:\] )?Baris (\d+), kolom (\d+):", message)
+    if not match:
+        return None
+    return {"line": int(match.group(1)), "column": int(match.group(2))}
+
+
 def _cuk_language_identity(source: str) -> dict[str, Any]:
     """Describe official aliases recognized as tokens, not words in comments/strings."""
     from lexer import lex
@@ -297,6 +305,7 @@ class ToolRegistry:
                     "error": "CUK_COMPILE_FAILED",
                     "diagnostic": str(exc)[:500],
                     "diagnostic_type": type(exc).__name__,
+                    "diagnostic_location": _cuk_diagnostic_location(str(exc)),
                     "target": "javascript",
                     "language_version": LANGUAGE_VERSION,
                     "language_identity": language_identity,
