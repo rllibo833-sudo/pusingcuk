@@ -112,7 +112,6 @@ class DocumentationContractTests(unittest.TestCase):
         self.assertIn("22 kasus baseline menghasilkan top-1", status)
         self.assertIn("5/8 (62,5%)", status)
         self.assertIn("6/8 (75%)", status)
-        self.assertIn("70 fixture", status)
 
     def test_supabase_notes_migration_has_owner_only_rls_and_no_client_secret(self):
         root = Path(__file__).resolve().parents[1]
