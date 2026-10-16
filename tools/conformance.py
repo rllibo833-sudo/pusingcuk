@@ -322,5 +322,85 @@ def evaluate_fixture(fixture_id):
         ),
     }
 
+def main():
+    try:
+        fixtures = load_manifest()
+    except ManifestError as exc:
+        print(f"MANIFEST FAIL: {exc}", file=sys.stderr)
+        return 2
+
+    states = {"PASS": 0, "FAIL": 0, "UNSUPPORTED": 0}
+    native_needed = any(
+        item["runtimes"].get("native") in {"required", "optional"}
+        for item, _ in fixtures
+    )
+    with tempfile.TemporaryDirectory(prefix="pusingcuk-conformance-") as temp:
+        native_path = Path(temp) / "pusingcuk-native"
+        native_ready, native_error = build_native(native_path) if native_needed else (False, "")
+
+        for item, source_path in fixtures:
+            expected = item["expected"]
+            for runtime, state in item["runtimes"].items():
+                label = f'{item["id"]} [{runtime}]'
+                if state == "unsupported":
+                    states["UNSUPPORTED"] += 1
+                    print(f"UNSUPPORTED {label}: runtime belum mendukung fitur ini")
+                    continue
+                if runtime == "native" and not native_ready:
+                    if state == "optional":
+                        states["UNSUPPORTED"] += 1
+                        print(f"UNSUPPORTED {label}: native tidak tersedia ({native_error})")
+                    else:
+                        states["FAIL"] += 1
+                        print(f"FAIL {label}: native wajib tetapi build gagal ({native_error})")
+                    continue
+
+                command = (
+                    [sys.executable, str(ROOT / "pusingcuk_new.py"), str(source_path)]
+                    if runtime == "reference"
+                    else [str(native_path), str(source_path)]
+                )
+                result, run_error = run_command(command, expected.get("stdin", ""))
+                if run_error:
+                    states["FAIL"] += 1
+                    print(f"FAIL {label}: {run_error}")
+                    continue
+
+                actual_class = classify_stderr(result.returncode, result.stderr)
+                expected_exit_code = expected["exit_code"]
+                matches = (
+                    result.returncode == expected_exit_code
+                    and result.stdout == expected["stdout"]
+                    and actual_class == expected.get("stderr_class")
+                    and (
+                        expected.get("source_line") is None
+                        or source_line_from_stderr(result.stderr) == expected["source_line"]
+                    )
+                )
+                if matches:
+                    states["PASS"] += 1
+                    print(f"PASS {label}")
+                else:
+                    states["FAIL"] += 1
+                    print(f"FAIL {label}")
+                    print(f"  exit: expected={expected_exit_code} actual={result.returncode}")
+                    print(f"  stdout expected={expected['stdout']!r} actual={result.stdout!r}")
+                    print(f"  stderr_class expected={expected.get('stderr_class')!r} actual={actual_class!r}")
+                    if expected.get("source_line") is not None:
+                        print(
+                            "  source_line expected="
+                            f"{expected['source_line']} actual={source_line_from_stderr(result.stderr)!r}"
+                        )
+                    if result.stderr:
+                        print(f"  stderr={result.stderr.strip()!r}")
+
+    print(
+        "Ringkasan konformansi: "
+        f"{states['PASS']} PASS, {states['FAIL']} FAIL, "
+        f"{states['UNSUPPORTED']} UNSUPPORTED"
+    )
+    return 1 if states["FAIL"] else 0
+
+
 if __name__ == "__main__":
     raise SystemExit(main())
