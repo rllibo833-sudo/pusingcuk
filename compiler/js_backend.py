@@ -117,7 +117,10 @@ const pcMod = (a, b) => {
       !Number.isFinite(a) || !Number.isFinite(b))
     throw new Error("operator % membutuhkan dua angka finite");
   if (b === 0) throw new Error("modulo dengan nol");
-  return pcNumericResult("operator %", ((a % b) + b) % b);
+  // Match the language contract and native C: a - floor(a / b) * b.
+  // Reuse pcDiv so quotient overflow is rejected consistently across runtimes.
+  const quotient = pcDiv(a, b);
+  return pcNumericResult("operator %", a - Math.floor(quotient) * b);
 };
 const pcNeg = (value) => {
   if (typeof value !== "number" || !Number.isFinite(value))
