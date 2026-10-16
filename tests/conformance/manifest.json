@@ -154,6 +154,26 @@
       }
     },
     {
+      "id": "collections.list-concatenation",
+      "source": "list_concatenation.cuk",
+      "profile": "core",
+      "requires": [
+        "lists",
+        "operators",
+        "concatenation",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "4\n1\n4\n2\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
       "id": "collections.boolean-numeric-dictionary-keys",
       "source": "dictionary_keys.pusingcuk",
       "profile": "core",
