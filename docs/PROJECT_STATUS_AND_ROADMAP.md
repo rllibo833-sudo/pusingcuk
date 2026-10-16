@@ -248,3 +248,20 @@ Perubahan langsung pada `main` menambahkan tool `cuk_conformance_check`. Tool in
 `cuk_compile_check` tetap compile-only dan tidak mengeksekusi source model/pengguna. Prompt AI sekarang mengarahkan model dari diagnostik ke kontrak/fixture relevan, lalu ke pengujian fixture terdaftar; kegagalan harness tidak boleh dilabeli sebagai kegagalan source. Ini menutup jalur bukti untuk fixture yang sudah ada, **bukan** bukti runtime untuk source baru. Fixture baru harus ditambahkan secara reviewable setelah kegagalan semantik berulang direproduksi, dengan SPEC/kontrak, implementasi, dan target dukungan diperbarui bersama.
 
 Validasi otomatis yang ditambahkan: tes unit untuk eksekusi fixture nyata melalui registry, penolakan ID fixture yang tidak terdaftar, dan aliran hasil bukti runtime kembali ke provider AI. Status CI harus diperiksa pada HEAD terbaru sebelum perubahan ini dianggap tervalidasi.
+
+## Sinkronisasi HEAD main — 16 Oktober 2026
+
+**Snapshot terverifikasi saat pembaruan ini**
+
+- Branch default yang aktif adalah `main`; HEAD: [`03b45e7acaa7c34b61d1c2dd38d18ab39f9ea832`](https://github.com/rllibo833-sudo/pusingcuk/commit/03b45e7acaa7c34b61d1c2dd38d18ab39f9ea832), commit dokumentasi alur bukti compiler-ke-runtime.
+- Commit kode induk langsung [`097bab2a00b861fe3389df2691799b780faee5b5`](https://github.com/rllibo833-sudo/pusingcuk/commit/097bab2a00b861fe3389df2691799b780faee5b5) memiliki workflow **Tes Pusingcuk** yang berstatus sukses: [Actions run 38909706708](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38909706708). Ini bukti untuk commit induk tersebut, bukan run pada HEAD dokumentasi.
+- HEAD dokumentasi tidak mengubah runtime atau tes; workflow utama memakai filter `paths`, sehingga perubahan dokumentasi saja tidak otomatis memicu tes. Jangan menulis status CI seolah-olah run pada HEAD ini telah terjadi.
+- Perubahan terbaru pada jalur AI/compiler menghubungkan diagnostik compiler, ID fixture terdaftar, eksekusi runtime yang diwajibkan manifest, pembandingan exit code/stdout/diagnostik/baris, dan hasil bukti kembali ke konteks AI. Compile sukses tetap bukan bukti runtime; status paritas hanya boleh dinyatakan jika runtime yang diwajibkan manifest benar-benar lulus.
+- `main` adalah satu-satunya target sinkronisasi aktif untuk pekerjaan ini. Catatan audit branch lama di atas merupakan snapshot historis dan tidak boleh dipakai sebagai daftar branch aktif saat ini.
+- **Batas verifikasi:** audit melalui GitHub mengonfirmasi metadata branch, isi berkas, riwayat commit, dan status Actions yang disebutkan. Audit ini tidak menjalankan perintah tes pada perangkat lokal dan tidak membuktikan uji Android fisik, koneksi runtime ke Supabase, atau evaluasi model AI live.
+
+**Gerbang berikutnya**
+
+1. Pada perubahan kode berikutnya, jalankan suite regresi Python dan konformansi native yang relevan; pastikan hasil tercatat pada commit kode yang sama.
+2. Bila kegagalan semantik berulang ditemukan, reproduksi terlebih dahulu sebagai fixture deterministik; perbarui spesifikasi/kontrak, implementasi target, dan fixture secara bersamaan.
+3. Jangan memperbarui klaim paritas atau integrasi lintas-repo berdasarkan dokumentasi saja; tuntut bukti tes pada pin yang sama.
