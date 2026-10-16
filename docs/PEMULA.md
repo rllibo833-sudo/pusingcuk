@@ -6,7 +6,7 @@ Gaya dokumentasi mengikuti [Panduan Gaya Bahasa](GAYA_BAHASA.md): santai, jelas,
 
 ## 1. Siapkan alat di Android / Termux
 
-Versi bahasa saat ini `0.5-dev`, sedangkan versi paket pengembangan `0.8.0.dev0`. Kontrak memiliki 21 built-in; 17 di antaranya didukung runtime native C.
+Versi bahasa saat ini `0.5-dev`, sedangkan versi paket pengembangan `0.8.0.dev0`. Kontrak memiliki 25 built-in; 17 di antaranya didukung runtime native C.
 
 Gunakan Termux dari sumber yang terpelihara. Jalankan perintah berikut di shell Termux:
 
