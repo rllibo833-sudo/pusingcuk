@@ -29,17 +29,17 @@ class EvaluatorTests(unittest.TestCase):
 
     def test_range_index(self):
         self.assertEqual(capture(program(
-            "lah urutan = rentang(1, 7, 2)\\n"
-            "hedeh panjang(urutan)\\nhedeh urutan[0]\\n"
-            "hedeh urutan[1]\\nhedeh urutan[2]"
-        )), "3\\n1\\n3\\n5\\n")
+            "lah urutan = rentang(1, 7, 2)\n"
+            "hedeh panjang(urutan)\nhedeh urutan[0]\n"
+            "hedeh urutan[1]\nhedeh urutan[2]"
+        )), "3\n1\n3\n5\n")
 
     def test_range_index_rejects_negative_and_out_of_bounds(self):
         for index in ("-1", "3"):
             with self.subTest(index=index):
                 with self.assertRaisesRegex(RuntimeError, "indeks di luar batas"):
                     run(program(
-                        "lah urutan = rentang(1, 4)\\nhedeh urutan[" + index + "]"
+                        "lah urutan = rentang(1, 4)\nhedeh urutan[" + index + "]"
                     ))
 
     def test_length_of_range(self):
