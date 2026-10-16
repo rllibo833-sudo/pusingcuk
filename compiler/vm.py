@@ -189,47 +189,12 @@ class VirtualMachine:
                 if not isinstance(count, int) or count < 0 or count > len(stack): self.fail(line, "jumlah argumen tidak valid")
                 args = stack[-count:] if count else []
                 if count: del stack[-count:]
-                if name == "panjang":
-                    if len(args) != 1: self.fail(line, "panjang membutuhkan satu argumen")
-                    if not isinstance(args[0], (list, str, PusingDict)): self.fail(line, "panjang membutuhkan teks, daftar, atau kamus")
-                    result = len(args[0])
-                elif name == "rentang":
-                    if not 1 <= len(args) <= 3 or any(not isinstance(x, int) or isinstance(x, bool) for x in args):
-                        self.fail(line, "rentang membutuhkan 1-3 integer")
-                    try: result = range(*args)
-                    except ValueError: self.fail(line, "langkah rentang tidak boleh nol")
-                    if len(result) > 10000: self.fail(line, "rentang melewati batas 10000 item")
-                elif name in ("mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat"):
-                    arity = 2 if name in ("minimum", "maksimum", "pangkat") else 1
-                    if len(args) != arity: self.fail(line, f"{name} membutuhkan {arity} argumen")
-                    if any(isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) for value in args):
-                        self.fail(line, f"{name} membutuhkan angka finite")
-                    if name == "mutlak": result = abs(args[0])
-                    elif name == "minimum": result = min(args)
-                    elif name == "maksimum": result = max(args)
-                    elif name == "bawah": result = math.floor(args[0])
-                    elif name == "atas": result = math.ceil(args[0])
-                    elif name == "akar":
-                        if args[0] < 0: self.fail(line, "akar domain tidak valid: angka harus non-negatif")
-                        result = math.sqrt(args[0])
-                    elif name == "pangkat":
-                        if args[0] < 0 and not float(args[1]).is_integer():
-                            self.fail(line, "pangkat domain tidak valid")
-                        if args[0] == 0 and args[1] < 0:
-                            self.fail(line, "pangkat domain tidak valid")
-                        try: result = math.pow(args[0], args[1])
-                        except (ValueError, OverflowError): self.fail(line, "pangkat menghasilkan angka non-finite atau domain tidak valid")
-                    else:
-                        value = args[0]
-                        lower = math.floor(value)
-                        fraction = value - lower
-                        result = lower if fraction < 0.5 else lower + 1 if fraction > 0.5 else (lower if lower % 2 == 0 else lower + 1)
-                    if isinstance(result, float) and not math.isfinite(result):
-                        self.fail(line, f"{name} menghasilkan angka non-finite")
-                    if isinstance(result, float) and result.is_integer() and abs(result) <= 9007199254740991:
-                        result = int(result)
-                elif name in BUILTIN_BY_NAME:
-                    self.fail(line, f"built-in '{name}' belum didukung di VM")
+                if name in BUILTIN_BY_NAME:
+                    from library.stdlib import call_builtin
+                    try:
+                        result = call_builtin(name, *args)
+                    except (TypeError, ValueError, OverflowError, ZeroDivisionError, NameError) as exc:
+                        self.fail(line, str(exc))
                 else:
                     fn = self.functions.get(name)
                     if fn is None: self.fail(line, f"fungsi '{name}' tidak dikenal")
