@@ -120,7 +120,8 @@
       "implementation": "float",
       "backends": {
         "js": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pcFloat"
         },
         "python": {
           "status": "unsupported"
@@ -151,7 +152,8 @@
       "implementation": "boolean",
       "backends": {
         "js": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pcBoolean"
         },
         "python": {
           "status": "unsupported"
@@ -484,7 +486,8 @@
       "implementation": "log",
       "backends": {
         "js": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pcLog"
         },
         "python": {
           "status": "unsupported"
@@ -514,7 +517,8 @@
       "implementation": "log10",
       "backends": {
         "js": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pcLog10"
         },
         "python": {
           "status": "unsupported"
@@ -610,7 +614,8 @@
       "implementation": "sum",
       "backends": {
         "js": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pcSum"
         },
         "python": {
           "status": "unsupported"

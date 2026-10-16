@@ -416,5 +416,21 @@ class ToolInputContractTests(unittest.TestCase):
                 )
 
 
+
+    def test_compiler_context_reports_contract_and_real_target_gaps(self):
+        result = self.registry.execute("cuk_compiler_context", {"topic": "js"})
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(result["operation"], "compiler_context")
+        self.assertIn("desimal", result["context"]["supported_builtins"])
+        self.assertIn("json_teks", result["context"]["supported_builtins"])
+        self.assertEqual(result["context"]["unsupported_builtins"], [])
+
+        formats = self.registry.execute("cuk_compiler_context", {"topic": "formats"})
+        self.assertEqual({item["name"] for item in formats["context"]["builtins"]},
+                         {"json_teks", "json_baca", "html_aman", "csv_baris"})
+
+        invalid = self.registry.execute("cuk_compiler_context", {"topic": "not-a-topic"})
+        self.assertEqual(invalid, {"ok": False, "error": "COMPILER_CONTEXT_TOPIC_INVALID"})
+
 if __name__ == "__main__":
     unittest.main()

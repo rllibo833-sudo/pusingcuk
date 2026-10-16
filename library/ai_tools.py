@@ -14,6 +14,7 @@ from typing import Any
 from library.knowledge_grounding import rank_knowledge
 from compiler.ir import LANGUAGE_VERSION, from_source
 from compiler.js_backend import generate
+from library.builtin_contract import BUILTIN_CONTRACT
 from lexer import KEYWORD_ALIASES
 
 _MAX_CUK_SOURCE_BYTES = 16 * 1024
@@ -273,6 +274,26 @@ class ToolRegistry:
                     "additionalProperties": False,
                 },
             },        })
+        self.definitions.append({
+            "type": "function",
+            "function": {
+                "name": "cuk_compiler_context",
+                "description": (
+                    "Baca konteks compiler .cuk dari kontrak semantik kanonis: built-in, "
+                    "status target, fixture konformansi, dan batas dukungan. Gunakan sebelum "
+                    "menyarankan perubahan bahasa; data ini bukan bukti runtime lulus."
+                ),
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "topic": {"type": "string", "enum": ["general", "builtins", "js", "formats", "fixtures", "semantics"]}
+                    },
+                    "required": [],
+                    "additionalProperties": False,
+                },
+            },
+        })
+
         for tool_name, rule_id in _TOOL_RULE_BINDINGS.items():
             rule = _REGISTERED_RULES[rule_id]
             self.definitions.append({
@@ -314,6 +335,57 @@ class ToolRegistry:
                 "claim_status": item["claim_status"],
             } for item in ranked]
             return {"ok": True, "result_count": len(results), "results": results}
+
+        if name == "cuk_compiler_context":
+            if set(arguments) - {"topic"}:
+                return {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"}
+            topic = arguments.get("topic", "general")
+            if topic not in {"general", "builtins", "js", "formats", "fixtures", "semantics"}:
+                return {"ok": False, "error": "COMPILER_CONTEXT_TOPIC_INVALID"}
+            entries = BUILTIN_CONTRACT["builtins"]
+            try:
+                manifest_path = Path(__file__).resolve().parent.parent / "tests" / "conformance" / "manifest.json"
+                fixtures = json.loads(manifest_path.read_text(encoding="utf-8")).get("fixtures", [])
+            except (OSError, json.JSONDecodeError):
+                return {"ok": False, "error": "COMPILER_CONTEXT_FIXTURES_UNAVAILABLE"}
+            summarize = lambda entry: {
+                "name": entry["name"], "min_args": entry["min_args"], "max_args": entry["max_args"],
+                "description": entry["description"], "implementation": entry["implementation"],
+                "targets": {target: entry["backends"][target]["status"] for target in BUILTIN_CONTRACT["targets"]},
+            }
+            if topic == "builtins":
+                result = {"builtins": [summarize(entry) for entry in entries]}
+            elif topic == "js":
+                result = {
+                    "supported_builtins": [entry["name"] for entry in entries if entry["backends"]["js"]["status"] == "supported"],
+                    "unsupported_builtins": [entry["name"] for entry in entries if entry["backends"]["js"]["status"] != "supported"],
+                    "backend_nodes": ["Program", "Declare", "Assign", "Input", "Print", "If", "While", "For", "Function", "Return", "Literal", "Variable", "Unary", "Binary", "Try", "List", "Dict", "Index", "IndexAssign", "Call"],
+                }
+            elif topic == "formats":
+                names = {"json_teks", "json_baca", "html_aman", "csv_baris"}
+                result = {"builtins": [summarize(entry) for entry in entries if entry["name"] in names],
+                          "contract": {"json": "strict JSON; string keys; finite numbers; safe integers", "html": "escape &, <, >, double quote, apostrophe", "csv": "one row; quote fields containing comma, quote, CR, or LF"}}
+            elif topic == "fixtures":
+                result = {"count": len(fixtures), "ids": [fixture.get("id") for fixture in fixtures],
+                          "last_fixture_ids": [fixture.get("id") for fixture in fixtures[-12:]]}
+            elif topic == "semantics":
+                result = {
+                    "source_of_truth": ["SPEC.md", "docs/SEMANTIC_CONTRACT.md", "library/builtin_contract.json", "tests/conformance/manifest.json"],
+                    "rules": ["boolean is not numeric", "short-circuit and/or", "floor division follows mathematical floor", "modulo follows a-floor(a/b)*b", "finite numeric values only for math builtins", "safe integer range is +/-9007199254740991", "compile success does not prove runtime parity"],
+                    "review_order": ["reproduce behavior with a fixture", "check reference interpreter", "check target backend", "update metadata only after implementation exists", "run focused conformance"],
+                }
+            else:
+                result = {
+                    "language_version": BUILTIN_CONTRACT["language_version"],
+                    "contract_version": BUILTIN_CONTRACT["contract_version"],
+                    "builtin_count": len(entries),
+                    "supported_builtin_counts": {target: sum(1 for entry in entries if entry["backends"][target]["status"] == "supported") for target in BUILTIN_CONTRACT["targets"]},
+                    "fixture_count": len(fixtures),
+                    "compiler_pipeline": ["lexer", "parser", "IR validation", "target backend generation"],
+                    "known_limits": ["compile_check does not execute generated code", "cross-runtime parity requires fixtures", "native C, Python transpiler, and VM support remain separately declared"],
+                    "next_priority": "Close semantic gaps in JS and build shared fixtures before claiming language independence.",
+                }
+            return {"ok": True, "operation": "compiler_context", "topic": topic, "context": result}
 
         if name == "cuk_compile_check":
             if set(arguments) != {"source"}:

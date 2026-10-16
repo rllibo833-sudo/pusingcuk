@@ -1,0 +1,10 @@
+jancuk
+hedeh desimal("2.5")
+hedeh logika([])
+hedeh logika("salah")
+hedeh logaritma(1)
+hedeh log10(100)
+hedeh jumlah([])
+hedeh jumlah([1, 2, 6])
+hedeh jumlah([0.1, 0.2, 0.3])
+selesai jancuk

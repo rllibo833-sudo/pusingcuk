@@ -229,5 +229,19 @@ class JavaScriptBackendTests(unittest.TestCase):
         self.assertEqual(result.stdout, "akhir\n")
         self.assertIn("pembagian dengan nol", result.stderr)
 
+
+    def test_expanded_builtins_match_reference_contract_fixture(self):
+        root = Path(__file__).resolve().parents[1]
+        source = (root / "tests" / "conformance" / "builtins_js_expanded.cuk").read_text(encoding="utf-8")
+        result = self.run_source(source)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "2.5\ntidak\nokelah\n0\n2\n0\n9\n0.6000000000000001\n")
+
+    def test_expanded_builtins_reject_invalid_domains_and_types(self):
+        for expression in ('desimal("Infinity")', 'desimal(benar)', 'logaritma(0)', 'log10(-1)', 'jumlah([1, benar])', 'jumlah([9007199254740991, 1])'):
+            with self.subTest(expression=expression):
+                result = self.run_source(f"jancuk\nhedeh {expression}\nselesai jancuk")
+                self.assertNotEqual(result.returncode, 0, expression)
+
 if __name__ == "__main__":
     unittest.main()

@@ -25,7 +25,7 @@ Untuk perubahan bahasa, ikuti satu jalur:
 
 Alias yang tercantum di bagian alias resmi `SPEC.md` adalah bagian dari permukaan bahasa. Perubahan pada alias harus disinkronkan pada lexer Python, pemetaan token runtime C, registry kosakata, dan fixture. Alias untuk kapabilitas platform yang belum tersedia di C harus tetap ditandai sesuai dukungan runtime, tidak disamarkan menjadi dukungan penuh.
 
-Compiler/transpiler lain dan PVM tetap eksperimental. Keduanya tidak mengubah semantik acuan, dan hasilnya tidak dihitung sebagai baseline Python/C.
+Backend JavaScript kini memiliki implementasi untuk seluruh built-in terkontrak; fixture positif dan negatif tetap diperlukan untuk menjaga kesetaraan perilaku. JSON/HTML/CSV hanya tersedia pada target yang dinyatakan `supported` di kontrak. Compiler/transpiler lain dan PVM tetap eksperimental. Keduanya tidak mengubah semantik acuan, dan hasilnya tidak dihitung sebagai baseline Python/C.
 
 ## Evaluasi dan nilai
 
@@ -33,7 +33,7 @@ Compiler/transpiler lain dan PVM tetap eksperimental. Keduanya tidak mengubah se
 - dan / atau menggunakan short-circuit: operand kanan tidak dievaluasi jika hasil sudah ditentukan.
 - Boolean benar dan salah adalah tipe berbeda dari angka. Kesetaraan benar == 1 menghasilkan tidak.
 - Output boolean memakai `okelah` dan `tidak`, bukan `True`/`False`. Built-in `teks` juga menggunakan ejaan bahasa Pusingcuk untuk boolean.
-- Kontrak built-in disimpan di `library/builtin_contract.json`, diuji oleh `tests/test_builtin_contract.py`, dan didokumentasikan di `docs/language/BUILTINS.md`. Interpreter referensi mendukung 21 built-in terdaftar; native C memiliki fixture untuk 17: `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`, `logaritma`, `log10`, `sinus`, `kosinus`, `jumlah`, `rata_rata`, dan `median`. Transpiler/VM memiliki subset tersendiri.
+- Kontrak built-in disimpan di `library/builtin_contract.json`, diuji oleh `tests/test_builtin_contract.py`, dan didokumentasikan di `docs/language/BUILTINS.md`. Interpreter referensi mendukung 25 built-in terdaftar; native C memiliki fixture untuk 17: `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`, `logaritma`, `log10`, `sinus`, `kosinus`, `jumlah`, `rata_rata`, dan `median`. Transpiler/VM memiliki subset tersendiri.
 - `sinus` dan `kosinus` menerima satu angka finite non-boolean dalam radian; semua input finite punya domain matematis valid, hasil non-finite ditolak, dan hasil integral dalam rentang aman dinormalisasi sebagai integer.
 - `jumlah` menerima tepat satu daftar angka finite non-boolean. Daftar kosong bernilai integer 0; input integer-valued di luar `±(2^53 - 1)`, akumulasi non-finite, dan setiap hasil akumulasi integral sementara atau akhir di luar rentang aman ditolak sebagai error runtime. Hasil integral yang aman dinormalisasi ke integer; penjumlahan dilakukan berurutan dalam binary64 pada kedua runtime.
 - `rata_rata` dan `median` menerima satu daftar tidak kosong yang berisi angka finite non-boolean dalam rentang aman `±(2^53 - 1)`; daftar kosong, boolean, tipe lain, aritas salah, dan angka di luar rentang ditolak. Fixture mengunci singleton, cancellation di batas aman, fraksi binary64, nilai negatif, sampel duplikat, median ganjil/genap, dan batas aman inklusif.

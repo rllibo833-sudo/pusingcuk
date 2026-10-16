@@ -206,6 +206,20 @@ const pcInteger = (value) => {
     throw new Error("bilangan() di luar rentang aman lintas target");
   return result;
 };
+const pcFloat = (value) => {
+  if (typeof value === "boolean" || value === null)
+    throw new Error("desimal() tidak menerima boolean atau None");
+  let result;
+  if (typeof value === "number") result = value;
+  else if (typeof value === "string" && value.trim() !== "" &&
+    /^[+-]?(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?)$/.test(value.trim()))
+    result = Number(value.trim());
+  else throw new Error("desimal() membutuhkan angka atau teks angka desimal");
+  if (!Number.isFinite(result)) throw new Error("desimal() membutuhkan angka finite");
+  return result;
+};
+const pcBoolean = (value) => pcTruthy(value);
+
 const pcRange = (...args) => {
   if (args.length < 1 || args.length > 3 || args.some(v => !Number.isSafeInteger(v)))
     throw new Error("rentang() membutuhkan 1-3 integer aman");
@@ -243,6 +257,36 @@ const pcSqrt = (value) => pcMathResult("akar", Math.sqrt(pcNumeric("akar", value
 const pcFloor = (value) => Math.floor(pcNumeric("bawah", value));
 const pcCeil = (value) => Math.ceil(pcNumeric("atas", value));
 const pcPow = (a, b) => pcMathResult("pangkat", Math.pow(pcNumeric("pangkat", a), pcNumeric("pangkat", b)));
+const pcCanonicalMathResult = (name, value) => {
+  const result = pcMathResult(name, value);
+  return Number.isInteger(result) && Number.isSafeInteger(result) ? result : result;
+};
+const pcLog = (value) => {
+  const n = pcNumeric("logaritma", value);
+  if (n <= 0) throw new Error("logaritma() domain tidak valid: angka harus lebih besar dari nol");
+  return pcCanonicalMathResult("logaritma", Math.log(n));
+};
+const pcLog10 = (value) => {
+  const n = pcNumeric("log10", value);
+  if (n <= 0) throw new Error("log10() domain tidak valid: angka harus lebih besar dari nol");
+  return pcCanonicalMathResult("log10", Math.log10(n));
+};
+const pcSum = (value) => {
+  if (!Array.isArray(value)) throw new Error("jumlah() membutuhkan daftar angka finite");
+  let total = 0;
+  for (const item of value) {
+    if (typeof item !== "number" || !Number.isFinite(item))
+      throw new Error("jumlah() membutuhkan angka finite, bukan boolean atau tipe lain");
+    if (Number.isInteger(item) && !Number.isSafeInteger(item))
+      throw new Error("jumlah() menolak angka di luar rentang aman lintas target");
+    total += item;
+    if (!Number.isFinite(total)) throw new Error("jumlah() menghasilkan angka non-finite");
+    if (Number.isInteger(total) && !Number.isSafeInteger(total))
+      throw new Error("jumlah() menghasilkan integer di luar rentang aman lintas target");
+  }
+  return total;
+};
+
 const pcSin = (value) => pcMathResult("sinus", Math.sin(pcNumeric("sinus", value)));
 const pcCos = (value) => pcMathResult("kosinus", Math.cos(pcNumeric("kosinus", value)));
 const pcStatValues = (name, value) => {

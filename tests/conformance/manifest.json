@@ -1346,6 +1346,27 @@
         "reference": "required",
         "native": "unsupported"
       }
+    },
+    {
+      "id": "builtins.js-expanded-parity",
+      "source": "builtins_js_expanded.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-conversion",
+        "truthiness",
+        "logarithms",
+        "sum"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "2.5\ntidak\nokelah\n0\n2\n0\n9\n0.6000000000000001\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "unsupported"
+      }
     }
   ]
 }
