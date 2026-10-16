@@ -129,25 +129,44 @@ class VirtualMachine:
             elif op == "BINARY":
                 right, left = self.pop(stack, line), self.pop(stack, line)
                 try:
-                    if arg == "+": result = left + right
-                    elif arg == "-": result = left - right
-                    elif arg == "*": result = left * right
-                    elif arg == "/":
-                        if right == 0: self.fail(line, "pembagian dengan nol")
-                        result = left / right
-                    elif arg == "//":
-                        if right == 0: self.fail(line, "pembagian dengan nol")
-                        result = left // right
-                    elif arg == "%":
-                        if right == 0: self.fail(line, "modulo dengan nol")
-                        result = left % right
-                    elif arg == "==": result = language_equal(left, right)
-                    elif arg == "!=": result = not language_equal(left, right)
-                    elif arg == "<": result = left < right
-                    elif arg == "<=": result = left <= right
-                    elif arg == ">": result = left > right
-                    elif arg == ">=": result = left >= right
-                    else: self.fail(line, f"operator tidak dikenal: {arg}")
+                    if arg == "+" and isinstance(left, str) and isinstance(right, str):
+                        result = left + right
+                    elif arg == "==":
+                        result = language_equal(left, right)
+                    elif arg == "!=":
+                        result = not language_equal(left, right)
+                    elif arg in ("+", "-", "*", "/", "//", "%", "<", "<=", ">", ">="):
+                        # Match the native C runtime: booleans are not numbers,
+                        # and arithmetic/comparison never inherit Python's
+                        # list concatenation or mixed-type comparison rules.
+                        if (isinstance(left, bool) or isinstance(right, bool)
+                                or not isinstance(left, (int, float))
+                                or not isinstance(right, (int, float))):
+                            if arg == "+" and isinstance(left, str) and isinstance(right, str):
+                                result = left + right
+                            else:
+                                self.fail(line, f"operator '{arg}' membutuhkan dua angka")
+                        elif arg == "+":
+                            result = left + right
+                        elif arg == "-":
+                            result = left - right
+                        elif arg == "*":
+                            result = left * right
+                        elif arg == "/":
+                            if right == 0: self.fail(line, "pembagian dengan nol")
+                            result = left / right
+                        elif arg == "//":
+                            if right == 0: self.fail(line, "pembagian dengan nol")
+                            result = left // right
+                        elif arg == "%":
+                            if right == 0: self.fail(line, "modulo dengan nol")
+                            result = left % right
+                        elif arg == "<": result = left < right
+                        elif arg == "<=": result = left <= right
+                        elif arg == ">": result = left > right
+                        else: result = left >= right
+                    else:
+                        self.fail(line, f"operator tidak dikenal: {arg}")
                 except VMError:
                     raise
                 except Exception as exc:
