@@ -181,7 +181,7 @@ def pc_math_result(name, value):
     return value
 def pc_sqrt(value):
     value = pc_numeric("akar", value)
-    if value < 0: raise ValueError("akar() membutuhkan angka non-negatif")
+    if value < 0: raise ValueError("akar() domain tidak valid: angka harus non-negatif")
     return pc_math_result("akar", math.sqrt(value))
 def pc_floor(value): return math.floor(pc_numeric("bawah", value))
 def pc_ceil(value): return math.ceil(pc_numeric("atas", value))
