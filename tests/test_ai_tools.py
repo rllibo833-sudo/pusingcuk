@@ -85,8 +85,8 @@ class ToolInputContractTests(unittest.TestCase):
         invalid_sources = (
             None,
             42,
-            "\\x00",
-            "jancuk\\nhedeh \\ud800\\nselesai jancuk",
+            "\x00",
+            "jancuk\nhedeh \ud800\nselesai jancuk",
         )
         for source in invalid_sources:
             with self.subTest(source=repr(source)):
