@@ -172,7 +172,7 @@ public final class {class_name} extends Activity {{
         if (value instanceof String) return !((String)value).isEmpty();
         return true;
     }}
-    private static Object pcNeg(Object value) {{ return Double.valueOf(-pcNum(value)); }}
+    private static Object pcNeg(Object value) {{ return pcFinite(-pcNum(value)); }}
     private static List<Object> pcList(Object... values) {{
         List<Object> result = new ArrayList<>();
         java.util.Collections.addAll(result, values);
@@ -235,23 +235,32 @@ public final class {class_name} extends Activity {{
         throw new IllegalArgumentException("bilangan() membutuhkan angka atau teks integer");
     }}
     private static double pcNum(Object x) {{
-        if (x instanceof Number) return ((Number)x).doubleValue();
+        if (x instanceof Number) {{
+            double value = ((Number)x).doubleValue();
+            if (Double.isFinite(value)) return value;
+            throw new ArithmeticException("operasi angka non-finite");
+        }}
         throw new IllegalArgumentException("operasi membutuhkan angka");
     }}
     private static Object pcAdd(Object a, Object b) {{
         if (a instanceof String && b instanceof String) return (String)a + (String)b;
-        return Double.valueOf(pcNum(a) + pcNum(b));
+        return pcFinite(pcNum(a) + pcNum(b));
     }}
-    private static Object pcSub(Object a, Object b) {{ return Double.valueOf(pcNum(a) - pcNum(b)); }}
-    private static Object pcMul(Object a, Object b) {{ return Double.valueOf(pcNum(a) * pcNum(b)); }}
+    private static Object pcSub(Object a, Object b) {{ return pcFinite(pcNum(a) - pcNum(b)); }}
+    private static Object pcMul(Object a, Object b) {{ return pcFinite(pcNum(a) * pcNum(b)); }}
     private static Object pcDiv(Object a, Object b) {{
-        if (pcNum(b) == 0.0) throw new ArithmeticException("pembagian dengan nol");
-        return Double.valueOf(pcNum(a) / pcNum(b));
+        double divisor = pcNum(b);
+        if (divisor == 0.0) throw new ArithmeticException("pembagian dengan nol");
+        return pcFinite(pcNum(a) / divisor);
     }}
-    private static Object pcFloorDiv(Object a, Object b) {{ return Double.valueOf(Math.floor(pcNum(a) / pcNum(b))); }}
+    private static Object pcFloorDiv(Object a, Object b) {{ return pcFinite(Math.floor(pcNum(a) / pcNum(b))); }}
     private static Object pcMod(Object a, Object b) {{
         double divisor = pcNum(b); if (divisor == 0.0) throw new ArithmeticException("modulo dengan nol");
-        return Double.valueOf(((pcNum(a) % divisor) + divisor) % divisor);
+        return pcFinite(((pcNum(a) % divisor) + divisor) % divisor);
+    }}
+    private static Double pcFinite(double value) {{
+        if (!Double.isFinite(value)) throw new ArithmeticException("operasi angka non-finite");
+        return Double.valueOf(value);
     }}
     private static boolean pcCompare(Object a, Object b, String op) {{
         int c;
