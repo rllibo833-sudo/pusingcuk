@@ -308,6 +308,7 @@ class ToolRegistry:
                 "target": "javascript",
                 "language_version": LANGUAGE_VERSION,
                 "language_identity": language_identity,
+                "features": document.get("features", []),
                 "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
                 "artifact_sha256": hashlib.sha256(artifact_bytes).hexdigest(),
                 "artifact_bytes": len(artifact_bytes),
