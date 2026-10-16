@@ -271,3 +271,11 @@ Validasi otomatis yang ditambahkan: tes unit untuk eksekusi fixture nyata melalu
 Jalur konformansi membedakan kategori observasi per runtime (`syntax_error`, `runtime_failure`, `semantic_mismatch`, `backend_unavailable`, `harness_timeout`, `harness_error`, atau `none`), lokasi diagnostik jika tersedia, dan petunjuk tindak lanjut. Kategori observasi terpisah dari status fixture: fixture negatif tetap lulus ketika kesalahan yang diperkirakan benar-benar terjadi.
 
 Tes regresi mengikat kasus sintaks rusak dan kesalahan domain runtime ke fixture terdaftar serta memastikan ID yang tidak dikenal dilaporkan sebagai masalah registry, bukan kesalahan source. Perubahan ini tidak menambah semantik bahasa baru atau memperluas matriks dukungan target. CI pada commit perubahan tetap menjadi gerbang penerimaan.
+
+## Bukti regresi klasifikasi diagnostik — 16 Oktober 2026
+
+- Tool `cuk_compile_check` kini mengembalikan kategori kegagalan stabil dan petunjuk perbaikan; lokasi baris/kolom tetap diambil dari diagnostik nyata, tidak direka.
+- Tool `cuk_conformance_check` kini membedakan observasi kesalahan sintaks, kegagalan runtime, mismatch semantik, backend tidak tersedia, timeout/harness, dan hasil sesuai kontrak. Fixture negatif tetap lulus jika error aktual cocok dengan ekspektasi manifest.
+- Tes regresi meliputi kompilasi sukses (tanpa klaim runtime), sintaks rusak dengan lokasi/petunjuk, kesalahan compiler internal, fixture sintaks negatif, fixture kesalahan domain runtime, dan ID fixture yang tidak dikenal.
+- **Gerbang CI pada commit yang sama** [`421660f14a16a0016ef49a228ded4c0b3ba0f30f`](https://github.com/rllibo833-sudo/pusingcuk/commit/421660f14a16a0016ef49a228ded4c0b3ba0f30f) lulus: [Actions run 38912777295](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38912777295). Python 3.11, Python 3.12, native GCC, native Clang, dan job regresi keamanan PVM semuanya berstatus sukses.
+- Tidak ada semantik bahasa baru yang ditambahkan pada perubahan ini; karena itu tidak ada klaim dukungan backend baru. Perubahan semantik berikutnya tetap wajib menyelaraskan `SPEC.md`, kontrak semantik, implementasi, fixture positif/negatif, dan label dukungan target.
