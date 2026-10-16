@@ -112,12 +112,20 @@ class VirtualMachine:
                 else: self.fail(line, "assignment indeks hanya mendukung daftar dan kamus")
             elif op == "UNARY":
                 value = self.pop(stack, line)
-                if arg == "bukan": stack.append(not value)
+                if arg == "bukan":
+                    stack.append(not value)
                 elif arg == "-":
-                    result = -value
-                    if isinstance(result, float) and not math.isfinite(result): self.fail(line, "operasi angka non-finite")
+                    if isinstance(value, bool) or not isinstance(value, (int, float)):
+                        self.fail(line, "operator unary '-' membutuhkan angka")
+                    try:
+                        result = -value
+                    except (ArithmeticError, TypeError, ValueError):
+                        self.fail(line, "operasi unary angka gagal")
+                    if isinstance(result, float) and not math.isfinite(result):
+                        self.fail(line, "operasi angka non-finite")
                     stack.append(result)
-                else: self.fail(line, f"operator unary tidak dikenal: {arg}")
+                else:
+                    self.fail(line, f"operator unary tidak dikenal: {arg}")
             elif op == "BINARY":
                 right, left = self.pop(stack, line), self.pop(stack, line)
                 try:
