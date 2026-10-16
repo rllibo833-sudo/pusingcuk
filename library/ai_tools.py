@@ -188,9 +188,10 @@ class ToolRegistry:
             "function": {
                 "name": "cuk_compile_check",
                 "description": (
-                    "Kompilasi source .cuk menjadi artefak JavaScript mandiri yang dapat diuji dengan Node.js. "
-                    "Mengembalikan source JavaScript dan hash artefak. Tidak menjalankan source "
-                    "dan tidak menyimpan artefak di server."
+                    "Validasi dan kompilasi source .cuk dengan front-end/compiler PusingCuk, "
+                    "hasilkan artefak JavaScript, lalu jalankan bytecode hasil compiler melalui PVM "
+                    "dengan batas 10000 instruksi. Mengembalikan diagnostik atau stdout PVM serta "
+                    "hash artefak JavaScript. Ini bukan eksekusi artefak JavaScript dan bukan sandbox OS."
                 ),
                 "parameters": {
                     "type": "object",
