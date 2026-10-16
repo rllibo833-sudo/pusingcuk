@@ -35,6 +35,7 @@ class ToolInputContractTests(unittest.TestCase):
         result = self.registry.execute("cuk_compile_check", {"source": source})
         self.assertTrue(result["ok"], result)
         self.assertEqual(result["operation"], "compile_check")
+        self.assertEqual(result["evidence_status"], "KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI")
         self.assertEqual(result["target"], "javascript")
         self.assertEqual(result["language_version"], LANGUAGE_VERSION)
         self.assertEqual(result["source_sha256"], hashlib.sha256(source.encode("utf-8")).hexdigest())
@@ -66,6 +67,7 @@ class ToolInputContractTests(unittest.TestCase):
         invalid = self.registry.execute("cuk_compile_check", {"source": "jancuk\nhedeh fungsi_tidak_ada(1)\nselesai jancuk"})
         self.assertFalse(invalid["ok"])
         self.assertEqual(invalid["error"], "CUK_COMPILE_FAILED")
+        self.assertEqual(invalid["evidence_status"], "SOURCE_DITOLAK_COMPILER")
         oversized = self.registry.execute("cuk_compile_check", {"source": "x" * (16 * 1024 + 1)})
         self.assertEqual(oversized, {"ok": False, "error": "CUK_SOURCE_TOO_LARGE"})
         self.assertEqual(
@@ -82,6 +84,7 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertEqual(result["error"], "CUK_COMPILER_INTERNAL_ERROR")
         self.assertEqual(result["semantic_review"]["status"], "compiler_internal_error")
+        self.assertEqual(result["evidence_status"], "STATUS_KOMPILASI_TIDAK_VALID")
         self.assertNotIn("internal detail", result["diagnostic"])
         self.assertIs(result["executed"], False)
 
