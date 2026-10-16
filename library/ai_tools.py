@@ -307,6 +307,27 @@ class ToolRegistry:
                     net_result, income_debit, income_credit,
                     expense_debit, expense_credit, retained_debit, retained_credit,
                 ) = values
+                # Treat the .cuk rule as the planner, then independently verify
+                # its accounting semantics before exposing the plan to the model.
+                income_total = arguments["income_total"]
+                expense_total = arguments["expense_total"]
+                expected_result = income_total - expense_total
+                expected_status = (
+                    "PENUTUPAN_LABA" if expected_result > 0 else
+                    "PENUTUPAN_RUGI" if expected_result < 0 else
+                    "PENUTUPAN_NOL"
+                )
+                if (
+                    result.get("result") != expected_status
+                    or net_result != expected_result
+                    or income_debit != income_total
+                    or income_credit != 0
+                    or expense_debit != 0
+                    or expense_credit != expense_total
+                    or retained_debit != max(-expected_result, 0)
+                    or retained_credit != max(expected_result, 0)
+                ):
+                    return {"ok": False, "error": "RULE_SEMANTIC_MISMATCH"}
                 closing_lines = []
                 for role, debit, credit in (
                     ("income", income_debit, income_credit),
