@@ -58,11 +58,18 @@ const pcEq = (a, b) => {
   if (a instanceof Map || b instanceof Map) return a === b;
   return a === b;
 };
+const pcNumericResult = (name, value) => {
+  if (!Number.isFinite(value))
+    throw new Error(name + ": operasi angka non-finite");
+  if (Number.isInteger(value) && !Number.isSafeInteger(value))
+    throw new Error(name + ": hasil integer di luar rentang aman lintas target");
+  return value;
+};
 const pcAdd = (a, b) => {
   if (typeof a === "number" && typeof b === "number") {
-    const n = a + b;
-    if (!Number.isFinite(n)) throw new Error("operasi angka non-finite");
-    return n;
+    if (!Number.isFinite(a) || !Number.isFinite(b))
+      throw new Error("operator + membutuhkan angka finite");
+    return pcNumericResult("operator +", a + b);
   }
   if (typeof a === "string" && typeof b === "string") return a + b;
   if (Array.isArray(a) && Array.isArray(b)) return a.concat(b);
@@ -72,19 +79,13 @@ const pcSub = (a, b) => {
   if (typeof a !== "number" || typeof b !== "number" ||
       !Number.isFinite(a) || !Number.isFinite(b))
     throw new Error("operator - membutuhkan dua angka finite");
-  const n = a - b;
-  if (!Number.isFinite(n)) throw new Error("operasi angka non-finite");
-  return n;
+  return pcNumericResult("operator -", a - b);
 };
 const pcMul = (a, b) => {
   if (typeof a === "number" && typeof b === "number") {
     if (!Number.isFinite(a) || !Number.isFinite(b))
       throw new Error("operator * membutuhkan angka finite");
-    const n = a * b;
-    if (!Number.isFinite(n)) throw new Error("operasi angka non-finite");
-    if (Number.isInteger(n) && !Number.isSafeInteger(n))
-      throw new Error("hasil integer di luar rentang aman lintas target");
-    return n;
+    return pcNumericResult("operator *", a * b);
   }
   const repeat = (value, count) => {
     if (!Number.isSafeInteger(count))
@@ -108,27 +109,20 @@ const pcDiv = (a, b) => {
       !Number.isFinite(a) || !Number.isFinite(b))
     throw new Error("operator / membutuhkan dua angka finite");
   if (b === 0) throw new Error("pembagian dengan nol");
-  const n = a / b;
-  if (!Number.isFinite(n)) throw new Error("operasi angka non-finite");
-  return n;
+  return pcNumericResult("operator /", a / b);
 };
-const pcFloorDiv = (a, b) => Math.floor(pcDiv(a, b));
+const pcFloorDiv = (a, b) => pcNumericResult("operator //", Math.floor(pcDiv(a, b)));
 const pcMod = (a, b) => {
   if (typeof a !== "number" || typeof b !== "number" ||
       !Number.isFinite(a) || !Number.isFinite(b))
     throw new Error("operator % membutuhkan dua angka finite");
   if (b === 0) throw new Error("modulo dengan nol");
-  const n = ((a % b) + b) % b;
-  if (!Number.isFinite(n)) throw new Error("operasi angka non-finite");
-  return n;
+  return pcNumericResult("operator %", ((a % b) + b) % b);
 };
 const pcNeg = (value) => {
   if (typeof value !== "number" || !Number.isFinite(value))
     throw new Error("operator unary - membutuhkan angka finite");
-  const result = -value;
-  if (Number.isInteger(result) && !Number.isSafeInteger(result))
-    throw new Error("hasil integer di luar rentang aman lintas target");
-  return result;
+  return pcNumericResult("operator unary -", -value);
 };
 const pcCompare = (a, b, op) => {
   if (typeof a !== typeof b ||
@@ -239,14 +233,14 @@ const pcNumeric = (name, value) => {
     throw new Error(name + "() membutuhkan angka finite");
   return value;
 };
-const pcAbs = (value) => Math.abs(pcNumeric("mutlak", value));
-const pcMin = (a, b) => Math.min(pcNumeric("minimum", a), pcNumeric("minimum", b));
-const pcMax = (a, b) => Math.max(pcNumeric("maksimum", a), pcNumeric("maksimum", b));
+const pcAbs = (value) => pcNumericResult("mutlak", Math.abs(pcNumeric("mutlak", value)));
+const pcMin = (a, b) => pcNumericResult("minimum", Math.min(pcNumeric("minimum", a), pcNumeric("minimum", b)));
+const pcMax = (a, b) => pcNumericResult("maksimum", Math.max(pcNumeric("maksimum", a), pcNumeric("maksimum", b)));
 const pcRound = (value) => {
   const n = pcNumeric("bulatkan", value), lower = Math.floor(n), fraction = n - lower;
-  if (fraction < 0.5) return lower;
-  if (fraction > 0.5) return lower + 1;
-  return lower % 2 === 0 ? lower : lower + 1;
+  if (fraction < 0.5) return pcNumericResult("bulatkan", lower);
+  if (fraction > 0.5) return pcNumericResult("bulatkan", lower + 1);
+  return pcNumericResult("bulatkan", lower % 2 === 0 ? lower : lower + 1);
 };
 const pcMathResult = (name, value) => {
   if (typeof value !== "number" || !Number.isFinite(value))
@@ -254,9 +248,9 @@ const pcMathResult = (name, value) => {
   return value;
 };
 const pcSqrt = (value) => pcMathResult("akar", Math.sqrt(pcNumeric("akar", value)));
-const pcFloor = (value) => Math.floor(pcNumeric("bawah", value));
-const pcCeil = (value) => Math.ceil(pcNumeric("atas", value));
-const pcPow = (a, b) => pcMathResult("pangkat", Math.pow(pcNumeric("pangkat", a), pcNumeric("pangkat", b)));
+const pcFloor = (value) => pcNumericResult("bawah", Math.floor(pcNumeric("bawah", value)));
+const pcCeil = (value) => pcNumericResult("atas", Math.ceil(pcNumeric("atas", value)));
+const pcPow = (a, b) => pcNumericResult("pangkat", pcMathResult("pangkat", Math.pow(pcNumeric("pangkat", a), pcNumeric("pangkat", b))));
 const pcCanonicalMathResult = (name, value) => {
   const result = pcMathResult(name, value);
   return Number.isInteger(result) && Number.isSafeInteger(result) ? result : result;

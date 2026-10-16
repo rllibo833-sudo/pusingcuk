@@ -186,6 +186,34 @@ class JavaScriptBackendTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "[950000,2950000,0]")
 
+    def test_arithmetic_rejects_unsafe_integer_results_consistently(self):
+        for expression in (
+            "9007199254740991 + 1",
+            "0 - 9007199254740992",
+            "9007199254740991 * 2",
+            "9007199254740991 // 0.5",
+        ):
+            with self.subTest(expression=expression):
+                result = self.run_source(
+                    f"jancuk\nhedeh {expression}\nselesai jancuk"
+                )
+                self.assertNotEqual(result.returncode, 0, expression)
+                self.assertIn("rentang aman lintas target", result.stderr)
+
+    def test_arithmetic_accepts_safe_integer_boundary(self):
+        result = self.run_source(
+            "jancuk\n"
+            "hedeh 9007199254740991 + 0\n"
+            "hedeh 9007199254740991 - 1\n"
+            "hedeh 9007199254740991 * 1\n"
+            "selesai jancuk"
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            result.stdout,
+            "9007199254740991\n9007199254740990\n9007199254740991\n",
+        )
+
     def test_rejects_integer_outside_javascript_safe_range(self):
         with self.assertRaisesRegex(JSBackendError, "rentang aman JavaScript"):
             generate(from_source("jancuk\nhedeh 9007199254740992\nselesai jancuk"))
