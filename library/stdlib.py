@@ -48,7 +48,7 @@ def _to_text(value: Any) -> str:
 
 def _numeric(name: str, value: Any) -> int | float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise TypeError(name + "() membutuhkan angka, bukan boolean atau tipe lain")
+        raise TypeError(name + "() membutuhkan angka finite, bukan boolean atau tipe lain")
     if isinstance(value, float) and not math.isfinite(value):
         raise TypeError(name + "() membutuhkan angka finite")
     return value

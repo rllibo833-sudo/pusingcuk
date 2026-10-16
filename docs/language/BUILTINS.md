@@ -18,26 +18,26 @@ Status `not-claimed` pada native C berarti scalar subset telah diuji, tetapi kes
 | Built-in | Argumen | Perilaku | Python reference | Native C | JS transpiler | Python transpiler | HTML | VM |
 |---|---:|---|---|---|---|---|---|---|
 | `panjang` | 1 | Jumlah elemen pada teks, daftar, kamus, atau rentang yang didukung runtime. | supported | supported | supported | supported | supported | supported |
-| `teks` | 1 | Konversi nilai menjadi teks. | supported | not-claimed | supported | unsupported | unsupported | unsupported |
-| `bilangan` | 1 | Konversi nilai menjadi bilangan bulat. | supported | not-claimed | supported | unsupported | unsupported | unsupported |
-| `desimal` | 1 | Konversi nilai menjadi bilangan desimal. | supported | not-claimed | unsupported | unsupported | unsupported | unsupported |
-| `logika` | 1 | Konversi nilai menjadi benar/salah. | supported | not-claimed | unsupported | unsupported | unsupported | unsupported |
+| `teks` | 1 | Konversi nilai menjadi teks. | supported | not-claimed | supported | unsupported | unsupported | supported |
+| `bilangan` | 1 | Konversi nilai menjadi bilangan bulat. | supported | not-claimed | supported | unsupported | unsupported | supported |
+| `desimal` | 1 | Konversi nilai menjadi bilangan desimal. | supported | not-claimed | unsupported | unsupported | unsupported | supported |
+| `logika` | 1 | Konversi nilai menjadi benar/salah. | supported | not-claimed | unsupported | unsupported | unsupported | supported |
 | `rentang` | 1–3 | Rentang bilangan bulat dengan batas akhir eksklusif. | supported | supported | supported | supported | supported | supported |
 | `mutlak` | 1 | Nilai absolut angka finite. | supported | supported | supported | supported | supported | supported |
 | `minimum` | 2 | Nilai terkecil dari dua angka finite. | supported | supported | supported | supported | supported | supported |
 | `maksimum` | 2 | Nilai terbesar dari dua angka finite. | supported | supported | supported | supported | supported | supported |
 | `bulatkan` | 1 | Pembulatan ties-to-even ke bilangan terdekat. | supported | supported | supported | supported | supported | supported |
-| `akar` | 1 | Akar kuadrat angka finite non-negatif; hasil bulat dalam rentang aman dikembalikan sebagai integer. | supported | supported | supported | supported | supported | unsupported |
-| `bawah` | 1 | Pembulatan ke bawah menuju integer. | supported | supported | supported | supported | supported | unsupported |
-| `atas` | 1 | Pembulatan ke atas menuju integer. | supported | supported | supported | supported | supported | unsupported |
-| `pangkat` | 2 | Pangkat dua angka finite; domain tidak valid dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | unsupported |
-| `logaritma` | 1 | Logaritma natural untuk angka finite positif. | supported | supported | unsupported | unsupported | unsupported | unsupported |
-| `log10` | 1 | Logaritma basis 10 untuk angka finite positif. | supported | supported | unsupported | unsupported | unsupported | unsupported |
-| `sinus` | 1 | Sinus sudut finite dalam radian; hasil integral aman dinormalisasi dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | unsupported |
-| `kosinus` | 1 | Kosinus sudut finite dalam radian; hasil integral aman dinormalisasi dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | unsupported |
-| `jumlah` | 1 | Jumlah berurutan angka finite non-boolean dalam daftar; daftar kosong bernilai nol dan setiap hasil integral antara/akhir dibatasi rentang aman lintas target. | supported | supported | unsupported | unsupported | unsupported | unsupported |
-| `rata_rata` | 1 | Rata-rata aritmetika daftar nonkosong angka finite non-boolean dalam rentang aman lintas target. | supported | supported | supported | supported | supported | unsupported |
-| `median` | 1 | Median daftar nonkosong angka finite non-boolean dalam rentang aman lintas target. | supported | supported | supported | supported | supported | unsupported |
+| `akar` | 1 | Akar kuadrat angka finite non-negatif; hasil bulat dalam rentang aman dikembalikan sebagai integer. | supported | supported | supported | supported | supported | supported |
+| `bawah` | 1 | Pembulatan ke bawah menuju integer. | supported | supported | supported | supported | supported | supported |
+| `atas` | 1 | Pembulatan ke atas menuju integer. | supported | supported | supported | supported | supported | supported |
+| `pangkat` | 2 | Pangkat dua angka finite; domain tidak valid dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | supported |
+| `logaritma` | 1 | Logaritma natural untuk angka finite positif. | supported | supported | unsupported | unsupported | unsupported | supported |
+| `log10` | 1 | Logaritma basis 10 untuk angka finite positif. | supported | supported | unsupported | unsupported | unsupported | supported |
+| `sinus` | 1 | Sinus sudut finite dalam radian; hasil integral aman dinormalisasi dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | supported |
+| `kosinus` | 1 | Kosinus sudut finite dalam radian; hasil integral aman dinormalisasi dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | supported |
+| `jumlah` | 1 | Jumlah berurutan angka finite non-boolean dalam daftar; daftar kosong bernilai nol dan setiap hasil integral antara/akhir dibatasi rentang aman lintas target. | supported | supported | unsupported | unsupported | unsupported | supported |
+| `rata_rata` | 1 | Rata-rata aritmetika daftar nonkosong angka finite non-boolean dalam rentang aman lintas target. | supported | supported | supported | supported | supported | supported |
+| `median` | 1 | Median daftar nonkosong angka finite non-boolean dalam rentang aman lintas target. | supported | supported | supported | supported | supported | supported |
 
 ## Intrinsics Tambahan Python (reference only)
 
