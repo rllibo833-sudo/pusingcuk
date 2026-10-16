@@ -160,28 +160,83 @@ def compile_source(source, source_name="<memory>"):
 
 
 def validate_bytecode(document):
+    """Reject malformed operands and control-flow targets before VM execution."""
     if not isinstance(document, dict) or set(document) != {
         "format", "bytecode_version", "language_version", "source_name", "functions", "code"
     }:
         raise BytecodeError("envelope bytecode tidak valid")
     if document["format"] != FORMAT or document["bytecode_version"] != VERSION:
         raise BytecodeError("format atau versi bytecode tidak didukung")
+    if not isinstance(document["language_version"], str) or not isinstance(document["source_name"], str):
+        raise BytecodeError("metadata bytecode tidak valid")
     if not isinstance(document["code"], list) or len(document["code"]) > 100000:
         raise BytecodeError("instruksi bytecode tidak valid atau melewati batas")
-    if not isinstance(document["functions"], dict):
+    if not isinstance(document["functions"], dict) or len(document["functions"]) > 10000:
         raise BytecodeError("tabel fungsi bytecode tidak valid")
+
     for name, fn in document["functions"].items():
-        if not isinstance(name, str) or not isinstance(fn, dict) or set(fn) != {"params", "code"}:
+        if (not isinstance(name, str) or not name or not isinstance(fn, dict)
+                or set(fn) != {"params", "code"}):
             raise BytecodeError("entri fungsi bytecode tidak valid")
-        if not isinstance(fn["params"], list) or not isinstance(fn["code"], list):
-            raise BytecodeError("parameter atau kode fungsi tidak valid")
-        if len(fn["code"]) > 100000: raise BytecodeError("fungsi melewati batas instruksi")
-    for code in [document["code"]] + [fn["code"] for fn in document["functions"].values()]:
+        params = fn["params"]
+        if (not isinstance(params, list) or any(not isinstance(p, str) or not p for p in params)
+                or len(params) != len(set(params))):
+            raise BytecodeError("parameter fungsi bytecode tidak valid")
+        if not isinstance(fn["code"], list) or len(fn["code"]) > 100000:
+            raise BytecodeError("kode fungsi tidak valid atau melewati batas")
+
+    def integer(value):
+        return isinstance(value, int) and not isinstance(value, bool)
+
+    def check_code(code):
+        size = len(code)
         for ins in code:
             if not isinstance(ins, list) or len(ins) != 3 or ins[0] not in OPS:
                 raise BytecodeError("instruksi bytecode tidak valid")
-            if not isinstance(ins[2], int) or isinstance(ins[2], bool) or ins[2] < 1:
+            op, arg, line = ins
+            if not integer(line) or line < 1:
                 raise BytecodeError("nomor baris bytecode tidak valid")
+            if op in {"LOAD", "DECLARE", "STORE", "INPUT"}:
+                if not isinstance(arg, str) or not arg:
+                    raise BytecodeError(f"operand nama tidak valid pada {op}")
+            elif op in {"MAKE_LIST", "MAKE_DICT"}:
+                if not integer(arg) or arg < 0 or arg > 10000:
+                    raise BytecodeError(f"jumlah elemen tidak valid pada {op}")
+            elif op in {"JUMP", "JUMP_IF_FALSE", "JUMP_IF_TRUE"}:
+                if not integer(arg) or not 0 <= arg <= size:
+                    raise BytecodeError(f"tujuan lompatan tidak valid pada {op}")
+            elif op == "ITER_INIT":
+                if not integer(arg) or arg < 0 or arg > 10000:
+                    raise BytecodeError("slot iterator tidak valid")
+            elif op == "ITER_NEXT":
+                if (not isinstance(arg, list) or len(arg) != 3
+                        or not integer(arg[0]) or arg[0] < 0
+                        or not isinstance(arg[1], str) or not arg[1]
+                        or not integer(arg[2]) or not 0 <= arg[2] <= size):
+                    raise BytecodeError("operand ITER_NEXT tidak valid")
+            elif op == "CALL":
+                if (not isinstance(arg, list) or len(arg) != 2
+                        or not isinstance(arg[0], str) or not arg[0]
+                        or not integer(arg[1]) or not 0 <= arg[1] <= 255):
+                    raise BytecodeError("operand CALL tidak valid")
+            elif op == "UNARY":
+                if arg not in {"bukan", "-"}:
+                    raise BytecodeError("operator unary bytecode tidak valid")
+            elif op == "BINARY":
+                if arg not in {"+", "-", "*", "/", "//", "%", "==", "!=", "<", "<=", ">", ">="}:
+                    raise BytecodeError("operator binary bytecode tidak valid")
+            elif op in {"PRINT", "POP", "GET", "SET_INDEX", "TO_BOOL", "RETURN"}:
+                if arg is not None:
+                    raise BytecodeError(f"opcode {op} tidak menerima operand")
+            elif op == "CONST":
+                try:
+                    json.dumps(arg, ensure_ascii=False, allow_nan=False)
+                except (TypeError, ValueError):
+                    raise BytecodeError("konstanta bytecode tidak valid") from None
+
+    check_code(document["code"])
+    for fn in document["functions"].values():
+        check_code(fn["code"])
     return document
 
 
