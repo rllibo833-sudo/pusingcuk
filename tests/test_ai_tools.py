@@ -476,6 +476,19 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertIn("jumlah", native["context"]["supported_builtins"])
         self.assertTrue(native["context"]["required_fixture_ids"])
         self.assertIn("unsupported_fixture_ids", native["context"])
+        self.assertTrue(native["context"]["shared_required_fixture_ids"])
+        self.assertTrue(native["context"]["reference_only_fixture_ids"])
+        self.assertEqual(
+            set(native["context"]["shared_required_fixture_ids"]),
+            set(native["context"]["shared_required_fixture_ids"]) & set(native["context"]["required_fixture_ids"]),
+        )
+
+        development = self.registry.execute("cuk_compiler_context", {"topic": "development"})
+        self.assertTrue(development["ok"], development)
+        self.assertIn("jumlah", " ".join(development["context"]["priority_semantics"]))
+        self.assertIn("compile success is not runtime proof", " ".join(development["context"]["guardrails"]))
+        self.assertTrue(development["context"]["shared_required_fixture_ids"])
+        self.assertTrue(development["context"]["next_actions"])
 
         formats = self.registry.execute("cuk_compiler_context", {"topic": "formats"})
         self.assertEqual({item["name"] for item in formats["context"]["builtins"]},
