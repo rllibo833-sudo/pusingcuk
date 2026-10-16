@@ -264,8 +264,13 @@ public final class {class_name} extends Activity {{
         if (v == null) return "None";
         if (Boolean.TRUE.equals(v)) return "okelah";
         if (Boolean.FALSE.equals(v)) return "tidak";
-        if (v instanceof Double && ((Double)v).doubleValue() == Math.rint(((Double)v).doubleValue()))
-            return Long.toString(((Double)v).longValue());
+        if (v instanceof Double) {
+            double number = ((Double)v).doubleValue();
+            // Never cast an out-of-range or non-finite double to long for display.
+            if (Double.isFinite(number) && number == Math.rint(number)
+                    && Math.abs(number) <= 9007199254740991.0)
+                return Long.toString((long) number);
+        }
         return String.valueOf(v);
     }}
 }}
