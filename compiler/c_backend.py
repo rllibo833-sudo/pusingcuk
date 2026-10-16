@@ -1,6 +1,6 @@
 """Portable C11 source backend for the explicitly supported Pusingcuk subset."""
 from __future__ import annotations
-import argparse, re, sys
+import argparse, json, re, sys
 from pathlib import Path
 from compiler.ir import from_source, validate
 
@@ -11,8 +11,17 @@ C_RUNTIME = r'''#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <limits.h>
 static unsigned int pc_call_depth = 0;
+static const char *pc_concat(const char *a, const char *b) {
+    size_t na = strlen(a), nb = strlen(b);
+    if (na > SIZE_MAX - nb - 1) { fputs("Pusingcuk C backend: string too large\\n", stderr); exit(EXIT_FAILURE); }
+    char *out = (char *)malloc(na + nb + 1);
+    if (!out) { fputs("Pusingcuk C backend: out of memory\\n", stderr); exit(EXIT_FAILURE); }
+    memcpy(out, a, na); memcpy(out + na, b, nb + 1);
+    return out;
+}
 static void pc_overflow(void) { fputs("Pusingcuk C backend: integer overflow\n", stderr); exit(EXIT_FAILURE); }
 static void pc_division_by_zero(void) { fputs("Pusingcuk C backend: division by zero\n", stderr); exit(EXIT_FAILURE); }
 void pc_loop_limit(void) { fputs("Pusingcuk C backend: loop iteration limit reached\n", stderr); exit(EXIT_FAILURE); }
@@ -75,9 +84,13 @@ def generate(document: dict) -> str:
         kind, f, line=n.get("kind"),n.get("fields"),n.get("line"); _node(kind,f,line)
         if kind=="Literal":
             v=f.get("value")
+            if isinstance(v, str):
+                if any(ord(ch) < 32 and ch not in "\\n\\r\\t\\b\\f" for ch in v):
+                    raise CBackendError(f"baris {line}: teks berisi karakter kontrol yang belum didukung backend C")
+                return (json.dumps(v, ensure_ascii=False), "str")
             if type(v) is bool: return ("INT64_C(1)" if v else "INT64_C(0)","bool")
             if type(v) is int and 0<=v<=9223372036854775807: return (f"INT64_C({v})","int")
-            raise CBackendError(f"baris {line}: backend C hanya mendukung literal integer nonnegatif sampai INT64_MAX dan boolean benar/salah")
+            raise CBackendError(f"baris {line}: literal belum didukung backend C")
         if kind=="Variable":
             name=f.get("name")
             if name not in names: raise CBackendError(f"baris {line}: variabel {name!r} belum dideklarasikan")
@@ -102,6 +115,8 @@ def generate(document: dict) -> str:
             raise CBackendError(f"baris {line}: operator unary {op!r} belum didukung")
         if kind=="Binary":
             op=f.get("op"); left,lt=expression(f.get("left"),names,types); right,rt=expression(f.get("right"),names,types)
+            if op == "+" and lt == rt == "str":
+                return f"pc_concat(({left}), ({right}))", "str"
             if op in {"+","-","*","//","%"}:
                 if lt!="int" or rt!="int": raise CBackendError(f"baris {line}: operator {op!r} hanya mendukung operand integer")
                 helper={"+":"pc_add","-":"pc_sub","*":"pc_mul","//":"pc_floor_div","%":"pc_mod"}[op]
@@ -127,16 +142,20 @@ def generate(document: dict) -> str:
                 if name in names: raise CBackendError(f"baris {line}: variabel {name!r} sudah dideklarasikan")
                 if in_loop: raise CBackendError(f"baris {line}: deklarasi lah di dalam loop belum didukung; deklarasikan sebelum loop")
                 value,typ=expression(f.get("value"),names,types); cname=f"pc_v_{next_id}"; next_id+=1
-                names[name],types[name]=cname,typ; out.extend([f"{indent}int64_t {cname} = (int64_t)({value});",f"{indent}(void){cname};"])
+                names[name],types[name]=cname,typ
+                declaration = f"const char *{cname} = {value};" if typ == "str" else f"int64_t {cname} = (int64_t)({value});"
+                out.extend([f"{indent}{declaration}",f"{indent}(void){cname};"])
             elif kind=="Assign":
                 name=f.get("name")
                 if name not in names: raise CBackendError(f"baris {line}: variabel {name!r} belum dideklarasikan")
                 value,typ=expression(f.get("value"),names,types)
                 if typ!=types[name]: raise CBackendError(f"baris {line}: backend C subset tidak mendukung perubahan tipe variabel {name!r}")
-                out.append(f"{indent}{names[name]} = (int64_t)({value});")
+                rendered = value if typ == "str" else f"(int64_t)({value})"
+                out.append(f"{indent}{names[name]} = {rendered};")
             elif kind=="Print":
                 value,typ=expression(f.get("value"),names,types)
                 if typ=="bool": out.append(f'{indent}if (printf("%s\\n", ({value}) ? "okelah" : "tidak") < 0) return EXIT_FAILURE;')
+                elif typ=="str": out.append(f'{indent}if (printf("%s\\n", {value}) < 0) return EXIT_FAILURE;')
                 else: out.append(f'{indent}if (printf("%" PRId64 "\\n", (int64_t)({value})) < 0) return EXIT_FAILURE;')
             elif kind=="If":
                 cond,_=expression(f.get("condition"),names,types); out.append(f"{indent}if (({cond}) != 0) {{")
