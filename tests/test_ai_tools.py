@@ -72,6 +72,18 @@ class ToolInputContractTests(unittest.TestCase):
             {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"},
         )
 
+    def test_cuk_compile_check_distinguishes_internal_compiler_failure(self):
+        with patch("library.ai_tools.generate", side_effect=RuntimeError("internal detail")):
+            result = self.registry.execute(
+                "cuk_compile_check",
+                {"source": "jancuk\\nhedeh 42\\nselesai jancuk\\n"},
+            )
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["error"], "CUK_COMPILER_INTERNAL_ERROR")
+        self.assertEqual(result["semantic_review"]["status"], "compiler_internal_error")
+        self.assertNotIn("internal detail", result["diagnostic"])
+        self.assertIs(result["executed"], False)
+
     def test_tool_binding_resolves_to_named_registered_rule(self):
         self.assertEqual(_TOOL_RULE_BINDINGS["budget_threshold"], "budget.threshold.v1")
         names = [item["function"]["name"] for item in self.registry.definitions]
