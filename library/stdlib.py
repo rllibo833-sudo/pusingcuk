@@ -156,7 +156,10 @@ def _max(a: Any, b: Any) -> int | float:
 
 
 def _round(value: Any) -> int:
-    return round(_numeric("bulatkan", value))
+    result = round(_numeric("bulatkan", value))
+    if abs(result) > _MAX_SAFE_INTEGER:
+        raise ValueError("bulatkan() menghasilkan integer di luar rentang aman lintas target")
+    return result
 
 
 def _sqrt(value: Any) -> int | float:
