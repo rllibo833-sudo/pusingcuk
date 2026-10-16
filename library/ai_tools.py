@@ -287,7 +287,7 @@ class ToolRegistry:
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "topic": {"type": "string", "enum": ["general", "builtins", "js", "formats", "fixtures", "semantics"]}
+                        "topic": {"type": "string", "enum": ["general", "builtins", "js", "native", "formats", "fixtures", "semantics"]}
                     },
                     "required": [],
                     "additionalProperties": False,
@@ -341,7 +341,7 @@ class ToolRegistry:
             if set(arguments) - {"topic"}:
                 return {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"}
             topic = arguments.get("topic", "general")
-            if topic not in {"general", "builtins", "js", "formats", "fixtures", "semantics"}:
+            if topic not in {"general", "builtins", "js", "native", "formats", "fixtures", "semantics"}:
                 return {"ok": False, "error": "COMPILER_CONTEXT_TOPIC_INVALID"}
             entries = BUILTIN_CONTRACT["builtins"]
             try:
@@ -361,6 +361,22 @@ class ToolRegistry:
                     "supported_builtins": [entry["name"] for entry in entries if entry["backends"]["js"]["status"] == "supported"],
                     "unsupported_builtins": [entry["name"] for entry in entries if entry["backends"]["js"]["status"] != "supported"],
                     "backend_nodes": ["Program", "Declare", "Assign", "Input", "Print", "If", "While", "For", "Function", "Return", "Literal", "Variable", "Unary", "Binary", "Try", "List", "Dict", "Index", "IndexAssign", "Call"],
+                }
+            elif topic == "native":
+                native_fixtures = [
+                    fixture for fixture in fixtures
+                    if isinstance(fixture, dict)
+                    and isinstance(fixture.get("runtimes"), dict)
+                    and fixture["runtimes"].get("native") in {"required", "unsupported"}
+                ]
+                result = {
+                    "baseline_role": "Native C is the second runtime for the explicitly supported subset; reference-only features must not be presented as native parity.",
+                    "supported_builtins": [entry["name"] for entry in entries if entry["backends"].get("native_c", {}).get("status") == "supported"],
+                    "unsupported_builtins": [entry["name"] for entry in entries if entry["backends"].get("native_c", {}).get("status") != "supported"],
+                    "fixture_count": len(native_fixtures),
+                    "required_fixture_ids": [fixture["id"] for fixture in native_fixtures if fixture["runtimes"].get("native") == "required"],
+                    "unsupported_fixture_ids": [fixture["id"] for fixture in native_fixtures if fixture["runtimes"].get("native") == "unsupported"],
+                    "parity_rule": "Only fixtures marked required for both reference and native establish the shared baseline; unsupported is not a pass.",
                 }
             elif topic == "formats":
                 names = {"json_teks", "json_baca", "html_aman", "csv_baris"}
