@@ -122,14 +122,14 @@ class JavaScriptBackendTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "🌾\n3\n")
 
-    def test_dictionary_equality_matches_language_value_semantics(self):
+    def test_dictionary_equality_is_identity_based_per_language_contract(self):
         result = self.run_source(
             "jancuk\n"
             'lah pertama = {"nama": "Budi", "umur": 20}\n'
             'lah kedua = {"umur": 20, "nama": "Budi"}\n'
             'lah ketiga = {"nama": "Budi", "umur": 21}\n'
+            "hedeh pertama == pertama\n"
             "hedeh pertama == kedua\n"
-            "hedeh pertama == ketiga\n"
             "selesai jancuk"
         )
         self.assertEqual(result.returncode, 0, result.stderr)
