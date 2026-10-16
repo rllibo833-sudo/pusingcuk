@@ -1,5 +1,6 @@
 # Registered period-close rule. It computes the result and every closing-line amount.
-# Output contract: status, net result, income D/C, expense D/C, retained earnings D/C.
+# Output contract for valid input: status, net result, income D/C, expense D/C, retained earnings D/C.
+# Invalid input emits only INPUT_TIDAK_VALID; it must never resemble a journal plan.
 # This rule plans only; CukAccount remains responsible for posting and audit records.
 
 jancuk
@@ -25,25 +26,31 @@ tanya pendapatan_teks = ""
 tanya beban_teks = ""
 lah pendapatan_total = bilangan(pendapatan_teks)
 lah beban_total = bilangan(beban_teks)
-lah hasil_bersih = pendapatan_total - beban_total
-lah debit_laba_ditahan = 0
-lah kredit_laba_ditahan = 0
+lah status = status_penutupan_periode(pendapatan_total, beban_total)
 
-njir hasil_bersih > 0
-    kredit_laba_ditahan = hasil_bersih
+njir status == "INPUT_TIDAK_VALID"
+    hedeh status
 kampret
-    njir hasil_bersih < 0
-        debit_laba_ditahan = 0 - hasil_bersih
-    selesai njir
-selesai njir
+    lah hasil_bersih = pendapatan_total - beban_total
+    lah debit_laba_ditahan = 0
+    lah kredit_laba_ditahan = 0
 
-hedeh status_penutupan_periode(pendapatan_total, beban_total)
-hedeh hasil_bersih
-hedeh pendapatan_total
-hedeh 0
-hedeh 0
-hedeh beban_total
-hedeh debit_laba_ditahan
-hedeh kredit_laba_ditahan
+    njir hasil_bersih > 0
+        kredit_laba_ditahan = hasil_bersih
+    kampret
+        njir hasil_bersih < 0
+            debit_laba_ditahan = 0 - hasil_bersih
+        selesai njir
+    selesai njir
+
+    hedeh status
+    hedeh hasil_bersih
+    hedeh pendapatan_total
+    hedeh 0
+    hedeh 0
+    hedeh beban_total
+    hedeh debit_laba_ditahan
+    hedeh kredit_laba_ditahan
+selesai njir
 
 selesai jancuk
