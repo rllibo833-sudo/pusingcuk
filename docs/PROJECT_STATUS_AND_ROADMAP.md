@@ -279,3 +279,12 @@ Tes regresi mengikat kasus sintaks rusak dan kesalahan domain runtime ke fixture
 - Tes regresi meliputi kompilasi sukses (tanpa klaim runtime), sintaks rusak dengan lokasi/petunjuk, kesalahan compiler internal, fixture sintaks negatif, fixture kesalahan domain runtime, dan ID fixture yang tidak dikenal.
 - **Gerbang CI pada commit yang sama** [`421660f14a16a0016ef49a228ded4c0b3ba0f30f`](https://github.com/rllibo833-sudo/pusingcuk/commit/421660f14a16a0016ef49a228ded4c0b3ba0f30f) lulus: [Actions run 38912777295](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38912777295). Python 3.11, Python 3.12, native GCC, native Clang, dan job regresi keamanan PVM semuanya berstatus sukses.
 - Tidak ada semantik bahasa baru yang ditambahkan pada perubahan ini; karena itu tidak ada klaim dukungan backend baru. Perubahan semantik berikutnya tetap wajib menyelaraskan `SPEC.md`, kontrak semantik, implementasi, fixture positif/negatif, dan label dukungan target.
+
+## Regresi semantik konkatenasi list — 17 Oktober 2026
+
+- Celah yang ditelusuri: evaluator referensi Python menerima operator `+` untuk dua list dan menghasilkan list baru, sedangkan runtime native C sebelumnya menolak operand list.
+- Kontrak kini menyatakan konkatenasi dua list mempertahankan urutan dan tidak memutasi kedua operand. Implementasi native membangun list hasil baru dan tetap mematuhi batas kapasitas native 256 item.
+- Fixture `collections.list-concatenation` diwajibkan pada reference dan native; ia memeriksa panjang/elemen hasil serta panjang kedua operand setelah operasi. Tes unit evaluator mengunci hasil dan non-mutasi.
+- Sinkronisasi mencakup `SPEC.md`, kontrak semantik, implementasi C, manifest dan source fixture, katalog cakupan konformansi, panduan runtime native, dan matriks kompatibilitas.
+- Gerbang penerimaan tetap `python -m unittest discover -s tests -v`, `make test-native`, dan `python tools/conformance.py` pada commit kode yang sama. Keberhasilan belum boleh diklaim sebelum hasil Actions untuk commit tersebut terkonfirmasi.
+
