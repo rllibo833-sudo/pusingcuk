@@ -23,7 +23,7 @@ Pusingcuk is an experimental programming language built around Indonesian-friend
 >
 > **Security warning:** Eksekusi PusingCuk tidak ter-sandbox OS. Jangan jalankan kode tidak terpercaya. Execution runs with the current process's operating-system permissions; do not run untrusted code or bytecode.
 >
-> **Status & roadmap (15 Oct 2026):** lihat [audit status bahasa, AI dan Supabase](docs/PROJECT_STATUS_AND_ROADMAP.md). Bahasa `.cuk` dan aplikasi PusingCuk AI mempunyai tingkat kematangan berbeda. AI adalah aplikasi di atas Ollama atau Gemini, bukan foundation model yang dilatih sendiri. Supabase project PusingCuk saat ini belum menjadi koneksi runtime.
+> **Status & roadmap (16 Oct 2026):** lihat [audit status bahasa, AI dan Supabase](docs/PROJECT_STATUS_AND_ROADMAP.md). Bahasa `.cuk` dan aplikasi PusingCuk AI mempunyai tingkat kematangan berbeda. AI adalah aplikasi di atas Ollama atau Gemini, bukan foundation model yang dilatih sendiri. Supabase project PusingCuk saat ini belum menjadi koneksi runtime.
 
 ## Try Pusingcuk on Termux
 
@@ -194,3 +194,10 @@ Siklus peningkatan PusingCuk AI yang dapat diverifikasi:
 Ini adalah peningkatan berbasis konteks, aturan deterministik, dan evaluasi regresi—bukan bukti bahwa bobot model telah dilatih ulang. Bahasa masih eksperimental; native C, transpiler, dan VM memiliki cakupan yang berbeda. Eksekusi .cuk bukan sandbox OS, jadi jangan jalankan kode tak tepercaya.
 
 Acuan aplikasi: [CukAccount — spesifikasi dan roadmap](https://github.com/rllibo833-sudo/Cukaccount/blob/main/CUKACCOUNT_SPEC_AND_ROADMAP.md). Status APK CukAccount saat ini adalah APK uji, bukan rilis produksi.
+
+
+## Siklus penerimaan CukAccount ↔ PusingCuk AI ↔ `.cuk` — 16 Oktober 2026
+
+CukAccount menyediakan kebutuhan akuntansi dan fixture sintetis; aturan `.cuk` serta `ToolRegistry` PusingCuk AI menganalisis kasus deterministik; hasilnya dibandingkan kembali dengan output Dart/SQLite. Workflow CukAccount mem-pin commit PusingCuk `862402c1e8243394ecbc3d3c469a15a5e19a0c95` dan membandingkan dataset bersama, termasuk rencana penutupan laba/rugi/nol serta input tidak valid.
+
+**Batas bukti:** [tes upstream PusingCuk](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38826340175) pada pin tersebut sukses. Itu tidak membuktikan Flutter checks CukAccount pada head UI terbaru lulus; perubahan UI terbaru belum terverifikasi dan pemeriksaan format gagal. Sukses upstream saja tidak menutup siklus.

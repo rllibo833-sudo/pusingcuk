@@ -1,6 +1,6 @@
 # Status teknis dan roadmap PusingCuk
 
-**Audit:** 15 Oktober 2026  
+**Status sinkronisasi:** 16 Oktober 2026  
 **Cakupan:** repositori `rllibo833-sudo/pusingcuk`, runtime bahasa `.cuk`, aplikasi AI, dokumentasi, CI, dan proyek Supabase yang dipetakan.  
 **Status audit:** pembaruan dikerjakan langsung di `main`; periksa hasil Actions terbaru pada commit yang hendak dipakai. Tes utama kini mengunci versi bahasa/paket, alias, fixture konformansi, benchmark retrieval, serta batas klaim rilis.
 
@@ -198,3 +198,11 @@ Audit ini tidak menyatakan bahasa stabil atau AI akurat secara umum. Database Su
 - [Peta project Supabase](integrations/SUPABASE_PROJECTS.md)
 - [CI utama](https://github.com/rllibo833-sudo/pusingcuk/actions/workflows/tests.yml)
 - [Build CLI](https://github.com/rllibo833-sudo/pusingcuk/actions/workflows/build-test.yml)
+
+
+## Sinkronisasi lintas-repo — 16 Oktober 2026
+
+- Pin PusingCuk yang digunakan CukAccount: `862402c1e8243394ecbc3d3c469a15a5e19a0c95`; beberapa catatan historis masih menyebut pin lama `994b90ca` dan harus diperlakukan sebagai bukti historis.
+- Tes upstream pada pin saat ini: [run 38826340175](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38826340175) sukses.
+- Status UI CukAccount pada `d86a665e3e404fc7aff02548c12b5872158078b6`: belum terverifikasi lulus; kegagalan `dart format` harus dibereskan sebelum mengklaim integrasi penuh.
+- Siklus penerimaan tetap: fixture akuntansi sintetis dari CukAccount → aturan `.cuk`/ToolRegistry → perbandingan output penuh → fixture regresi yang sama kembali di CukAccount. Sukses tes upstream saja tidak menutup siklus.
