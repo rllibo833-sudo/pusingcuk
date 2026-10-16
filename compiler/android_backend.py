@@ -38,18 +38,36 @@ def generate(document, package_name="org.pusingcuk.generated",
             if op == "-": return f"pcNeg({value})"
             if op in ("!", "tidak"): return f"!pcTruthy({value})"
             raise AndroidBackendError(f"baris {line}: operator unary {op!r} belum didukung")
+        if kind == "List":
+            values = ", ".join(expression(item) for item in f["items"])
+            return f"pcList({values})" if values else "new java.util.ArrayList<>()"
+        if kind == "Dict":
+            pairs = []
+            for pair in f["items"]:
+                if not isinstance(pair, list) or len(pair) != 2:
+                    raise AndroidBackendError(f"baris {line}: bentuk kamus IR tidak valid")
+                pairs.extend((expression(pair[0]), expression(pair[1])))
+            return f"pcMapOf({', '.join(pairs)})" if pairs else "new java.util.LinkedHashMap<>()"
+        if kind == "Index":
+            return f"pcGet({expression(f['collection'])}, {expression(f['index'])})"
         if kind == "Binary":
             op = f["op"]; a, b = expression(f["left"]), expression(f["right"])
             if op == "+": return f"pcAdd({a}, {b})"
-            if op in ("-", "*", "/"):
-                return f"pc{ {'-':'Sub','*':'Mul','/':'Div'}[op] }({a}, {b})"
+            if op in ("-", "*", "/", "//", "%"):
+                return f"pc{ {'-':'Sub','*':'Mul','/':'Div','//':'FloorDiv','%':'Mod'}[op] }({a}, {b})"
             if op in ("==", "!="):
                 eq = f"java.util.Objects.equals({a}, {b})"
                 return eq if op == "==" else f"!({eq})"
             if op in ("<", "<=", ">", ">="): return f"pcCompare({a}, {b}, {json.dumps(op)})"
+            if op in ("dan", "atau"):
+                return f"Boolean.valueOf({'pcTruthy(' + a + ') && pcTruthy(' + b + ')' if op == 'dan' else 'pcTruthy(' + a + ') || pcTruthy(' + b + ')'})"
             raise AndroidBackendError(f"baris {line}: operator {op!r} belum didukung")
-        if kind == "Call" and f["name"] == "teks" and len(f["args"]) == 1:
-            return f"pcText({expression(f['args'][0])})"
+        if kind == "Call":
+            name, args = f["name"], [expression(arg) for arg in f["args"]]
+            builtins = {"teks": ("pcText", 1), "panjang": ("pcLength", 1),
+                        "bilangan": ("pcInteger", 1), "desimal": ("pcNum", 1)}
+            if name in builtins and len(args) == builtins[name][1]:
+                return f"{builtins[name][0]}({', '.join(args)})"
         raise AndroidBackendError(f"baris {line}: ekspresi {kind!r} belum didukung Android")
 
     def walk_statements(items):
@@ -66,6 +84,14 @@ def generate(document, package_name="org.pusingcuk.generated",
                 walk_statements(fields["then_body"])
                 walk_statements(fields["else_body"])
             elif kind == "While":
+                walk_statements(fields["body"])
+            elif kind == "For":
+                name = fields["name"]
+                if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+                    raise AndroidBackendError(f"baris {item.get('line', 0)}: nama iterasi tidak valid")
+                if name in variables:
+                    raise AndroidBackendError(f"baris {item.get('line', 0)}: nama iterasi {name!r} bertabrakan dengan variabel")
+                variables[name] = "pcv_" + name
                 walk_statements(fields["body"])
 
     walk_statements(document["program"]["fields"]["body"])
@@ -95,9 +121,21 @@ def generate(document, package_name="org.pusingcuk.generated",
                 lines.append(f"{indent}while (pcTruthy({expression(f['condition'])})) {{")
                 emit(f["body"], indent + "    ")
                 lines.append(f"{indent}}}")
+            elif kind == "For":
+                name = variables[f["name"]]
+                loop_id = emit.loop_id
+                emit.loop_id += 1
+                item_name = f"pcLoopItem{loop_id}"
+                lines.append(f"{indent}for (Object {item_name} : pcIterable({expression(f['iterable'])})) {{")
+                lines.append(f"{indent}    {name} = {item_name};")
+                emit(f["body"], indent + "    ")
+                lines.append(f"{indent}}}")
+            elif kind == "IndexAssign":
+                lines.append(f"{indent}pcSet({expression(f['collection'])}, {expression(f['index'])}, {expression(f['value'])});")
             else:
                 raise AndroidBackendError(f"baris {line}: pernyataan {kind!r} belum didukung Android; tidak ada fallback")
 
+    emit.loop_id = 0
     emit(document["program"]["fields"]["body"])
     body = "\n".join(lines) or '            output.append("Program .cuk kosong");'
     return f'''package {package_name};
@@ -106,6 +144,10 @@ import android.os.Bundle;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class {class_name} extends Activity {{
     @Override public void onCreate(Bundle state) {{
@@ -131,6 +173,67 @@ public final class {class_name} extends Activity {{
         return true;
     }}
     private static Object pcNeg(Object value) {{ return Double.valueOf(-pcNum(value)); }}
+    private static List<Object> pcList(Object... values) {{
+        List<Object> result = new ArrayList<>();
+        java.util.Collections.addAll(result, values);
+        return result;
+    }}
+    private static Map<Object,Object> pcMap() {{ return new LinkedHashMap<>(); }}
+    private static Object pcPut(Map<Object,Object> map, Object key, Object value) {{ map.put(key, value); return value; }}
+    private static Map<Object,Object> pcMapOf(Object... ignored) {{
+        Map<Object,Object> result = new LinkedHashMap<>();
+        for (int i = 0; i + 1 < ignored.length; i += 2) result.put(ignored[i], ignored[i + 1]);
+        return result;
+    }}
+    private static Object pcGet(Object collection, Object key) {{
+        if (collection instanceof List && key instanceof Number) {{
+            int i = ((Number)key).intValue(); List<?> list = (List<?>)collection;
+            if (i < 0 || i >= list.size()) throw new IndexOutOfBoundsException("indeks di luar batas");
+            return list.get(i);
+        }}
+        if (collection instanceof String && key instanceof Number) {{
+            int i = ((Number)key).intValue(); String value = (String)collection;
+            if (i < 0 || i >= value.length()) throw new IndexOutOfBoundsException("indeks di luar batas");
+            return String.valueOf(value.charAt(i));
+        }}
+        if (collection instanceof Map) {{
+            Map<?,?> map = (Map<?,?>)collection;
+            if (!map.containsKey(key)) throw new IllegalArgumentException("kunci kamus tidak ditemukan");
+            return map.get(key);
+        }}
+        throw new IllegalArgumentException("nilai tidak dapat diindeks");
+    }}
+    @SuppressWarnings("unchecked")
+    private static Object pcSet(Object collection, Object key, Object value) {{
+        if (collection instanceof List && key instanceof Number) {{
+            int i = ((Number)key).intValue(); List<Object> list = (List<Object>)collection;
+            if (i < 0 || i >= list.size()) throw new IndexOutOfBoundsException("indeks di luar batas");
+            list.set(i, value); return value;
+        }}
+        if (collection instanceof Map) {{ ((Map<Object,Object>)collection).put(key, value); return value; }}
+        throw new IllegalArgumentException("target indeks tidak dapat diubah");
+    }}
+    private static Iterable<?> pcIterable(Object value) {{
+        if (value instanceof Iterable) return (Iterable<?>)value;
+        if (value instanceof Map) return ((Map<?,?>)value).keySet();
+        if (value instanceof String) {{
+            List<String> chars = new ArrayList<>();
+            for (int i = 0; i < ((String)value).length(); i++) chars.add(String.valueOf(((String)value).charAt(i)));
+            return chars;
+        }}
+        throw new IllegalArgumentException("nilai tidak dapat diulang");
+    }}
+    private static int pcLength(Object value) {{
+        if (value instanceof String) return ((String)value).length();
+        if (value instanceof List) return ((List<?>)value).size();
+        if (value instanceof Map) return ((Map<?,?>)value).size();
+        throw new IllegalArgumentException("panjang() membutuhkan teks, daftar, atau kamus");
+    }}
+    private static Long pcInteger(Object value) {{
+        if (value instanceof Number) return Long.valueOf(((Number)value).longValue());
+        if (value instanceof String) return Long.valueOf(Long.parseLong(((String)value).trim()));
+        throw new IllegalArgumentException("bilangan() membutuhkan angka atau teks integer");
+    }}
     private static double pcNum(Object x) {{
         if (x instanceof Number) return ((Number)x).doubleValue();
         throw new IllegalArgumentException("operasi membutuhkan angka");
@@ -144,6 +247,11 @@ public final class {class_name} extends Activity {{
     private static Object pcDiv(Object a, Object b) {{
         if (pcNum(b) == 0.0) throw new ArithmeticException("pembagian dengan nol");
         return Double.valueOf(pcNum(a) / pcNum(b));
+    }}
+    private static Object pcFloorDiv(Object a, Object b) {{ return Double.valueOf(Math.floor(pcNum(a) / pcNum(b))); }}
+    private static Object pcMod(Object a, Object b) {{
+        double divisor = pcNum(b); if (divisor == 0.0) throw new ArithmeticException("modulo dengan nol");
+        return Double.valueOf(((pcNum(a) % divisor) + divisor) % divisor);
     }}
     private static boolean pcCompare(Object a, Object b, String op) {{
         int c;
