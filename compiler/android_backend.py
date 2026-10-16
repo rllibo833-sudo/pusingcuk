@@ -149,12 +149,13 @@ def generate(document, package_name="org.pusingcuk.generated",
             else:
                 raise AndroidBackendError(f"baris {line}: pernyataan {kind!r} belum didukung Android; tidak ada fallback")
 
+    declarations = "\n".join(lines[:len(variables)])
     emit.loop_id = 0
     emit(document["program"]["fields"]["body"])
+    execution_body = "\n".join(lines[len(variables):]) or '            output.append("Program .cuk kosong");'
     input_fields_add = "\n".join(f"        inputFields.add(input{i});" for i in range(len(inputs)))
     input_assignments = "\n".join(f"            {variables[item['name']]} = inputFields.get({i}).getText().toString();" for i, item in enumerate(inputs))
     input_ui = "\n".join(f"        EditText input{i} = new EditText(this); input{i}.setSingleLine(true); input{i}.setHint({json.dumps(item['prompt'], ensure_ascii=True)}); layout.addView(input{i});" for i, item in enumerate(inputs))
-    body = "\n".join(lines) or '            output.append("Program .cuk kosong");'
     return f'''package {package_name};
 import android.app.Activity;
 import android.os.Bundle;
@@ -191,8 +192,9 @@ public final class {class_name} extends Activity {{
         run.setOnClickListener(view -> {{
             StringBuilder output = new StringBuilder();
             try {{
-{body}
+{declarations}
 {input_assignments}
+{execution_body}
             }} catch (RuntimeException error) {{
                 output.append("Kesalahan .cuk: ").append(error.getMessage());
             }}
