@@ -38,6 +38,8 @@ class AssistantTests(unittest.TestCase):
         self.assertIn("tulis implementasi utamanya dalam source `.cuk`", self.provider.calls[0]["system_prompt"])
         self.assertIn("interpreter, lexer/parser, AST/evaluator", self.provider.calls[0]["system_prompt"])
         self.assertIn("status `compile_only` bukan bukti", self.provider.calls[0]["system_prompt"])
+        self.assertIn("KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI", self.provider.calls[0]["system_prompt"])
+        self.assertIn("hanya runner terpisah yang benar-benar menjalankan pengujian", self.provider.calls[0]["system_prompt"])
         self.assertIn("LOCAL", self.provider.calls[0]["system_prompt"].upper())
         self.assertIn("Sumber rujukan", answer)
         self.assertIn("733d4328a8d4433b1633e8d3bba9601786c2e08a", answer)
