@@ -20,16 +20,28 @@ _MAX_CUK_SOURCE_BYTES = 16 * 1024
 
 
 def _cuk_language_identity(source: str) -> dict[str, Any]:
-    """Describe the actual PusingCuk vocabulary present in a source snippet."""
-    words = re.findall(r"\b[^\W\d]\w*\b", source, flags=re.UNICODE)
-    aliases_used = list(dict.fromkeys(word for word in words if word in KEYWORD_ALIASES))
+    """Describe official aliases recognized as tokens, not words in comments/strings."""
+    from lexer import lex
+
+    line_offsets = [0]
+    line_offsets.extend(index + 1 for index, char in enumerate(source) if char == "\n")
+    aliases_used = []
+    seen = set()
+    for token in lex(source):
+        if token.kind != "KEYWORD":
+            continue
+        offset = line_offsets[token.line - 1] + token.column - 1
+        match = re.match(r"[^\W\d]\w*", source[offset:], flags=re.UNICODE)
+        if not match:
+            continue
+        word = match.group(0)
+        if word in KEYWORD_ALIASES and word not in seen:
+            seen.add(word)
+            aliases_used.append({"word": word, "canonical": KEYWORD_ALIASES[word]})
     return {
         "opening_form": "jancuk",
         "closing_form": "selesai jancuk",
-        "aliases_used": [
-            {"word": alias, "canonical": KEYWORD_ALIASES[alias]}
-            for alias in aliases_used
-        ],
+        "aliases_used": aliases_used,
     }
 
 _MAX_RULE_INPUT = 1_000_000_000_000
