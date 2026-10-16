@@ -25,7 +25,7 @@ Pusingcuk harus mudah dimulai oleh pemula, tetap dapat dipakai untuk proyek seri
 | Android melalui Termux | Ada skrip instalasi dan panduan | Pengujian perangkat fisik masih perlu dilakukan |
 | Windows / macOS | Belum menjadi target native yang terverifikasi | Jangan menjanjikan kompatibilitas native sebelum ada CI dan tes platform |
 | Interpreter Python | Unit test berjalan pada Python 3.11 dan 3.12 di CI; 25 built-in terkontrak tersedia di interpreter referensi | Ini jalur referensi pengembangan, bukan runtime mandiri |
-| Runtime native C | Fixture mencakup 25 nama built-in dan konkatenasi list pada subset yang diuji; konversi scalar tetap dibatasi sesuai [panduan runtime native](NATIVE_RUNTIME.md) | `teks()` tidak memformat koleksi; list dibatasi 256 item; runtime bukan sandbox dan modul/file/jaringan belum tersedia |
+| Runtime native C | Fixture mencakup 25 nama built-in, konkatenasi list, dan pembacaan indeks rentang pada subset yang diuji; konversi scalar tetap dibatasi sesuai [panduan runtime native](NATIVE_RUNTIME.md) | `teks()` tidak memformat koleksi; list dibatasi 256 item; runtime bukan sandbox dan modul/file/jaringan belum tersedia |
 | Modul dan paket | Belum tersedia penuh pada native | Impor modul bukan kontrak portabel saat ini |
 | UTF-8 | Berkas sumber dibaca sebagai teks UTF-8 pada CLI Python; native menangani sebagian operasi UTF-8 | Validasi UTF-8 penuh, normalisasi, dan semantik Unicode lintas runtime belum dijamin |
 | File, jaringan, database | Belum ada pustaka standar lintas runtime yang lengkap | Gunakan hanya API yang secara eksplisit tersedia pada runtime target |
