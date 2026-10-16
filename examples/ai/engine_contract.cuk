@@ -60,6 +60,10 @@ hedeh status_keluaran("Jawaban berbasis sumber.")
 hedeh status_bukti_kode("lulus", "belum_dijalankan")
 hedeh status_bukti_kode("lulus", "lulus")
 hedeh status_bukti_kode("ditolak", "belum_dijalankan")
+hedeh status_bukti_kode("lulus", "gagal")
+hedeh status_bukti_kode("gagal", "belum_dijalankan")
+hedeh status_bukti_kode("lulus", "status_tidak_dikenal")
+hedeh status_bukti_kode("status_tidak_dikenal", "lulus")
 hedeh susun_prompt("Kontrak runtime lokal.", "Apa batas tool?")
 
 selesai jancuk
