@@ -1,6 +1,6 @@
 # CukAccount integration contract
 
-PusingCuk's integration branch for CukAccount is named `in-this-economy`. Keep this branch separate from `main` until reviewed and tested.
+CukAccount integration work is maintained against PusingCuk `main`; the previously documented `in-this-economy` branch is not present in the current repository branch list. Do not rely on that stale branch name or create another branch as part of this workflow.
 
 ## Why this project exists
 CukAccount is the first real application project used to strengthen `.cuk` as an independent programming language and to train/evaluate the currently local PusingCuk AI. The app is a practical testbed for compiler diagnostics, deterministic language rules, integration fixtures, and regression cases—not a claim that CukAccount is already compiled entirely from `.cuk`.
@@ -13,6 +13,12 @@ CukAccount is the first real application project used to strengthen `.cuk` as an
 - AI-generated output is advisory only. It must not post, mutate, delete, or commit financial records.
 - The journal-balance rule checks supplied totals only. It does not validate individual journal lines, account status, period status, or posting permissions.
 - Cross-repository CI should pin the exact PusingCuk commit SHA rather than depend on a moving branch ref.
+
+## Current Android build boundary
+
+The workflow `.github/workflows/android-studio-apk.yml` builds the separate PusingCuk Studio APK and is manual-only. A successful Studio build is not evidence of a CukAccount APK or accounting functionality. The current generic Android compiler backend emits a small Activity for a limited .cuk subset; it does not by itself provide CukAccount navigation, persistent accounting storage, journal posting, audit records, or reconciled reports.
+
+Do not mark the CukAccount Android target complete until a dedicated artifact has the expected CukAccount application identity and normal/professional modes, offline persistence, journal posting, and reports verified against the same synthetic domain cases used by the .cuk rules. Keep financial posting authority in the app's deterministic domain layer; PusingCuk AI remains advisory.
 
 ## Accounting example
 The file examples/accounting/report_equation.cuk is a synthetic educational fixture for profit calculation and the basic accounting equation. It is not a complete financial-report engine or a claim of compliance with SAK/PSAK or Islamic accounting standards.
