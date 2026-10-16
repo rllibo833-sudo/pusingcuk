@@ -140,3 +140,8 @@ Keep the 22-source curated index, 22-case baseline and 12-case adversarial corpu
 ## AI engine evidence-status regression
 
 `examples/ai/engine_contract.cuk` is the language-owned source of the deterministic compile/runtime evidence labels. Regression tests execute it through both the Python reference interpreter and generated JavaScript, and require each supported status to appear in both outputs. A successful compile-check remains explicitly **not runtime proof**; only a separately observed runtime result may be labeled runtime-tested.
+
+
+### Compile-check input rejection
+
+The `cuk_compile_check` host boundary classifies empty/non-string source, embedded NUL, invalid UTF-8 encodability, and oversized source before compilation. Invalid source text consistently reports `SOURCE_INPUT_TIDAK_VALID`; source size is measured in UTF-8 bytes, with values above 16 KiB reporting `SOURCE_MELEBIHI_BATAS`. Regression tests cover malformed inputs and the byte-size boundary.

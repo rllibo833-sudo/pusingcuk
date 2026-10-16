@@ -80,6 +80,42 @@ class ToolInputContractTests(unittest.TestCase):
             {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"},
         )
 
+
+    def test_cuk_compile_check_classifies_malformed_text_consistently(self):
+        invalid_sources = (
+            None,
+            42,
+            "\\x00",
+            "jancuk\\nhedeh \\ud800\\nselesai jancuk",
+        )
+        for source in invalid_sources:
+            with self.subTest(source=repr(source)):
+                result = self.registry.execute("cuk_compile_check", {"source": source})
+                self.assertEqual(
+                    result,
+                    {
+                        "ok": False,
+                        "error": "CUK_SOURCE_INVALID",
+                        "evidence_status": "SOURCE_INPUT_TIDAK_VALID",
+                    },
+                )
+
+    def test_cuk_compile_check_enforces_source_size_in_utf8_bytes(self):
+        # The limit is measured in encoded bytes, not Unicode character count.
+        at_limit = "a" * (16 * 1024)
+        over_limit = "é" * (8 * 1024 + 1)
+        at_limit_result = self.registry.execute("cuk_compile_check", {"source": at_limit})
+        over_limit_result = self.registry.execute("cuk_compile_check", {"source": over_limit})
+        self.assertNotEqual(at_limit_result.get("error"), "CUK_SOURCE_TOO_LARGE")
+        self.assertEqual(
+            over_limit_result,
+            {
+                "ok": False,
+                "error": "CUK_SOURCE_TOO_LARGE",
+                "evidence_status": "SOURCE_MELEBIHI_BATAS",
+            },
+        )
+
     def test_cuk_compile_check_distinguishes_internal_compiler_failure(self):
         with patch("library.ai_tools.generate", side_effect=RuntimeError("internal detail")):
             result = self.registry.execute(

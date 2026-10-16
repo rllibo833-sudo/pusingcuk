@@ -532,11 +532,19 @@ class ToolRegistry:
             if not isinstance(source, str) or not source.strip():
                 return {"ok": False, "error": "CUK_SOURCE_INVALID", "evidence_status": "SOURCE_INPUT_TIDAK_VALID"}
             if "\x00" in source:
-                return {"ok": False, "error": "CUK_SOURCE_INVALID"}
+                return {
+                    "ok": False,
+                    "error": "CUK_SOURCE_INVALID",
+                    "evidence_status": "SOURCE_INPUT_TIDAK_VALID",
+                }
             try:
                 source_bytes = source.encode("utf-8")
             except UnicodeEncodeError:
-                return {"ok": False, "error": "CUK_SOURCE_INVALID"}
+                return {
+                    "ok": False,
+                    "error": "CUK_SOURCE_INVALID",
+                    "evidence_status": "SOURCE_INPUT_TIDAK_VALID",
+                }
             if len(source_bytes) > _MAX_CUK_SOURCE_BYTES:
                 return {"ok": False, "error": "CUK_SOURCE_TOO_LARGE", "evidence_status": "SOURCE_MELEBIHI_BATAS"}
             language_identity = {
