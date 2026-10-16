@@ -50,3 +50,30 @@ A change to this loop is complete only when the relevant source/tool behavior is
 PusingCuk AI uses one request orchestrator and a fixed registry of three tools (curated knowledge search, `.cuk` compile-check, and the registered budget rule). Do not create autonomous subagents or allow the model to register tools dynamically. Each request permits at most three model turns and four tool calls in total; exceeding the budget stops further tool execution and must be reported without claiming completion. Provider choice changes inference transport, not authority, tool permissions, or `.cuk` semantics. Any future specialist must first demonstrate a distinct task that cannot be handled by a bounded registered tool, and must have a hard call/latency budget and deterministic evaluation.
 
 For `.cuk` learning, preserve one language contract and build progressive examples on top of it: a beginner should be able to copy a tiny working program, change one value, read an Indonesian diagnostic, and re-run the compiler; advanced users should have the same explicit types, errors, and conformance rules rather than a separate “AI syntax.” Slang and Gen Z/Gen Alpha tone belong in teaching, examples, and diagnostics where clarity survives; they must not create ambiguous grammar or change runtime semantics. A language feature is accepted only when its specification, compiler behavior, and relevant conformance fixture agree.
+
+## Evidence-driven self-tuning loop
+
+“Self-tuning” initially means improving the assistant's reviewed knowledge and candidate-generation strategy from reproducible compiler evidence; it does **not** mean the model can rewrite its own weights, redefine language semantics, or merge code without review.
+
+For each real compiler failure or missing capability:
+
+1. Capture the smallest reproducible `.cuk` source, compiler version/commit, requested target, structured diagnostic, and expected behavior. Exclude credentials, personal data, and unrelated conversation text.
+2. Classify the failure as specification ambiguity, parser/IR gap, backend limitation, diagnostic defect, or model-generated source error. Do not label every compile failure a language defect.
+3. Ask the AI for a bounded candidate fix and a short explanation tied to the source-of-truth contract. Keep the original failure as evidence; do not relax validation merely to make the candidate compile.
+4. Verify only the relevant path: compiler acceptance, generated artifact, and—where execution matters—expected output. Record each stage separately. Add a permanent fixture only after expected behavior is settled.
+5. Feed the verified result back into curated language knowledge and examples so later requests can use it. Unverified candidates stay out of authoritative knowledge.
+6. Compare before/after outcomes on the same small evaluation set. Keep a change only if it improves the targeted behavior without breaking established semantics. Model-weight training is a separate optional future project, not required for this loop.
+
+## First application target: CukAccount Android
+
+The first product proof should move from a tiny standalone `.cuk` program to a compiler-built native component inside an Android package, then grow toward the actual CukAccount application. Build-time Python may orchestrate the compiler initially; the installed offline core must not depend on Python, a hosted AI, or network access.
+
+Acceptance must distinguish these milestones:
+- `.cuk` source is accepted by the selected compiler target.
+- Generated C is compiled with the Android NDK for the intended ABI.
+- The generated component is linked into the APK and called by the application, not merely copied into assets.
+- The APK installs and its compiled `.cuk` behavior works offline.
+- CukAccount screens, local persistence, and business operations are progressively moved to the `.cuk` path with parity evidence before any claim that the whole app is `.cuk`-built.
+
+The existing PusingCuk Studio APK is an editor/runner and is not proof of this CukAccount pipeline. Until the application-linking and offline runtime steps pass, report the pipeline as experimental/incomplete rather than complete.
+
