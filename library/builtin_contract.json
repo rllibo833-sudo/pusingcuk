@@ -363,7 +363,7 @@
           "via": "js"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "supported"
@@ -396,7 +396,7 @@
           "via": "js"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "supported"
@@ -429,7 +429,7 @@
           "via": "js"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "supported"
@@ -463,7 +463,7 @@
           "via": "js"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "supported"
