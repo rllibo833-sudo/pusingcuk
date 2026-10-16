@@ -10,7 +10,13 @@ import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
 import android.content.Intent;
+import android.net.Uri;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -22,13 +28,28 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
+import java.security.KeyStore;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class MainActivity extends Activity {
     private static final int MAX_SOURCE_BYTES = 64 * 1024, MAX_STDIN_BYTES = 16 * 1024;
+    private static final int MAX_AI_CONTEXT_CHARS = 12000, MAX_AI_QUESTION_CHARS = 3000;
+    private static final String AI_KEY_ALIAS = "org.pusingcuk.studio.gemini.key.v1";
+    private static final String AI_PREFS = "pusingcuk_ai_secure";
+    private static final String AI_KEY_PREF = "gemini_key_encrypted";
+    private static final String[] AI_MODEL_LABELS = {"Gemini 3.5 Flash-Lite · hemat", "Gemini 3.8 Flash · lebih kuat"};
+    private static final String[] AI_MODEL_IDS = {"gemini-3.5-flash-lite", "gemini-3.8-flash"};
+    private static final String AI_SYSTEM_INSTRUCTION = "Kamu membantu di PusingCuk Studio. Bantu pengguna pemula dengan bahasa Indonesia yang jelas dan tidak merendahkan. Bahasa target adalah .cuk versi 0.6-dev; jangan mengarang keyword, built-in, atau kemampuan runtime. Program biasanya dimulai dengan jancuk dan diakhiri selesai jancuk. Gunakan hanya sintaks .cuk yang dikenal, jangan mengasumsikan Python/JavaScript bisa langsung dipakai sebagai sintaks .cuk. Runtime aplikasi Android saat ini adalah subset native C: jelaskan bila fitur mungkin belum didukung. Jangan mengklaim source telah dikompilasi atau diuji jika belum ada bukti. Jangan meminta atau menampilkan secret dan jangan membuat kode untuk mengakses token atau menjalankan shell. Jika pengguna meminta program atau perbaikan source, sertakan satu blok kode berlabel cuk yang berisi program lengkap; selain itu jelaskan sesuai kebutuhan. Jawaban adalah saran AI eksternal, bukan hasil eksekusi ToolRegistry PusingCuk AI.";
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private EditText source, stdin;
     private TextView output, status;
-    private Button runButton;
+    private Button runButton, aiButton, applyAiButton;
+    private String pendingAiCode;
     private File runtime, compiledDemo, projectFile;
 
     private int dp(float n) { return (int)(n * getResources().getDisplayMetrics().density + 0.5f); }
@@ -58,7 +79,7 @@ public final class MainActivity extends Activity {
         cleanupStaleRunFiles();
         getWindow().setStatusBarColor(Color.rgb(10,15,28)); getWindow().setNavigationBarColor(Color.rgb(10,15,28));
         File dir = new File(getFilesDir(), "projects"); if (!dir.exists()) dir.mkdirs();
-        projectFile = new File(dir, "program.pusingcuk"); buildUi(); installRuntime(); loadProject();
+        projectFile = new File(dir, "program.cuk"); buildUi(); installRuntime(); loadProject();
     }
 
     // Cache files are app-private, but a force-stop can leave source files behind.
@@ -86,7 +107,11 @@ public final class MainActivity extends Activity {
         button("Buka proyek lokal",actions,v->loadProject());
         button("Impor file publik dari GitHub",actions,v->showGitHubImport());
         button("Bagikan / ekspor kode",actions,v->shareProject());
-        page.addView(label("program.pusingcuk",16,Color.WHITE));
+        aiButton = button("Bantuan PusingCuk AI · online (opsional)", actions, v -> showAiAssistant());
+        button("Buat / kelola API key Gemini", actions, v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://aistudio.google.com/app/apikey"))));
+        applyAiButton = button("Terapkan kode hasil AI ke editor", actions, v -> applyAiCode());
+        applyAiButton.setVisibility(View.GONE);
+        page.addView(label("program.cuk",16,Color.WHITE));
         source = editor("Tulis kode Pusingcuk di sini…",14); page.addView(source,new LinearLayout.LayoutParams(-1,dp(310)));
         page.addView(label("Input program (stdin) — satu baris per jawaban",14,Color.WHITE));
         stdin = editor("Contoh: Budi",2); page.addView(stdin,new LinearLayout.LayoutParams(-1,dp(80)));
@@ -211,7 +236,7 @@ public final class MainActivity extends Activity {
         LinearLayout form=column();form.setPadding(dp(18),0,dp(18),0);
         EditText owner=editor("Pemilik repo",1);owner.setText("rllibo833-sudo");
         EditText repo=editor("Nama repo",1);repo.setText("pusingcuk");
-        EditText path=editor("Path file .pusingcuk",1);path.setText("examples/native/rekap_anggaran.pusingcuk");
+        EditText path=editor("Path file .cuk",1);path.setText("examples/android_native_demo.cuk");
         form.addView(owner);form.addView(repo);form.addView(path);
         new AlertDialog.Builder(this).setTitle("Impor file publik GitHub")
           .setMessage("Versi awal membaca repo publik saja; belum mengirim commit ke GitHub.")
@@ -236,6 +261,239 @@ public final class MainActivity extends Activity {
             });
           }).show();
     }
+
+    // Optional online AI. Keys are encrypted by Android Keystore; editor source is opt-in.
+    private void showAiAssistant() {
+        LinearLayout form = column();
+        form.setPadding(dp(18), 0, dp(18), 0);
+        form.addView(label("Model AI", 14, Color.WHITE));
+        Spinner model = new Spinner(this);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, AI_MODEL_LABELS);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        model.setAdapter(adapter);
+        form.addView(model);
+        form.addView(label("API key Google AI Studio", 14, Color.WHITE));
+        EditText key = editor("Kunci tersimpan terenkripsi; kosongkan untuk memakai yang tersimpan", 1);
+        key.setSingleLine(true);
+        key.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        form.addView(key, new LinearLayout.LayoutParams(-1, dp(54)));
+        form.addView(label("Apa yang ingin kamu buat atau perbaiki?", 14, Color.WHITE));
+        EditText question = editor("Contoh: buat program .cuk untuk menghitung belanja dan kembalian.", 4);
+        question.setHorizontallyScrolling(false);
+        form.addView(question, new LinearLayout.LayoutParams(-1, dp(112)));
+        CheckBox includeCode = new CheckBox(this);
+        includeCode.setText("Kirim kode yang sedang ada di editor sebagai konteks");
+        includeCode.setTextColor(Color.WHITE);
+        includeCode.setTextSize(13);
+        includeCode.setChecked(false);
+        form.addView(includeCode);
+        form.addView(label("Privasi: permintaan dikirim ke Google Gemini lewat HTTPS. Kode editor tidak dikirim kecuali kotak dicentang. API key disimpan terenkripsi di perangkat. Kuota/biaya mengikuti akun provider. Kode hasil AI tidak otomatis dijalankan.", 12, Color.LTGRAY));
+
+        new AlertDialog.Builder(this)
+            .setTitle("Bantuan PusingCuk AI")
+            .setView(form)
+            .setNegativeButton("Batal", null)
+            .setNeutralButton("Hapus kunci", (dialog, which) -> deleteAiKey())
+            .setPositiveButton("Tanya AI", (dialog, which) -> {
+                String userQuestion = question.getText().toString().trim();
+                String enteredKey = key.getText().toString().trim();
+                if (userQuestion.isEmpty() || userQuestion.length() > MAX_AI_QUESTION_CHARS) {
+                    toastError("Isi pertanyaan AI (maksimum 3.000 karakter).");
+                    return;
+                }
+                if (enteredKey.length() > 512) {
+                    toastError("API key terlalu panjang.");
+                    return;
+                }
+                String context = "";
+                if (includeCode.isChecked()) {
+                    context = source.getText().toString();
+                    if (context.length() > MAX_AI_CONTEXT_CHARS) {
+                        toastError("Kode terlalu panjang untuk dikirim ke AI (maksimum 12.000 karakter).");
+                        return;
+                    }
+                }
+                final String prompt = buildAiPrompt(userQuestion, context);
+                final String requestedModel = AI_MODEL_IDS[Math.max(0, Math.min(model.getSelectedItemPosition(), AI_MODEL_IDS.length - 1))];
+                try {
+                    if (!enteredKey.isEmpty()) saveAiKey(enteredKey);
+                    String storedKey = readAiKey();
+                    if (storedKey.isEmpty()) {
+                        toastError("Masukkan API key Google AI Studio, atau batalkan untuk membuatnya.");
+                        return;
+                    }
+                    aiButton.setEnabled(false);
+                    applyAiButton.setVisibility(View.GONE);
+                    pendingAiCode = null;
+                    status.setText("Meminta bantuan AI online…");
+                    output.setText("Menghubungi provider AI. Kode tidak dijalankan otomatis.");
+                    worker.execute(() -> {
+                        try {
+                            String answer = requestGemini(storedKey, requestedModel, prompt);
+                            String candidate = extractCukCode(answer);
+                            runOnUiThread(() -> {
+                                pendingAiCode = candidate;
+                                applyAiButton.setVisibility(candidate == null ? View.GONE : View.VISIBLE);
+                                status.setText(candidate == null ? "Jawaban AI diterima · belum ada blok kode .cuk" : "Jawaban AI diterima · source belum diverifikasi");
+                                output.setText(answer);
+                                aiButton.setEnabled(true);
+                            });
+                        } catch (Exception e) {
+                            String message = e.getMessage() == null ? "Permintaan AI gagal." : e.getMessage();
+                            runOnUiThread(() -> {
+                                status.setText("Bantuan AI gagal");
+                                output.setText(message + "\nPeriksa internet, API key, kuota, dan nama model. Kode tidak dijalankan.");
+                                aiButton.setEnabled(true);
+                            });
+                        }
+                    });
+                } catch (Exception e) {
+                    toastError("Kunci AI tidak dapat disimpan/dibaca. Coba hapus kunci lalu masukkan kembali.");
+                }
+            })
+            .show();
+    }
+
+    private String buildAiPrompt(String question, String currentSource) {
+        StringBuilder prompt = new StringBuilder();
+        prompt.append("Permintaan pengguna:\n").append(question);
+        if (!currentSource.isEmpty()) {
+            prompt.append("\n\nSource .cuk yang secara eksplisit diizinkan pengguna untuk dikirim:\n[SOURCE .cuk]\n")
+                  .append(currentSource).append("\n[AKHIR SOURCE .cuk]");
+        }
+        prompt.append("\n\nAturan: bantu pengguna memahami dan membuat program .cuk yang cocok dengan runtime Android yang terbatas. Jika memperbaiki kode, jelaskan singkat dan sertakan program lengkap dalam satu blok kode berlabel cuk. Jangan menyatakan berhasil dijalankan atau lintas-runtime sebelum ada hasil tes.");
+        return prompt.toString();
+    }
+
+    private SecretKey getOrCreateAiEncryptionKey() throws Exception {
+        KeyStore store = KeyStore.getInstance("AndroidKeyStore");
+        store.load(null);
+        if (store.containsAlias(AI_KEY_ALIAS)) return (SecretKey) store.getKey(AI_KEY_ALIAS, null);
+        KeyGenerator generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
+        generator.init(new KeyGenParameterSpec.Builder(
+                AI_KEY_ALIAS, KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setRandomizedEncryptionRequired(true)
+                .build());
+        return generator.generateKey();
+    }
+
+    private void saveAiKey(String value) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.ENCRYPT_MODE, getOrCreateAiEncryptionKey());
+        byte[] encrypted = cipher.doFinal(value.getBytes(StandardCharsets.UTF_8));
+        String packed = android.util.Base64.encodeToString(cipher.getIV(), android.util.Base64.NO_WRAP)
+                + ":" + android.util.Base64.encodeToString(encrypted, android.util.Base64.NO_WRAP);
+        getSharedPreferences(AI_PREFS, MODE_PRIVATE).edit().putString(AI_KEY_PREF, packed).apply();
+    }
+
+    private String readAiKey() throws Exception {
+        String packed = getSharedPreferences(AI_PREFS, MODE_PRIVATE).getString(AI_KEY_PREF, "");
+        if (packed.isEmpty()) return "";
+        String[] pieces = packed.split(":", 2);
+        if (pieces.length != 2) throw new IllegalStateException("Penyimpanan kunci tidak valid.");
+        byte[] iv = android.util.Base64.decode(pieces[0], android.util.Base64.NO_WRAP);
+        byte[] encrypted = android.util.Base64.decode(pieces[1], android.util.Base64.NO_WRAP);
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.DECRYPT_MODE, getOrCreateAiEncryptionKey(), new GCMParameterSpec(128, iv));
+        return new String(cipher.doFinal(encrypted), StandardCharsets.UTF_8);
+    }
+
+    private void deleteAiKey() {
+        try {
+            getSharedPreferences(AI_PREFS, MODE_PRIVATE).edit().remove(AI_KEY_PREF).apply();
+            KeyStore store = KeyStore.getInstance("AndroidKeyStore");
+            store.load(null);
+            if (store.containsAlias(AI_KEY_ALIAS)) store.deleteEntry(AI_KEY_ALIAS);
+            Toast.makeText(this, "API key AI lokal dihapus", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            toastError("Gagal menghapus kunci AI.");
+        }
+    }
+
+    private String requestGemini(String apiKey, String modelId, String prompt) throws Exception {
+        if (!"gemini-3.5-flash-lite".equals(modelId) && !"gemini-3.8-flash".equals(modelId))
+            throw new IllegalArgumentException("Model AI tidak diizinkan.");
+        URL url = new URL("https://generativelanguage.googleapis.com/v1beta/models/" + modelId + ":generateContent");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setConnectTimeout(15000);
+        connection.setReadTimeout(45000);
+        connection.setInstanceFollowRedirects(false);
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Accept", "application/json");
+        connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+        connection.setRequestProperty("x-goog-api-key", apiKey);
+        JSONObject system = new JSONObject().put("parts",
+                new org.json.JSONArray().put(new JSONObject().put("text", AI_SYSTEM_INSTRUCTION)));
+        JSONObject user = new JSONObject().put("role", "user").put("parts",
+                new org.json.JSONArray().put(new JSONObject().put("text", prompt)));
+        JSONObject payload = new JSONObject()
+                .put("system_instruction", system)
+                .put("contents", new org.json.JSONArray().put(user))
+                .put("generationConfig", new JSONObject().put("temperature", 0.2).put("maxOutputTokens", 3072));
+        try {
+            byte[] body = payload.toString().getBytes(StandardCharsets.UTF_8);
+            try (OutputStream stream = connection.getOutputStream()) { stream.write(body); }
+            int code = connection.getResponseCode();
+            InputStream responseStream = (code >= 200 && code < 300) ? connection.getInputStream() : connection.getErrorStream();
+            String responseBody = readText(responseStream, 256 * 1024);
+            if (code < 200 || code >= 300) {
+                String detail = "provider menolak permintaan";
+                try {
+                    JSONObject error = new JSONObject(responseBody).optJSONObject("error");
+                    if (error != null && !error.optString("message", "").isEmpty()) detail = error.optString("message");
+                } catch (Exception ignored) { }
+                if (detail.length() > 500) detail = detail.substring(0, 500);
+                throw new IOException("Gemini HTTP " + code + ": " + detail);
+            }
+            JSONObject response = new JSONObject(responseBody);
+            org.json.JSONArray candidates = response.optJSONArray("candidates");
+            StringBuilder answer = new StringBuilder();
+            if (candidates != null) {
+                for (int i = 0; i < candidates.length(); i++) {
+                    JSONObject candidate = candidates.optJSONObject(i);
+                    JSONObject content = candidate == null ? null : candidate.optJSONObject("content");
+                    org.json.JSONArray parts = content == null ? null : content.optJSONArray("parts");
+                    if (parts == null) continue;
+                    for (int j = 0; j < parts.length(); j++) {
+                        JSONObject part = parts.optJSONObject(j);
+                        if (part != null && part.has("text")) {
+                            if (answer.length() > 0) answer.append("\n");
+                            answer.append(part.optString("text"));
+                        }
+                    }
+                    if (answer.length() > 0) break;
+                }
+            }
+            if (answer.length() == 0) throw new IOException("Model tidak menghasilkan jawaban teks (mungkin diblokir oleh kebijakan provider).");
+            return answer.toString();
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    private String extractCukCode(String answer) {
+        Matcher matcher = Pattern.compile("\\x60{3}(?:cuk|pusingcuk)\\s*\\r?\\n([\\s\\S]*?)\\x60{3}", Pattern.CASE_INSENSITIVE).matcher(answer);
+        if (!matcher.find()) return null;
+        String code = matcher.group(1).trim();
+        if (code.isEmpty() || utf8Length(code) > MAX_SOURCE_BYTES) return null;
+        return code + "\n";
+    }
+
+    private void applyAiCode() {
+        if (pendingAiCode == null || pendingAiCode.trim().isEmpty()) {
+            toastError("Belum ada source .cuk dari jawaban AI.");
+            return;
+        }
+        source.setText(pendingAiCode);
+        pendingAiCode = null;
+        applyAiButton.setVisibility(View.GONE);
+        status.setText("Kode AI disalin ke editor · belum diverifikasi");
+        Toast.makeText(this, "Kode masuk editor. Periksa dulu sebelum menjalankan.", Toast.LENGTH_LONG).show();
+    }
+
 
     private String encodePath(String path)throws Exception {
         StringBuilder b=new StringBuilder();for(String part:path.split("/")){if(b.length()>0)b.append('/');b.append(java.net.URLEncoder.encode(part,"UTF-8").replace("+","%20"));}return b.toString();
