@@ -112,7 +112,7 @@ class ToolInputContractTests(unittest.TestCase):
                 )
 
     def test_cuk_compile_check_returns_consistent_syntax_category_location_and_hint(self):
-        source = "jancuk\\nhedeh 1 +\\nselesai jancuk\\n"
+        source = "jancuk\nhedeh 1 +\nselesai jancuk\n"
         result = self.registry.execute("cuk_compile_check", {"source": source})
         self.assertFalse(result["ok"])
         self.assertEqual(result["failure_category"], "syntax_error")
