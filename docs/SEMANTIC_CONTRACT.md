@@ -4,6 +4,8 @@
 
 Status: baseline engineering untuk perilaku yang harus dipatuhi front-end, interpreter, runtime native, dan backend berikutnya. Hanya perilaku yang ditetapkan spesifikasi atau dibuktikan fixture boleh diklaim stabil lintas runtime.
 
+Nilai `rentang()` yang disimpan ke variabel dapat dibaca dengan indeks bilangan bulat nonnegatif berbasis nol; indeks negatif, bukan bilangan bulat, dan indeks di luar batas menghasilkan kesalahan runtime. Implementasi yang mengklaim dukungan rentang harus menguji kasus sukses dan batas ini.
+
 ## Satu sumber kebenaran
 
 - SPEC.md mendefinisikan sintaks dan perilaku bahasa.
