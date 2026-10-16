@@ -101,6 +101,16 @@
       "id": "query-20",
       "query": "masterplan 1000 hektar hidrologi lahan tata ruang fase digital pilot ekonomi pendapatan",
       "expected_top_id": "pusingcuk-kawasan-masterplan-operating-model"
+    },
+    {
+      "id": "query-21",
+      "query": "Bagaimana PusingCuk AI memeriksa total debit dan kredit untuk CukAccount dengan aturan .cuk?",
+      "expected_top_id": "pusingcuk-journal-balance-cross-check"
+    },
+    {
+      "id": "query-22",
+      "query": "Bagaimana menghubungkan fixture keuangan .cuk, hasil compiler, dan tes domain CukAccount untuk melatih PusingCuk AI lokal?",
+      "expected_top_id": "pusingcuk-cukaccount-integration-contract"
     }
   ]
 }

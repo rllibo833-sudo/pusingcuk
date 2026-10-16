@@ -16,10 +16,10 @@ from parser import parse
 
 FORMAT = "pusingcuk-ir"
 IR_VERSION = 1
-LANGUAGE_VERSION = "0.4-dev"
+LANGUAGE_VERSION = "0.5-dev"
 NODE_KINDS = {
     "Program", "Declare", "Print", "Input", "If", "While", "For",
-    "Function", "Return", "Assign", "IndexAssign", "Variable", "Literal",
+    "Function", "Return", "Assign", "IndexAssign", "Variable", "Literal", "Try",
     "Unary", "Binary", "List", "Dict", "Index", "Call",
 }
 FEATURE_RULES = {
@@ -27,7 +27,7 @@ FEATURE_RULES = {
     "For": "control-flow", "Function": "functions", "Return": "functions",
     "List": "lists", "Dict": "dictionaries", "Index": "indexing",
     "IndexAssign": "indexing", "Call": "calls", "Unary": "operators",
-    "Binary": "operators", "Declare": "variables", "Assign": "variables",
+    "Binary": "operators", "Try": "error-handling", "Declare": "variables", "Assign": "variables",
     "Variable": "variables", "Print": "console-output",
 }
 ENVELOPE_KEYS = {
@@ -62,6 +62,7 @@ NODE_FIELDS = {
     "Dict": {"items"},
     "Index": {"collection", "index"},
     "Call": {"name", "args"},
+    "Try": {"body", "handler_name", "handler", "final"},
 }
 
 

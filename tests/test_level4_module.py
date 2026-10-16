@@ -1,6 +1,7 @@
 import os
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from evaluator import Evaluator, PusingDict
@@ -98,6 +99,16 @@ class Level4ModuleTests(unittest.TestCase):
             'lah invalid = angkut("not-a-module.txt")'
         ))
         self.assertIs(env["invalid"], False)
+
+    def test_angkut_does_not_reopen_module_after_bounded_read(self):
+        write_module(self.root, "single-read.cuk", 'lah marker = "bounded-read"')
+        with mock.patch.object(Path, "read_text", side_effect=AssertionError(
+            "module loader must reuse the bounded, symlink-safe read"
+        )):
+            env = self.evaluator().run_module(source(
+                'lah mod = angkut("single-read.cuk")'
+            ))
+        self.assertEqual(env["mod"]["marker"], "bounded-read")
 
     def test_angkut_reject_absolute_path_and_large_file(self):
         env = self.evaluator().run_module(source(

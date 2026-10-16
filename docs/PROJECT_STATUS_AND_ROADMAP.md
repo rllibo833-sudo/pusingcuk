@@ -1,6 +1,6 @@
 # Status teknis dan roadmap PusingCuk
 
-**Audit:** 15 Oktober 2026  
+**Status sinkronisasi:** 16 Oktober 2026  
 **Cakupan:** repositori `rllibo833-sudo/pusingcuk`, runtime bahasa `.cuk`, aplikasi AI, dokumentasi, CI, dan proyek Supabase yang dipetakan.  
 **Status audit:** pembaruan dikerjakan langsung di `main`; periksa hasil Actions terbaru pada commit yang hendak dipakai. Tes utama kini mengunci versi bahasa/paket, alias, fixture konformansi, benchmark retrieval, serta batas klaim rilis.
 
@@ -26,7 +26,7 @@
 - **Versi bahasa kontraktual:** `0.5-dev`.
 - **Versi paket Python:** `0.8.0.dev0`. Ini metadata paket, bukan versi bahasa.
 - **Kontrak built-in:** 21 built-in terkontrak; 17 berstatus didukung oleh native C sebagai built-in penuh. Beberapa konversi skalar memiliki cakupan terbatas; lihat matriks resmi, jangan menghitung semuanya sebagai paritas.
-- **Fixture konformansi:** 66 fixture: 66 wajib pada interpreter referensi Python, 61 wajib pada native C, dan 5 secara eksplisit tidak didukung native. Status ini bukan klaim bahwa setiap backend mendukung semua fitur.
+- **Fixture konformansi:** 67 fixture: 67 wajib pada interpreter referensi Python, 62 wajib pada native C, dan 5 secara eksplisit tidak didukung native. Status ini bukan klaim bahwa setiap backend mendukung semua fitur.
 - **Jalur yang dipelihara:** `lexer.py → parser.py → ast_nodes.py → evaluator.py` dan runtime `native/pusingcuk.c`.
 - **Targets eksperimental:** `compiler/`, `src/`, VM/PVM, dan aplikasi `android-studio/`. Folder atau workflow yang ada bukan bukti rilis stabil.
 
@@ -63,7 +63,7 @@ pusingcuk-ai CLI / adapter HTTP lokal
        /        |        \
   provider   retrieval   ToolRegistry
     |            |         |
-  Ollama      indeks 20    aturan .cuk tetap
+  Ollama      indeks 21    aturan .cuk tetap
     |          sumber      budget_threshold
  lokal / loopback
                  |
@@ -72,10 +72,10 @@ pusingcuk-ai CLI / adapter HTTP lokal
 
 - **Provider lokal:** adapter Ollama, default model `qwen3:4b`, endpoint `127.0.0.1:11434`. Model dan runtime Ollama harus dipasang terpisah dan berjalan pada mesin yang sama. Model Qwen3 4B yang tercantum di Ollama memerlukan unduhan sekitar 2,5 GB; RAM, kecepatan, dan kualitas hasil bergantung perangkat serta konfigurasi.
 - **Provider alternatif:** Gemini GenerateContent API, dipilih eksplisit dengan `--provider gemini` dan `GEMINI_API_KEY`. Provider ini mengirim prompt/konteks ke layanan pihak ketiga dan bergantung pada model yang tersedia, kuota, ketentuan akun, serta biaya yang berlaku.
-- **Grounding:** indeks berisi **21 dokumen sumber terkurasi**. Seluruh entri tercatat milik repositori PusingCuk, memakai visibility `public-safe`, dan mematok path/commit. Runtime tidak melakukan crawl otomatis terhadap repo lain.
-- **Benchmark retrieval:** 21 kasus baseline menghasilkan top-1 **20/20 (100%)** dan top-3 **20/20 (100%)** pada kueri terkurasi. Pada 8 dari 12 kasus adversarial yang memiliki expected source, top-1 **5/8 (62,5%)** dan top-3 **6/8 (75%)**. Metrik ini menilai retrieval leksikal atas fixture kecil, bukan akurasi jawaban model.
+- **Grounding:** indeks berisi **22 dokumen sumber terkurasi**. Seluruh entri tercatat milik repositori PusingCuk, memakai visibility `public-safe`, dan mematok path/commit. Runtime tidak melakukan crawl otomatis terhadap repo lain.
+- **Benchmark retrieval:** 22 kasus baseline menghasilkan top-1 **21/21 (100%)** dan top-3 **21/21 (100%)** pada kueri terkurasi. Pada 8 dari 12 kasus adversarial yang memiliki expected source, top-1 **5/8 (62,5%)** dan top-3 **6/8 (75%)**. Metrik ini menilai retrieval leksikal atas fixture kecil, bukan akurasi jawaban model.
 - **Sitasi:** URL yang ditempel ke jawaban diambil dari sumber tervalidasi, bukan dipercaya dari teks model. Sitasi membuktikan asal sumber, bukan otomatis kebenaran seluruh klaim.
-- **Tool:** `knowledge_search` untuk pencarian read-only dan `budget_threshold` untuk menjalankan artefak `.cuk` tetap yang di-hash. Model tidak diberi akses bebas untuk mengirim source code, shell command, path, atau capability arbitrer.
+- **Tool:** `knowledge_search` untuk pencarian read-only dan `budget_threshold` untuk aturan anggaran dan `journal_balance_check` untuk pemeriksaan sekunder total debit/kredit dari artefak `.cuk` tetap yang di-hash. Pemeriksaan jurnal tidak membaca atau memposting buku; model tidak diberi akses bebas ke source code, shell command, path, atau capability arbitrer.
 - **Memori:** konteks percakapan aktif bersifat sementara. Catatan proyek harus disimpan secara eksplisit oleh pengguna di penyimpanan lokal; chat tidak otomatis dipersistenkan ke Supabase.
 - **HTTP lokal:** adapter loopback dengan bearer token dan batas input/sesi/konkurensi. `/healthz` hanya membuktikan proses hidup, bukan model siap melayani.
 
@@ -198,3 +198,44 @@ Audit ini tidak menyatakan bahasa stabil atau AI akurat secara umum. Database Su
 - [Peta project Supabase](integrations/SUPABASE_PROJECTS.md)
 - [CI utama](https://github.com/rllibo833-sudo/pusingcuk/actions/workflows/tests.yml)
 - [Build CLI](https://github.com/rllibo833-sudo/pusingcuk/actions/workflows/build-test.yml)
+
+
+## Sinkronisasi lintas-repo — 16 Oktober 2026
+
+- Pin PusingCuk yang digunakan CukAccount: `862402c1e8243394ecbc3d3c469a15a5e19a0c95`; beberapa catatan historis masih menyebut pin lama `994b90ca` dan harus diperlakukan sebagai bukti historis.
+- Tes upstream pada pin saat ini: [run 38826340175](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38826340175) sukses.
+- Status UI CukAccount pada `d86a665e3e404fc7aff02548c12b5872158078b6`: belum terverifikasi lulus; kegagalan `dart format` harus dibereskan sebelum mengklaim integrasi penuh.
+- Siklus penerimaan tetap: fixture akuntansi sintetis dari CukAccount → aturan `.cuk`/ToolRegistry → perbandingan output penuh → fixture regresi yang sama kembali di CukAccount. Sukses tes upstream saja tidak menutup siklus.
+
+
+## Audit branch dan bukti CI lintas-repo — 16 Oktober 2026
+
+### Branch PusingCuk yang ditemukan
+
+| Branch | Head (singkat) | Catatan audit |
+|---|---|---|
+| `main` | `cb6b71b2` | Baseline branch utama; tidak sama dengan branch integrasi yang diminta. |
+| `in-this-economy` | `09f67d9d` | Branch integrasi yang diaudit; berisi 35 commit di depan `main`, tidak tertinggal menurut GitHub compare. |
+| `cukaccount-bridge` | `cb6b71b2` | Head sama dengan `main`; tidak ada perubahan unik pada head saat ini. |
+| `audit/cukaccount-bridge` | `d5f60791` | Branch audit terpisah yang masih ada; perlu dipertimbangkan untuk dibersihkan oleh pemilik, bukan dihapus otomatis. |
+| `feat/accounting-student-app` | `d6db591c` | Branch fitur terpisah; jangan diasumsikan terintegrasi. |
+| `integration/core-tool-contract-20261014` | `b87d7859` | Branch integrasi lama yang masih ada; jangan diasumsikan terintegrasi. |
+
+Tidak ada branch baru yang dibuat oleh audit ini. Branch tambahan yang sudah ada menunjukkan riwayat pekerjaan paralel; jangan menggabungkan atau menghapusnya tanpa membandingkan perubahan dan keputusan pemilik.
+
+### Hasil CI branch `in-this-economy`
+
+Dalam 25 run terbaru yang dikembalikan API: **13 success, 5 failure, 7 cancelled**. Run terbaru yang sukses adalah [38826340175](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38826340175) pada commit `862402c1e8243394ecbc3d3c469a15a5e19a0c95`. Job Python 3.11/3.12 dan native gcc/clang melaporkan sukses, tetapi langkah integrasi aplikasi akuntansi pada job Python 3.11 dan pemeriksaan keamanan PVM berstatus **skipped**. Maka run ini bukan bukti bahwa seluruh bridge CukAccount sudah dijalankan.
+
+### Sinkronisasi dengan CukAccount
+
+- Workflow CukAccount mem-pin PusingCuk `862402c1e8243394ecbc3d3c469a15a5e19a0c95`.
+- Run Flutter [38829220078](https://github.com/rllibo833-sudo/Cukaccount/actions/runs/38829220078) dan APK [38829220101](https://github.com/rllibo833-sudo/Cukaccount/actions/runs/38829220101) gagal pada commit UI `d86a665e3e404fc7aff02548c12b5872158078b6`, sebelum tahap lanjutan yang relevan. Karena itu, status UI/bridge pada head terbaru adalah **belum lulus**, walaupun beberapa tes lama pernah lulus.
+- Prioritas P0: pulihkan format UI dalam satu perubahan koheren, jalankan Flutter checks, dan pastikan bridge dieksekusi (tidak skipped). Baru setelah bukti tersebut ada, naikkan pin PusingCuk atau centang penerimaan end-to-end.
+
+### Audit dokumentasi dan scope
+
+- `docs/CUKACCOUNT_INTEGRATION.md` dan `docs/integrations/CUKACCOUNT.md` tumpang tindih: keduanya menjelaskan bridge, tetapi detail/tingkat cakupannya berbeda. Pertahankan satu dokumen kontrak kanonis pada perubahan berikutnya; jangan menambah dokumen ketiga.
+- `docs/PROJECT_STATUS_AND_ROADMAP.md` menjadi ringkasan status; `docs/VISION.md` tetap sumber tujuan produk/bahasa. `README.md` menjelaskan kemampuan runtime dengan batas yang eksplisit.
+- Runtime bahasa masih eksperimental: Python referensi dan native C merupakan jalur utama konformansi; JS/Python transpiler dan PVM memiliki subset/eksperimental. Tes lulus tidak berarti semua backend setara.
+- PusingCuk AI adalah aplikasi/orchestrator berbasis provider, bukan model foundation yang dilatih dari awal. Fixture dan aturan deterministik meningkatkan konteks/evaluasi, bukan bukti fine-tuning.

@@ -23,7 +23,7 @@ Pusingcuk is an experimental programming language built around Indonesian-friend
 >
 > **Security warning:** Eksekusi PusingCuk tidak ter-sandbox OS. Jangan jalankan kode tidak terpercaya. Execution runs with the current process's operating-system permissions; do not run untrusted code or bytecode.
 >
-> **Status & roadmap (15 Oct 2026):** lihat [audit status bahasa, AI dan Supabase](docs/PROJECT_STATUS_AND_ROADMAP.md). Bahasa `.cuk` dan aplikasi PusingCuk AI mempunyai tingkat kematangan berbeda. AI adalah aplikasi di atas Ollama atau Gemini, bukan foundation model yang dilatih sendiri. Supabase project PusingCuk saat ini belum menjadi koneksi runtime.
+> **Status & roadmap (16 Oct 2026):** lihat [audit status bahasa, AI dan Supabase](docs/PROJECT_STATUS_AND_ROADMAP.md). Bahasa `.cuk` dan aplikasi PusingCuk AI mempunyai tingkat kematangan berbeda. AI adalah aplikasi di atas Ollama atau Gemini, bukan foundation model yang dilatih sendiri. Supabase project PusingCuk saat ini belum menjadi koneksi runtime.
 
 ## Try Pusingcuk on Termux
 
@@ -55,7 +55,7 @@ Ollama harus berjalan di perangkat yang sama dan mendengarkan di loopback port 1
 
 Sebagai opsi provider terpisah, PusingCuk juga menyediakan adapter independen untuk Gemini GenerateContent API. Atur `GEMINI_API_KEY` di environment (jangan simpan kunci di repository), lalu jalankan `pusingcuk-ai --provider gemini`. Model default adalah `gemini-3.8-flash` dan dapat diganti dengan `--model`. Pemakaian API tunduk pada ketersediaan model, kuota, dan ketentuan akun Google. Kunci dikirim melalui header HTTPS, tidak ditulis ke URL atau log. Provider ini opsional dan memakai layanan eksternal; bukan jalur model lokal tanpa biaya. Ketik `/reset` untuk menghapus konteks sesi atau `/keluar` untuk berhenti. Riwayat chat tidak disimpan ke disk. Catatan proyek yang ingin dipertahankan harus disimpan secara eksplisit dengan `/ingat <catatan>`, dilihat melalui `/memori [kueri]`, dan dihapus dengan `/hapus-memori <id>`. Catatan tersimpan berada di file lokal pengguna, dibatasi jumlah/ukuran, dan pola kredensial umum ditolak.
 
-Tool yang tersedia adalah pencarian dokumen read-only (`knowledge_search`) dan aturan anggaran terdaftar (`budget_threshold`) melalui `ToolRegistry` internal. Rule `.cuk` yang dipakai dipatok dengan SHA-256 dan menerima input sesuai skema; model tidak dapat mengirim source code arbitrer untuk dieksekusi. Eksekusi runtime referensi lokal tetap **bukan sandbox OS**, sehingga hanya artefak tetap yang telah ditinjau boleh didaftarkan. `tools/core-rule-runner.mjs` masih dipertahankan sebagai harness kompatibilitas/integrasi terpisah untuk pengujian lintas-repo dan regresi sandbox; runner tersebut bukan dependensi runtime assistant. Jangan mengekspos runner lama atau layanan lokal AI ke internet.
+Tool yang tersedia mencakup pencarian dokumen read-only (`knowledge_search`), aturan anggaran (`budget_threshold`), pemeriksaan jurnal (`journal_balance_check`), persamaan akuntansi (`accounting_equation_check`), rencana penutupan periode (`period_close_plan`), serta diagnosis klasifikasi laporan (`report_classification_check`) melalui `ToolRegistry` internal. Diagnosis klasifikasi menerima hitungan agregat dan menandai kategori arus kas/ekuitas yang hilang; ia tidak membaca atau mengubah buku pengguna. Semua rule `.cuk` dipatok dengan SHA-256 dan menerima input sesuai skema; model tidak dapat mengirim source code arbitrer untuk dieksekusi. Eksekusi runtime referensi lokal tetap **bukan sandbox OS**, sehingga hanya artefak tetap yang telah ditinjau boleh didaftarkan. `tools/core-rule-runner.mjs` masih dipertahankan sebagai harness kompatibilitas/integrasi terpisah untuk pengujian lintas-repo dan regresi sandbox; runner tersebut bukan dependensi runtime assistant. Jangan mengekspos runner lama atau layanan lokal AI ke internet.
 
 ### Layanan HTTP AI lokal (eksperimental)
 
@@ -155,9 +155,9 @@ CI tests the reference interpreter on Python 3.11 and 3.12 and builds the native
 
 ## Development status and next steps
 
-PusingCuk is still experimental. The current language contract is `0.5-dev`; the Python package version `0.8.0.dev0` is separate. The active conformance manifest contains **66 fixtures**: all 66 are required on the Python reference interpreter, 61 are required on native C, and 5 are explicitly unsupported on native C. Unsupported fixtures are not counted as passes or cross-runtime parity.
+PusingCuk is still experimental. The current language contract is `0.5-dev`; the Python package version `0.8.0.dev0` is separate. The active conformance manifest contains **67 fixtures**: all 67 are required on the Python reference interpreter, 62 are required on native C, and 5 are explicitly unsupported on native C. Unsupported fixtures are not counted as passes or cross-runtime parity.
 
-Recent engineering work has added regression coverage for the local AI path from HTTP chat handling through the allowlisted tool registry and a registered `.cuk` rule to a generated JavaScript artifact. The automated checks validate expected results and source/artifact identity. This is focused integration evidence, not proof of general live-model quality or production readiness.
+Recent engineering work has added regression coverage for the local AI path from HTTP chat handling through the allowlisted tool registry and a registered `.cuk` rule to a generated JavaScript artifact. The CukAccount shared synthetic acceptance dataset now feeds both the Dart/SQLite report-and-close tests and the registered `period_close_plan` rule. That rule classifies profit/loss/zero and returns a deterministic role-based closing-line plan for comparison with SQLite's actual closing journal; it never posts transactions. These deterministic checks do not post real transactions and are not proof of general live-model quality or production readiness.
 
 The next work follows [the project vision](docs/VISION.md):
 
@@ -179,3 +179,25 @@ Do not run code or bytecode from an untrusted source with access to important fi
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Integrasi CukAccount dan siklus evaluasi AI — 16 Oktober 2026
+
+CukAccount menggunakan PusingCuk sebagai runtime ber-pin untuk menjalankan fixture keuangan sintetis di CI. Pin yang dipakai bridge adalah `5732076cb04b90b259b7e9d6beba8ff72b3ad117`; perubahan versi harus diikuti pengujian ulang bridge dan pembaruan kontrak pada kedua repositori. Fixture kini memiliki pemeriksaan senyap untuk penutupan laba/rugi/hasil nol agar output sukses lama tetap stabil; jika rumus meleset, marker kegagalan tambahan membuat perbandingan output gagal. Jangan menganggap output fixture sebagai posting transaksi atau sumber kebenaran ledger.
+
+Siklus peningkatan PusingCuk AI yang dapat diverifikasi:
+1. Gunakan dokumentasi terkurasi dan contoh finansial sintetis, bukan data keuangan pribadi.
+2. Minta AI menjelaskan aturan atau mengusulkan contoh .cuk; jangan jalankan kode yang dihasilkan tanpa tinjauan.
+3. Jalankan `--check`, tes interpreter referensi, serta konformansi native C bila fixture mengklaim dukungan lintas-runtime.
+4. Bandingkan output dan diagnostik dengan expected result, lalu simpan kegagalan yang direproduksi sebagai regresi.
+5. Nilai perubahan dengan suite yang sama sebelum mengubah kontrak bahasa atau pin integrasi.
+
+Ini adalah peningkatan berbasis konteks, aturan deterministik, dan evaluasi regresi—bukan bukti bahwa bobot model telah dilatih ulang. Bahasa masih eksperimental; native C, transpiler, dan VM memiliki cakupan yang berbeda. Eksekusi .cuk bukan sandbox OS, jadi jangan jalankan kode tak tepercaya.
+
+Acuan aplikasi: [CukAccount — spesifikasi dan roadmap](https://github.com/rllibo833-sudo/Cukaccount/blob/main/CUKACCOUNT_SPEC_AND_ROADMAP.md). Status APK CukAccount saat ini adalah APK uji, bukan rilis produksi.
+
+
+## Siklus penerimaan CukAccount ↔ PusingCuk AI ↔ `.cuk` — 16 Oktober 2026
+
+CukAccount menyediakan kebutuhan akuntansi dan fixture sintetis; aturan `.cuk` serta `ToolRegistry` PusingCuk AI menganalisis kasus deterministik; hasilnya dibandingkan kembali dengan output Dart/SQLite. Workflow CukAccount mem-pin commit PusingCuk `862402c1e8243394ecbc3d3c469a15a5e19a0c95` dan membandingkan dataset bersama, termasuk rencana penutupan laba/rugi/nol serta input tidak valid.
+
+**Batas bukti:** [tes upstream PusingCuk](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/38826340175) pada pin tersebut sukses. Itu tidak membuktikan Flutter checks CukAccount pada head UI terbaru lulus; perubahan UI terbaru belum terverifikasi dan pemeriksaan format gagal. Sukses upstream saja tidak menutup siklus.

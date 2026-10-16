@@ -1,0 +1,32 @@
+# PusingCuk AI report-classification diagnosis rule for CukAccount.
+# Inputs are aggregate counts, never raw accounting records.
+
+jancuk
+
+fungsi cek_klasifikasi_laporan(jumlah_kas, kas_tanpa_kategori, jumlah_ekuitas, ekuitas_tanpa_kategori)
+    njir jumlah_kas < 0 atau kas_tanpa_kategori < 0 atau jumlah_ekuitas < 0 atau ekuitas_tanpa_kategori < 0
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        njir kas_tanpa_kategori > jumlah_kas atau ekuitas_tanpa_kategori > jumlah_ekuitas
+            balek "INPUT_TIDAK_VALID"
+        kampret
+            njir kas_tanpa_kategori > 0 atau ekuitas_tanpa_kategori > 0
+                balek "KLASIFIKASI_LAPORAN_BELUM_LENGKAP"
+            kampret
+                balek "KLASIFIKASI_LAPORAN_LENGKAP"
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+tanya jumlah_kas_teks = ""
+tanya kas_tanpa_kategori_teks = ""
+tanya jumlah_ekuitas_teks = ""
+tanya ekuitas_tanpa_kategori_teks = ""
+lah jumlah_kas = bilangan(jumlah_kas_teks)
+lah kas_tanpa_kategori = bilangan(kas_tanpa_kategori_teks)
+lah jumlah_ekuitas = bilangan(jumlah_ekuitas_teks)
+lah ekuitas_tanpa_kategori = bilangan(ekuitas_tanpa_kategori_teks)
+hedeh cek_klasifikasi_laporan(jumlah_kas, kas_tanpa_kategori, jumlah_ekuitas, ekuitas_tanpa_kategori)
+
+selesai jancuk

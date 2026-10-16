@@ -1,0 +1,318 @@
+{
+  "schema_version": 1,
+  "currency_code": "IDR",
+  "period": {
+    "id": "2026",
+    "from": "2026-01-01",
+    "through": "2026-12-31"
+  },
+  "accounts": [
+    {
+      "code": "1000",
+      "name": "Kas dan bank",
+      "type": "asset",
+      "is_cash": true
+    },
+    {
+      "code": "1500",
+      "name": "Peralatan",
+      "type": "asset",
+      "is_cash": false
+    },
+    {
+      "code": "3000",
+      "name": "Modal pemilik",
+      "type": "equity",
+      "is_cash": false
+    },
+    {
+      "code": "3100",
+      "name": "Saldo laba",
+      "type": "equity",
+      "is_cash": false
+    },
+    {
+      "code": "4000",
+      "name": "Pendapatan usaha",
+      "type": "income",
+      "is_cash": false
+    },
+    {
+      "code": "5000",
+      "name": "Beban operasional",
+      "type": "expense",
+      "is_cash": false
+    }
+  ],
+  "entries": [
+    {
+      "id": "OPENING",
+      "date": "2026-01-01",
+      "description": "Setoran modal awal",
+      "lines": [
+        {
+          "account_code": "1000",
+          "debit": 1000000,
+          "credit": 0,
+          "cash_flow_category": "financing"
+        },
+        {
+          "account_code": "3000",
+          "debit": 0,
+          "credit": 1000000,
+          "equity_change_category": "contribution"
+        }
+      ]
+    },
+    {
+      "id": "SALE",
+      "date": "2026-02-01",
+      "description": "Penerimaan pendapatan",
+      "lines": [
+        {
+          "account_code": "1000",
+          "debit": 250000,
+          "credit": 0,
+          "cash_flow_category": "operating"
+        },
+        {
+          "account_code": "4000",
+          "debit": 0,
+          "credit": 250000
+        }
+      ]
+    },
+    {
+      "id": "EXPENSE",
+      "date": "2026-02-02",
+      "description": "Pembayaran beban operasional",
+      "lines": [
+        {
+          "account_code": "5000",
+          "debit": 100000,
+          "credit": 0
+        },
+        {
+          "account_code": "1000",
+          "debit": 0,
+          "credit": 100000,
+          "cash_flow_category": "operating"
+        }
+      ]
+    },
+    {
+      "id": "EQUIPMENT",
+      "date": "2026-02-03",
+      "description": "Pembelian peralatan",
+      "lines": [
+        {
+          "account_code": "1500",
+          "debit": 200000,
+          "credit": 0
+        },
+        {
+          "account_code": "1000",
+          "debit": 0,
+          "credit": 200000,
+          "cash_flow_category": "investing"
+        }
+      ]
+    },
+    {
+      "id": "DRAW",
+      "date": "2026-02-04",
+      "description": "Prive pemilik",
+      "lines": [
+        {
+          "account_code": "3000",
+          "debit": 50000,
+          "credit": 0,
+          "equity_change_category": "distribution"
+        },
+        {
+          "account_code": "1000",
+          "debit": 0,
+          "credit": 50000,
+          "cash_flow_category": "financing"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "profit_and_loss": {
+      "total_income": 250000,
+      "total_expenses": 100000,
+      "net_profit": 150000
+    },
+    "cash_flow": {
+      "opening_cash": 0,
+      "operating": 150000,
+      "investing": -200000,
+      "financing": 950000,
+      "net_change": 900000,
+      "ending_cash": 900000
+    },
+    "changes_in_equity_before_close": {
+      "opening_equity": 0,
+      "contributions": 1000000,
+      "distributions": -50000,
+      "other_changes": 0,
+      "current_period_result": 150000,
+      "transferred_period_result": 0,
+      "ending_equity": 1100000
+    },
+    "changes_in_equity_after_close": {
+      "opening_equity": 0,
+      "contributions": 1000000,
+      "distributions": -50000,
+      "other_changes": 0,
+      "current_period_result": 0,
+      "transferred_period_result": 150000,
+      "ending_equity": 1100000
+    },
+    "closing_journal_lines": [
+      {
+        "account_code": "4000",
+        "debit": 250000,
+        "credit": 0
+      },
+      {
+        "account_code": "5000",
+        "debit": 0,
+        "credit": 100000
+      },
+      {
+        "account_code": "3100",
+        "debit": 0,
+        "credit": 150000
+      }
+    ],
+    "report_classification": {
+      "complete": {
+        "input": {
+          "jumlah_kas": 5,
+          "kas_tanpa_kategori": 0,
+          "jumlah_ekuitas": 2,
+          "ekuitas_tanpa_kategori": 0
+        },
+        "result": "KLASIFIKASI_LAPORAN_LENGKAP"
+      },
+      "missing_cash_category": {
+        "input": {
+          "jumlah_kas": 5,
+          "kas_tanpa_kategori": 1,
+          "jumlah_ekuitas": 2,
+          "ekuitas_tanpa_kategori": 0
+        },
+        "result": "KLASIFIKASI_LAPORAN_BELUM_LENGKAP"
+      },
+      "missing_equity_category": {
+        "input": {
+          "jumlah_kas": 5,
+          "kas_tanpa_kategori": 0,
+          "jumlah_ekuitas": 2,
+          "ekuitas_tanpa_kategori": 1
+        },
+        "result": "KLASIFIKASI_LAPORAN_BELUM_LENGKAP"
+      }
+    },
+    "period_close_cases": [
+      {
+        "id": "profit",
+        "income_total": 250000,
+        "expense_total": 100000,
+        "result": "PENUTUPAN_LABA",
+        "net_result_minor_units": 150000,
+        "debit_total": 250000,
+        "credit_total": 250000,
+        "closing_lines": [
+          {
+            "role": "income",
+            "debit_minor_units": 250000,
+            "credit_minor_units": 0
+          },
+          {
+            "role": "expense",
+            "debit_minor_units": 0,
+            "credit_minor_units": 100000
+          },
+          {
+            "role": "retained_earnings",
+            "debit_minor_units": 0,
+            "credit_minor_units": 150000
+          }
+        ]
+      },
+      {
+        "id": "loss",
+        "income_total": 100000,
+        "expense_total": 250000,
+        "result": "PENUTUPAN_RUGI",
+        "net_result_minor_units": -150000,
+        "debit_total": 250000,
+        "credit_total": 250000,
+        "closing_lines": [
+          {
+            "role": "income",
+            "debit_minor_units": 100000,
+            "credit_minor_units": 0
+          },
+          {
+            "role": "expense",
+            "debit_minor_units": 0,
+            "credit_minor_units": 250000
+          },
+          {
+            "role": "retained_earnings",
+            "debit_minor_units": 150000,
+            "credit_minor_units": 0
+          }
+        ]
+      },
+      {
+        "id": "zero",
+        "income_total": 100000,
+        "expense_total": 100000,
+        "result": "PENUTUPAN_NOL",
+        "net_result_minor_units": 0,
+        "debit_total": 100000,
+        "credit_total": 100000,
+        "closing_lines": [
+          {
+            "role": "income",
+            "debit_minor_units": 100000,
+            "credit_minor_units": 0
+          },
+          {
+            "role": "expense",
+            "debit_minor_units": 0,
+            "credit_minor_units": 100000
+          }
+        ]
+      }
+    ],
+    "period_close_invalid_inputs": [
+      {
+        "input": {
+          "income_total": -1,
+          "expense_total": 0
+        },
+        "error": "RULE_INPUT_INVALID"
+      },
+      {
+        "input": {
+          "income_total": 0,
+          "expense_total": 1000000000001
+        },
+        "error": "RULE_INPUT_INVALID"
+      },
+      {
+        "input": {
+          "income_total": true,
+          "expense_total": 1
+        },
+        "error": "RULE_INPUT_INVALID"
+      }
+    ]
+  }
+}

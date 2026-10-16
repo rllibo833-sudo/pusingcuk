@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -11,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from library.knowledge_grounding import rank_knowledge
-from compiler.ir import from_source
+from compiler.ir import LANGUAGE_VERSION, from_source
 from compiler.js_backend import generate
 
 _MAX_CUK_SOURCE_BYTES = 16 * 1024
@@ -44,11 +45,95 @@ _REGISTERED_RULES: dict[str, dict[str, Any]] = {
             "Runtime referensi lokal bukan sandbox OS."
         ),
     },
+    "journal.balance.v1": {
+        "source_file": "journal_balance_check.cuk",
+        "source_sha256": "ce519f68d20c0db3a5c611a30a7355e1dd1170a3450ab93d1f048e1945bd4f2c",
+        "entrypoint": "cek_keseimbangan_jurnal",
+        "language_version": "0.5-dev",
+        "input_fields": ("debit_total", "kredit_total"),
+        "properties": {
+            "debit_total": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "kredit_total": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+        },
+        "required": ("debit_total", "kredit_total"),
+        "allowed_outputs": ("JURNAL_SEIMBANG", "JURNAL_TIDAK_SEIMBANG", "INPUT_TIDAK_VALID"),
+        "capabilities": (),
+        "description": (
+            "Periksa dua total debit/kredit dengan aturan .cuk tetap. Ini hanya pemeriksaan "
+            "sekunder atas total yang diberikan, bukan pembukuan, posting jurnal, atau "
+            "pengganti mesin akuntansi deterministik CukAccount."
+        ),
+    },
+    "accounting.equation.v1": {
+        "source_file": "accounting_equation_check.cuk",
+        "source_sha256": "aa2f46e3fb3ac65adc763de5f4818ccda251e2f316a6a91e16e41095890b35bc",
+        "entrypoint": "cek_persamaan_akuntansi",
+        "language_version": "0.5-dev",
+        "input_fields": ("aset", "liabilitas", "ekuitas"),
+        "properties": {
+            "aset": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "liabilitas": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "ekuitas": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+        },
+        "required": ("aset", "liabilitas", "ekuitas"),
+        "allowed_outputs": ("PERSAMAAN_SEIMBANG", "PERSAMAAN_TIDAK_SEIMBANG", "INPUT_TIDAK_VALID"),
+        "capabilities": (),
+        "description": (
+            "Periksa persamaan aset = liabilitas + ekuitas memakai artefak .cuk "
+            "tetap. Pemeriksaan pendamping; bukan pengganti buku besar CukAccount."
+        ),
+    },
+    "period.close.plan.v1": {
+        "source_file": "period_close_plan.cuk",
+        "source_sha256": "ddd1bf005106d7defe4a64cb9694eb8b7fca1f03b9d4814ad04d08ac8e0b6ef5",
+        "entrypoint": "status_penutupan_periode",
+        "language_version": "0.5-dev",
+        "input_fields": ("income_total", "expense_total"),
+        "properties": {
+            "income_total": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "expense_total": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+        },
+        "required": ("income_total", "expense_total"),
+        "allowed_outputs": ("PENUTUPAN_LABA", "PENUTUPAN_RUGI", "PENUTUPAN_NOL", "INPUT_TIDAK_VALID"),
+        "capabilities": (),
+        "description": (
+            "Rencanakan baris penutupan periode dari total pendapatan dan beban sintetis "
+            "menggunakan aturan .cuk terdaftar. Menghasilkan rencana peran-akun untuk "
+            "dibandingkan dengan CukAccount; tidak mem-posting jurnal."
+        ),
+    },
+    "report.classification.v1": {
+        "source_file": "report_classification_check.cuk",
+        "source_sha256": "6f1882ee8d68d0bbe1feb279ce438a592b458ef3f267fc7a5607a224ec423c1d",
+        "entrypoint": "cek_klasifikasi_laporan",
+        "language_version": "0.5-dev",
+        "input_fields": ("jumlah_kas", "kas_tanpa_kategori", "jumlah_ekuitas", "ekuitas_tanpa_kategori"),
+        "properties": {
+            "jumlah_kas": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "kas_tanpa_kategori": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "jumlah_ekuitas": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+            "ekuitas_tanpa_kategori": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
+        },
+        "required": ("jumlah_kas", "kas_tanpa_kategori", "jumlah_ekuitas", "ekuitas_tanpa_kategori"),
+        "allowed_outputs": ("KLASIFIKASI_LAPORAN_BELUM_LENGKAP", "KLASIFIKASI_LAPORAN_LENGKAP", "INPUT_TIDAK_VALID"),
+        "capabilities": (),
+        "description": (
+            "Diagnosis CukAccount: periksa jumlah baris kas/ekuitas dan jumlah yang belum "
+            "diklasifikasikan sebelum laporan dihitung. Gunakan ketika arus kas atau perubahan "
+            "ekuitas gagal karena kategori hilang. Input hanya hitungan agregat sintetis; "
+            "rule tidak membaca atau mengubah buku pengguna. Setelah diagnosis, periksa program "
+            ".cuk melalui cuk_compile_check dan sarankan klasifikasi eksplisit pada jurnal."
+        ),
+    },
 }
 
 # Model-facing tool names map only to internal registered rule IDs.
 _TOOL_RULE_BINDINGS = {
     "budget_threshold": "budget.threshold.v1",
+    "journal_balance_check": "journal.balance.v1",
+    "accounting_equation_check": "accounting.equation.v1",
+    "period_close_plan": "period.close.plan.v1",
+    "report_classification_check": "report.classification.v1",
 }
 
 
@@ -112,8 +197,7 @@ class ToolRegistry:
                     "required": ["source"],
                     "additionalProperties": False,
                 },
-            },
-        })
+            },        })
         for tool_name, rule_id in _TOOL_RULE_BINDINGS.items():
             rule = _REGISTERED_RULES[rule_id]
             self.definitions.append({
@@ -183,7 +267,7 @@ class ToolRegistry:
                 "ok": True,
                 "operation": "compile_check",
                 "target": "javascript",
-                "language_version": "0.5-dev",
+                "language_version": LANGUAGE_VERSION,
                 "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
                 "artifact_sha256": hashlib.sha256(generated.encode("utf-8")).hexdigest(),
                 "artifact_bytes": len(generated.encode("utf-8")),
@@ -210,7 +294,36 @@ class ToolRegistry:
                     )
                 ):
                     return {"ok": False, "error": "RULE_INPUT_INVALID"}
-            return self._run_registered_rule(rule_id, arguments)
+            result = self._run_registered_rule(rule_id, arguments)
+            if result.get("ok") and rule_id == "period.close.plan.v1":
+                values = result.pop("period_close_values", None)
+                if not isinstance(values, list) or len(values) != 7:
+                    return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
+                (
+                    net_result, income_debit, income_credit,
+                    expense_debit, expense_credit, retained_debit, retained_credit,
+                ) = values
+                closing_lines = []
+                for role, debit, credit in (
+                    ("income", income_debit, income_credit),
+                    ("expense", expense_debit, expense_credit),
+                    ("retained_earnings", retained_debit, retained_credit),
+                ):
+                    if debit or credit:
+                        closing_lines.append({
+                            "role": role,
+                            "debit_minor_units": debit,
+                            "credit_minor_units": credit,
+                        })
+                debit_total = sum(line["debit_minor_units"] for line in closing_lines)
+                credit_total = sum(line["credit_minor_units"] for line in closing_lines)
+                if debit_total != credit_total:
+                    return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
+                result["net_result_minor_units"] = net_result
+                result["closing_lines"] = closing_lines
+                result["debit_total"] = debit_total
+                result["credit_total"] = credit_total
+            return result
 
         return {"ok": False, "error": "TOOL_NOT_ALLOWLISTED"}
 
@@ -276,10 +389,32 @@ class ToolRegistry:
             or completed.stderr
             or not isinstance(stdout, str)
             or len(stdout.encode("utf-8")) > _MAX_RULE_OUTPUT_BYTES
-            or stdout not in {f"{value}\n" for value in rule["allowed_outputs"]}
         ):
             return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
 
+        if rule_id == "period.close.plan.v1":
+            lines = stdout.splitlines()
+            if len(lines) != 8 or lines[0] not in rule["allowed_outputs"]:
+                return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
+            if any(not re.fullmatch(r"-?\d+", value) for value in lines[1:]):                return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
+            values = [int(value) for value in lines[1:]]
+            if any(abs(value) > _MAX_RULE_INPUT for value in values):
+                return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
+            return {
+                "ok": True,
+                "program_id": rule_id,
+                "program_sha256": rule["source_sha256"],
+                "language_version": rule["language_version"],
+                "entrypoint": rule["entrypoint"],
+                "capabilities": [],
+                "execution_boundary": "fixed-hash-local-rule-not-os-sandbox",
+                "result": lines[0],
+                "period_close_values": values,
+                "elapsed_ms": elapsed_ms,
+            }
+
+        if stdout not in {f"{value}\n" for value in rule["allowed_outputs"]}:
+            return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
         return {
             "ok": True,
             "program_id": rule_id,

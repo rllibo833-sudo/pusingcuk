@@ -2,7 +2,7 @@ name: Tes Pusingcuk
 
 on:
   push:
-    branches: [main, "audit/**"]
+    branches: [main, "audit/**", "in-this-economy"]
     paths:
       - ".github/workflows/tests.yml"
       - "pusingcuk_new.py"
@@ -85,6 +85,13 @@ jobs:
         if: matrix.python-version == '3.12'
         working-directory: apps/accounting
         run: npm run test:core
+      - name: Uji fixture persamaan laporan CukAccount
+        run: |
+          set -euo pipefail
+          python pusingcuk_new.py --check examples/accounting/report_equation.cuk
+          output="$(python pusingcuk_new.py examples/accounting/report_equation.cuk)"
+          printf '%s\\n' "$output"
+          test "$output" = "CUKACCOUNT_REPORT_EQUATION_BALANCED"
       - name: Uji contoh file I/O dengan input dummy
         run: |
           set -euo pipefail

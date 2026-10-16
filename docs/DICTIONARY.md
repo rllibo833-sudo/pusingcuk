@@ -1,6 +1,6 @@
 # Pusingcuk Language and Technical Dictionary
 
-This is the plain-language map for learners and contributors. It describes the `0.4-dev` language-spec contract; the implementation release line is versioned separately. It is not a promise that every feature works on every backend.
+This is the plain-language map for learners and contributors. It describes the `0.5-dev` language-spec contract; the implementation release line is versioned separately. It is not a promise that every feature works on every backend.
 
 ## 1. Start here
 
@@ -56,7 +56,7 @@ A declaration creates a new variable; assignment updates an existing one. Redecl
 
 ## 4. Built-in functions
 
-The complete and test-checked list of 19 built-ins, argument counts, and per-target support is in the [built-in catalogue](language/BUILTINS.md). The native C runtime has fixture-backed support for fifteen built-ins, including `jumlah`, `rata_rata`, `median`, `sinus`, and `kosinus`; the four value-conversion built-ins remain unsupported there. The examples below are a learner-friendly subset; an entry in a registry does not mean every target supports it.
+The complete and test-checked list of 21 built-ins, argument counts, and per-target support is in the [built-in catalogue](language/BUILTINS.md). The native C runtime has fixture-backed support for seventeen full-contract built-ins, including `jumlah`, `rata_rata`, `median`, `sinus`, and `kosinus`; the four conversion built-ins have only scalar-subset coverage and are not claimed as fully equivalent to the reference interpreter. The examples below are a learner-friendly subset; an entry in a registry does not mean every target supports it.
 
 | Function | Purpose | Example |
 |---|---|---|

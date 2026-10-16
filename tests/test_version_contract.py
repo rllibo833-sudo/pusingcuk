@@ -3,6 +3,8 @@ import json
 import re
 import tomllib
 import unittest
+
+from compiler.ir import LANGUAGE_VERSION
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,6 +47,7 @@ class VersionContractTests(unittest.TestCase):
 
         expected = package["tool"]["pusingcuk"]["language-version"]
         self.assertEqual(expected, "0.5-dev")
+        self.assertEqual(LANGUAGE_VERSION, expected)
         self.assertEqual(contract["contract_version"], expected)
         self.assertEqual(contract["language_version"], expected)
         self.assertEqual(vocabulary["language_version"], expected)

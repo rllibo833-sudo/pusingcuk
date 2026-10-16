@@ -2,15 +2,17 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import shutil
+import sys
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from compiler.ir import from_source
+from compiler.ir import LANGUAGE_VERSION, from_source
 from compiler.js_backend import generate
 from library.ai_tools import (
     ToolRegistry,
@@ -33,6 +35,7 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertTrue(result["ok"], result)
         self.assertEqual(result["operation"], "compile_check")
         self.assertEqual(result["target"], "javascript")
+        self.assertEqual(result["language_version"], LANGUAGE_VERSION)
         self.assertEqual(result["source_sha256"], hashlib.sha256(source.encode("utf-8")).hexdigest())
         self.assertGreater(result["artifact_bytes"], 0)
         self.assertEqual(len(result["artifact_sha256"]), 64)
@@ -126,6 +129,212 @@ class ToolInputContractTests(unittest.TestCase):
                     self.assertEqual(result["result"], expected)
                     self.assertEqual(compiled.returncode, 0, compiled.stderr)
                     self.assertEqual(compiled.stdout, expected + "\n")
+
+    def test_journal_balance_rule_is_hash_pinned_and_registered(self):
+        rule = _REGISTERED_RULES["journal.balance.v1"]
+        source = _load_rule_source(rule)
+        self.assertEqual(hashlib.sha256(source).hexdigest(), rule["source_sha256"])
+        self.assertIn(b"fungsi cek_keseimbangan_jurnal(debit_total, kredit_total)", source)
+        self.assertEqual(rule["capabilities"], ())
+        self.assertEqual(_TOOL_RULE_BINDINGS["journal_balance_check"], "journal.balance.v1")
+
+    def test_journal_balance_rule_checks_only_positive_totals(self):
+        cases = (
+            (1250000, 1250000, "JURNAL_SEIMBANG"),
+            (1250000, 1249999, "JURNAL_TIDAK_SEIMBANG"),
+            (0, 0, "INPUT_TIDAK_VALID"),
+            (1, 0, "INPUT_TIDAK_VALID"),
+            (1_000_000_000_000, 1_000_000_000_000, "JURNAL_SEIMBANG"),
+        )
+        for debit_total, kredit_total, expected in cases:
+            with self.subTest(debit_total=debit_total, kredit_total=kredit_total):
+                result = self.registry.execute(
+                    "journal_balance_check",
+                    {"debit_total": debit_total, "kredit_total": kredit_total},
+                )
+                self.assertTrue(result["ok"], result)
+                self.assertEqual(result["program_id"], "journal.balance.v1")
+                self.assertEqual(result["result"], expected)
+                self.assertEqual(result["capabilities"], [])
+                self.assertEqual(
+                    result["execution_boundary"],
+                    "fixed-hash-local-rule-not-os-sandbox",
+                )
+
+    def test_cukaccount_period_close_fixture_is_ai_regression_input(self):
+        root = Path(__file__).resolve().parents[1]
+        fixture = root / "tests" / "conformance" / "cukaccount_financial_cases.cuk"
+        completed = subprocess.run(
+            [sys.executable, str(root / "pusingcuk_new.py"), str(fixture)],
+            cwd=root,
+            text=True,
+            encoding="utf-8",
+            capture_output=True,
+            timeout=10,
+            check=False,
+        )
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertEqual(
+            completed.stdout,
+            "\n".join(
+                (
+                    "CUKACCOUNT_VALID_BALANCED",
+                    "CUKACCOUNT_INVALID_UNBALANCED",
+                    "CUKACCOUNT_INVALID_ZERO",
+                    "CUKACCOUNT_INVALID_NEGATIVE",
+                    "CUKACCOUNT_BOUNDARY_MAX",
+                )
+            ) + "\n",
+        )
+        self.assertNotIn("CUKACCOUNT_PERIOD_CLOSE_", completed.stdout)
+
+        # Feed the same synthetic closing totals through the AI's fixed .cuk rule.
+        for debit_total, credit_total in (
+            (250000, 250000),  # profit close
+            (250000, 250000),  # loss close
+            (100000, 100000),  # zero-result close
+        ):
+            result = self.registry.execute(
+                "journal_balance_check",
+                {"debit_total": debit_total, "kredit_total": credit_total},
+            )
+            self.assertTrue(result["ok"], result)
+            self.assertEqual(result["result"], "JURNAL_SEIMBANG")
+
+        mismatch = self.registry.execute(
+            "journal_balance_check",
+            {"debit_total": 250000, "kredit_total": 249999},
+        )
+        self.assertTrue(mismatch["ok"], mismatch)
+        self.assertEqual(mismatch["result"], "JURNAL_TIDAK_SEIMBANG")
+
+    def test_period_close_plan_matches_shared_cukaccount_acceptance_dataset(self):
+        root = Path(__file__).resolve().parents[1]
+        dataset_path = root / "tests" / "fixtures" / "cukaccount_financial_acceptance.json"
+        dataset = json.loads(dataset_path.read_text(encoding="utf-8"))
+        expected = dataset["expected"]
+        cases = expected["period_close_cases"]
+        self.assertEqual({case["id"] for case in cases}, {"profit", "loss", "zero"})
+
+        for case in cases:
+            arguments = {
+                "income_total": case["income_total"],
+                "expense_total": case["expense_total"],
+            }
+            with self.subTest(case=case["id"]):
+                result = self.registry.execute("period_close_plan", arguments)
+                self.assertTrue(result["ok"], result)
+                self.assertEqual(result["program_id"], "period.close.plan.v1")
+                self.assertEqual(result["result"], case["result"])
+                self.assertEqual(result["net_result_minor_units"], case["net_result_minor_units"])
+                self.assertEqual(result["debit_total"], case["debit_total"])
+                self.assertEqual(result["credit_total"], case["credit_total"])
+                self.assertEqual(result["debit_total"], result["credit_total"])
+                self.assertEqual(result["closing_lines"], case["closing_lines"])
+
+        profit = next(case for case in cases if case["id"] == "profit")
+        expected_account_lines = expected["closing_journal_lines"]
+        self.assertEqual(
+            [(line["debit"], line["credit"]) for line in expected_account_lines],
+            [(line["debit_minor_units"], line["credit_minor_units"]) for line in profit["closing_lines"]],
+        )
+
+    def test_period_close_plan_rejects_invalid_values_from_shared_fixture(self):
+        root = Path(__file__).resolve().parents[1]
+        fixture_path = root / "tests" / "fixtures" / "cukaccount_financial_acceptance.json"
+        fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+        cases = fixture["expected"]["period_close_invalid_inputs"]
+        for case in cases:
+            with self.subTest(input=case["input"]):
+                result = self.registry.execute("period_close_plan", case["input"])
+                self.assertEqual(
+                    result,
+                    {"ok": False, "error": case["error"]},
+                )
+
+    @unittest.skipUnless(NODE, "Node.js tidak tersedia")
+    def test_period_close_rule_matches_compiled_javascript_and_shared_cases(self):
+        root = Path(__file__).resolve().parents[1]
+        fixture_path = root / "tests" / "fixtures" / "cukaccount_financial_acceptance.json"
+        fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+        cases = fixture["expected"]["period_close_cases"]
+        rule = _REGISTERED_RULES["period.close.plan.v1"]
+        source = _load_rule_source(rule)
+        generated = generate(from_source(source.decode("utf-8"), rule["source_file"]))
+        with tempfile.TemporaryDirectory(prefix="pusingcuk-period-close-") as temp:
+            artifact = Path(temp) / "period-close.js"
+            artifact.write_text(generated, encoding="utf-8")
+            for case in cases:
+                with self.subTest(case=case["id"]):
+                    compiled = subprocess.run(
+                        [NODE, str(artifact)],
+                        input=f'{case["income_total"]}\n{case["expense_total"]}\n',
+                        text=True, encoding="utf-8", capture_output=True,
+                        timeout=15, check=False,
+                    )
+                    self.assertEqual(compiled.returncode, 0, compiled.stderr)
+                    expected_output = "\n".join(str(value) for value in (
+                        case["result"],
+                        case["net_result_minor_units"],
+                        case["income_total"], 0, 0, case["expense_total"],
+                        max(-case["net_result_minor_units"], 0),
+                        max(case["net_result_minor_units"], 0),
+                    )) + "\n"
+                    self.assertEqual(compiled.stdout, expected_output)
+
+    def test_journal_balance_rule_rejects_invalid_arguments(self):
+        cases = (
+            {"debit_total": 1},
+            {"kredit_total": 1},
+            {"debit_total": 1, "kredit_total": 2, "command": "id"},
+            {"debit_total": True, "kredit_total": 1},
+            {"debit_total": -1, "kredit_total": 1},
+            {"debit_total": 1_000_000_000_001, "kredit_total": 1},
+        )
+        for arguments in cases:
+            with self.subTest(arguments=arguments):
+                expected = (
+                    {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"}
+                    if set(arguments) != {"debit_total", "kredit_total"}
+                    else {"ok": False, "error": "RULE_INPUT_INVALID"}
+                )
+                self.assertEqual(
+                    self.registry.execute("journal_balance_check", arguments),
+                    expected,
+                )
+
+    @unittest.skipUnless(NODE, "Node.js tidak tersedia")
+    def test_journal_balance_rule_matches_compiled_javascript(self):
+        rule = _REGISTERED_RULES["journal.balance.v1"]
+        source = _load_rule_source(rule)
+        generated = generate(from_source(source.decode("utf-8"), rule["source_file"]))
+        cases = (
+            (1250000, 1250000, "JURNAL_SEIMBANG"),
+            (1250000, 1249999, "JURNAL_TIDAK_SEIMBANG"),
+            (0, 0, "INPUT_TIDAK_VALID"),
+        )
+        with tempfile.TemporaryDirectory(prefix="pusingcuk-ai-journal-rule-") as temp:
+            artifact = Path(temp) / "journal-balance.js"
+            artifact.write_text(generated, encoding="utf-8")
+            for debit_total, kredit_total, expected in cases:
+                with self.subTest(debit_total=debit_total, kredit_total=kredit_total):
+                    completed = subprocess.run(
+                        [NODE, str(artifact)],
+                        input=f"{debit_total}\n{kredit_total}\n",
+                        text=True,
+                        encoding="utf-8",
+                        capture_output=True,
+                        timeout=15,
+                        check=False,
+                    )
+                    result = self.registry.execute(
+                        "journal_balance_check",
+                        {"debit_total": debit_total, "kredit_total": kredit_total},
+                    )
+                    self.assertTrue(result["ok"], result)
+                    self.assertEqual(result["result"], expected)
+                    self.assertEqual(completed.returncode, 0, completed.stderr)
+                    self.assertEqual(completed.stdout, expected + "\n")
 
     def test_tampered_artifact_fails_closed_before_execution(self):
         with patch("library.ai_tools._load_rule_source", return_value=b"tampered"):

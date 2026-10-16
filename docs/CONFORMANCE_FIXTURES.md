@@ -1,6 +1,6 @@
 # Kontrak Fixture Konformansi Pusingcuk
 
-**Versi bahasa:** `0.5-dev`. Manifest berisi 66 fixture: 66 wajib pada reference; 61 wajib dan 5 eksplisit unsupported pada native C.
+**Versi bahasa:** `0.5-dev`. Manifest berisi 67 fixture: 67 wajib pada reference; 62 wajib dan 5 eksplisit unsupported pada native C.
 
 Harness konformansi aktif ada di `tools/conformance.py` dan dijalankan oleh CI. Manifest membandingkan perilaku yang terlihat pengguna pada interpreter referensi Python dan runtime native C. Fixture kanonis baru memakai ekstensi `.cuk`; contoh lama berekstensi `.pusingcuk` tetap boleh digunakan untuk kompatibilitas.
 
@@ -100,3 +100,9 @@ python tools/conformance.py
 - [Katalog built-in](language/BUILTINS.md) menjelaskan fungsi dan status per target.
 - [Runtime native](NATIVE_RUNTIME.md) mencatat kemampuan C yang sudah teruji.
 - [Contributing](../CONTRIBUTING.md) menentukan gerbang perubahan dan review.
+
+## Fixture keuangan CukAccount
+
+Fixture `cukaccount_financial_cases.cuk` menetapkan expected output untuk jurnal seimbang, jurnal tidak seimbang, nilai nol, nilai negatif, dan batas nominal aturan Rp1.000.000.000.000. Fixture ini wajib pada interpreter referensi dan native C; ia hanya menguji semantik bahasa untuk data sintetis, bukan memvalidasi atau memposting buku akuntansi.
+
+Batas schema tool juga diuji pada `tests/test_accounting_equation_rule.py`: nilai tepat di batas diterima, sedangkan nilai negatif, nilai di atas batas, boolean, float, teks, null, koleksi, dan argumen yang hilang/berlebih ditolak tanpa coercion.
