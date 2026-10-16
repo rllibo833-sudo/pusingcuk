@@ -66,7 +66,7 @@
           "status": "unsupported"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "not-claimed",
@@ -98,7 +98,7 @@
           "status": "unsupported"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "not-claimed",
@@ -129,7 +129,7 @@
           "status": "unsupported"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "not-claimed",
@@ -160,7 +160,7 @@
           "status": "unsupported"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "not-claimed",
@@ -493,7 +493,7 @@
           "status": "unsupported"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "supported"
@@ -523,7 +523,7 @@
           "status": "unsupported"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "supported"
@@ -556,7 +556,7 @@
           "via": "js"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "supported"
@@ -589,7 +589,7 @@
           "via": "js"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "supported"
@@ -619,7 +619,7 @@
           "status": "unsupported"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "supported"
@@ -652,7 +652,7 @@
           "via": "js"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "supported"
@@ -685,7 +685,7 @@
           "via": "js"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         },
         "native_c": {
           "status": "supported"
