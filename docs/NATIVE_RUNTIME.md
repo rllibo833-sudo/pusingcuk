@@ -22,6 +22,7 @@ Runtime C adalah jalur eksekusi mandiri untuk program Pusingcuk yang termasuk da
 | Literal kamus, kunci teks/angka/boolean, baca/ubah/tambah kunci | Teruji |
 | Batas kamus 256 entri dan penolakan entri ke-257 | Fixture native mengharapkan error |
 | `panjang(kamus)`, truthiness kamus kosong/terisi, iterasi kunci | Teruji |
+| Indeks rentang tersimpan dengan bilangan bulat nonnegatif dan batas valid | Teruji melalui fixture konformansi `collections.range-index` |
 | Error untuk kunci yang tidak didukung dan kunci yang tidak ditemukan | Teruji |
 | Fungsi buatan pengguna (`fungsi`, parameter, `balek`, rekursi) | Teruji oleh CI GCC/Clang di Ubuntu; perangkat Termux nyata belum diverifikasi |
 | Sistem modul | Belum tersedia di native |
