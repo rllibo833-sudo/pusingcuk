@@ -341,7 +341,11 @@ class ToolRegistry:
             if set(arguments) - {"topic"}:
                 return {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"}
             topic = arguments.get("topic", "general")
-            if topic not in {"general", "builtins", "js", "native", "formats", "fixtures", "semantics", "development", "independence"}:
+            allowed_topics = {
+                "general", "builtins", "js", "native", "formats",
+                "fixtures", "semantics", "development", "independence",
+            }
+            if not isinstance(topic, str) or topic not in allowed_topics:
                 return {"ok": False, "error": "COMPILER_CONTEXT_TOPIC_INVALID"}
             entries = BUILTIN_CONTRACT["builtins"]
             try:

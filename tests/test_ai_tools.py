@@ -545,8 +545,10 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertEqual({item["name"] for item in formats["context"]["builtins"]},
                          {"json_teks", "json_baca", "html_aman", "csv_baris"})
 
-        invalid = self.registry.execute("cuk_compiler_context", {"topic": "not-a-topic"})
-        self.assertEqual(invalid, {"ok": False, "error": "COMPILER_CONTEXT_TOPIC_INVALID"})
+        for topic in ("not-a-topic", None, 42, [], {}):
+            with self.subTest(topic=repr(topic)):
+                invalid = self.registry.execute("cuk_compiler_context", {"topic": topic})
+                self.assertEqual(invalid, {"ok": False, "error": "COMPILER_CONTEXT_TOPIC_INVALID"})
 
 
     @unittest.skipUnless(NODE, "Node.js tidak tersedia")
