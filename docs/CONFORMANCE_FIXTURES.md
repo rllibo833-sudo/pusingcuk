@@ -1,6 +1,6 @@
 # Kontrak Fixture Konformansi Pusingcuk
 
-**Versi bahasa:** `0.6-dev`. Manifest berisi 70 fixture: 70 wajib pada reference; 67 wajib dan 3 eksplisit unsupported pada native C.
+**Versi bahasa:** `0.6-dev`. Manifest berisi 71 fixture: 71 wajib pada reference; 68 wajib dan 3 eksplisit unsupported pada native C.
 
 Harness konformansi aktif ada di `tools/conformance.py` dan dijalankan oleh CI. Manifest membandingkan perilaku yang terlihat pengguna pada interpreter referensi Python dan runtime native C. Fixture kanonis baru memakai ekstensi `.cuk`; contoh lama berekstensi `.pusingcuk` tetap boleh digunakan untuk kompatibilitas.
 
@@ -66,7 +66,7 @@ Manifest tidak mengizinkan `exit_code_by_runtime`. Bila suatu runtime belum meng
 1. Sintaks, alias resmi, komentar, string, ekstensi `.cuk`, dan error parsing.
 2. Nilai dan angka: precedence, pembagian lantai/modulo negatif, boolean, short-circuit, dan pembagian nol.
 3. Fungsi dan scope: return, aritas, nama belum dikenal, scope lokal tidak bocor, alias koleksi, dan rekursi.
-4. List/kamus: identitas kunci, mutasi termasuk melalui parameter, indeks di luar batas, kunci hilang, dan batas kapasitas.
+4. List/kamus: konkatenasi list yang mempertahankan urutan dan tidak memutasi operand, identitas kunci, mutasi termasuk melalui parameter, indeks di luar batas, kunci hilang, dan batas kapasitas.
 5. Kondisi, loop, iterasi rentang, dan batas eksekusi.
 6. Built-in: hasil numerik, ties-to-even, akar kuadrat/pangkat, sinus/kosinus dalam radian, jumlah/rata-rata/median, cancellation, hasil pecahan, sampel duplikat, median ganjil/genap, daftar kosong, aritas salah, boolean/tipe koleksi invalid, batas integer aman inklusif/eksklusif, akumulasi di luar rentang aman, overflow/non-finite, dan status dukungan target.
 7. CLI: kelas error, nomor baris, kode keluar, output dan input standar.
