@@ -253,7 +253,11 @@ const pcMathResult = (name, value) => {
     throw new Error(name + "() menghasilkan angka di luar domain atau non-finite");
   return value;
 };
-const pcSqrt = (value) => pcMathResult("akar", Math.sqrt(pcNumeric("akar", value)));
+const pcSqrt = (value) => {
+  const n = pcNumeric("akar", value);
+  if (n < 0) throw new Error("akar() domain tidak valid: angka harus non-negatif");
+  return pcMathResult("akar", Math.sqrt(n));
+};
 const pcFloor = (value) => pcNumericResult("bawah", Math.floor(pcNumeric("bawah", value)));
 const pcCeil = (value) => pcNumericResult("atas", Math.ceil(pcNumeric("atas", value)));
 const pcPow = (a, b) => pcNumericResult("pangkat", pcMathResult("pangkat", Math.pow(pcNumeric("pangkat", a), pcNumeric("pangkat", b))));
