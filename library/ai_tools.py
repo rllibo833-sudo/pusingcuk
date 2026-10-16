@@ -14,8 +14,23 @@ from typing import Any
 from library.knowledge_grounding import rank_knowledge
 from compiler.ir import LANGUAGE_VERSION, from_source
 from compiler.js_backend import generate
+from lexer import KEYWORD_ALIASES
 
 _MAX_CUK_SOURCE_BYTES = 16 * 1024
+
+
+def _cuk_language_identity(source: str) -> dict[str, Any]:
+    """Describe the actual PusingCuk vocabulary present in a source snippet."""
+    words = re.findall(r"\\b[^\\W\\d]\\w*\\b", source, flags=re.UNICODE)
+    aliases_used = list(dict.fromkeys(word for word in words if word in KEYWORD_ALIASES))
+    return {
+        "opening_form": "jancuk",
+        "closing_form": "selesai jancuk",
+        "aliases_used": [
+            {"word": alias, "canonical": KEYWORD_ALIASES[alias]}
+            for alias in aliases_used
+        ],
+    }
 
 _MAX_RULE_INPUT = 1_000_000_000_000
 _MAX_RULE_INPUT_BYTES = 128
@@ -255,6 +270,7 @@ class ToolRegistry:
                 return {"ok": False, "error": "CUK_SOURCE_INVALID"}
             if len(source_bytes) > _MAX_CUK_SOURCE_BYTES:
                 return {"ok": False, "error": "CUK_SOURCE_TOO_LARGE"}
+            language_identity = _cuk_language_identity(source)
             try:
                 document = from_source(source, "ai_input.cuk")
                 generated = generate(document)
@@ -264,6 +280,8 @@ class ToolRegistry:
                     "error": "CUK_COMPILE_FAILED",
                     "diagnostic": str(exc)[:500],
                     "target": "javascript",
+                    "language_version": LANGUAGE_VERSION,
+                    "language_identity": language_identity,
                     "executed": False,
                 }
             artifact_bytes = generated.encode("utf-8")
@@ -272,6 +290,7 @@ class ToolRegistry:
                 "operation": "compile_check",
                 "target": "javascript",
                 "language_version": LANGUAGE_VERSION,
+                "language_identity": language_identity,
                 "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
                 "artifact_sha256": hashlib.sha256(artifact_bytes).hexdigest(),
                 "artifact_bytes": len(artifact_bytes),
