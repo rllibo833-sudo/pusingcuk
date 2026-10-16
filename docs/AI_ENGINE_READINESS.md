@@ -135,3 +135,8 @@ For PusingCuk development, the target state is no runtime/API-key/repository dep
 ## Immediate acceptance target
 
 Keep the 22-source curated index, 22-case baseline and 12-case adversarial corpus aligned by automated test. CI prints reproducible top-1/top-3 and structural safety metrics with `python tools/evaluate_knowledge_retrieval.py`. Maintain a non-contradictory grounding contract and document release gates. Live-model refusal and general response quality remain unmeasured; the AI Engine is not claimed production-ready.
+
+
+## AI engine evidence-status regression
+
+`examples/ai/engine_contract.cuk` is the language-owned source of the deterministic compile/runtime evidence labels. Regression tests execute it through both the Python reference interpreter and generated JavaScript, and require each supported status to appear in both outputs. A successful compile-check remains explicitly **not runtime proof**; only a separately observed runtime result may be labeled runtime-tested.

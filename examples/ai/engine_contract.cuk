@@ -31,26 +31,26 @@ fungsi status_bukti_kode(status_kompilasi, status_runtime)
             balek "SOURCE_MELEBIHI_BATAS"
         kampret
             njir status_kompilasi == "ditolak"
-        balek "SOURCE_DITOLAK_COMPILER"
-    kampret
-        njir status_kompilasi != "lulus"
-            balek "STATUS_KOMPILASI_TIDAK_VALID"
-        kampret
-            njir status_runtime == "lulus"
-                balek "RUNTIME_TERUJI"
+                balek "SOURCE_DITOLAK_COMPILER"
             kampret
-                njir status_runtime == "belum_dijalankan"
-                    balek "KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI"
+                njir status_kompilasi != "lulus"
+                    balek "STATUS_KOMPILASI_TIDAK_VALID"
                 kampret
-                    njir status_runtime == "gagal"
-                        balek "RUNTIME_GAGAL"
+                    njir status_runtime == "lulus"
+                        balek "RUNTIME_TERUJI"
                     kampret
-                        balek "STATUS_RUNTIME_TIDAK_VALID"
+                        njir status_runtime == "belum_dijalankan"
+                            balek "KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI"
+                        kampret
+                            njir status_runtime == "gagal"
+                                balek "RUNTIME_GAGAL"
+                            kampret
+                                balek "STATUS_RUNTIME_TIDAK_VALID"
+                            selesai njir
+                        selesai njir
                     selesai njir
                 selesai njir
             selesai njir
-        selesai njir
-    selesai njir
         selesai njir
     selesai njir
 selesai fungsi

@@ -505,5 +505,44 @@ class ToolInputContractTests(unittest.TestCase):
         invalid = self.registry.execute("cuk_compiler_context", {"topic": "not-a-topic"})
         self.assertEqual(invalid, {"ok": False, "error": "COMPILER_CONTEXT_TOPIC_INVALID"})
 
+
+    @unittest.skipUnless(NODE, "Node.js tidak tersedia")
+    def test_ai_engine_contract_evidence_statuses_match_python_and_javascript(self):
+        """The .cuk evidence contract must execute identically in reference and generated runtimes."""
+        source_path = ROOT / "examples" / "ai" / "engine_contract.cuk"
+        source = source_path.read_text(encoding="utf-8")
+        generated = generate(from_source(source, str(source_path.relative_to(ROOT))))
+
+        with tempfile.TemporaryDirectory(prefix="pusingcuk-engine-contract-") as temp:
+            artifact = Path(temp) / "engine-contract.js"
+            artifact.write_text(generated, encoding="utf-8")
+            reference = subprocess.run(
+                [sys.executable, str(ROOT / "pusingcuk_new.py"), str(source_path)],
+                cwd=ROOT, text=True, encoding="utf-8", capture_output=True,
+                timeout=15, check=False,
+            )
+            compiled = subprocess.run(
+                [NODE, str(artifact)], cwd=ROOT, text=True, encoding="utf-8",
+                capture_output=True, timeout=15, check=False,
+            )
+
+        self.assertEqual(reference.returncode, 0, reference.stderr)
+        self.assertEqual(compiled.returncode, 0, compiled.stderr)
+        expected_statuses = (
+            "SOURCE_INPUT_TIDAK_VALID",
+            "SOURCE_MELEBIHI_BATAS",
+            "SOURCE_DITOLAK_COMPILER",
+            "STATUS_KOMPILASI_TIDAK_VALID",
+            "KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI",
+            "RUNTIME_TERUJI",
+            "RUNTIME_GAGAL",
+            "STATUS_RUNTIME_TIDAK_VALID",
+        )
+        for status in expected_statuses:
+            with self.subTest(status=status):
+                self.assertIn(status, reference.stdout)
+                self.assertIn(status, compiled.stdout)
+
+
 if __name__ == "__main__":
     unittest.main()
