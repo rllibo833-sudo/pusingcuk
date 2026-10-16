@@ -274,6 +274,65 @@ const pcMedian = (value) => {
   if (values.length % 2) return values[middle];
   return pcStatResult("median", values[middle - 1] / 2 + values[middle] / 2);
 };
+const pcJsonCompatible = (value, path = "$", seen = new Set()) => {
+  if (value === null || typeof value === "string" || typeof value === "boolean") return value;
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) throw new Error("JSON angka non-finite: " + path);
+    if (Number.isInteger(value) && !Number.isSafeInteger(value))
+      throw new Error("JSON integer di luar rentang aman: " + path);
+    return value;
+  }
+  if (Array.isArray(value)) {
+    if (seen.has(value)) throw new Error("JSON tidak menerima struktur melingkar: " + path);
+    seen.add(value);
+    const result = value.map((item, index) => pcJsonCompatible(item, path + "[" + index + "]", seen));
+    seen.delete(value);
+    return result;
+  }
+  if (value instanceof Map) {
+    if (seen.has(value)) throw new Error("JSON tidak menerima struktur melingkar: " + path);
+    seen.add(value);
+    const result = {};
+    for (const [key, item] of value.entries()) {
+      if (typeof key !== "string") throw new Error("kunci objek JSON harus teks: " + path);
+      Object.defineProperty(result, key, {
+        value: pcJsonCompatible(item, path + "." + key, seen),
+        enumerable: true, configurable: true, writable: true
+      });
+    }
+    seen.delete(value);
+    return result;
+  }
+  throw new Error("tipe tidak didukung JSON: " + typeof value + " pada " + path);
+};
+const pcJsonText = (value) => JSON.stringify(pcJsonCompatible(value));
+const pcJsonRead = (value) => {
+  if (typeof value !== "string") throw new Error("json_baca() membutuhkan teks JSON");
+  try {
+    return JSON.parse(value, (_key, item) => {
+      if (item && typeof item === "object" && !Array.isArray(item)) return new Map(Object.entries(item));
+      return item;
+    });
+  } catch (error) {
+    throw new Error("teks JSON tidak valid: " + error.message);
+  }
+};
+const pcHtmlEscape = (value) => pcText(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+  .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#x27;");
+const pcCsvRow = (value) => {
+  if (!Array.isArray(value)) throw new Error("csv_baris() membutuhkan daftar");
+  return value.map((item) => {
+    let field;
+    if (item === null || typeof item === "string" || typeof item === "boolean") field = pcText(item);
+    else if (typeof item === "number" && Number.isFinite(item) &&
+      (!Number.isInteger(item) || Number.isSafeInteger(item))) field = String(item);
+    else throw new Error("csv_baris() hanya menerima nilai skalar aman");
+    const mustQuote = field.includes(",") || field.includes('"') ||
+      field.includes(String.fromCharCode(13)) || field.includes(String.fromCharCode(10));
+    return mustQuote ? '"' + field.replaceAll('"', '""') + '"' : field;
+  }).join(",");
+};
+
 const pcInputLines = (typeof process !== "undefined" && typeof require === "function" &&
   typeof module !== "undefined" && require.main === module)
   ? require("fs").readFileSync(0, "utf8").split(/\r?\n/)

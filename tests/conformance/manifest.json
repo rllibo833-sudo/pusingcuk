@@ -1326,6 +1326,26 @@
         "reference": "required",
         "native": "required"
       }
+    },
+    {
+      "id": "formats.json-html-csv",
+      "source": "formats_json_html_csv.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "json",
+        "html-escaping",
+        "csv-quoting"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "{\"nama\":\"Budi\",\"aktif\":true}\nBudi\nokelah\n&lt;b&gt;&amp;&quot;&#x27;\nBudi,\"kopi, susu\",\"dia bilang \"\"hai\"\"\"\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "unsupported"
+      }
     }
   ]
 }

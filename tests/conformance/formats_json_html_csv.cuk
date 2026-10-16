@@ -1,0 +1,9 @@
+jancuk
+lah data = {"nama": "Budi", "aktif": benar}
+hedeh json_teks(data)
+lah pulih = json_baca("{\"nama\":\"Budi\",\"aktif\":true}")
+hedeh pulih["nama"]
+hedeh pulih["aktif"]
+hedeh html_aman("<b>&\"'")
+hedeh csv_baris(["Budi", "kopi, susu", "dia bilang \"hai\""])
+selesai jancuk

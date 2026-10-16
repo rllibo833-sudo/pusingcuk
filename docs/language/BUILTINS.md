@@ -2,7 +2,7 @@
 
 Halaman ini adalah katalog built-in yang dipakai bersama oleh dokumentasi dan pengujian. Jumlah argumen, deskripsi ringkas, dan status setiap target diambil dari `library/builtin_contract.json`; tes memeriksa agar tabel ini tidak menyimpang dari metadata.
 
-**Versi bahasa:** `0.5-dev`. Bagian pertama berisi tepat 21 built-in terkontrak; fungsi tambahan yang langsung ditangani evaluator reference dipisahkan dan tidak masuk hitungan built-in lintas target.
+**Versi bahasa:** `0.5-dev`. Bagian pertama berisi tepat 25 built-in terkontrak; fungsi tambahan yang langsung ditangani evaluator reference dipisahkan dan tidak masuk hitungan built-in lintas target.
 
 Status `not-claimed` pada native C berarti scalar subset telah diuji, tetapi kesetaraan penuh dengan interpreter referensi belum diklaim. `teks()` native menerima teks, angka finite, boolean dan None; koleksi belum diformat. Backend JS menyediakan `teks()` dan `bilangan()` untuk alur konversi yang diperlukan contoh akuntansi; `bilangan()` membatasi hasil ke rentang aman lintas target dan menerima teks integer. `desimal()` menerima angka finite atau teks angka finite; nilai `NaN`/tak hingga ditolak. `logika()` memakai truthiness native yang tersedia. Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python mentah. Misalnya, `teks(benar)` menghasilkan `okelah` dan `teks(salah)` menghasilkan `tidak`, bukan ejaan boolean dari bahasa host. Statistik `rata_rata` dan `median` menerima daftar angka finite non-boolean yang tidak kosong; `jumlah` menerima daftar termasuk daftar kosong yang menghasilkan nol. Nilai integer di luar rentang aman dan hasil non-finite ditolak.
 
@@ -13,7 +13,7 @@ Status `not-claimed` pada native C berarti scalar subset telah diuji, tetapi kes
 - `not-claimed`: dukungan belum diverifikasi; jangan menjanjikan kompatibilitas.
 - **Python reference** adalah interpreter bahasa utama. **Python transpiler** adalah target compiler yang berbeda dan tidak boleh disamakan dengannya.
 
-## 21 Built-in Terkontrak
+## 25 Built-in Terkontrak
 
 | Built-in | Argumen | Perilaku | Python reference | Native C | JS transpiler | Python transpiler | HTML | VM |
 |---|---:|---|---|---|---|---|---|---|
@@ -38,10 +38,14 @@ Status `not-claimed` pada native C berarti scalar subset telah diuji, tetapi kes
 | `jumlah` | 1 | Jumlah berurutan angka finite non-boolean dalam daftar; daftar kosong bernilai nol dan setiap hasil integral antara/akhir dibatasi rentang aman lintas target. | supported | supported | unsupported | unsupported | unsupported | supported |
 | `rata_rata` | 1 | Rata-rata aritmetika daftar nonkosong angka finite non-boolean dalam rentang aman lintas target. | supported | supported | supported | supported | supported | supported |
 | `median` | 1 | Median daftar nonkosong angka finite non-boolean dalam rentang aman lintas target. | supported | supported | supported | supported | supported | supported |
+| `json_teks` | 1 | Serialisasi nilai JSON dengan tipe dan kunci yang aman lintas target. | supported | unsupported | supported | unsupported | supported | unsupported |
+| `json_baca` | 1 | Membaca teks JSON menjadi nilai PusingCuk. | supported | unsupported | supported | unsupported | supported | unsupported |
+| `html_aman` | 1 | Meloloskan karakter khusus untuk teks HTML. | supported | unsupported | supported | unsupported | supported | unsupported |
+| `csv_baris` | 1 | Menyerialisasi daftar nilai skalar menjadi satu baris CSV RFC 4180 tanpa terminator baris. | supported | unsupported | supported | unsupported | supported | unsupported |
 
 ## Intrinsics Tambahan Python (reference only)
 
-Fungsi berikut ditangani langsung oleh evaluator Python dan bukan bagian dari 21 built-in terkontrak. Ketersediaannya tidak boleh diasumsikan pada runtime native C, transpiler, HTML, atau VM.
+Fungsi berikut ditangani langsung oleh evaluator Python dan bukan bagian dari 25 built-in terkontrak. Ketersediaannya tidak boleh diasumsikan pada runtime native C, transpiler, HTML, atau VM.
 
 - **Berkas/JSON:** `baca`, `tulis`, `baca_json`, `tulis_json`
 - **Modul dan waktu:** `angkut`, `jam`, `tanggal`

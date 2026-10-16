@@ -694,6 +694,134 @@
           "status": "supported"
         }
       }
+    },
+    {
+      "name": "json_teks",
+      "parameters": [
+        "nilai"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Serialisasi nilai JSON dengan tipe dan kunci yang aman lintas target.",
+      "implementation": "json_text",
+      "backends": {
+        "reference": {
+          "status": "supported"
+        },
+        "native_c": {
+          "status": "unsupported"
+        },
+        "js": {
+          "status": "supported",
+          "helper": "pcJsonText"
+        },
+        "python": {
+          "status": "unsupported"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "unsupported"
+        }
+      }
+    },
+    {
+      "name": "json_baca",
+      "parameters": [
+        "teks_json"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Membaca teks JSON menjadi nilai PusingCuk.",
+      "implementation": "json_read",
+      "backends": {
+        "reference": {
+          "status": "supported"
+        },
+        "native_c": {
+          "status": "unsupported"
+        },
+        "js": {
+          "status": "supported",
+          "helper": "pcJsonRead"
+        },
+        "python": {
+          "status": "unsupported"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "unsupported"
+        }
+      }
+    },
+    {
+      "name": "html_aman",
+      "parameters": [
+        "nilai"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Meloloskan karakter khusus untuk teks HTML.",
+      "implementation": "html_escape",
+      "backends": {
+        "reference": {
+          "status": "supported"
+        },
+        "native_c": {
+          "status": "unsupported"
+        },
+        "js": {
+          "status": "supported",
+          "helper": "pcHtmlEscape"
+        },
+        "python": {
+          "status": "unsupported"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "unsupported"
+        }
+      }
+    },
+    {
+      "name": "csv_baris",
+      "parameters": [
+        "kolom"
+      ],
+      "min_args": 1,
+      "max_args": 1,
+      "description": "Menyerialisasi daftar nilai skalar menjadi satu baris CSV RFC 4180 tanpa terminator baris.",
+      "implementation": "csv_row",
+      "backends": {
+        "reference": {
+          "status": "supported"
+        },
+        "native_c": {
+          "status": "unsupported"
+        },
+        "js": {
+          "status": "supported",
+          "helper": "pcCsvRow"
+        },
+        "python": {
+          "status": "unsupported"
+        },
+        "html": {
+          "status": "supported",
+          "via": "js"
+        },
+        "vm": {
+          "status": "unsupported"
+        }
+      }
     }
   ],
   "python_builtins": [
