@@ -165,7 +165,7 @@
       ],
       "expected": {
         "exit_code": 0,
-        "stdout": "4\n1\n4\n2\n",
+        "stdout": "4\n1\n4\n2\n2\n",
         "stderr_class": null
       },
       "runtimes": {
