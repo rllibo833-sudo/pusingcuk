@@ -53,13 +53,9 @@ const pcEq = (a, b) => {
   if (typeof a !== typeof b) return false;
   if (Array.isArray(a) && Array.isArray(b))
     return a.length === b.length && a.every((v, i) => pcEq(v, b[i]));
-  if (a instanceof Map || b instanceof Map) {
-    if (!(a instanceof Map) || !(b instanceof Map) || a.size !== b.size) return false;
-    for (const [key, value] of a.entries()) {
-      if (!b.has(key) || !pcEq(value, b.get(key))) return false;
-    }
-    return true;
-  }
+  // Dictionary equality is identity-based in the current language contract.
+  // Do not silently give the JavaScript target structural equality.
+  if (a instanceof Map || b instanceof Map) return a === b;
   return a === b;
 };
 const pcAdd = (a, b) => {
