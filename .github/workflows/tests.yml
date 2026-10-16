@@ -194,7 +194,7 @@ jobs:
             request_id: randomUUID(),
             program_id: "budget.threshold.v1",
             program_sha256: "e79058b314d921a4b4353133b30a7a7b0da64d32785a39f66cb5ce356406067d",
-            language_version: "0.5-dev",
+            language_version: "0.6-dev",
             entrypoint: "status_anggaran",
             capabilities: [],
             limits: { timeout_ms: 3000, input_bytes: 128, output_bytes: 1024 },

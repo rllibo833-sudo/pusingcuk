@@ -19,7 +19,7 @@ class DocumentationContractTests(unittest.TestCase):
         self.assertEqual(contract["language_version"], language)
         self.assertEqual(contract["contract_version"], language)
         self.assertEqual((language, package_version, total, native),
-                         ("0.5-dev", "0.8.0.dev0", 25, 17))
+                         ("0.6-dev", "0.8.0.dev0", 25, 17))
         expectations = {
             "docs/COMPATIBILITY.md": [f"`{language}`", f"{total} built-in", f"{native} built-in"],
             "docs/VISION.md": [f"`{language}`", f"`{package_version}`"],

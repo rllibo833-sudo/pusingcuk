@@ -258,6 +258,17 @@ class JavaScriptBackendTests(unittest.TestCase):
         self.assertIn("pembagian dengan nol", result.stderr)
 
 
+    def test_json_read_returns_indexable_mutable_language_dictionary(self):
+        root = Path(__file__).resolve().parents[1]
+        source = (root / "tests" / "conformance" / "formats_json_html_csv.cuk").read_text(encoding="utf-8")
+        result = self.run_source(source)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            result.stdout,
+            '{"nama":"Budi","aktif":true}\nBudi\nSiti\nokelah\n'
+            '&lt;b&gt;&amp;&quot;&#x27;\nBudi,"kopi, susu","dia bilang ""hai"""\n',
+        )
+
     def test_expanded_builtins_match_reference_contract_fixture(self):
         root = Path(__file__).resolve().parents[1]
         source = (root / "tests" / "conformance" / "builtins_js_expanded.cuk").read_text(encoding="utf-8")

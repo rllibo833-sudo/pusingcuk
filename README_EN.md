@@ -2,7 +2,7 @@
 
 PusingCuk is an experimental programming language with Indonesian-readable keywords. Its compatibility baseline is the **Python reference interpreter** plus a tested **native C runtime** subset.
 
-- **Language contract:** `0.5-dev`
+- **Language contract:** `0.6-dev`
 - **Development package version:** `0.8.0.dev0` (PEP 440 spelling for the `0.8.0-dev` line)
 - **Canonical source extension:** `.cuk`; legacy `.pusingcuk` files remain supported.
 

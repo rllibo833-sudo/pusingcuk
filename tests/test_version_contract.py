@@ -46,7 +46,7 @@ class VersionContractTests(unittest.TestCase):
         vocabulary = json.loads((ROOT / "library" / "kosakata.json").read_text(encoding="utf-8"))
 
         expected = package["tool"]["pusingcuk"]["language-version"]
-        self.assertEqual(expected, "0.5-dev")
+        self.assertEqual(expected, "0.6-dev")
         self.assertEqual(LANGUAGE_VERSION, expected)
         self.assertEqual(contract["contract_version"], expected)
         self.assertEqual(contract["language_version"], expected)

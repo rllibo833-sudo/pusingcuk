@@ -18,7 +18,7 @@ class ReplEntryPointTests(unittest.TestCase):
             check=False,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("Pusingcuk Terminal 0.5-dev", result.stdout)
+        self.assertIn("Pusingcuk Terminal 0.6-dev", result.stdout)
         self.assertIn("Sampai jumpa!", result.stdout)
 
     def test_check_without_file_still_errors(self):

@@ -1,6 +1,6 @@
 # Pusingcuk Language and Technical Dictionary
 
-This is the plain-language map for learners and contributors. It describes the `0.5-dev` language-spec contract; the implementation release line is versioned separately. It is not a promise that every feature works on every backend.
+This is the plain-language map for learners and contributors. It describes the `0.6-dev` language-spec contract; the implementation release line is versioned separately. It is not a promise that every feature works on every backend.
 
 ## 1. Start here
 

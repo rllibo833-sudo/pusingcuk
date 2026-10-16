@@ -1,4 +1,4 @@
-"""Lexer untuk bahasa Pusingcuk 0.5-dev (metadata paket main: 0.8.0.dev0)."""
+"""Lexer untuk bahasa Pusingcuk 0.6-dev (metadata paket main: 0.8.0.dev0)."""
 
 from dataclasses import dataclass
 

@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "language": "Pusingcuk",
-  "language_version": "0.5-dev",
-  "description": "Glosarium keyword, alias resmi yang sudah disetujui, operator, dan status runtime Pusingcuk 0.5-dev. Perubahan kosakata wajib mengikuti SPEC.md dan fixture konformansi; registry ini tidak mengusulkan alias baru.",
+  "language_version": "0.6-dev",
+  "description": "Glosarium keyword, alias resmi yang sudah disetujui, operator, dan status runtime Pusingcuk 0.6-dev. Perubahan kosakata wajib mengikuti SPEC.md dan fixture konformansi; registry ini tidak mengusulkan alias baru.",
   "source_of_truth": [
     "../SPEC.md",
     "../docs/KOSAKATA_GENZ.md",

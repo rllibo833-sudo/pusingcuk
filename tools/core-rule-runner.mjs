@@ -13,7 +13,7 @@ import { spawn } from "node:child_process";
 import { createServer } from "node:http";
 
 const PINNED_COMMIT = "e367f45b0a35ccb8fdb91424099b8046b346d77d";
-const LANGUAGE_VERSION = "0.5-dev";
+const LANGUAGE_VERSION = "0.6-dev";
 const RUNTIME_VERSION = "Pusingcuk native 0.8.0.dev0";
 const CONTRACT_VERSION = "pusingcuk.core.tool.v1";
 const SOURCE_PATH = "examples/core/anggaran_threshold_service.cuk";

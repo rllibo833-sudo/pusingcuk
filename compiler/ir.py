@@ -16,7 +16,7 @@ from parser import parse
 
 FORMAT = "pusingcuk-ir"
 IR_VERSION = 1
-LANGUAGE_VERSION = "0.5-dev"
+LANGUAGE_VERSION = "0.6-dev"
 NODE_KINDS = {
     "Program", "Declare", "Print", "Input", "If", "While", "For",
     "Function", "Return", "Assign", "IndexAssign", "Variable", "Literal", "Try",

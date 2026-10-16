@@ -2,7 +2,7 @@
 
 Pusingcuk is an experimental programming language built around Indonesian-friendly keywords and readable examples. Its near-term goal is not to support every compiler target; it is to make one language behave predictably across its **Python reference interpreter** and **native C runtime**.
 
-**Canonical language version:** `0.5-dev`. Development package metadata is `0.8.0.dev0` (PEP 440 spelling for the `0.8.0-dev` line). New programs use `.cuk`; `.pusingcuk` remains a compatibility extension.
+**Canonical language version:** `0.6-dev`. Development package metadata is `0.8.0.dev0` (PEP 440 spelling for the `0.8.0-dev` line). New programs use `.cuk`; `.pusingcuk` remains a compatibility extension.
 
 ### Runtime capability matrix
 
@@ -91,7 +91,7 @@ The build command validates the source and stops with a compilation error when i
 
 The `.cuk` extension is Pusingcuk's canonical source-file identity for new programs. The distinctive identity comes from its Indonesian-readable syntax and tested language rules—not the suffix alone. Existing `.pusingcuk` files remain supported for compatibility.
 
-Metadata paket pada `main` adalah `0.8.0.dev0` (`pyproject.toml`, `Makefile`, `library/kosakata.json`, dan fallback runtime native); kontrak bahasa tetap `0.5-dev` (`lexer.py`, `SPEC.md`). Tag rilis yang lebih lama tetap menunjuk snapshot historis; metadata pengembangan saat ini menggunakan versi paket PEP 440 `0.8.0.dev0`. Gunakan `make version` dan `make language-version` untuk memeriksa keduanya.
+Metadata paket pada `main` adalah `0.8.0.dev0` (`pyproject.toml`, `Makefile`, `library/kosakata.json`, dan fallback runtime native); kontrak bahasa tetap `0.6-dev` (`lexer.py`, `SPEC.md`). Tag rilis yang lebih lama tetap menunjuk snapshot historis; metadata pengembangan saat ini menggunakan versi paket PEP 440 `0.8.0.dev0`. Gunakan `make version` dan `make language-version` untuk memeriksa keduanya.
 
 After installing the CLI, run `pusingcuk script.cuk` directly. Executable scripts can start with `#!/usr/bin/env pusingcuk` and use `chmod +x script.cuk`; the CLI must be installed and on `PATH`.
 
@@ -155,7 +155,7 @@ CI tests the reference interpreter on Python 3.11 and 3.12 and builds the native
 
 ## Development status and next steps
 
-PusingCuk is still experimental. The current language contract is `0.5-dev`; the Python package version `0.8.0.dev0` is separate. The active conformance manifest contains **69 fixtures**: all 69 are required on the Python reference interpreter, 62 are required on native C, and 7 are explicitly unsupported on native C. Unsupported fixtures are not counted as passes or cross-runtime parity.
+PusingCuk is still experimental. The current language contract is `0.6-dev`; the Python package version `0.8.0.dev0` is separate. The active conformance manifest contains **69 fixtures**: all 69 are required on the Python reference interpreter, 62 are required on native C, and 7 are explicitly unsupported on native C. Unsupported fixtures are not counted as passes or cross-runtime parity.
 
 Recent engineering work has added regression coverage for the local AI path from HTTP chat handling through the allowlisted tool registry and a registered `.cuk` rule to a generated JavaScript artifact. The CukAccount shared synthetic acceptance dataset now feeds both the Dart/SQLite report-and-close tests and the registered `period_close_plan` rule. That rule classifies profit/loss/zero and returns a deterministic role-based closing-line plan for comparison with SQLite's actual closing journal; it never posts transactions. These deterministic checks do not post real transactions and are not proof of general live-model quality or production readiness.
 

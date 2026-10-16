@@ -1,6 +1,6 @@
 # Runtime Native Pusingcuk
 
-**Versi bahasa:** `0.5-dev`. Versi paket `0.8.0.dev0` adalah versi distribusi dan tidak mengubah kontrak bahasa. Native C adalah subset eksekusi mandiri, bukan implementasi seluruh intrinsics reference.
+**Versi bahasa:** `0.6-dev`. Versi paket `0.8.0.dev0` adalah versi distribusi dan tidak mengubah kontrak bahasa. Native C adalah subset eksekusi mandiri, bukan implementasi seluruh intrinsics reference.
 
 ## Tujuan
 

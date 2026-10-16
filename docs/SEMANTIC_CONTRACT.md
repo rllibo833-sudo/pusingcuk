@@ -1,6 +1,6 @@
 # Kontrak Semantik Pusingcuk v1
 
-**Versi bahasa yang diatur:** `0.5-dev`. Nomor `v1` pada judul adalah revisi dokumen kontrak semantik, bukan versi bahasa.
+**Versi bahasa yang diatur:** `0.6-dev`. Nomor `v1` pada judul adalah revisi dokumen kontrak semantik, bukan versi bahasa.
 
 Status: baseline engineering untuk perilaku yang harus dipatuhi front-end, interpreter, runtime native, dan backend berikutnya. Hanya perilaku yang ditetapkan spesifikasi atau dibuktikan fixture boleh diklaim stabil lintas runtime.
 
@@ -33,6 +33,7 @@ Backend JavaScript kini memiliki implementasi untuk seluruh built-in terkontrak;
 - dan / atau menggunakan short-circuit: operand kanan tidak dievaluasi jika hasil sudah ditentukan.
 - Boolean benar dan salah adalah tipe berbeda dari angka. Kesetaraan benar == 1 menghasilkan tidak.
 - Output boolean memakai `okelah` dan `tidak`, bukan `True`/`False`. Built-in `teks` juga menggunakan ejaan bahasa Pusingcuk untuk boolean.
+- `json_baca(teks)` menghasilkan kamus yang bisa dibaca dan diubah dengan akses indeks pada interpreter referensi Python dan backend JavaScript. Native C belum mengklaim dukungan JSON; fixture JSON tetap `unsupported` pada target tersebut.
 - Kontrak built-in disimpan di `library/builtin_contract.json`, diuji oleh `tests/test_builtin_contract.py`, dan didokumentasikan di `docs/language/BUILTINS.md`. Interpreter referensi mendukung 25 built-in terdaftar; native C memiliki fixture untuk 17: `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`, `logaritma`, `log10`, `sinus`, `kosinus`, `jumlah`, `rata_rata`, dan `median`. Transpiler/VM memiliki subset tersendiri.
 - `sinus` dan `kosinus` menerima satu angka finite non-boolean dalam radian; semua input finite punya domain matematis valid, hasil non-finite ditolak, dan hasil integral dalam rentang aman dinormalisasi sebagai integer.
 - `jumlah` menerima tepat satu daftar angka finite non-boolean. Daftar kosong bernilai integer 0; input integer-valued di luar `±(2^53 - 1)`, akumulasi non-finite, dan setiap hasil akumulasi integral sementara atau akhir di luar rentang aman ditolak sebagai error runtime. Hasil integral yang aman dinormalisasi ke integer; penjumlahan dilakukan berurutan dalam binary64 pada kedua runtime.

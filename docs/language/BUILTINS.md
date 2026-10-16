@@ -2,7 +2,7 @@
 
 Halaman ini adalah katalog built-in yang dipakai bersama oleh dokumentasi dan pengujian. Jumlah argumen, deskripsi ringkas, dan status setiap target diambil dari `library/builtin_contract.json`; tes memeriksa agar tabel ini tidak menyimpang dari metadata.
 
-**Versi bahasa:** `0.5-dev`. Bagian pertama berisi tepat 25 built-in terkontrak; fungsi tambahan yang langsung ditangani evaluator reference dipisahkan dan tidak masuk hitungan built-in lintas target.
+**Versi bahasa:** `0.6-dev`. Bagian pertama berisi tepat 25 built-in terkontrak; fungsi tambahan yang langsung ditangani evaluator reference dipisahkan dan tidak masuk hitungan built-in lintas target.
 
 Status `not-claimed` pada native C berarti scalar subset telah diuji, tetapi kesetaraan penuh dengan interpreter referensi belum diklaim. `teks()` native menerima teks, angka finite, boolean dan None; koleksi belum diformat. Backend JS mengikuti kontrak built-in bersama: `desimal()` menerima angka atau teks desimal finite (bukan boolean/null), `logika()` memakai truthiness bahasa, dan `logaritma()`, `log10()`, serta `jumlah()` memvalidasi domain, tipe, finite values, dan rentang integer aman. Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python mentah. Misalnya, `teks(benar)` menghasilkan `okelah` dan `teks(salah)` menghasilkan `tidak`, bukan ejaan boolean dari bahasa host. Statistik `rata_rata` dan `median` menerima daftar angka finite non-boolean yang tidak kosong; `jumlah` menerima daftar termasuk daftar kosong yang menghasilkan nol. Nilai integer di luar rentang aman dan hasil non-finite ditolak.
 

@@ -1,6 +1,6 @@
 # Contributing to Pusingcuk
 
-**Canonical language version:** `0.5-dev`. New source examples use `.cuk`; legacy `.pusingcuk` files remain valid compatibility fixtures.
+**Canonical language version:** `0.6-dev`. New source examples use `.cuk`; legacy `.pusingcuk` files remain valid compatibility fixtures.
 
 Start with the [project vision and community principles](docs/VISION.md). Pusingcuk welcomes code and non-code contributions; technical changes must still be tested and reviewed.
 

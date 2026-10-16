@@ -19,7 +19,7 @@ selesai jancuk"""
 
 
 def main():
-    print("Pusingcuk Terminal 0.5-dev")
+    print("Pusingcuk Terminal 0.6-dev")
     print("Ketik :bantuan untuk petunjuk, :keluar untuk keluar.")
     lines = []
     repl_env = {}

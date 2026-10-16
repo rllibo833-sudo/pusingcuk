@@ -2,7 +2,7 @@
 
 Dokumen ini menetapkan batas kompatibilitas yang boleh diklaim, bukan janji bahwa semua sasaran sudah tercapai. Pusingcuk masih eksperimental dan runtime Python serta C belum setara untuk semua fitur.
 
-**Versi bahasa kanonis:** `0.5-dev`. Versi paket pengembangan `0.8.0.dev0` adalah versi distribusi, bukan versi bahasa. Kontrak memuat 25 built-in; 17 built-in functions are supported by the native C runtime, while four scalar conversion built-ins have partial native support and do not imply full parity. Dukungan transpiler dan VM berbeda per built-in, jadi gunakan matriks kontrak.
+**Versi bahasa kanonis:** `0.6-dev`. Versi paket pengembangan `0.8.0.dev0` adalah versi distribusi, bukan versi bahasa. Kontrak memuat 25 built-in; 17 built-in functions are supported by the native C runtime, while four scalar conversion built-ins have partial native support and do not imply full parity. Dukungan transpiler dan VM berbeda per built-in, jadi gunakan matriks kontrak.
 
 **Baseline yang dipelihara:** Python modular adalah referensi; runtime native C adalah implementasi kedua untuk subset yang diuji. Sebuah perilaku disebut lintas-runtime hanya jika fixture yang sama berstatus `required` pada `reference` dan `native` serta lulus di CI. Fitur Python-only tetap valid sebagai kemampuan referensi, tetapi tidak otomatis tersedia pada C. Compiler/transpiler lain dan PVM ditunda dari jalur kompatibilitas utama.
 

@@ -106,7 +106,7 @@ _REGISTERED_RULES: dict[str, dict[str, Any]] = {
         "source_file": "budget_threshold.cuk",
         "source_sha256": "0320f50b48489251d4a784ce3c1781a1a014ca2aecc5dfd1b8317f8a6b9fb911",
         "entrypoint": "status_anggaran",
-        "language_version": "0.5-dev",
+        "language_version": "0.6-dev",
         "input_fields": ("nominal", "batas"),
         "properties": {
             "nominal": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
@@ -125,7 +125,7 @@ _REGISTERED_RULES: dict[str, dict[str, Any]] = {
         "source_file": "journal_balance_check.cuk",
         "source_sha256": "ce519f68d20c0db3a5c611a30a7355e1dd1170a3450ab93d1f048e1945bd4f2c",
         "entrypoint": "cek_keseimbangan_jurnal",
-        "language_version": "0.5-dev",
+        "language_version": "0.6-dev",
         "input_fields": ("debit_total", "kredit_total"),
         "properties": {
             "debit_total": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
@@ -144,7 +144,7 @@ _REGISTERED_RULES: dict[str, dict[str, Any]] = {
         "source_file": "accounting_equation_check.cuk",
         "source_sha256": "aa2f46e3fb3ac65adc763de5f4818ccda251e2f316a6a91e16e41095890b35bc",
         "entrypoint": "cek_persamaan_akuntansi",
-        "language_version": "0.5-dev",
+        "language_version": "0.6-dev",
         "input_fields": ("aset", "liabilitas", "ekuitas"),
         "properties": {
             "aset": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
@@ -163,7 +163,7 @@ _REGISTERED_RULES: dict[str, dict[str, Any]] = {
         "source_file": "period_close_plan.cuk",
         "source_sha256": "7625849ce41d1c5149b49a8d2f16f0df8834318c4cd2200fa647032b99a7eb7e",
         "entrypoint": "status_penutupan_periode",
-        "language_version": "0.5-dev",
+        "language_version": "0.6-dev",
         "input_fields": ("income_total", "expense_total"),
         "properties": {
             "income_total": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
@@ -182,7 +182,7 @@ _REGISTERED_RULES: dict[str, dict[str, Any]] = {
         "source_file": "report_classification_check.cuk",
         "source_sha256": "6f1882ee8d68d0bbe1feb279ce438a592b458ef3f267fc7a5607a224ec423c1d",
         "entrypoint": "cek_klasifikasi_laporan",
-        "language_version": "0.5-dev",
+        "language_version": "0.6-dev",
         "input_fields": ("jumlah_kas", "kas_tanpa_kategori", "jumlah_ekuitas", "ekuitas_tanpa_kategori"),
         "properties": {
             "jumlah_kas": {"type": "integer", "minimum": 0, "maximum": _MAX_RULE_INPUT},
