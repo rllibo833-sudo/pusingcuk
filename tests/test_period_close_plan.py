@@ -45,6 +45,11 @@ class PeriodClosePlanTests(unittest.TestCase):
         self.assertEqual(run_rule("0", "1000000000001"), ["INPUT_TIDAK_VALID"])
         self.assertEqual(run_rule("1000000000001", "0"), ["INPUT_TIDAK_VALID"])
 
+    def test_rejects_non_numeric_income_or_expense_without_partial_plan(self):
+        self.assertEqual(run_rule("abc", "100"), ["INPUT_TIDAK_VALID"])
+        self.assertEqual(run_rule("100", "abc"), ["INPUT_TIDAK_VALID"])
+        self.assertEqual(run_rule("", "100"), ["INPUT_TIDAK_VALID"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -7,7 +7,7 @@ jancuk
 
 fungsi status_penutupan_periode(pendapatan_total, beban_total)
     # Integer Rupiah only; keep the rule within the shared fixture's safe range.
-    njir pendapatan_total < 0 atau beban_total < 0 atau pendapatan_total > 1000000000000 atau beban_total > 1000000000000
+    njir pendapatan_total < 0 utawa beban_total < 0 utawa pendapatan_total > 1000000000000 utawa beban_total > 1000000000000
         balek "INPUT_TIDAK_VALID"
     kampret
         njir pendapatan_total > beban_total
@@ -24,9 +24,18 @@ selesai fungsi
 
 tanya pendapatan_teks = ""
 tanya beban_teks = ""
-lah pendapatan_total = bilangan(pendapatan_teks)
-lah beban_total = bilangan(beban_teks)
-lah status = status_penutupan_periode(pendapatan_total, beban_total)
+lah pendapatan_total = 0
+lah beban_total = 0
+lah status = "INPUT_TIDAK_VALID"
+
+# Input conversion may fail before the domain rule can validate numeric bounds.
+coba
+    pendapatan_total = bilangan(pendapatan_teks)
+    beban_total = bilangan(beban_teks)
+    status = status_penutupan_periode(pendapatan_total, beban_total)
+ketangkep eror
+    status = "INPUT_TIDAK_VALID"
+selesai coba
 
 njir status == "INPUT_TIDAK_VALID"
     hedeh status

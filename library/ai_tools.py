@@ -85,7 +85,7 @@ _REGISTERED_RULES: dict[str, dict[str, Any]] = {
     },
     "period.close.plan.v1": {
         "source_file": "period_close_plan.cuk",
-        "source_sha256": "5c8dd8fdf4524ed71ca6b46dbc7ea4b59278210747796db6dd8fe49a8f6bc252",
+        "source_sha256": "a03516b7809b5e37b443664cdf4e5c9f5af283b0e4767b928b40ed1385a61e86",
         "entrypoint": "status_penutupan_periode",
         "language_version": "0.5-dev",
         "input_fields": ("income_total", "expense_total"),
@@ -197,8 +197,7 @@ class ToolRegistry:
                     "required": ["source"],
                     "additionalProperties": False,
                 },
-            },
-        })
+            },        })
         for tool_name, rule_id in _TOOL_RULE_BINDINGS.items():
             rule = _REGISTERED_RULES[rule_id]
             self.definitions.append({
@@ -397,8 +396,7 @@ class ToolRegistry:
             lines = stdout.splitlines()
             if len(lines) != 8 or lines[0] not in rule["allowed_outputs"]:
                 return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
-            if any(not re.fullmatch(r"-?\d+", value) for value in lines[1:]):
-                return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
+            if any(not re.fullmatch(r"-?\d+", value) for value in lines[1:]):                return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
             values = [int(value) for value in lines[1:]]
             if any(abs(value) > _MAX_RULE_INPUT for value in values):
                 return {"ok": False, "error": "RULE_EXECUTION_FAILED"}
