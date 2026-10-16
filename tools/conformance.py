@@ -165,6 +165,98 @@ def build_native(output_path):
     return True, ""
 
 
+
+def evaluate_fixture(fixture_id):
+    """Execute one repository-owned fixture on its declared runtimes and return evidence."""
+    fixtures = load_manifest()
+    selected = next(((item, path) for item, path in fixtures if item["id"] == fixture_id), None)
+    if selected is None:
+        return {"ok": False, "error": "CONFORMANCE_FIXTURE_NOT_FOUND", "fixture_id": fixture_id}
+
+    item, source_path = selected
+    expected = item["expected"]
+    runtime_results = {}
+    native_states = item["runtimes"].get("native") in {"required", "optional"}
+    with tempfile.TemporaryDirectory(prefix="pusingcuk-ai-fixture-") as temp:
+        native_path = Path(temp) / "pusingcuk-native"
+        native_ready, native_error = build_native(native_path) if native_states else (False, "")
+        for runtime, state in item["runtimes"].items():
+            if state == "unsupported":
+                runtime_results[runtime] = {"status": "unsupported", "matched": False}
+                continue
+            if runtime == "native" and not native_ready:
+                runtime_results[runtime] = {
+                    "status": "unavailable",
+                    "matched": False,
+                    "reason": native_error or "native runtime tidak diperlukan",
+                }
+                continue
+
+            command = (
+                [sys.executable, str(ROOT / "pusingcuk_new.py"), str(source_path)]
+                if runtime == "reference"
+                else [str(native_path), str(source_path)]
+            )
+            result, run_error = run_command(command, expected.get("stdin", ""))
+            if run_error:
+                runtime_results[runtime] = {
+                    "status": run_error,
+                    "matched": False,
+                }
+                continue
+
+            actual_class = classify_stderr(result.returncode, result.stderr)
+            actual_line = source_line_from_stderr(result.stderr)
+            matched = (
+                result.returncode == expected["exit_code"]
+                and result.stdout == expected["stdout"]
+                and actual_class == expected.get("stderr_class")
+                and (
+                    expected.get("source_line") is None
+                    or actual_line == expected["source_line"]
+                )
+            )
+            runtime_results[runtime] = {
+                "status": "passed" if matched else "failed",
+                "matched": matched,
+                "exit_code": result.returncode,
+                "stdout": result.stdout[:2000],
+                "stderr_class": actual_class,
+                "source_line": actual_line,
+                "stderr": result.stderr[:2000],
+            }
+
+    required = [
+        runtime for runtime, state in item["runtimes"].items()
+        if state == "required"
+    ]
+    required_passed = all(
+        runtime_results.get(runtime, {}).get("matched") is True
+        for runtime in required
+    )
+    parity_claim = (
+        item["runtimes"].get("reference") == "required"
+        and item["runtimes"].get("native") == "required"
+        and required_passed
+    )
+    return {
+        "ok": required_passed,
+        "operation": "conformance_check",
+        "fixture_id": item["id"],
+        "source": item["source"],
+        "profile": item.get("profile"),
+        "requires": item.get("requires", []),
+        "expected": expected,
+        "runtime_results": runtime_results,
+        "required_runtimes_passed": required_passed,
+        "python_native_parity_proven_for_fixture": parity_claim,
+        "evidence_status": "RUNTIME_TERUJI" if required_passed else "RUNTIME_GAGAL",
+        "scope_note": (
+            "Hanya fixture tepercaya yang terdaftar ini yang dijalankan. Ini bukan "
+            "eksekusi source AI/pengguna dan bukan sandbox untuk kode tidak tepercaya."
+        ),
+    }
+
 def main():
     try:
         fixtures = load_manifest()
