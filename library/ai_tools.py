@@ -282,8 +282,8 @@ class ToolRegistry:
                 return {"ok": False, "error": "CUK_SOURCE_INVALID"}
             if len(source_bytes) > _MAX_CUK_SOURCE_BYTES:
                 return {"ok": False, "error": "CUK_SOURCE_TOO_LARGE"}
-            language_identity = _cuk_language_identity(source)
             try:
+                language_identity = _cuk_language_identity(source)
                 document = from_source(source, "ai_input.cuk")
                 generated = generate(document)
             except (SyntaxError, ValueError, TypeError, UnicodeError, ArithmeticError) as exc:
