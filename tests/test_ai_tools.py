@@ -589,5 +589,40 @@ class ToolInputContractTests(unittest.TestCase):
                 self.assertIn(status, compiled.stdout)
 
 
+
+class ConformanceEvidenceClassificationTests(unittest.TestCase):
+    def test_ai_conformance_evidence_distinguishes_expected_errors(self):
+        from tools.conformance import evaluate_fixture
+
+        syntax = evaluate_fixture("syntax.malformed-expression")
+        self.assertTrue(syntax["ok"], syntax)
+        self.assertEqual(syntax["failure_category"], "none")
+        self.assertEqual(syntax["evidence_status"], "RUNTIME_TERUJI")
+        for runtime in ("reference", "native"):
+            result = syntax["runtime_results"][runtime]
+            self.assertTrue(result["matched"], result)
+            self.assertEqual(result["observed_category"], "syntax_error")
+            self.assertIn("SPEC.md", result["repair_hint"])
+            self.assertIsInstance(result["diagnostic_location"]["line"], int)
+
+        runtime_error = evaluate_fixture("builtins.logarithm-domain-error")
+        self.assertTrue(runtime_error["ok"], runtime_error)
+        self.assertEqual(runtime_error["failure_category"], "none")
+        for runtime in ("reference", "native"):
+            result = runtime_error["runtime_results"][runtime]
+            self.assertTrue(result["matched"], result)
+            self.assertEqual(result["observed_category"], "runtime_failure")
+            self.assertEqual(result["diagnostic_location"]["line"], 3)
+            self.assertIn("fixture", result["repair_hint"])
+
+    def test_unknown_fixture_is_not_mislabeled_as_source_error(self):
+        from tools.conformance import evaluate_fixture
+
+        result = evaluate_fixture("fixture-that-does-not-exist")
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["failure_category"], "fixture_not_found")
+        self.assertIn("manifest.json", result["repair_hint"])
+
+
 if __name__ == "__main__":
     unittest.main()
