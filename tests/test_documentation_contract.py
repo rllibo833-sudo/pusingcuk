@@ -79,10 +79,30 @@ class DocumentationContractTests(unittest.TestCase):
             for runtime, status in fixture["runtimes"].items():
                 key = f"{runtime}:{status}"
                 counts[key] = counts.get(key, 0) + 1
-        self.assertEqual(len(manifest["fixtures"]), 70)
-        self.assertEqual(counts["reference:required"], 70)
-        self.assertEqual(counts["native:required"], 67)
-        self.assertEqual(counts["native:unsupported"], 3)
+        fixture_total = len(manifest["fixtures"])
+        reference_required = counts["reference:required"]
+        native_required = counts["native:required"]
+        native_unsupported = counts["native:unsupported"]
+        self.assertEqual(fixture_total, reference_required)
+        self.assertEqual(fixture_total, native_required + native_unsupported)
+
+        count_summary = (
+            f"{fixture_total} fixtures" if fixture_total != 1 else "1 fixture"
+        )
+        readme = (root / "README.md").read_text(encoding="utf-8")
+        self.assertIn(
+            f"**{fixture_total} fixtures**: all {reference_required} are required "
+            f"on the Python reference interpreter, {native_required} are required "
+            f"on native C, and {native_unsupported} are explicitly unsupported "
+            f"on native C",
+            readme,
+        )
+        self.assertIn(
+            f"{fixture_total} fixture: {reference_required} wajib pada interpreter "
+            f"referensi Python, {native_required} wajib pada native C, dan "
+            f"{native_unsupported} secara eksplisit tidak didukung native",
+            status,
+        )
 
         readiness = (root / "docs/AI_ENGINE_READINESS.md").read_text(encoding="utf-8")
         ledger = (root / "docs/AI_ENGINE_MIGRATION_LEDGER.md").read_text(encoding="utf-8")
