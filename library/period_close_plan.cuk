@@ -5,7 +5,8 @@
 jancuk
 
 fungsi status_penutupan_periode(pendapatan_total, beban_total)
-    njir pendapatan_total < 0 atau beban_total < 0
+    # Integer Rupiah only; keep the rule within the shared fixture's safe range.
+    njir pendapatan_total < 0 atau beban_total < 0 atau pendapatan_total > 1000000000000 atau beban_total > 1000000000000
         balek "INPUT_TIDAK_VALID"
     kampret
         njir pendapatan_total > beban_total
