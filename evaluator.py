@@ -528,7 +528,7 @@ class Evaluator:
             if k == "Index":
                 obj = self.expr(n.collection, env, depth)
                 idx = self.expr(n.index, env, depth)
-                if isinstance(obj, (list, str)):
+                if isinstance(obj, (list, str, range)):
                     if not isinstance(idx, int) or isinstance(idx, bool):
                         self.fail(line, "indeks harus berupa bilangan bulat")
                     if idx < 0 or idx >= len(obj):
