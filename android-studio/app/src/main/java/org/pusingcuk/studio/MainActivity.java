@@ -34,6 +34,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import java.util.regex.Matcher;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public final class MainActivity extends Activity {
@@ -42,6 +43,14 @@ public final class MainActivity extends Activity {
     private static final String AI_KEY_ALIAS = "org.pusingcuk.studio.gemini.key.v1";
     private static final String AI_PREFS = "pusingcuk_ai_secure";
     private static final String AI_KEY_PREF = "gemini_key_encrypted";
+    private static final String[] TEMPLATE_LABELS = {"Halo dunia", "Kalkulasi belanja", "Rekap kas sederhana", "Input nama interaktif"};
+    private static final String[] TEMPLATE_FILES = {"halo_dunia", "kalkulasi_belanja", "rekap_kas", "sapa_pengguna"};
+    private static final String[] TEMPLATE_SOURCES = {
+        "jancuk\nlah nama = \"Dunia\"\nhedeh \"Halo, \" + nama\nselesai jancuk\n",
+        "jancuk\nlah harga = 15000\nlah jumlah = 3\nlah total = harga * jumlah\nhedeh \"Total belanja: \" + teks(total)\nselesai jancuk\n",
+        "jancuk\nlah pendapatan = 2500000\nlah pengeluaran = 1200000\nlah sisa = pendapatan - pengeluaran\nhedeh \"Sisa: \" + teks(sisa)\nnjir sisa >= 0\n    hedeh \"Status: aman\"\nkampret\n    hedeh \"Status: defisit\"\nselesai njir\nselesai jancuk\n",
+        "jancuk\ntanya nama = \"Nama kamu: \"\nhedeh \"Halo, \" + nama\nselesai jancuk\n"
+    };
     private static final String[] AI_MODEL_LABELS = {"Gemini 3.5 Flash-Lite · hemat", "Gemini 3.8 Flash · lebih kuat"};
     private static final String[] AI_MODEL_IDS = {"gemini-3.5-flash-lite", "gemini-3.8-flash"};
     private static final String AI_SYSTEM_INSTRUCTION = "Kamu membantu di PusingCuk Studio. Bantu pengguna pemula dengan bahasa Indonesia yang jelas dan tidak merendahkan. Bahasa target adalah .cuk versi 0.6-dev; jangan mengarang keyword, built-in, atau kemampuan runtime. Program biasanya dimulai dengan jancuk dan diakhiri selesai jancuk. Gunakan hanya sintaks .cuk yang dikenal, jangan mengasumsikan Python/JavaScript bisa langsung dipakai sebagai sintaks .cuk. Runtime aplikasi Android saat ini adalah subset native C: jelaskan bila fitur mungkin belum didukung. Jangan mengklaim source telah dikompilasi atau diuji jika belum ada bukti. Jangan meminta atau menampilkan secret dan jangan membuat kode untuk mengakses token atau menjalankan shell. Jika pengguna meminta program atau perbaikan source, sertakan satu blok kode berlabel cuk yang berisi program lengkap; selain itu jelaskan sesuai kebutuhan. Jawaban adalah saran AI eksternal, bukan hasil eksekusi ToolRegistry PusingCuk AI.";
@@ -50,7 +59,8 @@ public final class MainActivity extends Activity {
     private TextView output, status;
     private Button runButton, aiButton, applyAiButton;
     private String pendingAiCode;
-    private File runtime, compiledDemo, projectFile;
+    private File runtime, compiledDemo, projectDir, projectFile;
+    private TextView projectLabel;
 
     private int dp(float n) { return (int)(n * getResources().getDisplayMetrics().density + 0.5f); }
     private TextView label(String text, int size, int color) {
@@ -78,8 +88,9 @@ public final class MainActivity extends Activity {
         super.onCreate(state);
         cleanupStaleRunFiles();
         getWindow().setStatusBarColor(Color.rgb(10,15,28)); getWindow().setNavigationBarColor(Color.rgb(10,15,28));
-        File dir = new File(getFilesDir(), "projects"); if (!dir.exists()) dir.mkdirs();
-        projectFile = new File(dir, "program.cuk"); buildUi(); installRuntime(); loadProject();
+        projectDir = new File(getFilesDir(), "projects");
+        if (!projectDir.exists()) projectDir.mkdirs();
+        projectFile = new File(projectDir, "program.cuk"); buildUi(); installRuntime(); loadProject();
     }
 
     // Cache files are app-private, but a force-stop can leave source files behind.
@@ -87,7 +98,7 @@ public final class MainActivity extends Activity {
     private void cleanupStaleRunFiles() {
         File work = new File(getCacheDir(), "run");
         File[] files = work.listFiles((dir, name) ->
-                name.startsWith("program-") && name.endsWith(".pusingcuk"));
+                name.startsWith("program-") && (name.endsWith(".cuk") || name.endsWith(".pusingcuk")));
         if (files == null) return;
         long cutoff = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(24);
         for (File file : files) {
@@ -103,15 +114,17 @@ public final class MainActivity extends Activity {
         LinearLayout actions = column(); actions.setPadding(0,dp(2),0,dp(2)); page.addView(actions);
         runButton = button("▶ Jalankan",actions,v->runProgram());
         button("Jalankan demo .cuk hasil kompilasi native",actions,v->runCompiledDemo());
+        button("Proyek baru", actions, v -> showNewProjectDialog());
         button("Simpan proyek",actions,v->saveProject());
-        button("Buka proyek lokal",actions,v->loadProject());
+        button("Buka proyek lokal",actions,v->showProjectPicker());
         button("Impor file publik dari GitHub",actions,v->showGitHubImport());
         button("Bagikan / ekspor kode",actions,v->shareProject());
         aiButton = button("Bantuan PusingCuk AI · online (opsional)", actions, v -> showAiAssistant());
         button("Buat / kelola API key Gemini", actions, v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://aistudio.google.com/app/apikey"))));
         applyAiButton = button("Terapkan kode hasil AI ke editor", actions, v -> applyAiCode());
         applyAiButton.setVisibility(View.GONE);
-        page.addView(label("program.cuk",16,Color.WHITE));
+        projectLabel = label(projectFile == null ? "program.cuk" : projectFile.getName(),16,Color.WHITE);
+        page.addView(projectLabel);
         source = editor("Tulis kode Pusingcuk di sini…",14); page.addView(source,new LinearLayout.LayoutParams(-1,dp(310)));
         page.addView(label("Input program (stdin) — satu baris per jawaban",14,Color.WHITE));
         stdin = editor("Contoh: Budi",2); page.addView(stdin,new LinearLayout.LayoutParams(-1,dp(80)));
@@ -144,22 +157,90 @@ public final class MainActivity extends Activity {
         } catch(Exception e) { status.setText("Runtime gagal disiapkan: "+e.getMessage()); runButton.setEnabled(false); }
     }
 
+
     private void saveProject() {
         try {
-            String code=source.getText().toString(); if(utf8Length(code)>MAX_SOURCE_BYTES) throw new IllegalArgumentException("Kode melebihi 64 KiB.");
-            try(FileOutputStream out=new FileOutputStream(projectFile)){out.write(code.getBytes(StandardCharsets.UTF_8));}
-            Toast.makeText(this,"Tersimpan di proyek lokal aplikasi",Toast.LENGTH_SHORT).show();
-        } catch(Exception e){toastError("Gagal menyimpan: "+e.getMessage());}
+            if (projectDir == null || !projectDir.isDirectory() || projectFile == null || !projectFile.getParentFile().equals(projectDir))
+                throw new IllegalStateException("Lokasi proyek tidak valid.");
+            String code = source.getText().toString();
+            if (utf8Length(code) > MAX_SOURCE_BYTES) throw new IllegalArgumentException("Kode melebihi 64 KiB.");
+            try (FileOutputStream out = new FileOutputStream(projectFile)) { out.write(code.getBytes(StandardCharsets.UTF_8)); }
+            projectLabel.setText(projectFile.getName());
+            status.setText("Tersimpan: " + projectFile.getName());
+            Toast.makeText(this, "Tersimpan: " + projectFile.getName(), Toast.LENGTH_SHORT).show();
+        } catch (Exception e) { toastError("Gagal menyimpan: " + e.getMessage()); }
     }
+
     private void loadProject() {
         try {
-            if(projectFile==null||!projectFile.isFile()) { if(source!=null&&source.length()==0) source.setText("jancuk\nhedeh \"Halo, dunia!\"\nselesai jancuk"); return; }
-            try(FileInputStream in=new FileInputStream(projectFile); ByteArrayOutputStream out=new ByteArrayOutputStream()) {
-                byte[] b=new byte[4096]; int n; while((n=in.read(b))!=-1)out.write(b,0,n);
-                source.setText(new String(out.toByteArray(),StandardCharsets.UTF_8));
+            if (projectFile == null || !projectFile.isFile()) {
+                if (source != null && source.length() == 0) source.setText("jancuk\nhedeh \"Halo, dunia!\"\nselesai jancuk");
+                if (projectLabel != null && projectFile != null) projectLabel.setText(projectFile.getName());
+                return;
             }
-            status.setText("Proyek lokal dibuka");
-        } catch(Exception e){toastError("Gagal membuka proyek: "+e.getMessage());}
+            if (!projectFile.getParentFile().equals(projectDir) || projectFile.length() > MAX_SOURCE_BYTES)
+                throw new IllegalStateException("Lokasi atau ukuran file proyek tidak valid (maksimum 64 KiB).");
+            try (FileInputStream in = new FileInputStream(projectFile); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                byte[] b = new byte[4096]; int n;
+                while ((n = in.read(b)) != -1) {
+                    if (out.size() + n > MAX_SOURCE_BYTES) throw new IllegalStateException("File proyek lebih besar dari 64 KiB.");
+                    out.write(b, 0, n);
+                }
+                source.setText(new String(out.toByteArray(), StandardCharsets.UTF_8));
+            }
+            projectLabel.setText(projectFile.getName());
+            status.setText("Proyek dibuka: " + projectFile.getName());
+        } catch (Exception e) { toastError("Gagal membuka: " + e.getMessage()); }
+    }
+
+    private void showProjectPicker() {
+        File[] files = projectDir == null ? null : projectDir.listFiles((dir, name) ->
+                name.endsWith(".cuk") || name.endsWith(".pusingcuk"));
+        if (files == null || files.length == 0) {
+            toastError("Belum ada file proyek. Tekan Proyek baru untuk mulai.");
+            return;
+        }
+        Arrays.sort(files, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+        String[] names = new String[files.length];
+        for (int i = 0; i < files.length; i++) names[i] = files[i].getName();
+        new AlertDialog.Builder(this).setTitle("Buka proyek lokal")
+                .setItems(names, (dialog, which) -> { projectFile = files[which]; loadProject(); })
+                .setNegativeButton("Batal", null).show();
+    }
+
+    private void showNewProjectDialog() {
+        new AlertDialog.Builder(this).setTitle("Pilih template .cuk")
+                .setItems(TEMPLATE_LABELS, (dialog, which) -> promptNewProjectName(which))
+                .setNegativeButton("Batal", null).show();
+    }
+
+    private void promptNewProjectName(int templateIndex) {
+        EditText name = editor("Nama file tanpa ekstensi", 1);
+        name.setSingleLine(true);
+        name.setText(TEMPLATE_FILES[templateIndex]);
+        new AlertDialog.Builder(this).setTitle("Nama proyek baru")
+                .setView(name).setNegativeButton("Batal", null)
+                .setPositiveButton("Buat", (dialog, which) -> {
+                    String stem = name.getText().toString().trim();
+                    if (stem.toLowerCase(java.util.Locale.ROOT).endsWith(".cuk"))
+                        stem = stem.substring(0, stem.length() - 4);
+                    if (!stem.matches("[A-Za-z0-9_-]{1,48}") || stem.contains("..")) {
+                        toastError("Nama file gunakan huruf, angka, garis bawah, atau tanda hubung (maks. 48 karakter).");
+                        return;
+                    }
+                    File next = new File(projectDir, stem + ".cuk");
+                    if (next.exists()) {
+                        toastError("Nama itu sudah ada. Buka proyek yang ada atau pilih nama lain.");
+                        return;
+                    }
+                    projectFile = next;
+                    source.setText(TEMPLATE_SOURCES[templateIndex]);
+                    stdin.setText("");
+                    pendingAiCode = null;
+                    applyAiButton.setVisibility(View.GONE);
+                    projectLabel.setText(projectFile.getName());
+                    saveProject();
+                }).show();
     }
 
     private void runProgram() {
@@ -173,7 +254,7 @@ public final class MainActivity extends Activity {
             File program=null; Process proc=null; BoundedOutputStream stdout=new BoundedOutputStream(), stderr=new BoundedOutputStream();
             try {
                 File work=new File(getCacheDir(),"run"); if(!work.exists()&&!work.mkdirs())throw new IllegalStateException("Folder sementara gagal dibuat.");
-                program=File.createTempFile("program-",".pusingcuk",work);
+                program=File.createTempFile("program-",".cuk",work);
                 try(FileOutputStream out=new FileOutputStream(program)){out.write(code.getBytes(StandardCharsets.UTF_8));}
                 proc=new ProcessBuilder(runtime.getAbsolutePath(),program.getAbsolutePath()).directory(work).start();
                 final Process active=proc;
@@ -505,7 +586,7 @@ public final class MainActivity extends Activity {
     }
     private void shareProject() {
         String code=source.getText().toString();if(utf8Length(code)>MAX_SOURCE_BYTES){toastError("Kode maksimum 64 KiB.");return;}
-        Intent intent=new Intent(Intent.ACTION_SEND);intent.setType("text/plain");intent.putExtra(Intent.EXTRA_SUBJECT,"program.pusingcuk");intent.putExtra(Intent.EXTRA_TEXT,code);
+        Intent intent=new Intent(Intent.ACTION_SEND);intent.setType("text/plain");intent.putExtra(Intent.EXTRA_SUBJECT,projectFile == null ? "program.cuk" : projectFile.getName());intent.putExtra(Intent.EXTRA_TEXT,code);
         startActivity(Intent.createChooser(intent,"Bagikan kode Pusingcuk"));
     }
     private static int utf8Length(String s){return s.getBytes(StandardCharsets.UTF_8).length;}
