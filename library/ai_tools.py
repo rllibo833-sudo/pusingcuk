@@ -383,8 +383,9 @@ class ToolRegistry:
                     "supported_builtin_counts": {target: sum(1 for entry in entries if entry["backends"][target]["status"] == "supported") for target in BUILTIN_CONTRACT["targets"]},
                     "fixture_count": len(fixtures),
                     "compiler_pipeline": ["lexer", "parser", "IR validation", "target backend generation"],
-                    "known_limits": ["compile_check does not execute generated code", "cross-runtime parity requires fixtures", "native C, Python transpiler, and VM support remain separately declared"],
-                    "next_priority": "Close semantic gaps in JS and build shared fixtures before claiming language independence.",
+                    "known_limits": ["compile_check does not execute generated code", "cross-runtime parity requires fixtures", "native C, JavaScript transpiler, and VM support remain separately declared", "JavaScript transpiler, PVM, and Android Studio APK work are experimental or deferred, not the supported baseline"],
+                    "baseline_targets": ["Python reference interpreter", "native C runtime"],
+                    "next_priority": "Prioritaskan kesenjangan semantik Python/C yang terbukti: operator, tipe, koleksi, built-in, diagnostik, dan fixture konformansi bersama. Untuk jumlah dan statistik, kunci perilaku daftar kosong, nilai negatif, pembatalan, pecahan, tipe tidak valid, serta batas integer aman. Jangan mengutamakan JS/PVM/APK sebelum baseline Python/C dan fixture terkait konsisten.",
                 }
             return {"ok": True, "operation": "compiler_context", "topic": topic, "context": result}
 
