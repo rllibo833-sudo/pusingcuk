@@ -1,7 +1,17 @@
 name: CukAccount Android APK
 
 on:
-  # Manual-only to avoid consuming Android runners on unrelated commits.
+  # Only rebuild for files that affect this APK; keep unrelated commits cheap.
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/cukaccount-android-apk.yml"
+      - "apps/cukaccount-android/**"
+      - "apps/accounting/index.html"
+      - "apps/accounting/accounting-core.js"
+      - "examples/accounting/aturan_ringkasan.cuk"
+      - "compiler/js_backend.py"
+      - "compiler/ir.py"
   workflow_dispatch:
 
 permissions:
