@@ -603,12 +603,8 @@ class Evaluator:
                         return False
                     if path in self._module_cache:
                         return self._module_cache[path]
-                    try:
-                        if not path.is_file() or path.stat().st_size > MAX_MODULE_FILE_BYTES:
-                            return False
-                        source = path.read_text(encoding="utf-8")
-                    except (OSError, UnicodeError):
-                        return False
+                    # Reuse the bounded, symlink-safe read above. Reopening with Path.read_text()
+                    # would bypass that guard and introduce a second path-resolution race.
 
                     self._module_loading_stack.add(path)
                     try:
