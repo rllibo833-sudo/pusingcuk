@@ -16,8 +16,10 @@ def run_rule(income: str, expense: str) -> list[str]:
         capture_output=True,
         cwd=ROOT,
         timeout=10,
-        check=True,
+        check=False,
     )
+    if completed.returncode != 0:
+        raise AssertionError(f"rule exited {completed.returncode}; stderr={completed.stderr!r}; stdout={completed.stdout!r}")
     return completed.stdout.splitlines()
 
 
