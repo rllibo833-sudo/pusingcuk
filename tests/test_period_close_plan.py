@@ -41,9 +41,9 @@ class PeriodClosePlanTests(unittest.TestCase):
         )
 
     def test_rejects_negative_and_over_limit_totals(self):
-        self.assertEqual(run_rule("-1", "0")[0], "INPUT_TIDAK_VALID")
-        self.assertEqual(run_rule("0", "1000000000001")[0], "INPUT_TIDAK_VALID")
-        self.assertEqual(run_rule("1000000000001", "0")[0], "INPUT_TIDAK_VALID")
+        self.assertEqual(run_rule("-1", "0"), ["INPUT_TIDAK_VALID"])
+        self.assertEqual(run_rule("0", "1000000000001"), ["INPUT_TIDAK_VALID"])
+        self.assertEqual(run_rule("1000000000001", "0"), ["INPUT_TIDAK_VALID"])
 
 
 if __name__ == "__main__":
