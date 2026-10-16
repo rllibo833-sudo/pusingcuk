@@ -148,11 +148,11 @@ class CBackendTests(unittest.TestCase):
         self.assertIn("integer overflow", result.stderr)
 
     def test_string_variables_and_concatenation_match_reference(self):
-        source = 'jancuk\\nlah nama = "Dunia"\\nnama = "Halo, " + nama\\nhedeh nama + "!"\\nselesai jancuk'
+        source = 'jancuk\nlah nama = "Dunia"\nnama = "Halo, " + nama\nhedeh nama + "!"\nselesai jancuk'
         self.assert_matches_reference(source)
         result = self.compile_and_run(source)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout, "Halo, Dunia!\\n")
+        self.assertEqual(result.stdout, "Halo, Dunia!\n")
 
     def test_rejects_use_before_declaration(self):
         with self.assertRaisesRegex(CBackendError, "belum dideklarasikan"):
