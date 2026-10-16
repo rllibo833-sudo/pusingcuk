@@ -287,7 +287,7 @@ class ToolRegistry:
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "topic": {"type": "string", "enum": ["general", "builtins", "js", "native", "formats", "fixtures", "semantics"]}
+                        "topic": {"type": "string", "enum": ["general", "builtins", "js", "native", "formats", "fixtures", "semantics", "development"]}
                     },
                     "required": [],
                     "additionalProperties": False,
@@ -341,7 +341,7 @@ class ToolRegistry:
             if set(arguments) - {"topic"}:
                 return {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"}
             topic = arguments.get("topic", "general")
-            if topic not in {"general", "builtins", "js", "native", "formats", "fixtures", "semantics"}:
+            if topic not in {"general", "builtins", "js", "native", "formats", "fixtures", "semantics", "development"}:
                 return {"ok": False, "error": "COMPILER_CONTEXT_TOPIC_INVALID"}
             entries = BUILTIN_CONTRACT["builtins"]
             try:
@@ -375,8 +375,18 @@ class ToolRegistry:
                     "unsupported_builtins": [entry["name"] for entry in entries if entry["backends"].get("native_c", {}).get("status") != "supported"],
                     "fixture_count": len(native_fixtures),
                     "required_fixture_ids": [fixture["id"] for fixture in native_fixtures if fixture["runtimes"].get("native") == "required"],
+                    "shared_required_fixture_ids": [
+                        fixture["id"] for fixture in native_fixtures
+                        if fixture["runtimes"].get("reference") == "required"
+                        and fixture["runtimes"].get("native") == "required"
+                    ],
+                    "reference_only_fixture_ids": [
+                        fixture["id"] for fixture in native_fixtures
+                        if fixture["runtimes"].get("reference") == "required"
+                        and fixture["runtimes"].get("native") == "unsupported"
+                    ],
                     "unsupported_fixture_ids": [fixture["id"] for fixture in native_fixtures if fixture["runtimes"].get("native") == "unsupported"],
-                    "parity_rule": "Only fixtures marked required for both reference and native establish the shared baseline; unsupported is not a pass.",
+                    "parity_rule": "Only shared_required_fixture_ids establish the Python/native parity baseline; unsupported is not a pass and reference-only features are not native parity.",
                 }
             elif topic == "formats":
                 names = {"json_teks", "json_baca", "html_aman", "csv_baris"}
@@ -390,6 +400,46 @@ class ToolRegistry:
                     "source_of_truth": ["SPEC.md", "docs/SEMANTIC_CONTRACT.md", "library/builtin_contract.json", "tests/conformance/manifest.json"],
                     "rules": ["boolean is not numeric", "short-circuit and/or", "floor division follows mathematical floor", "modulo follows a-floor(a/b)*b", "finite numeric values only for math builtins", "safe integer range is +/-9007199254740991", "compile success does not prove runtime parity"],
                     "review_order": ["reproduce behavior with a fixture", "check reference interpreter", "check target backend", "update metadata only after implementation exists", "run focused conformance"],
+                }
+            elif topic == "development":
+                shared = [
+                    fixture for fixture in fixtures
+                    if isinstance(fixture, dict)
+                    and isinstance(fixture.get("runtimes"), dict)
+                    and fixture["runtimes"].get("reference") == "required"
+                    and fixture["runtimes"].get("native") == "required"
+                ]
+                reference_only = [
+                    fixture for fixture in fixtures
+                    if isinstance(fixture, dict)
+                    and isinstance(fixture.get("runtimes"), dict)
+                    and fixture["runtimes"].get("reference") == "required"
+                    and fixture["runtimes"].get("native") == "unsupported"
+                ]
+                result = {
+                    "purpose": "Use PusingCuk AI to improve .cuk semantics from repository evidence, not from guesses or compile-only success.",
+                    "source_of_truth": ["SPEC.md", "docs/SEMANTIC_CONTRACT.md", "library/builtin_contract.json", "tests/conformance/manifest.json"],
+                    "baseline": "Python reference behavior is authoritative; native C is the second runtime only for the shared required subset.",
+                    "shared_required_fixture_count": len(shared),
+                    "shared_required_fixture_ids": [fixture["id"] for fixture in shared],
+                    "reference_only_fixture_count": len(reference_only),
+                    "reference_only_fixture_ids": [fixture["id"] for fixture in reference_only],
+                    "next_actions": [
+                        "Find one concrete behavior gap in an existing required fixture or semantic contract.",
+                        "Reproduce the smallest failing case on the Python reference and native C before changing behavior.",
+                        "Make the implementation agree with the documented contract; do not weaken a fixture to hide a mismatch.",
+                        "Add or update only the focused fixture that proves the behavior and its relevant error boundary.",
+                        "Update builtin/runtime metadata only after implementation and fixture evidence agree.",
+                        "Report the exact changed behavior and which runtime evidence exists; never infer APK readiness from compiler success."
+                    ],
+                    "priority_semantics": [
+                        "jumlah: empty list, negative values, cancellation, fractions, invalid types, safe-integer intermediate and final bounds",
+                        "collections: empty/malformed collections, indexing and mutation consistency",
+                        "operators and types: boolean-versus-number, floor division, modulo, short-circuit behavior",
+                        "diagnostics: syntax/runtime class, exit code, source line and no partial output on failure"
+                    ],
+                    "deferred_targets": ["JavaScript/PVM as experimental", "Android/APK until language semantics and a runnable target are independently proven"],
+                    "guardrails": ["Unsupported is not a pass", "compile success is not runtime proof", "no broad test runs for every edit; use the narrowest relevant conformance case"]
                 }
             else:
                 result = {
