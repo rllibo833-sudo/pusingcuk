@@ -356,6 +356,32 @@ class ToolRegistry:
                     "language_identity": language_identity,
                     "executed": False,
                 }
+            except Exception as exc:
+                # Unexpected compiler failures are not evidence that user source is invalid.
+                # Keep the AI tool response usable without exposing internal exception details.
+                return {
+                    "ok": False,
+                    "error": "CUK_COMPILER_INTERNAL_ERROR",
+                    "diagnostic": (
+                        "Terjadi kesalahan internal saat memvalidasi atau menghasilkan "
+                        "artefak .cuk; sumber belum dapat dinilai."
+                    ),
+                    "diagnostic_type": type(exc).__name__,
+                    "diagnostic_location": None,
+                    "semantic_review": {
+                        "status": "compiler_internal_error",
+                        "evidence": ["unexpected_compiler_exception"],
+                        "diagnostic_type": type(exc).__name__,
+                        "next_step": (
+                            "Periksa kesalahan internal compiler/tool terlebih dahulu; "
+                            "jangan menyimpulkan source .cuk salah atau mengubah kontrak semantik."
+                        ),
+                    },
+                    "target": "javascript",
+                    "language_version": LANGUAGE_VERSION,
+                    "language_identity": language_identity,
+                    "executed": False,
+                }
             artifact_bytes = generated.encode("utf-8")
             return {
                 "ok": True,
