@@ -55,6 +55,8 @@ Backend JavaScript kini memiliki implementasi untuk seluruh built-in terkontrak;
 - Alias keyword dinormalisasi pada front-end; backend tidak boleh mengurai slang lewat pencocokan teks.
 - Kegagalan batas resource harus menjadi error, bukan hasil parsial yang terlihat sukses.
 
+Rentang yang dihasilkan `rentang()` dapat diindeks setelah disimpan ke variabel. Indeks harus berupa bilangan bulat nonnegatif dan berada dalam batas; kegagalan adalah kesalahan runtime pada seluruh target yang mengklaim dukungan rentang.
+
 ## Koleksi
 
 - Indeks list dimulai dari nol.
