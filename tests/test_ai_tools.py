@@ -470,6 +470,13 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertIn("json_teks", result["context"]["supported_builtins"])
         self.assertEqual(result["context"]["unsupported_builtins"], [])
 
+        native = self.registry.execute("cuk_compiler_context", {"topic": "native"})
+        self.assertTrue(native["ok"], native)
+        self.assertIn("panjang", native["context"]["supported_builtins"])
+        self.assertIn("jumlah", native["context"]["supported_builtins"])
+        self.assertTrue(native["context"]["required_fixture_ids"])
+        self.assertIn("unsupported_fixture_ids", native["context"])
+
         formats = self.registry.execute("cuk_compiler_context", {"topic": "formats"})
         self.assertEqual({item["name"] for item in formats["context"]["builtins"]},
                          {"json_teks", "json_baca", "html_aman", "csv_baris"})
