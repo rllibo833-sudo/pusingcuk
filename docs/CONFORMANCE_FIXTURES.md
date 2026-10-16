@@ -84,6 +84,19 @@ Nama, aritas, deskripsi, dan dukungan target harus sejalan di:
 
 Setiap status `supported` harus memiliki pengujian yang sesuai. Keberadaan fungsi dalam registry internal saja tidak cukup untuk mengklaim dukungan interpreter, native, atau backend.
 
+## Bukti runtime yang dipakai PusingCuk AI
+
+Tool AI `cuk_compile_check` hanya memvalidasi source dan menghasilkan artefak; ia tidak menjalankan kode. Untuk menghubungkan diagnostik compiler dengan perilaku yang benar-benar diuji, tool `cuk_conformance_check` menerima **ID fixture yang sudah ada di manifest**, lalu menjalankan fixture tepercaya itu pada setiap runtime yang diwajibkan oleh metadata fixture.
+
+- `RUNTIME_TERUJI` berarti seluruh runtime berstatus `required` untuk fixture terpilih memenuhi exit code, stdout, kelas stderr, dan nomor baris yang diharapkan.
+- `RUNTIME_GAGAL` berarti setidaknya satu runtime wajib tidak memenuhi kontrak atau tidak dapat dijalankan.
+- `python_native_parity_proven_for_fixture=true` hanya diberikan bila fixture mewajibkan Python referensi dan native C serta keduanya lulus.
+- Status `unsupported` tetap bukan PASS. Fixture reference-only tidak membuktikan parity native.
+- Tool ini **tidak menerima source AI/pengguna untuk dieksekusi**. Ia hanya menjalankan fixture milik repositori yang tercantum pada manifest. Ini membatasi permukaan eksekusi, tetapi bukan sandbox OS.
+- Kegagalan pengujian harus mempertahankan diagnostik terstruktur dan ID fixture; jangan mengubah spesifikasi atau fixture agar source terlihat lolos. Perbaikan semantik perlu memperbarui SPEC/kontrak, implementasi, dan fixture bersama-sama.
+
+Urutan yang disarankan untuk AI: (1) periksa source dengan `cuk_compile_check`; (2) baca diagnostik dan fitur yang terdeteksi; (3) gunakan `cuk_compiler_context` untuk mencari fixture/kontrak terkait; (4) jalankan `cuk_conformance_check` untuk fixture terdekat; (5) nyatakan dengan jelas jika belum ada fixture yang menguji perilaku source tersebut. Lolosnya fixture pembanding adalah bukti kontrak fixture itu, bukan bukti otomatis bahwa source baru benar.
+
 ## Perintah pengujian
 
 ```sh
