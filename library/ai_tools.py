@@ -56,6 +56,26 @@ def _cuk_language_identity(source: str) -> dict[str, Any]:
     }
 
 
+def _cuk_failure_category(message: str, diagnostic_type: str | None = None) -> str:
+    """Map compiler diagnostics to stable categories for the AI without guessing runtime behavior."""
+    lower = message.lower()
+    if "kesalahan lexer:" in lower or "kesalahan sintaks:" in lower or diagnostic_type in {"ParserError", "SyntaxError"}:
+        return "syntax_error"
+    if "kesalahan runtime:" in lower:
+        return "runtime_failure"
+    return "compiler_error"
+
+
+def _cuk_repair_hint(category: str) -> str:
+    """Provide stable, conservative next steps for compile-check outcomes."""
+    return {
+        "syntax_error": "Periksa baris/kolom pada diagnostik dan cocokkan sintaks dengan SPEC.md; jangan menyebutnya kegagalan runtime.",
+        "runtime_failure": "Periksa diagnostik runtime dan buat fixture reproduksi sebelum mengubah semantik.",
+        "compiler_error": "Periksa diagnostik compiler dan kontrak semantik; jangan menganggap source pasti salah jika kategori penyebab belum jelas.",
+        "none": "Kompilasi berhasil, tetapi output runtime dan kesetaraan backend belum diuji.",
+    }.get(category, "Periksa diagnostik dan bukti yang tersedia; jangan menyimpulkan penyebab yang belum teruji.")
+
+
 def _cuk_semantic_review(
     features: list[str],
     *,
@@ -612,6 +632,8 @@ class ToolRegistry:
                     "diagnostic": str(exc)[:500],
                     "diagnostic_type": type(exc).__name__,
                     "diagnostic_location": _cuk_diagnostic_location(str(exc)),
+                    "failure_category": _cuk_failure_category(str(exc), type(exc).__name__),
+                    "repair_hint": _cuk_repair_hint(_cuk_failure_category(str(exc), type(exc).__name__)),
                     "semantic_review": _cuk_semantic_review(
                         [],
                         compile_ok=False,
@@ -636,6 +658,8 @@ class ToolRegistry:
                     ),
                     "diagnostic_type": type(exc).__name__,
                     "diagnostic_location": None,
+                    "failure_category": "compiler_internal_error",
+                    "repair_hint": "Periksa kesalahan internal compiler/tool terlebih dahulu; jangan menyimpulkan source .cuk salah.",
                     "semantic_review": {
                         "status": "compiler_internal_error",
                         "evidence": ["unexpected_compiler_exception"],
@@ -663,6 +687,8 @@ class ToolRegistry:
                     document.get("features", []),
                     compile_ok=True,
                 ),
+                "failure_category": "none",
+                "repair_hint": _cuk_repair_hint("none"),
                 "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
                 "artifact_sha256": hashlib.sha256(artifact_bytes).hexdigest(),
                 "artifact_bytes": len(artifact_bytes),
