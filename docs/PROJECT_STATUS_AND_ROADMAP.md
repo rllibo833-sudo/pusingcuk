@@ -288,3 +288,10 @@ Tes regresi mengikat kasus sintaks rusak dan kesalahan domain runtime ke fixture
 - Sinkronisasi mencakup `SPEC.md`, kontrak semantik, implementasi C, manifest dan source fixture, katalog cakupan konformansi, panduan runtime native, dan matriks kompatibilitas.
 - Gerbang penerimaan tetap `python -m unittest discover -s tests -v`, `make test-native`, dan `python tools/conformance.py` pada commit kode yang sama. Keberhasilan belum boleh diklaim sebelum hasil Actions untuk commit tersebut terkonfirmasi.
 
+
+## Regresi semantik indeks rentang — 17 Oktober 2026
+
+- Celah yang direproduksi: interpreter referensi mengembalikan list dari `rentang()`, sehingga nilai yang disimpan dapat diindeks; runtime native memakai nilai internal `RANGE` tetapi sebelumnya menolak operasi indeks pada variabel rentang.
+- Implementasi native kini membaca indeks nonnegatif yang valid dari nilai rentang dan memeriksa batas serta rentang aman hasil. Perilaku salah tipe, indeks negatif, dan indeks di luar batas dikunci oleh fixture error terpisah.
+- Fixture `collections.range-index`, `collections.range-index-negative`, dan `collections.range-index-out-of-range` diwajibkan pada reference dan native. Dokumentasi spesifikasi, kontrak semantik, panduan native, kompatibilitas, dan inventaris fixture disinkronkan.
+- Wajib memverifikasi Python unit suite, `make test-native`, dan `python tools/conformance.py` pada commit yang sama sebelum menyatakan perbaikan lulus.
