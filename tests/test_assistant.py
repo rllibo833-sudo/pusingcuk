@@ -329,6 +329,58 @@ class AssistantTests(unittest.TestCase):
         self.assertEqual(result["runtime_results"]["native"]["status"], "passed")
         self.assertIn("bukan eksekusi source AI/pengguna", result["scope_note"])
 
+    def test_assistant_passes_runtime_evidence_tool_result_back_to_provider(self):
+        class ConformanceProvider:
+            def __init__(self):
+                self.calls = []
+                self.observed_result = None
+
+            def generate_turn(self, messages, *, system_prompt=None, tools=None):
+                self.calls.append({"messages": messages, "tools": tools})
+                if len(self.calls) == 1:
+                    return {
+                        "content": "",
+                        "tool_calls": [{
+                            "id": "fixture-check-1",
+                            "name": "cuk_conformance_check",
+                            "arguments": {"fixture_id": "core.output-arithmetic"},
+                        }],
+                    }
+                tool_message = [item for item in messages if item.get("role") == "tool"][-1]
+                self.observed_result = json.loads(tool_message["content"])
+                return {
+                    "content": (
+                        "Fixture runtime teruji."
+                        if self.observed_result.get("evidence_status") == "RUNTIME_TERUJI"
+                        else "Bukti runtime belum lulus."
+                    ),
+                    "tool_calls": [],
+                }
+
+        provider = ConformanceProvider()
+        expected = {
+            "ok": True,
+            "operation": "conformance_check",
+            "fixture_id": "core.output-arithmetic",
+            "evidence_status": "RUNTIME_TERUJI",
+            "required_runtimes_passed": True,
+            "python_native_parity_proven_for_fixture": True,
+        }
+        with patch.object(ToolRegistry, "execute", return_value=expected) as runner:
+            assistant = PusingCukAssistant(provider, self.documents)
+            answer = assistant.ask("Uji fixture konformansi core.output-arithmetic.")
+
+        runner.assert_called_once_with(
+            "cuk_conformance_check",
+            {"fixture_id": "core.output-arithmetic"},
+        )
+        self.assertEqual(provider.observed_result, expected)
+        self.assertIn("Fixture runtime teruji", answer)
+        self.assertTrue(any(
+            item["function"]["name"] == "cuk_conformance_check"
+            for item in provider.calls[0]["tools"]
+        ))
+
     def test_cuk_conformance_check_rejects_unregistered_fixture_id(self):
         registry = ToolRegistry(self.documents)
         result = registry.execute(
