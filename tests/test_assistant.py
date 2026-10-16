@@ -309,5 +309,35 @@ class AssistantTests(unittest.TestCase):
         self.assertIn("berhasil dikompilasi", answer)
 
 
+    def test_cuk_conformance_check_runs_registered_fixture_and_reports_runtime_evidence(self):
+        registry = ToolRegistry(self.documents)
+        names = {
+            item["function"]["name"] for item in registry.definitions
+        }
+        self.assertIn("cuk_compile_check", names)
+        self.assertIn("cuk_conformance_check", names)
+
+        result = registry.execute(
+            "cuk_conformance_check",
+            {"fixture_id": "core.output-arithmetic"},
+        )
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(result["evidence_status"], "RUNTIME_TERUJI")
+        self.assertTrue(result["required_runtimes_passed"])
+        self.assertTrue(result["python_native_parity_proven_for_fixture"])
+        self.assertEqual(result["runtime_results"]["reference"]["status"], "passed")
+        self.assertEqual(result["runtime_results"]["native"]["status"], "passed")
+        self.assertIn("bukan eksekusi source AI/pengguna", result["scope_note"])
+
+    def test_cuk_conformance_check_rejects_unregistered_fixture_id(self):
+        registry = ToolRegistry(self.documents)
+        result = registry.execute(
+            "cuk_conformance_check",
+            {"fixture_id": "../../library/assistant.py"},
+        )
+        self.assertEqual(result["error"], "CONFORMANCE_FIXTURE_NOT_FOUND")
+        self.assertNotIn("runtime_results", result)
+
+
 if __name__ == "__main__":
     unittest.main()
