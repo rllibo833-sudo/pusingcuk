@@ -125,6 +125,44 @@ def source_line_from_stderr(stderr):
     return int(match.group(1)) if match else None
 
 
+def source_column_from_stderr(stderr):
+    """Return a source column when the runtime publishes one."""
+    match = re.search(r"\bBaris\s+\d+\s*,\s*kolom\s+(\d+)\b", stderr, flags=re.IGNORECASE)
+    if match is None:
+        match = re.search(r"\[[^\]\n]*:\d+:(\d+)\]", stderr)
+    return int(match.group(1)) if match else None
+
+
+def classify_observation(returncode, stderr, run_error=None, matched=False):
+    """Describe runtime behavior independently of fixture expectations."""
+    if run_error == "timeout":
+        return "harness_timeout"
+    if run_error:
+        return "harness_error"
+    category = classify_stderr(returncode, stderr)
+    if category == "syntax_error":
+        return "syntax_error"
+    if category == "runtime_error":
+        return "runtime_failure"
+    if category == "error" or returncode != 0:
+        return "runtime_or_harness_error"
+    return "none" if matched else "semantic_mismatch"
+
+
+def repair_hint(category):
+    """Stable Indonesian guidance without treating harness failures as source defects."""
+    return {
+        "none": "Fixture sesuai kontrak; jangan mengubah semantik tanpa kasus reproduksi baru.",
+        "syntax_error": "Periksa lokasi sintaks dan cocokkan dengan SPEC.md; fixture negatif tetap valid jika penolakan ini memang diharapkan.",
+        "runtime_failure": "Periksa pesan runtime dan baris sumber; reproduksi sebagai fixture sebelum mengubah evaluator atau native runtime.",
+        "semantic_mismatch": "Bandingkan exit code, stdout, kelas diagnostik, dan lokasi aktual dengan manifest sebelum mengubah kontrak atau target.",
+        "backend_unavailable": "Backend wajib tidak berhasil dibangun/dijalankan; perbaiki lingkungan backend, jangan menyebutnya kesalahan source.",
+        "harness_timeout": "Fixture melewati batas waktu harness; periksa loop/kompleksitas dan timeout runner terlebih dahulu.",
+        "harness_error": "Harness tidak dapat menjalankan fixture; periksa command, izin, dan lingkungan pengujian terlebih dahulu.",
+        "runtime_or_harness_error": "Format diagnostik tidak dikenali; periksa stderr dan harness sebelum menyimpulkan bug source.",
+    }.get(category, "Periksa bukti runtime aktual dan manifest fixture sebelum mengubah semantik.")
+
+
 def run_command(command, stdin_text):
     try:
         result = subprocess.run(
@@ -167,11 +205,15 @@ def build_native(output_path):
 
 
 def evaluate_fixture(fixture_id):
-    """Execute one repository-owned fixture on its declared runtimes and return evidence."""
+    """Execute a registered fixture and return expected-vs-observed runtime evidence."""
     fixtures = load_manifest()
     selected = next(((item, path) for item, path in fixtures if item["id"] == fixture_id), None)
     if selected is None:
-        return {"ok": False, "error": "CONFORMANCE_FIXTURE_NOT_FOUND", "fixture_id": fixture_id}
+        return {
+            "ok": False, "error": "CONFORMANCE_FIXTURE_NOT_FOUND",
+            "fixture_id": fixture_id, "failure_category": "fixture_not_found",
+            "repair_hint": "Pilih fixture_id yang tercantum pada tests/conformance/manifest.json.",
+        }
 
     item, source_path = selected
     expected = item["expected"]
@@ -182,13 +224,20 @@ def evaluate_fixture(fixture_id):
         native_ready, native_error = build_native(native_path) if native_states else (False, "")
         for runtime, state in item["runtimes"].items():
             if state == "unsupported":
-                runtime_results[runtime] = {"status": "unsupported", "matched": False}
+                category = "backend_unavailable"
+                runtime_results[runtime] = {
+                    "status": "unsupported", "matched": False,
+                    "observed_category": category, "diagnostic_location": None,
+                    "repair_hint": repair_hint(category),
+                }
                 continue
             if runtime == "native" and not native_ready:
+                category = "backend_unavailable"
                 runtime_results[runtime] = {
-                    "status": "unavailable",
-                    "matched": False,
+                    "status": "unavailable", "matched": False,
                     "reason": native_error or "native runtime tidak diperlukan",
+                    "observed_category": category, "diagnostic_location": None,
+                    "repair_hint": repair_hint(category),
                 }
                 continue
 
@@ -199,14 +248,17 @@ def evaluate_fixture(fixture_id):
             )
             result, run_error = run_command(command, expected.get("stdin", ""))
             if run_error:
+                category = classify_observation(None, "", run_error=run_error)
                 runtime_results[runtime] = {
-                    "status": run_error,
-                    "matched": False,
+                    "status": run_error, "matched": False,
+                    "observed_category": category, "diagnostic_location": None,
+                    "repair_hint": repair_hint(category),
                 }
                 continue
 
             actual_class = classify_stderr(result.returncode, result.stderr)
             actual_line = source_line_from_stderr(result.stderr)
+            actual_column = source_column_from_stderr(result.stderr)
             matched = (
                 result.returncode == expected["exit_code"]
                 and result.stdout == expected["stdout"]
@@ -216,126 +268,59 @@ def evaluate_fixture(fixture_id):
                     or actual_line == expected["source_line"]
                 )
             )
+            category = classify_observation(result.returncode, result.stderr, matched=matched)
+            location = (
+                {"line": actual_line, "column": actual_column}
+                if actual_line is not None and actual_column is not None
+                else ({"line": actual_line} if actual_line is not None else None)
+            )
             runtime_results[runtime] = {
                 "status": "passed" if matched else "failed",
-                "matched": matched,
-                "exit_code": result.returncode,
-                "stdout": result.stdout[:2000],
-                "stderr_class": actual_class,
-                "source_line": actual_line,
-                "stderr": result.stderr[:2000],
+                "matched": matched, "exit_code": result.returncode,
+                "stdout": result.stdout[:2000], "stderr_class": actual_class,
+                "source_line": actual_line, "source_column": actual_column,
+                "diagnostic_location": location, "observed_category": category,
+                "repair_hint": repair_hint(category), "stderr": result.stderr[:2000],
             }
 
-    required = [
-        runtime for runtime, state in item["runtimes"].items()
-        if state == "required"
-    ]
-    required_passed = all(
-        runtime_results.get(runtime, {}).get("matched") is True
-        for runtime in required
-    )
+    required = [runtime for runtime, state in item["runtimes"].items() if state == "required"]
+    required_passed = all(runtime_results.get(runtime, {}).get("matched") is True for runtime in required)
     parity_claim = (
         item["runtimes"].get("reference") == "required"
         and item["runtimes"].get("native") == "required"
         and required_passed
     )
+    if required_passed:
+        failure_category = "none"
+    else:
+        categories = [
+            runtime_results.get(runtime, {}).get("observed_category", "backend_unavailable")
+            for runtime in required
+            if runtime_results.get(runtime, {}).get("matched") is not True
+        ]
+        priority = (
+            "backend_unavailable", "harness_timeout", "harness_error",
+            "syntax_error", "runtime_failure", "semantic_mismatch", "runtime_or_harness_error",
+        )
+        failure_category = next(
+            (candidate for candidate in priority if candidate in categories),
+            categories[0] if categories else "runtime_or_harness_error",
+        )
     return {
-        "ok": required_passed,
-        "operation": "conformance_check",
-        "fixture_id": item["id"],
-        "source": item["source"],
-        "profile": item.get("profile"),
-        "requires": item.get("requires", []),
-        "expected": expected,
-        "runtime_results": runtime_results,
+        "ok": required_passed, "operation": "conformance_check",
+        "fixture_id": item["id"], "source": item["source"],
+        "profile": item.get("profile"), "requires": item.get("requires", []),
+        "expected": expected, "runtime_results": runtime_results,
         "required_runtimes_passed": required_passed,
         "python_native_parity_proven_for_fixture": parity_claim,
         "evidence_status": "RUNTIME_TERUJI" if required_passed else "RUNTIME_GAGAL",
+        "failure_category": failure_category, "repair_hint": repair_hint(failure_category),
         "scope_note": (
-            "Hanya fixture tepercaya yang terdaftar ini yang dijalankan. Ini bukan "
-            "eksekusi source AI/pengguna dan bukan sandbox untuk kode tidak tepercaya."
+            "Kategori observasi menggambarkan hasil aktual; fixture negatif dapat mengamati "
+            "syntax_error/runtime_failure dan tetap lulus jika sesuai kontrak. Hanya fixture "
+            "terdaftar yang dijalankan; ini bukan eksekusi source AI/pengguna atau sandbox."
         ),
     }
-
-def main():
-    try:
-        fixtures = load_manifest()
-    except ManifestError as exc:
-        print(f"MANIFEST FAIL: {exc}", file=sys.stderr)
-        return 2
-
-    states = {"PASS": 0, "FAIL": 0, "UNSUPPORTED": 0}
-    native_needed = any(
-        item["runtimes"].get("native") in {"required", "optional"}
-        for item, _ in fixtures
-    )
-    with tempfile.TemporaryDirectory(prefix="pusingcuk-conformance-") as temp:
-        native_path = Path(temp) / "pusingcuk-native"
-        native_ready, native_error = build_native(native_path) if native_needed else (False, "")
-
-        for item, source_path in fixtures:
-            expected = item["expected"]
-            for runtime, state in item["runtimes"].items():
-                label = f'{item["id"]} [{runtime}]'
-                if state == "unsupported":
-                    states["UNSUPPORTED"] += 1
-                    print(f"UNSUPPORTED {label}: runtime belum mendukung fitur ini")
-                    continue
-                if runtime == "native" and not native_ready:
-                    if state == "optional":
-                        states["UNSUPPORTED"] += 1
-                        print(f"UNSUPPORTED {label}: native tidak tersedia ({native_error})")
-                    else:
-                        states["FAIL"] += 1
-                        print(f"FAIL {label}: native wajib tetapi build gagal ({native_error})")
-                    continue
-
-                command = (
-                    [sys.executable, str(ROOT / "pusingcuk_new.py"), str(source_path)]
-                    if runtime == "reference"
-                    else [str(native_path), str(source_path)]
-                )
-                result, run_error = run_command(command, expected.get("stdin", ""))
-                if run_error:
-                    states["FAIL"] += 1
-                    print(f"FAIL {label}: {run_error}")
-                    continue
-
-                actual_class = classify_stderr(result.returncode, result.stderr)
-                expected_exit_code = expected["exit_code"]
-                matches = (
-                    result.returncode == expected_exit_code
-                    and result.stdout == expected["stdout"]
-                    and actual_class == expected.get("stderr_class")
-                    and (
-                        expected.get("source_line") is None
-                        or source_line_from_stderr(result.stderr) == expected["source_line"]
-                    )
-                )
-                if matches:
-                    states["PASS"] += 1
-                    print(f"PASS {label}")
-                else:
-                    states["FAIL"] += 1
-                    print(f"FAIL {label}")
-                    print(f"  exit: expected={expected_exit_code} actual={result.returncode}")
-                    print(f"  stdout expected={expected['stdout']!r} actual={result.stdout!r}")
-                    print(f"  stderr_class expected={expected.get('stderr_class')!r} actual={actual_class!r}")
-                    if expected.get("source_line") is not None:
-                        print(
-                            "  source_line expected="
-                            f"{expected['source_line']} actual={source_line_from_stderr(result.stderr)!r}"
-                        )
-                    if result.stderr:
-                        print(f"  stderr={result.stderr.strip()!r}")
-
-    print(
-        "Ringkasan konformansi: "
-        f"{states['PASS']} PASS, {states['FAIL']} FAIL, "
-        f"{states['UNSUPPORTED']} UNSUPPORTED"
-    )
-    return 1 if states["FAIL"] else 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())
