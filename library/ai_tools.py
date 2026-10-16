@@ -552,6 +552,7 @@ class ToolRegistry:
                 return {
                     "ok": False,
                     "error": "CUK_COMPILE_FAILED",
+                    "evidence_status": "SOURCE_DITOLAK_COMPILER",
                     "diagnostic": str(exc)[:500],
                     "diagnostic_type": type(exc).__name__,
                     "diagnostic_location": _cuk_diagnostic_location(str(exc)),
@@ -572,6 +573,7 @@ class ToolRegistry:
                 return {
                     "ok": False,
                     "error": "CUK_COMPILER_INTERNAL_ERROR",
+                    "evidence_status": "STATUS_KOMPILASI_TIDAK_VALID",
                     "diagnostic": (
                         "Terjadi kesalahan internal saat memvalidasi atau menghasilkan "
                         "artefak .cuk; sumber belum dapat dinilai."
@@ -596,6 +598,7 @@ class ToolRegistry:
             return {
                 "ok": True,
                 "operation": "compile_check",
+                "evidence_status": "KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI",
                 "target": "javascript",
                 "language_version": LANGUAGE_VERSION,
                 "language_identity": language_identity,
