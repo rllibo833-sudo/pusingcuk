@@ -80,7 +80,7 @@ class DocumentationContractTests(unittest.TestCase):
                 key = f"{runtime}:{status}"
                 counts[key] = counts.get(key, 0) + 1
         self.assertEqual(len(manifest["fixtures"]), 70)
-        self.assertEqual(counts["reference:required"], 69)
+        self.assertEqual(counts["reference:required"], 70)
         self.assertEqual(counts["native:required"], 67)
         self.assertEqual(counts["native:unsupported"], 3)
 
