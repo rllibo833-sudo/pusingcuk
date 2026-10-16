@@ -21,7 +21,7 @@ _MAX_CUK_SOURCE_BYTES = 16 * 1024
 
 def _cuk_language_identity(source: str) -> dict[str, Any]:
     """Describe the actual PusingCuk vocabulary present in a source snippet."""
-    words = re.findall(r"\\b[^\\W\\d]\\w*\\b", source, flags=re.UNICODE)
+    words = re.findall(r"\b[^\W\d]\w*\b", source, flags=re.UNICODE)
     aliases_used = list(dict.fromkeys(word for word in words if word in KEYWORD_ALIASES))
     return {
         "opening_form": "jancuk",
