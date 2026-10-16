@@ -1,6 +1,6 @@
 # Kontrak Fixture Konformansi Pusingcuk
 
-**Versi bahasa:** `0.6-dev`. Manifest berisi 72 fixture: 72 wajib pada reference; 69 wajib dan 3 eksplisit unsupported pada native C.
+**Versi bahasa:** `0.6-dev`. Manifest berisi 74 fixture: 74 wajib pada reference; 71 wajib dan 3 eksplisit unsupported pada native C.
 
 Harness konformansi aktif ada di `tools/conformance.py` dan dijalankan oleh CI. Manifest membandingkan perilaku yang terlihat pengguna pada interpreter referensi Python dan runtime native C. Fixture kanonis baru memakai ekstensi `.cuk`; contoh lama berekstensi `.pusingcuk` tetap boleh digunakan untuk kompatibilitas.
 
