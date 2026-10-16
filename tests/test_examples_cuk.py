@@ -34,10 +34,17 @@ class CukExampleCliTests(unittest.TestCase):
 
     def test_ai_engine_contract_example_runs_without_provider_or_network(self):
         output, _, _ = self.run_example("ai/engine_contract.cuk", "")
-        self.assertIn("OUTPUT_MENUNGGU_TINJAUAN", output)
-        self.assertIn("KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI", output)
-        self.assertIn("RUNTIME_TERUJI", output)
-        self.assertIn("SOURCE_DITOLAK_COMPILER", output)
+        for expected_status in (
+            "OUTPUT_MENUNGGU_TINJAUAN",
+            "KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI",
+            "RUNTIME_TERUJI",
+            "SOURCE_DITOLAK_COMPILER",
+            "RUNTIME_GAGAL",
+            "STATUS_KOMPILASI_TIDAK_VALID",
+            "STATUS_RUNTIME_TIDAK_VALID",
+        ):
+            with self.subTest(expected_status=expected_status):
+                self.assertIn(expected_status, output)
         self.assertIn(
             "Gunakan konteks terverifikasi saja. Konteks: Kontrak runtime lokal. Pertanyaan: Apa batas tool?",
             output,
