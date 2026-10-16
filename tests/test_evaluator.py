@@ -18,6 +18,15 @@ class EvaluatorTests(unittest.TestCase):
             "lah a = [10, 20]\na[0] = 99\nhedeh a[0]\nhedeh panjang(a)"
         )), "99\n2\n")
 
+    def test_list_concatenation_preserves_order_and_operands(self):
+        self.assertEqual(capture(program(
+            "lah kiri = [1, 2]\nlah kanan = [3, 4]\n"
+            "lah gabung = kiri + kanan\n"
+            "hedeh panjang(gabung)\nhedeh gabung[0]\n"
+            "hedeh gabung[3]\nhedeh panjang(kiri)\n"
+            "hedeh panjang(kanan)"
+        )), "4\n1\n4\n2\n2\n")
+
     def test_length_of_range(self):
         self.assertEqual(capture(program(
             "hedeh panjang(rentang(1, 5))"
