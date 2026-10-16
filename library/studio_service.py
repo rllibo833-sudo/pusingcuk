@@ -14,7 +14,7 @@ from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 WEB = ROOT / "web"
-MAX_BODY = 4096
+MAX_BODY = 30_000
 MAX_SOURCE = 20_000
 MAX_STDIN = 4_000
 TIMEOUT_SECONDS = 8
