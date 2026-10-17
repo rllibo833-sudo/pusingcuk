@@ -82,8 +82,8 @@ class SaaSHttpFlowTests(unittest.TestCase):
         status, headers, body = self.register()
         self.assertEqual(status, 201, body)
         registered_id = body["user"]["id"]
-        self.assertIn("\nasync function loadHistory", html)
-        self.assertIn("\nasync function loadHistory", html)
+        self.assertIn("HttpOnly", headers.get("Set-Cookie", ""))
+        self.assertIn("pusingcuk_session=", headers.get("Set-Cookie", ""))
         self.assertEqual(body["user"]["email"], "user@example.com")
         status, _, body = self.request("/api/auth/me")
         self.assertEqual(status, 200)
