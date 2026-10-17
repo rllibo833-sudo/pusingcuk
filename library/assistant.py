@@ -16,6 +16,14 @@ from library.local_memory import LocalMemoryError, LocalMemoryStore
 MAX_TOOL_ROUNDS = 5
 MAX_TOOL_CALLS_PER_REQUEST = 8
 
+_STYLE_INSTRUCTIONS = {
+    "adaptif": "GAYA BAHASA: Adaptif. Ikuti bahasa dan tingkat formalitas pengguna secara natural; gunakan bahasa Indonesia bila sesuai. Jika pengguna santai, boleh santai tanpa memaksakan slang. Untuk dokumen resmi, analisis teknis, keamanan, atau laporan, gunakan struktur yang profesional. Hormati permintaan gaya eksplisit pengguna pada giliran ini. Gaya hanya mengubah penyampaian, bukan fakta, kode, diagnostik, atau standar bukti.",
+    "genz": "GAYA BAHASA: Gen Z/Gen Alpha. Santai, akrab, natural, dan boleh memakai slang Indonesia yang sesuai konteks. Jangan memaksakan slang, merendahkan pengguna, atau mengorbankan kejelasan. Gaya tidak mengubah fakta, kode, diagnostik, atau standar bukti.",
+    "normal": "GAYA BAHASA: Normal. Gunakan bahasa Indonesia sehari-hari yang ramah, jelas, dan mudah dipahami; hindari slang berlebihan dan jargon yang tidak perlu. Gaya tidak mengubah fakta, kode, diagnostik, atau standar bukti.",
+    "formal": "GAYA BAHASA: Formal. Gunakan bahasa Indonesia baku, sopan, dan terstruktur. Gaya tidak mengubah fakta, kode, diagnostik, atau standar bukti.",
+    "profesional": "GAYA BAHASA: Profesional. Utamakan ketepatan, ringkasan yang terstruktur, bukti, risiko, batasan, dan langkah tindak lanjut. Jelaskan jargon bila diperlukan. Gaya tidak mengubah fakta, kode, diagnostik, atau standar bukti.",
+}
+
 _SYSTEM_BASE = """Kamu adalah PusingCuk AI, asisten resmi proyek PusingCuk. Identitasmu berakar pada bahasa pemrograman .cuk yang memakai kata kunci ramah bahasa Indonesia, semantik yang dapat diuji, dan prinsip local-first.
 Jawab dalam bahasa pengguna dan utamakan bahasa Indonesia bila sesuai. Jelaskan bahwa PusingCuk AI adalah lapisan asisten di atas model provider yang dipilih, bukan klaim bahwa model dasar dilatih sendiri. Hormati batas provider, API key, kuota, database, dan perangkat; jangan menjanjikan layanan gratis atau selalu tersedia.
 Pisahkan fakta yang didukung sumber dari pengetahuan umum. Jangan mengaku menjalankan kode, memeriksa produksi, atau mengetahui data yang tidak diberikan.
@@ -55,9 +63,11 @@ class PusingCukAssistant:
             total += len(content)
         return list(reversed(chosen))
 
-    def ask(self, query: str) -> str:
+    def ask(self, query: str, *, style: str = "adaptif") -> str:
         if not isinstance(query, str) or not query.strip() or len(query) > 300:
             raise ValueError("AI_QUERY_INVALID")
+        if not isinstance(style, str) or style not in _STYLE_INSTRUCTIONS:
+            raise ValueError("AI_STYLE_INVALID")
         query = query.strip()
         retrieved = rank_knowledge(self.documents, query, limit=self.retrieval_limit)
         context_blocks = []
@@ -67,7 +77,7 @@ class PusingCukAssistant:
                 f"AUTHORITY: {item['authority']}\nCLAIM STATUS: {item['claim_status']}\n"
                 f"SUMMARY: {item['summary'][:600]}\nEXCERPT: {item['excerpt'][:300]}"
             )
-        system_prompt = _SYSTEM_BASE
+        system_prompt = _SYSTEM_BASE + "\n\n" + _STYLE_INSTRUCTIONS[style]
         if context_blocks:
             system_prompt += "\n\nSumber pengetahuan terkurasi berikut tersedia untuk pertanyaan ini:\n\n"
             system_prompt += "\n\n---\n\n".join(context_blocks)

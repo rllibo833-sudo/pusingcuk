@@ -23,7 +23,11 @@ SPEC.loader.exec_module(saas)
 
 
 class FakeAssistant:
-    def ask(self, query):
+    def __init__(self):
+        self.last_style = None
+
+    def ask(self, query, *, style="adaptif"):
+        self.last_style = style
         return "Dijawab: " + query
 
 
@@ -118,9 +122,14 @@ class SaaSHttpFlowTests(unittest.TestCase):
         self.assertEqual(status, 401)
         self.assertEqual(body["error"], "AUTH_REQUIRED")
         self.assertEqual(self.register()[0], 201)
-        status, _, body = self.request("/api/chat", {"query": "buat program .cuk"})
+        status, _, body = self.request("/api/chat", {"query": "buat program .cuk", "style": "profesional"})
         self.assertEqual(status, 200, body)
         self.assertEqual(body["answer"], "Dijawab: buat program .cuk")
+        self.assertEqual(next(iter(self.server._assistants.values())).last_style, "profesional")
+
+        status, _, body = self.request("/api/chat", {"query": "halo", "style": "unregistered"})
+        self.assertEqual(status, 400)
+        self.assertEqual(body["error"], "CHAT_STYLE_INVALID")
         status, _, body = self.request("/api/messages")
         self.assertEqual(status, 200)
         self.assertEqual([item["role"] for item in body["messages"]], ["user", "assistant"])
@@ -162,6 +171,10 @@ class SaaSPrimitiveTests(unittest.TestCase):
         # and makes the entire inline script fail to parse in the browser.
         self.assertNotIn(r"\nasync function loadHistory", html)
         self.assertIn("\nasync function loadHistory", html)
+        self.assertIn('id="styleSelect"', html)
+        self.assertIn('value="adaptif"', html)
+        self.assertIn("localStorage.setItem('pusingcuk-chat-style',chatStyle)", html)
+        self.assertIn("JSON.stringify({query,style:chatStyle})", html)
 
 
 if __name__ == "__main__":

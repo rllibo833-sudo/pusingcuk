@@ -340,18 +340,21 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/chat":
                 user = self._auth_required()
                 _rate_limit("chat:" + user["id"], 20)
-                if set(payload) != {"query"}:
+                if set(payload) not in ({"query"}, {"query", "style"}):
                     raise SaaSError("CHAT_PAYLOAD_INVALID")
                 query = payload["query"]
                 if not isinstance(query, str) or not query.strip() or len(query) > 300:
                     raise SaaSError("QUERY_INVALID")
+                style = payload.get("style", "adaptif")
+                if not isinstance(style, str) or style not in {"adaptif", "genz", "normal", "formal", "profesional"}:
+                    raise SaaSError("CHAT_STYLE_INVALID")
                 # A bounded in-memory assistant per authenticated user keeps turn history isolated.
                 assistant = self.server.assistant_for(user["id"])
                 user_lock, slot = self.server.acquire_turn(user["id"])
                 if user_lock is None:
                     raise SaaSError("AI_BUSY", 503)
                 try:
-                    answer = assistant.ask(query.strip())
+                    answer = assistant.ask(query.strip(), style=style)
                 except Exception:
                     self._json(502, {"error": "AI_PROVIDER_FAILURE", "request_id": request_id})
                     return
