@@ -6,6 +6,8 @@ on:
     paths:
       - "web/index.html"
       - "apps/pusingcuk-ai-saas/index.html"
+      - "supabase/functions/pusingcuk-ai/index.ts"
+      - "supabase/functions/pusingcuk-web/index.ts"
       - ".github/workflows/saas-frontend-smoke.yml"
   workflow_dispatch:
 
@@ -69,3 +71,13 @@ jobs:
           PY
           node --check "$RUNNER_TEMP/web-workspace.js"
           node --check "$RUNNER_TEMP/pusingcuk-ai-saas-workspace.js"
+
+      - name: Smoke test deployed workspace gateway
+        run: |
+          set -euo pipefail
+          page="$RUNNER_TEMP/pusingcuk-live.html"
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 --max-time 30 \
+            "https://vcvejjpzklpvknxmymgy.supabase.co/functions/v1/pusingcuk-web" -o "$page"
+          grep -q "Pakai kode di editor" "$page"
+          grep -q "PusingCuk AI" "$page"
+          echo "Deployed workspace gateway returned the expected interactive frontend."
