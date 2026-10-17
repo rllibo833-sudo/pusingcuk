@@ -60,11 +60,11 @@ fungsi klasifikasi_laporan(kas_tanpa_kategori, ekuitas_tanpa_kategori)
         balek "KLASIFIKASI_LENGKAP"
     selesai njir
 selesai fungsi
-fungsi hitung_pajak_dasar(penghasilan_kena_pajak, tarif_persen)
+fungsi validasi_input_pajak(penghasilan_kena_pajak, tarif_persen)
     njir penghasilan_kena_pajak < 0 atau tarif_persen < 0 atau tarif_persen > 100
         balek "INPUT_PAJAK_TIDAK_VALID"
     kampret
-        balek penghasilan_kena_pajak * tarif_persen / 100
+        balek "INPUT_PAJAK_VALID"
     selesai njir
 selesai fungsi
 fungsi pemeriksaan_syariah(transaksi_ada_bunga, transaksi_ada_gharar, transaksi_ada_maisir)
@@ -88,8 +88,8 @@ hedeh validasi_periode("2026-10-17", "2026-10-01", "2026-10-31", benar)
 hedeh validasi_periode("2026-11-01", "2026-10-01", "2026-10-31", benar)
 hedeh klasifikasi_laporan(0, 0)
 hedeh klasifikasi_laporan(1, 0)
-hedeh hitung_pajak_dasar(1000000, 11)
-hedeh hitung_pajak_dasar(-1, 11)
+hedeh validasi_input_pajak(1000000, 11)
+hedeh validasi_input_pajak(-1, 11)
 hedeh pemeriksaan_syariah(salah, salah, salah)
 hedeh pemeriksaan_syariah(benar, salah, salah)
 selesai jancuk
