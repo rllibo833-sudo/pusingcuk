@@ -49,9 +49,64 @@ class SaaSHttpFlowTests(unittest.TestCase):
         self.env_patch.start()
         self.assistant_patch = patch.object(saas, "_assistant_factory", side_effect=FakeAssistant)
         self.assistant_patch.start()
+        self.fake_users = {}
+        self.fake_tokens = {}
+        self.fake_messages = []
+        self.supabase_patch = patch.object(saas, "_supabase_request", side_effect=self.fake_supabase_request)
+        self.supabase_patch.start()
         self.opener = build_opener(HTTPCookieProcessor(http.cookiejar.CookieJar()))
 
+    def fake_supabase_request(self, method, path, *, token=None, body=None):
+        if path == "/auth/v1/signup" and method == "POST":
+            email = body["email"].casefold()
+            if email in self.fake_users:
+                return 422, {"msg": "User already registered"}
+            user = {"id": "user-" + str(len(self.fake_users) + 1), "email": email,
+                    "password": body["password"], "user_metadata": body.get("data", {})}
+            self.fake_users[email] = user
+            access = "access-" + user["id"]
+            refresh = "refresh-" + user["id"]
+            self.fake_tokens[access] = user
+            return 201, {"access_token": access, "refresh_token": refresh, "user": user}
+        if path == "/auth/v1/token?grant_type=password" and method == "POST":
+            user = self.fake_users.get(body["email"].casefold())
+            if not user or user["password"] != body["password"]:
+                return 400, {"msg": "Invalid login credentials"}
+            access = "access-" + user["id"]
+            refresh = "refresh-" + user["id"]
+            self.fake_tokens[access] = user
+            return 200, {"access_token": access, "refresh_token": refresh, "user": user}
+        if path == "/auth/v1/user" and method == "GET":
+            user = self.fake_tokens.get(token)
+            if not user:
+                return 401, {"msg": "Invalid token"}
+            return 200, {key: value for key, value in user.items() if key != "password"}
+        if path == "/auth/v1/logout" and method == "POST":
+            return 204, {}
+        if path == "/rest/v1/pusingcuk_saas_messages" and method == "POST":
+            user = self.fake_tokens.get(token)
+            if not user:
+                return 401, {"message": "Unauthorized"}
+            self.fake_messages.extend(body)
+            return 201, {}
+        if path.startswith("/rest/v1/pusingcuk_saas_messages?") and method == "GET":
+            user = self.fake_tokens.get(token)
+            if not user:
+                return 401, {"message": "Unauthorized"}
+            return 200, [{"role": item["role"], "content": item["content"],
+                          "created_at": "2026-10-17T00:00:00+00:00"}
+                         for item in self.fake_messages if item["user_id"] == user["id"]]
+        if path.startswith("/auth/v1/token?grant_type=refresh_token") and method == "POST":
+            user = next((u for u in self.fake_users.values() if "refresh-" + u["id"] == body.get("refresh_token")), None)
+            if not user:
+                return 401, {"msg": "Invalid refresh token"}
+            access = "access-" + user["id"]
+            self.fake_tokens[access] = user
+            return 200, {"access_token": access, "refresh_token": body["refresh_token"]}
+        return 404, {"message": "Mock Supabase endpoint not found"}
+
     def tearDown(self):
+        self.supabase_patch.stop()
         self.assistant_patch.stop()
         self.env_patch.stop()
         self.server.shutdown()
