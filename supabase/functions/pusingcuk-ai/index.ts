@@ -34,9 +34,20 @@ const systemPrompt = [
 ].join("\n");
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method !== "POST") return json({ error: "Gunakan metode POST." }, 405);
   const claims = getVerifiedUserClaims(req);
   if (!claims) return json({ error: "Sesi login tidak valid. Keluar lalu login kembali." }, 401);
+  // Read-only configuration check. It does not call the model and cannot consume inference credits.
+  if (req.method === "GET") {
+    const ownBase = Deno.env.get("MODEL_BASE_URL")?.trim();
+    const ownModel = Deno.env.get("MODEL_NAME")?.trim();
+    const openRouterKey = Deno.env.get("OPENROUTER_API_KEY");
+    const openRouterModel = Deno.env.get("OPENROUTER_MODEL")?.trim() || "qwen/qwen3-4b:free";
+    if (ownBase && ownModel) return json({ ready: true, provider: "pusingcuk-model-server", model: ownModel, check: "configuration-only" });
+    if (openRouterKey && openRouterModel.endsWith(":free")) return json({ ready: true, provider: "openrouter", model: openRouterModel, check: "configuration-only" });
+    if (openRouterKey && !openRouterModel.endsWith(":free")) return json({ ready: false, provider: "openrouter", reason: "model-not-free", check: "configuration-only" }, 503);
+    return json({ ready: false, reason: "model-not-configured", check: "configuration-only" }, 503);
+  }
+  if (req.method !== "POST") return json({ error: "Gunakan GET untuk cek konfigurasi atau POST untuk chat." }, 405);
   const now = Date.now();
   const recentRequests = (requestWindows.get(claims.sub) || []).filter((stamp) => now - stamp < 60000);
   if (recentRequests.length >= 4) return json({ error: "Batas hemat biaya: maksimal 4 permintaan per menit. Tunggu sebentar lalu coba lagi." }, 429);
