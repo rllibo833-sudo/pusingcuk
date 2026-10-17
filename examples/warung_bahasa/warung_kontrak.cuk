@@ -1,0 +1,104 @@
+# Warung Bahasa .cuk
+# Modul kontrak dan klasifikasi diagnostik.
+# Input status berasal dari pemeriksaan eksternal yang tepercaya.
+
+jancuk
+
+fungsi validasi_rentang(nilai, minimum, maksimum)
+    njir minimum > maksimum
+        balek "BATAS_TIDAK_VALID"
+    kampret
+        njir nilai < minimum
+            balek "NILAI_TERLALU_KECIL"
+        kampret
+            njir nilai > maksimum
+                balek "NILAI_TERLALU_BESAR"
+            kampret
+                balek "NILAI_VALID"
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi klasifikasi_sumber(status)
+    njir status == "kosong"
+        balek "SOURCE_KOSONG"
+    kampret
+        njir status == "terlalu_besar"
+            balek "SOURCE_MELEBIHI_BATAS"
+        kampret
+            njir status == "input_tidak_valid"
+                balek "SOURCE_INPUT_TIDAK_VALID"
+            kampret
+                njir status == "ditolak"
+                    balek "SOURCE_DITOLAK_COMPILER"
+                kampret
+                    njir status == "lulus"
+                        balek "SOURCE_LOLOS_PEMERIKSAAN"
+                    kampret
+                        balek "SOURCE_STATUS_TIDAK_DIKENAL"
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi klasifikasi_diagnostik(kode)
+    njir kode == "nama_tidak_dikenal"
+        balek "PERIKSA_EJAAN_NAMA"
+    kampret
+        njir kode == "argumen_tidak_cocok"
+            balek "PERIKSA_JUMLAH_DAN_TIPE_ARGUMEN"
+        kampret
+            njir kode == "tipe_tidak_cocok"
+                balek "PERIKSA_OPERASI_DAN_TIPE_DATA"
+            kampret
+                njir kode == "sintaks_tidak_valid"
+                    balek "PERIKSA_STRUKTUR_DAN_PENUTUP_BLOK"
+                kampret
+                    njir kode == "runtime_gagal"
+                        balek "PERIKSA_INPUT_DAN_ALUR_EKSEKUSI"
+                    kampret
+                        njir kode == "lulus"
+                            balek "TIDAK_ADA_DIAGNOSTIK"
+                        kampret
+                            balek "KODE_DIAGNOSTIK_BELUM_DIPETAKAN"
+                        selesai njir
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi rekomendasi_perbaikan(status_sumber, kode_diagnostik)
+    njir status_sumber != "lulus"
+        balek "PERBAIKI_SOURCE_DULU"
+    kampret
+        njir kode_diagnostik == "lulus"
+            balek "LANJUTKAN_KE_PEMERIKSAAN_RUNTIME"
+        kampret
+            balek klasifikasi_diagnostik(kode_diagnostik)
+        selesai njir
+    selesai njir
+selesai fungsi
+
+hedeh validasi_rentang(3, 1, 5)
+hedeh validasi_rentang(0, 1, 5)
+hedeh validasi_rentang(6, 1, 5)
+hedeh validasi_rentang(3, 8, 2)
+
+hedeh klasifikasi_sumber("kosong")
+hedeh klasifikasi_sumber("lulus")
+hedeh klasifikasi_sumber("status_aneh")
+
+hedeh klasifikasi_diagnostik("nama_tidak_dikenal")
+hedeh klasifikasi_diagnostik("tipe_tidak_cocok")
+hedeh klasifikasi_diagnostik("kode_baru")
+
+hedeh rekomendasi_perbaikan("ditolak", "lulus")
+hedeh rekomendasi_perbaikan("lulus", "runtime_gagal")
+hedeh rekomendasi_perbaikan("lulus", "lulus")
+
+selesai jancuk
