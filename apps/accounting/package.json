@@ -35,6 +35,9 @@
       "dist/index.html",
       "platform_bridge.py",
       "sqlite_store.py",
+      "cuk_domain.py",
+      "platform_bridge_cli.py",
+      "cuk-ui-preload.cjs",
       "cuk-ui-main.cjs"
     ],
     "win": {
