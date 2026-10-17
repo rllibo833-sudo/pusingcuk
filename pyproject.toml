@@ -28,7 +28,6 @@ pusingcuk-ai-service = "library.ai_service:main"
 pusingcuk-studio = "library.studio_service:main"
 pusingcuk-repl = "terminal:main"
 pusingcuk-build = "compiler.js_backend:main"
-pusingcuk-code = "tools.cuk_coder:main"
 
 [tool.pusingcuk]
 language-version = "0.6-dev"
