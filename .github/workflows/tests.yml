@@ -12,6 +12,7 @@ on:
       - "ast_nodes.py"
       - "compiler/**"
       - "apps/accounting/**"
+      - "apps/pusingcuk-ai-saas/**"
       - "library/**"
       - "native/**"
       - "tests/**"
@@ -36,6 +37,7 @@ on:
       - "ast_nodes.py"
       - "compiler/**"
       - "apps/accounting/**"
+      - "apps/pusingcuk-ai-saas/**"
       - "library/**"
       - "native/**"
       - "tests/**"
@@ -89,6 +91,25 @@ jobs:
           python tools/diagnostic_repair_loop.py apps/accounting/cukaccount_frontend.cuk --frontend-contract --json
           python tools/diagnostic_repair_loop.py apps/accounting/cukaccount_backend.cuk --expected apps/accounting/cukaccount_backend.expected.txt --json
           python -m unittest tests.test_diagnostic_repair_loop -v
+      - name: Validasi sintaks JavaScript workspace SaaS
+        if: matrix.python-version == '3.12'
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          html = Path("apps/pusingcuk-ai-saas/index.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script(?:\s[^>]*)?>(.*?)</script>", html, re.IGNORECASE | re.DOTALL)
+          if len(scripts) != 1:
+              raise SystemExit(f"Expected one inline workspace script, found {len(scripts)}")
+          output = Path(os.environ["RUNNER_TEMP"]) / "pusingcuk-saas-workspace.js"
+          output.write_text(scripts[0], encoding="utf-8")
+          print(f"Extracted workspace JavaScript to {output}")
+          PY
+          node --check "$RUNNER_TEMP/pusingcuk-saas-workspace.js"
+
       - name: Build and smoke-test standalone JS artifact from registered .cuk rule
         if: matrix.python-version == '3.12'
         run: |
