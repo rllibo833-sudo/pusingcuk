@@ -1,0 +1,71 @@
+name: PusingCuk SaaS frontend smoke
+
+on:
+  push:
+    branches: [warungpusingcuk]
+    paths:
+      - "web/index.html"
+      - "apps/pusingcuk-ai-saas/index.html"
+      - ".github/workflows/saas-frontend-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pusingcuk-saas-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  javascript-syntax:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: "22"
+      - name: Extract and check inline JavaScript in both workspaces
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import os
+
+          class InlineScripts(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.scripts = []
+                  self.active = False
+                  self.parts = []
+
+              def handle_starttag(self, tag, attrs):
+                  if tag.lower() == "script":
+                      self.active = not any(key.lower() == "src" for key, _ in attrs)
+                      self.parts = []
+
+              def handle_data(self, data):
+                  if self.active:
+                      self.parts.append(data)
+
+              def handle_endtag(self, tag):
+                  if tag.lower() == "script" and self.active:
+                      self.scripts.append("".join(self.parts))
+                      self.active = False
+                      self.parts = []
+
+          output_dir = Path(os.environ["RUNNER_TEMP"])
+          for source in ("web/index.html", "apps/pusingcuk-ai-saas/index.html"):
+              parser = InlineScripts()
+              parser.feed(Path(source).read_text(encoding="utf-8"))
+              if not parser.scripts or not any(script.strip() for script in parser.scripts):
+                  raise SystemExit(f"No inline JavaScript found in {source}")
+              target = output_dir / (Path(source).parent.name + "-workspace.js")
+              target.write_text("\n;\n".join(parser.scripts), encoding="utf-8")
+              print(f"Extracted {len(parser.scripts)} inline script(s) from {source} to {target}")
+          PY
+          node --check "$RUNNER_TEMP/web-workspace.js"
+          node --check "$RUNNER_TEMP/pusingcuk-ai-saas-workspace.js"
