@@ -190,7 +190,7 @@ class SaaSHttpFlowTests(unittest.TestCase):
         self.assertEqual([item["role"] for item in body["messages"]], ["user", "assistant"])
         self.assertEqual(body["messages"][0]["content"], "buat program .cuk")
 
-    def test_workspace_retries_real_compiler_diagnostic_without_saving(self):
+    def test_workspace_retries_compiler_diagnostic_without_saving(self):
         self.assertEqual(self.register()[0], 201)
         assistant = self.server.assistant_for("user-1")
         assistant.ask = Mock(side_effect=[
