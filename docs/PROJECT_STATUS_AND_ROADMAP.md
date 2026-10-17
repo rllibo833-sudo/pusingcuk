@@ -26,7 +26,7 @@
 - **Versi bahasa kontraktual:** `0.6-dev`.
 - **Versi paket Python:** `0.8.0.dev0`. Ini metadata paket, bukan versi bahasa.
 - **Kontrak built-in:** 25 built-in terkontrak; 17 berstatus didukung oleh native C sebagai built-in penuh. Beberapa konversi skalar memiliki cakupan terbatas; lihat matriks resmi, jangan menghitung semuanya sebagai paritas.
-- **Fixture konformansi:** 74 fixture: 74 wajib pada interpreter referensi Python, 71 wajib pada native C, dan 3 secara eksplisit tidak didukung native. Status ini bukan klaim bahwa setiap backend mendukung semua fitur.
+- **Fixture konformansi:** 77 fixture: 77 wajib pada interpreter referensi Python, 74 wajib pada native C, dan 3 secara eksplisit tidak didukung native. Status ini bukan klaim bahwa setiap backend mendukung semua fitur.
 - **Jalur yang dipelihara:** `lexer.py → parser.py → ast_nodes.py → evaluator.py` dan runtime `native/pusingcuk.c`.
 - **Targets eksperimental:** `compiler/`, `src/`, VM/PVM, dan aplikasi `android-studio/`. Folder atau workflow yang ada bukan bukti rilis stabil.
 
