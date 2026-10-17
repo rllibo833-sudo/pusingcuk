@@ -25,13 +25,13 @@ Tax output is arithmetic only, not tax advice or a statement of the applicable I
 
 ## Platform bridge status
 
-`platform_bridge.py` is a capability allowlist/dispatcher with injected handlers. It fails closed when an operation has no handler and rejects unknown operations and request shapes. It is **not yet a live SQLite, secure-storage, Android backup or restore adapter**. Do not treat a successful dispatcher test as evidence that persistence is active.
+`platform_bridge.py` is a capability allowlist/dispatcher with injected handlers. It fails closed when an operation has no handler and rejects unknown operations and request shapes. The typed dispatcher now has an SQLite reference adapter (`sqlite_store.py`), atomic draft/post transactions, integer-Rupiah validation, idempotency keys, period locking, general-ledger running balances, and append-only audit events. `db.post_journal` invokes `validasi_jurnal` from `cukaccount_backend.cuk` through the reference interpreter before the SQLite commit; SQLite repeats critical invariant checks as defense in depth. Electron UI actions call a narrow preload IPC method which forwards bounded JSON to `platform_bridge_cli.py`. This is a desktop development vertical slice, **not yet an Android-native bridge**; secure-store, encrypted backup/restore, account/period setup UI, and device testing remain open.
 
 ## Known implementation boundaries
 
 - `.cuk` remains the source of domain rules; the UI runtime does not move business rules to Dart.
-- The rendered UI is an executable interaction prototype, not yet wired to the bridge's database operations. Save/post/report actions must not be considered persisted or production-ready.
-- Before production, implement and test the SQLite adapter with atomic journal posting, idempotency, audit trail, period-lock enforcement and migration/restore tests.
+- The rendered UI can load account choices, save a two-line journal draft, and request posting through the typed bridge. Posting is gated by live `.cuk` interpreter validation and an atomic SQLite transaction. UI report views and period close preview are not all wired to data yet; the basic ledger adapter exists, but the complete report UI is still open.
+- Before production, add versioned migrations, chart-of-accounts and period setup, full report reconciliation, backup/restore and migration tests, and platform-native Android storage.
 - Integrate bridge requests through a narrowly scoped host API, not arbitrary SQL or unrestricted filesystem access.
 - Add cross-runtime conformance for these new backend rules before declaring them portable to JavaScript/native runtime.
 - Use integer Rupiah for persisted amounts; do not use floating-point tax calculations for financial posting. Tax and sharia policies need separately reviewed, versioned rules.
@@ -44,3 +44,13 @@ python pusingcuk_new.py --check apps/accounting/cukaccount_frontend.cuk
 python pusingcuk_new.py --check apps/accounting/cukaccount_backend.cuk
 python pusingcuk_new.py apps/accounting/cukaccount_backend.cuk
 ```
+
+
+## Typed bridge, storage and diagnostic repair loop (branch `warung-pusingcuk`)
+
+- `platform_bridge.py` validates the contract version, request ID, operation allowlist, and per-operation field schemas; extra/missing fields fail closed.
+- `sqlite_store.py` uses SQLite transactions for draft creation and posting. Posting uses `BEGIN IMMEDIATE`, verifies open period, active accounts, at least two lines, integer Rupiah and debit=credit, writes the posting audit event in the same transaction, and supports an idempotency key. A failed write rolls back both journal state and audit write.
+- `cuk_domain.py` calls the real `.cuk` function through `pusingcuk_new.py`; `db.post_journal` denies posting if compilation/runtime fails or `.cuk` returns a rejection. Python storage validation is a second guard, not a replacement for `.cuk`.
+- `cuk-ui-preload.cjs` exposes only a typed IPC request method; `cuk-ui-main.cjs` rejects non-local callers and oversized messages, invokes a fixed CLI without a shell, and stores the database under Electron's app-data directory. This host currently assumes a Python runtime is installed and is **not an Android APK integration**.
+- `tools/diagnostic_repair_loop.py` runs syntax and runtime checks with a timeout, hashes source, compares locked output fixtures, emits stable diagnostic codes and manual-only repair suggestions. It never auto-edits source or merges. This is a testable diagnostic handoff for the AI repair workflow, not proof that a local AI model has been connected.
+- Regression coverage: `tests.test_sqlite_store`, `tests.test_typed_bridge_integration`, and `tests.test_diagnostic_repair_loop`. CI evidence must be checked for the current branch head before treating this slice as green.
