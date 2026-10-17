@@ -347,11 +347,17 @@ class Handler(BaseHTTPRequestHandler):
                     raise SaaSError("QUERY_INVALID")
                 # A bounded in-memory assistant per authenticated user keeps turn history isolated.
                 assistant = self.server.assistant_for(user["id"])
+                user_lock, slot = self.server.acquire_turn(user["id"])
+                if user_lock is None:
+                    raise SaaSError("AI_BUSY", 503)
                 try:
                     answer = assistant.ask(query.strip())
                 except Exception:
                     self._json(502, {"error": "AI_PROVIDER_FAILURE", "request_id": request_id})
                     return
+                finally:
+                    user_lock.release()
+                    slot.release()
                 now = int(time.time())
                 with _db() as db:
                     db.execute("INSERT INTO messages(id,user_id,role,content,created_at) VALUES(?,?,?,?,?)",
@@ -385,6 +391,7 @@ class SaaSServer(ThreadingHTTPServer):
     def __init__(self, address, handler):
         super().__init__(address, handler)
         self._assistants = {}
+        self._assistant_locks = {}
         self._assistant_lock = __import__("threading").Lock()
         self._slots = __import__("threading").BoundedSemaphore(4)
 
@@ -394,7 +401,18 @@ class SaaSServer(ThreadingHTTPServer):
                 if len(self._assistants) >= 128:
                     raise SaaSError("AI_CAPACITY_REACHED", 503)
                 self._assistants[user_id] = _assistant_factory()
+                self._assistant_locks[user_id] = __import__("threading").Lock()
             return self._assistants[user_id]
+
+    def acquire_turn(self, user_id):
+        if not self._slots.acquire(blocking=False):
+            return None, None
+        with self._assistant_lock:
+            lock = self._assistant_locks.get(user_id)
+        if lock is None or not lock.acquire(blocking=False):
+            self._slots.release()
+            return None, None
+        return lock, self._slots
 
 
 def main() -> int:
@@ -404,7 +422,9 @@ def main() -> int:
         port = int(os.environ.get("PUSINGCUK_SAAS_PORT", os.environ.get("PORT", "8088")))
         if not 1 <= port <= 65535:
             raise ValueError("SAAS_PORT_INVALID")
-        if not os.environ.get("PUSINGCUK_SAAS_PUBLIC_ORIGIN", "").startswith("https://"):
+        public_origin = os.environ.get("PUSINGCUK_SAAS_PUBLIC_ORIGIN", "").rstrip("/")
+        local_dev_origin = public_origin in {"http://127.0.0.1:8088", "http://localhost:8088"} and os.environ.get("PUSINGCUK_SAAS_COOKIE_SECURE") == "0"
+        if not public_origin.startswith("https://") and not local_dev_origin:
             raise ValueError("SAAS_PUBLIC_ORIGIN_MUST_BE_HTTPS")
         # Fail fast on provider configuration, but create a fresh assistant per user.
         _assistant_factory()
