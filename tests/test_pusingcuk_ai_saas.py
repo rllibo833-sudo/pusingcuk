@@ -224,6 +224,40 @@ class SaaSHttpFlowTests(unittest.TestCase):
         repair_prompt = assistant.ask.call_args_list[1].args[0]
         self.assertIn("ekspresi tidak lengkap", repair_prompt)
 
+    def test_workspace_retries_with_real_compiler_diagnostics(self):
+        """The endpoint must feed real compiler diagnostics into a bounded repair."""
+        self.assertEqual(self.register()[0], 201)
+        assistant = self.server.assistant_for("user-1")
+        assistant.ask = Mock(side_effect=[
+            "Kandidat awal. <CUK>print(1 + )</CUK>",
+            "Kandidat diperbaiki. <CUK>print(1 + 2)</CUK>",
+        ])
+
+        # Do not mock ToolRegistry.execute: both checks must pass through the
+        # actual .cuk parser/IR validation/JavaScript generation pipeline.
+        status, _, body = self.request("/api/workspace/assist", {
+            "request": "Buat program penjumlahan sederhana",
+            "source": "",
+        })
+
+        self.assertEqual(status, 200, body)
+        self.assertEqual(body["candidate_source"], "print(1 + 2)\\n")
+        self.assertFalse(body["saved"])
+        check = body["compile_check"]
+        self.assertTrue(check["ok"], check)
+        self.assertEqual(check["evidence_status"], "COMPILE_CHECK_PASSED")
+        self.assertEqual(check["repair_attempts"], 1)
+        self.assertEqual(check["repair_stop_reason"], "compiler_passed")
+        attempts = check["compile_attempts"]
+        self.assertEqual(len(attempts), 2)
+        self.assertFalse(attempts[0]["ok"], attempts[0])
+        self.assertEqual(attempts[0]["evidence_status"], "SOURCE_DITOLAK_COMPILER")
+        self.assertTrue(attempts[0]["diagnostic"])
+        self.assertTrue(attempts[1]["ok"], attempts[1])
+        self.assertEqual(attempts[1]["evidence_status"], "COMPILE_CHECK_PASSED")
+        repair_prompt = assistant.ask.call_args_list[1].args[0]
+        self.assertIn(attempts[0]["diagnostic"], repair_prompt)
+
     def test_post_rejects_wrong_origin_and_oversized_body(self):
         status, _, body = self.request("/api/auth/register", {
             "email": "user@example.com", "password": "a-long-test-password", "display_name": "U"
