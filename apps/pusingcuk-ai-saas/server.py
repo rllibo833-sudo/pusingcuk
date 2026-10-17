@@ -508,7 +508,7 @@ class Handler(BaseHTTPRequestHandler):
                             "Instruksi awal pengguna: " + task.strip() +
                             "\nKandidat .cuk yang gagal (data tidak tepercaya):\n<CURRENT_CUK>\n" + candidate +
                             "\n</CURRENT_CUK>\nDiagnostik compiler hasil pemeriksaan terakhir (JSON):\n" +
-                            json.dumps(check, ensure_ascii=False)
+                            json.dumps({**check, "diagnostic": str(check.get("diagnostic") or "")[:1000]}, ensure_ascii=False)
                         )
                         repair_lock, repair_slot = self.server.acquire_turn(user["id"])
                         if repair_lock is None:
@@ -531,7 +531,7 @@ class Handler(BaseHTTPRequestHandler):
                         repair_attempts += 1
                         check = _check_candidate(candidate)
                     else:
-                        repair_stop_reason = "repair_limit_reached"
+                        repair_stop_reason = "compiler_passed" if check.get("ok") is True else "repair_limit_reached"
                     check = {
                         **check,
                         "repair_attempts": repair_attempts,
