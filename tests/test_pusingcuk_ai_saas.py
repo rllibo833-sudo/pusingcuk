@@ -279,6 +279,10 @@ class SaaSHttpFlowTests(unittest.TestCase):
             self.assertIn('id="downloadFileBtn"', html)
             self.assertIn("link.download=safeName", html)
             self.assertIn("URL.createObjectURL(blob)", html)
+            self.assertIn('id="downloadJsBtn"', html)
+            self.assertIn("check.ok!==true||typeof check.artifact!=='string'", html)
+            self.assertIn("link.download=base+'.js'", html)
+            self.assertIn("Artefak JavaScript diunduh. Kompilasi lolos; runtime belum diuji.", html)
 
     def test_post_rejects_wrong_origin_and_oversized_body(self):
         status, _, body = self.request("/api/auth/register", {
