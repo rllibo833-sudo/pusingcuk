@@ -190,6 +190,40 @@ class SaaSHttpFlowTests(unittest.TestCase):
         self.assertEqual([item["role"] for item in body["messages"]], ["user", "assistant"])
         self.assertEqual(body["messages"][0]["content"], "buat program .cuk")
 
+    def test_workspace_retries_real_compiler_diagnostic_without_saving(self):
+        self.assertEqual(self.register()[0], 201)
+        assistant = next(iter(self.server._assistants.values()))
+        assistant.ask = __import__("unittest").mock.Mock(side_effect=[
+            "Usulan awal. <CUK>print(1 + )</CUK>",
+            "Diperbaiki berdasarkan diagnostik. <CUK>print(1 + 2)</CUK>",
+        ])
+        failed_check = {
+            "ok": False, "error": "COMPILE_ERROR",
+            "diagnostic": "baris 1: ekspresi tidak lengkap",
+            "evidence_status": "DIAGNOSTIC_REAL", "diagnostic_location": {"line": 1, "column": 11},
+            "failure_category": "syntax",
+        }
+        passed_check = {
+            "ok": True, "error": None, "diagnostic": None,
+            "evidence_status": "COMPILE_CHECK_PASSED", "diagnostic_location": None,
+            "failure_category": None,
+        }
+        with patch("library.knowledge_grounding.load_index", return_value=[]), \\
+             patch("library.ai_tools.ToolRegistry.execute", side_effect=[failed_check, passed_check]) as compiler:
+            status, _, body = self.request("/api/workspace/assist", {
+                "request": "Buat penjumlahan sederhana", "source": ""
+            })
+        self.assertEqual(status, 200, body)
+        self.assertEqual(body["candidate_source"], "print(1 + 2)\\n")
+        self.assertFalse(body["saved"])
+        self.assertTrue(body["compile_check"]["ok"])
+        self.assertEqual(body["compile_check"]["repair_attempts"], 1)
+        self.assertEqual(body["compile_check"]["repair_stop_reason"], "compiler_passed")
+        self.assertEqual(len(body["compile_check"]["compile_attempts"]), 2)
+        self.assertEqual(compiler.call_count, 2)
+        repair_prompt = assistant.ask.call_args_list[1].args[0]
+        self.assertIn("ekspresi tidak lengkap", repair_prompt)
+
     def test_post_rejects_wrong_origin_and_oversized_body(self):
         status, _, body = self.request("/api/auth/register", {
             "email": "user@example.com", "password": "a-long-test-password", "display_name": "U"
