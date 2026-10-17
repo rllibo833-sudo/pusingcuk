@@ -1,0 +1,82 @@
+# CukAccount backend domain rules: integer Rupiah only; no platform I/O here.
+jancuk
+fungsi validasi_jurnal(total_debit, total_kredit, jumlah_baris, periode_terbuka)
+    njir bukan periode_terbuka
+        balek "PERIODE_TERTUTUP"
+    selesai njir
+    njir jumlah_baris < 2
+        balek "JURNAL_MINIMAL_DUA_BARIS"
+    selesai njir
+    njir total_debit <= 0 atau total_kredit <= 0
+        balek "NOMINAL_HARUS_POSITIF"
+    selesai njir
+    njir total_debit != total_kredit
+        balek "JURNAL_TIDAK_SEIMBANG"
+    kampret
+        balek "JURNAL_VALID"
+    selesai njir
+selesai fungsi
+fungsi saldo_normal(kategori, debit, kredit)
+    njir debit < 0 atau kredit < 0
+        balek "NOMINAL_TIDAK_VALID"
+    selesai njir
+    njir kategori == "Aset" atau kategori == "Beban"
+        balek debit - kredit
+    kampret
+        njir kategori == "Liabilitas" atau kategori == "Ekuitas" atau kategori == "Pendapatan"
+            balek kredit - debit
+        kampret
+            balek "KATEGORI_TIDAK_DIKENAL"
+        selesai njir
+    selesai njir
+selesai fungsi
+fungsi validasi_periode(tanggal_transaksi, tanggal_mulai, tanggal_akhir, periode_terbuka)
+    njir bukan periode_terbuka
+        balek "PERIODE_TERTUTUP"
+    selesai njir
+    njir tanggal_transaksi < tanggal_mulai atau tanggal_transaksi > tanggal_akhir
+        balek "TANGGAL_DI_LUAR_PERIODE"
+    kampret
+        balek "PERIODE_VALID"
+    selesai njir
+selesai fungsi
+fungsi klasifikasi_laporan(kas_tanpa_kategori, ekuitas_tanpa_kategori)
+    njir kas_tanpa_kategori < 0 atau ekuitas_tanpa_kategori < 0
+        balek "INPUT_TIDAK_VALID"
+    selesai njir
+    njir kas_tanpa_kategori > 0 atau ekuitas_tanpa_kategori > 0
+        balek "LAPORAN_PERLU_PERBAIKAN_KATEGORI"
+    kampret
+        balek "KLASIFIKASI_LENGKAP"
+    selesai njir
+selesai fungsi
+fungsi hitung_pajak_dasar(penghasilan_kena_pajak, tarif_persen)
+    njir penghasilan_kena_pajak < 0 atau tarif_persen < 0 atau tarif_persen > 100
+        balek "INPUT_PAJAK_TIDAK_VALID"
+    kampret
+        balek penghasilan_kena_pajak * tarif_persen / 100
+    selesai njir
+selesai fungsi
+fungsi pemeriksaan_syariah(transaksi_ada_bunga, transaksi_ada_gharar, transaksi_ada_maisir)
+    njir transaksi_ada_bunga atau transaksi_ada_gharar atau transaksi_ada_maisir
+        balek "PERLU_TINJAUAN_SYARIAH"
+    kampret
+        balek "TIDAK_ADA_PENANDA_AWAL"
+    selesai njir
+selesai fungsi
+hedeh validasi_jurnal(100, 100, 2, benar)
+hedeh validasi_jurnal(100, 99, 2, benar)
+hedeh validasi_jurnal(100, 100, 1, benar)
+hedeh validasi_jurnal(100, 100, 2, salah)
+hedeh saldo_normal("Aset", 1000, 250)
+hedeh saldo_normal("Liabilitas", 100, 500)
+hedeh saldo_normal("TidakDikenal", 0, 0)
+hedeh validasi_periode("2026-10-17", "2026-10-01", "2026-10-31", benar)
+hedeh validasi_periode("2026-11-01", "2026-10-01", "2026-10-31", benar)
+hedeh klasifikasi_laporan(0, 0)
+hedeh klasifikasi_laporan(1, 0)
+hedeh hitung_pajak_dasar(1000000, 11)
+hedeh hitung_pajak_dasar(-1, 11)
+hedeh pemeriksaan_syariah(salah, salah, salah)
+hedeh pemeriksaan_syariah(benar, salah, salah)
+selesai jancuk
