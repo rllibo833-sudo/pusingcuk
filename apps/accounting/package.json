@@ -9,7 +9,7 @@
     "prestart": "npm run build:rules",
     "pretest:core": "npm run build:rules",
     "start": "electron .",
-    "test:core": "node --test test-accounting-core.cjs && cd ../.. && python -m unittest tests.test_cuk_ui_runtime tests.test_platform_bridge -v",
+    "test:core": "node --test test-accounting-core.cjs && cd ../.. && python -m unittest tests.test_cuk_ui_runtime tests.test_platform_bridge tests.test_sqlite_store tests.test_typed_bridge_integration tests.test_diagnostic_repair_loop -v",
     "predist:win": "npm run build:rules",
     "dist:win": "electron-builder --win portable",
     "render:ui": "cd ../.. && python tools/cuk_ui_runtime.py apps/accounting/cukaccount_frontend.cuk --output apps/accounting/dist/index.html",
@@ -34,6 +34,7 @@
       "package.json",
       "dist/index.html",
       "platform_bridge.py",
+      "sqlite_store.py",
       "cuk-ui-main.cjs"
     ],
     "win": {
