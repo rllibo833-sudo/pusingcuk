@@ -345,3 +345,12 @@ jobs:
           actual="$(python pusingcuk_new.py apps/accounting/cukaccount_backend.cuk)"
           diff -u apps/accounting/cukaccount_backend.expected.txt <(printf '%s\n' "$actual")
           echo "PASS: journal, ledger balance, period, report classification, tax arithmetic, and sharia flag rules match fixtures."
+
+      - name: Compile-check curated Warung Bahasa .cuk examples
+        run: |
+          set -euo pipefail
+          for source in examples/warung_bahasa/*.cuk; do
+            echo "Checking $source"
+            python pusingcuk_new.py --check "$source"
+          done
+          echo "PASS: all curated Warung Bahasa examples passed compiler check."
