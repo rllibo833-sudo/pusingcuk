@@ -276,6 +276,9 @@ class SaaSHttpFlowTests(unittest.TestCase):
             html = response.read().decode("utf-8")
             self.assertIn('rel="manifest" href="/manifest.webmanifest"', html)
             self.assertIn("navigator.serviceWorker.register('/service-worker.js')", html)
+            self.assertIn('id="downloadFileBtn"', html)
+            self.assertIn("link.download=safeName", html)
+            self.assertIn("URL.createObjectURL(blob)", html)
 
     def test_post_rejects_wrong_origin_and_oversized_body(self):
         status, _, body = self.request("/api/auth/register", {
