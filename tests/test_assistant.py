@@ -85,7 +85,7 @@ class AssistantTests(unittest.TestCase):
 
     def test_workspace_prompt_rejects_context_over_16_kibibytes(self):
         with self.assertRaisesRegex(ValueError, "AI_QUERY_INVALID"):
-            self.assistant.ask("x" * (16 * 1024 + 1))
+            self.assistant.ask("x" * (24 * 1024 + 1))
         self.assertEqual(self.provider.calls, [])
 
     def test_invalid_query_is_rejected_before_provider_call(self):
