@@ -299,6 +299,26 @@ class ToolRegistry:
         self.definitions.append({
             "type": "function",
             "function": {
+                "name": "cuk_create_program",
+                "description": (
+                    "Simpan source .cuk yang sudah lolos cuk_compile_check ke berkas baru "
+                    "di direktori generated/. Hanya nama file sederhana .cuk; tidak menimpa "
+                    "berkas yang ada. Tool ini tidak menjalankan program."
+                ),
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "filename": {"type": "string", "minLength": 1, "maxLength": 80},
+                        "source": {"type": "string", "minLength": 1, "maxLength": 16000}
+                    },
+                    "required": ["filename", "source"],
+                    "additionalProperties": False,
+                },
+            },
+        })
+        self.definitions.append({
+            "type": "function",
+            "function": {
                 "name": "cuk_compiler_context",
                 "description": (
                     "Baca konteks compiler .cuk dari kontrak semantik kanonis: built-in, "
@@ -588,6 +608,43 @@ class ToolRegistry:
                     "next_priority": "Prioritaskan kesenjangan semantik Python/C yang terbukti: operator, tipe, koleksi, built-in, diagnostik, dan fixture konformansi bersama. Untuk jumlah dan statistik, kunci perilaku daftar kosong, nilai negatif, pembatalan, pecahan, tipe tidak valid, serta batas integer aman. Jangan mengutamakan JS/PVM/APK sebelum baseline Python/C dan fixture terkait konsisten.",
                 }
             return {"ok": True, "operation": "compiler_context", "topic": topic, "context": result}
+
+        if name == "cuk_create_program":
+            if set(arguments) != {"filename", "source"}:
+                return {"ok": False, "error": "TOOL_ARGUMENTS_INVALID"}
+            filename = arguments.get("filename")
+            source = arguments.get("source")
+            if (not isinstance(filename, str)
+                    or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,70}\\.cuk", filename)
+                    or not isinstance(source, str) or not source.strip()):
+                return {"ok": False, "error": "CUK_PROGRAM_INPUT_INVALID"}
+            checked = self.execute("cuk_compile_check", {"source": source})
+            if not checked.get("ok"):
+                return {
+                    "ok": False, "error": "CUK_PROGRAM_NOT_COMPILE_VALID",
+                    "compile_result": checked,
+                    "saved": False,
+                }
+            output_dir = Path(__file__).resolve().parent.parent / "generated"
+            try:
+                output_dir.mkdir(mode=0o700, exist_ok=True)
+                if output_dir.is_symlink():
+                    return {"ok": False, "error": "CUK_OUTPUT_PATH_REJECTED", "saved": False}
+                output_path = output_dir / filename
+                # Exclusive create prevents overwriting and races with another request.
+                with output_path.open("x", encoding="utf-8", newline="\\n") as stream:
+                    stream.write(source if source.endswith("\\n") else source + "\\n")
+            except FileExistsError:
+                return {"ok": False, "error": "CUK_OUTPUT_EXISTS", "saved": False}
+            except OSError:
+                return {"ok": False, "error": "CUK_OUTPUT_WRITE_FAILED", "saved": False}
+            return {
+                "ok": True, "operation": "cuk_program_created",
+                "path": "generated/" + filename,
+                "source_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
+                "compile_evidence": checked.get("evidence_status"),
+                "runtime_tested": False, "saved": True,
+            }
 
         if name == "cuk_compile_check":
             if set(arguments) != {"source"}:
