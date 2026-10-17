@@ -238,6 +238,21 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._json(200, {"user": _public_user(user)})
             return
+        if path == "/api/messages":
+            user = _current_user(self)
+            if user is None:
+                self._json(401, {"error": "AUTH_REQUIRED"})
+                return
+            with _db() as db:
+                rows = db.execute(
+                    "SELECT role,content,created_at FROM messages WHERE user_id=? "
+                    "ORDER BY created_at DESC LIMIT 100", (user["id"],)
+                ).fetchall()
+            self._json(200, {"messages": [
+                {"role": row["role"], "content": row["content"], "created_at": row["created_at"]}
+                for row in reversed(rows)
+            ]})
+            return
         if path == "/healthz":
             self._json(200, {"status": "ok"})
             return
@@ -386,7 +401,7 @@ def main() -> int:
     try:
         init_db()
         host = os.environ.get("PUSINGCUK_SAAS_BIND", "127.0.0.1")
-        port = int(os.environ.get("PUSINGCUK_SAAS_PORT", "8088"))
+        port = int(os.environ.get("PUSINGCUK_SAAS_PORT", os.environ.get("PORT", "8088")))
         if not 1 <= port <= 65535:
             raise ValueError("SAAS_PORT_INVALID")
         if not os.environ.get("PUSINGCUK_SAAS_PUBLIC_ORIGIN", "").startswith("https://"):
