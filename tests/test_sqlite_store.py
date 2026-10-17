@@ -48,6 +48,12 @@ class SQLiteStoreTests(unittest.TestCase):
         result=self.store.get_general_ledger({"account_id":"cash"})
         self.assertEqual(result["ending_balance"],100)
         self.assertEqual(result["lines"][0]["running_balance"],100)
+    def test_audit_trail_is_append_only(self):
+        self.draft()
+        with self.assertRaises(Exception):
+            self.store.db.execute("UPDATE audit_events SET details_json='{}' WHERE entity_id='j1'")
+        with self.assertRaises(Exception):
+            self.store.db.execute("DELETE FROM audit_events WHERE entity_id='j1'")
     def test_failed_draft_insert_rolls_back_entry_and_partial_lines(self):
         with self.assertRaises(STORE.StorageError):
             self.store.save_journal_draft({"entry_id":"bad","date":"2026-10-17","description":"bad","lines":[
