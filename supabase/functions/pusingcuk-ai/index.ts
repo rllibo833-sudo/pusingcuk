@@ -36,6 +36,11 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return json({ error: "Gunakan metode POST." }, 405);
   const claims = getVerifiedUserClaims(req);
   if (!claims) return json({ error: "Sesi login tidak valid. Keluar lalu login kembali." }, 401);
+  const now = Date.now();
+  const recentRequests = (requestWindows.get(claims.sub) || []).filter((stamp) => now - stamp < 60000);
+  if (recentRequests.length >= 12) return json({ error: "Batas 12 permintaan per menit tercapai. Tunggu sebentar lalu coba lagi." }, 429);
+  recentRequests.push(now);
+  requestWindows.set(claims.sub, recentRequests);
   let body: unknown;
   try {
     const raw = await req.text();
