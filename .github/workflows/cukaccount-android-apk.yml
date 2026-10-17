@@ -3,15 +3,14 @@ name: CukAccount Android APK
 on:
   # Only rebuild for files that affect this APK; keep unrelated commits cheap.
   push:
-    branches: [main]
+    branches: [main, warungpusingcuk]
     paths:
       - ".github/workflows/cukaccount-android-apk.yml"
       - "apps/cukaccount-android/**"
-      - "apps/accounting/index.html"
-      - "apps/accounting/accounting-core.js"
+      - "apps/accounting/**"
       - "examples/accounting/aturan_ringkasan.cuk"
-      - "compiler/js_backend.py"
-      - "compiler/ir.py"
+      - "tools/diagnostic_repair_loop.py"
+      - "compiler/**"
   workflow_dispatch:
 
 permissions:
@@ -47,14 +46,18 @@ jobs:
         uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
         with:
           gradle-version: "8.9"
-      - name: Compile registered .cuk accounting rule and stage offline UI
+      - name: Validate and compile CukAccount .cuk sources; stage offline UI
         shell: bash
         run: |
           set -euo pipefail
           ASSETS=apps/cukaccount-android/app/src/main/assets
           mkdir -p "$ASSETS"
+          python tools/diagnostic_repair_loop.py --frontend-contract --json > "$RUNNER_TEMP/frontend-contract.json"
+          python pusingcuk_new.py --check apps/accounting/cukaccount_frontend.cuk
+          python pusingcuk_new.py --check apps/accounting/cukaccount_backend.cuk
+          python -m compiler.js_backend apps/accounting/cukaccount_frontend.cuk --module -o "$ASSETS/cukaccount-frontend.generated.js"
+          python -m compiler.js_backend apps/accounting/cukaccount_backend.cuk --module -o "$ASSETS/cukaccount-backend.generated.js"
           python -m compiler.js_backend examples/accounting/aturan_ringkasan.cuk --module -o "$ASSETS/accounting-rules.generated.js"
-          cp apps/accounting/index.html "$ASSETS/index.html"
           cp apps/accounting/accounting-core.js "$ASSETS/accounting-core.js"
           test -s "$ASSETS/index.html"
           test -s "$ASSETS/accounting-core.js"
