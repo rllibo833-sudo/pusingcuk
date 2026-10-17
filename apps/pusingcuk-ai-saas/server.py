@@ -26,7 +26,7 @@ COOKIE_NAME = "pusingcuk_session"
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
 SUPABASE_PUBLISHABLE_KEY = os.environ.get("SUPABASE_PUBLISHABLE_KEY", "")
 SESSION_TTL = 60 * 60 * 24 * 14
-MAX_BODY = 16 * 1024
+MAX_BODY = 24 * 1024
 PBKDF2_ROUNDS = 310_000
 EMAIL_RE = re.compile(r"^[^\s@]{1,64}@[^\s@.]+(?:\.[^\s@.]+)+$")
 RATE_BUCKETS: dict[str, list[float]] = {}
@@ -100,6 +100,8 @@ def _supabase_request(method: str, path: str, *, token: str | None = None, body:
     headers = {"apikey": SUPABASE_PUBLISHABLE_KEY, "Accept": "application/json"}
     if payload is not None:
         headers["Content-Type"] = "application/json"
+    if method == "POST" and path.startswith("/rest/v1/"):
+        headers["Prefer"] = "return=representation"
     if token:
         headers["Authorization"] = "Bearer " + token
     request = Request(SUPABASE_URL + path, data=payload, headers=headers, method=method)
@@ -289,16 +291,6 @@ class Handler(BaseHTTPRequestHandler):
             session = getattr(self, "_supabase_session", None) or _session_from_cookie(self)
             token = session.get("access_token", "") if session else ""
             status, rows = _supabase_request("GET", "/rest/v1/pusingcuk_saas_projects?select=id,name,description,status,updated_at&user_id=eq." + quote(user["id"], safe="") + "&order=updated_at.desc&limit=100", token=token)
-            if status != 200 or not isinstance(rows, list):
-                raise SaaSError("PROJECT_STORAGE_UNAVAILABLE", 503)
-            self._json(200, {"projects": rows})
-            return
-        if path == "/api/projects":
-            user = self._auth_required()
-            session = getattr(self, "_supabase_session", None) or _session_from_cookie(self)
-            token = session.get("access_token", "") if session else ""
-            owner = quote(user["id"], safe="")
-            status, rows = _supabase_request("GET", "/rest/v1/pusingcuk_saas_projects?select=id,name,description,status,updated_at&user_id=eq." + owner + "&order=updated_at.desc&limit=100", token=token)
             if status != 200 or not isinstance(rows, list):
                 raise SaaSError("PROJECT_STORAGE_UNAVAILABLE", 503)
             self._json(200, {"projects": rows})
@@ -535,21 +527,6 @@ class Handler(BaseHTTPRequestHandler):
                     if status not in (200, 201, 204):
                         raise SaaSError("PROJECT_FILE_SAVE_FAILED", 503)
                 self._json(200, {"saved": True, "path": file_path})
-                return
-            if path == "/api/projects":
-                user = self._auth_required()
-                _rate_limit("projects:" + user["id"], 30)
-                if set(payload) != {"name"}:
-                    raise SaaSError("PROJECT_PAYLOAD_INVALID")
-                name = payload.get("name")
-                if not isinstance(name, str) or not name.strip() or name != name.strip() or len(name) > 120:
-                    raise SaaSError("PROJECT_NAME_INVALID")
-                session = getattr(self, "_supabase_session", None) or _session_from_cookie(self)
-                token = session.get("access_token", "") if session else ""
-                status, rows = _supabase_request("POST", "/rest/v1/pusingcuk_saas_projects", token=token, body={"user_id": user["id"], "name": name, "description": ""})
-                if status not in (200, 201) or not isinstance(rows, list) or not rows:
-                    raise SaaSError("PROJECT_CREATE_FAILED", 503)
-                self._json(201, {"project": rows[0]})
                 return
             if path == "/api/project-files":
                 user = self._auth_required()
