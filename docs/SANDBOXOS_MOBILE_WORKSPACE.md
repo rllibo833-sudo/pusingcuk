@@ -82,6 +82,21 @@ Only after the execution isolation model is reviewed and tested. Packaging an AP
 - Core UI actions work at Android phone width and are accessible by touch.
 - Documentation and UI clearly distinguish implemented, experimental, and not-yet-available features.
 
-## Current status
+## Implementation status — 2026-10-17
 
-This file records the product contract only. It does not claim that the workspace frontend, AI adapter, compiler loop, execution sandbox, APK, or bootable OS has been implemented or tested.
+The product contract remains the acceptance target. A first partial implementation now exists in the SaaS workspace branch:
+
+- `apps/pusingcuk-ai-saas/index.html`: mobile-friendly project picker, `.cuk` source editor, AI proposal action, compiler-check action, save action, and a visible before/after source preview.
+- `apps/pusingcuk-ai-saas/server.py`: authenticated project listing/creation, per-user project-file read/write routes backed by the existing Supabase workspace tables, an AI proposal endpoint, and a compiler-check endpoint.
+- `library/assistant.py`: the internal assistant accepts bounded workspace prompts up to 16 KiB; the public SaaS chat endpoint still enforces its separate 300-character limit.
+- `tests/test_assistant.py` and `tests/test_pusingcuk_ai_saas.py`: regression checks cover the bounded prompt limit and the presence of the workspace wiring.
+
+**Status: implemented in source, not yet verified end-to-end.** The AI proposal is shown in the editor and is not saved automatically. Saving requires an explicit user action. Compiler success means compile validation only, not runtime correctness. The workspace routes require the workspace Supabase migration to be applied to the correct project and a configured AI provider. No deployment, real-model request, live Supabase operation, or successful CI run is claimed by this status.
+
+Still not implemented/proven:
+
+- A runtime-level repair loop that passes the actual report from `tools/diagnostic_repair_loop.py` back into the model and reruns runtime/fixture checks.
+- An operating-system-level execution sandbox for arbitrary generated code.
+- APK packaging, a bootable SandboxOS distribution, and production deployment.
+
+Keep the acceptance criteria above as gates. Do not label the whole workspace as complete until the relevant checks are run against a configured environment and the results are recorded.
