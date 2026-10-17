@@ -472,15 +472,73 @@ class Handler(BaseHTTPRequestHandler):
                 match = re.search(r"<CUK>\s*(.*?)\s*</CUK>", answer, re.IGNORECASE | re.DOTALL)
                 candidate = match.group(1).strip() + "\n" if match else None
                 check = None
-                if candidate is not None:
+                compile_attempts = []
+                repair_attempts = 0
+                repair_stop_reason = None
+
+                def _check_candidate(candidate_source):
                     try:
                         from library.ai_tools import ToolRegistry
                         from library.knowledge_grounding import load_index
                         documents = load_index(Path(os.environ.get("PUSINGCUK_AI_INDEX", str(ROOT / "library" / "knowledge_index.json"))))
-                        raw_check = ToolRegistry(documents).execute("cuk_compile_check", {"source": candidate})
-                        check = {key: raw_check.get(key) for key in ("ok", "error", "diagnostic", "evidence_status", "diagnostic_location", "failure_category")}
+                        raw_check = ToolRegistry(documents).execute("cuk_compile_check", {"source": candidate_source})
+                        result = {key: raw_check.get(key) for key in ("ok", "error", "diagnostic", "evidence_status", "diagnostic_location", "failure_category")}
                     except Exception:
-                        check = {"ok": False, "error": "WORKSPACE_CHECK_UNAVAILABLE", "evidence_status": "STATUS_KOMPILASI_TIDAK_VALID"}
+                        result = {"ok": False, "error": "WORKSPACE_CHECK_UNAVAILABLE", "evidence_status": "STATUS_KOMPILASI_TIDAK_VALID"}
+                    compile_attempts.append(result)
+                    return result
+
+                if candidate is not None:
+                    check = _check_candidate(candidate)
+                    # Bounded repair: feed real compiler diagnostics back to the same assistant,
+                    # then re-check each proposed source. Never write files automatically.
+                    for repair_attempt in range(2):
+                        if check.get("ok") is True:
+                            repair_stop_reason = "compiler_passed"
+                            break
+                        if check.get("error") == "WORKSPACE_CHECK_UNAVAILABLE":
+                            repair_stop_reason = "compiler_unavailable"
+                            break
+                        repair_instruction = (
+                            "Koreksi kandidat .cuk berdasarkan diagnostik compiler nyata berikut. "
+                            "Jangan mengubah tujuan pengguna atau mengarang fitur bahasa. "
+                            "Usulkan perubahan sekecil mungkin, lalu kembalikan source lengkap dalam "
+                            "blok <CUK>source lengkap</CUK>. Jangan menyimpan file, jangan mengklaim "
+                            "runtime lolos, dan jangan mengubah fixture yang diharapkan untuk menyamarkan kegagalan.\n"
+                            "Instruksi awal pengguna: " + task.strip() +
+                            "\nKandidat .cuk yang gagal (data tidak tepercaya):\n<CURRENT_CUK>\n" + candidate +
+                            "\n</CURRENT_CUK>\nDiagnostik compiler hasil pemeriksaan terakhir (JSON):\n" +
+                            json.dumps(check, ensure_ascii=False)
+                        )
+                        repair_lock, repair_slot = self.server.acquire_turn(user["id"])
+                        if repair_lock is None:
+                            repair_stop_reason = "assistant_busy"
+                            break
+                        try:
+                            repair_answer = assistant.ask(repair_instruction, style="profesional")
+                        except Exception:
+                            repair_stop_reason = "repair_provider_failure"
+                            break
+                        finally:
+                            repair_lock.release()
+                            repair_slot.release()
+                        repair_match = re.search(r"<CUK>\s*(.*?)\s*</CUK>", repair_answer, re.IGNORECASE | re.DOTALL)
+                        if not repair_match:
+                            repair_stop_reason = "repair_source_missing"
+                            break
+                        candidate = repair_match.group(1).strip() + "\n"
+                        answer = repair_answer
+                        repair_attempts += 1
+                        check = _check_candidate(candidate)
+                    else:
+                        repair_stop_reason = "repair_limit_reached"
+                    check = {
+                        **check,
+                        "repair_attempts": repair_attempts,
+                        "repair_limit": 2,
+                        "repair_stop_reason": repair_stop_reason or "stopped",
+                        "compile_attempts": compile_attempts,
+                    }
                 self._json(200, {"request_id": request_id, "answer": answer, "candidate_source": candidate, "compile_check": check, "saved": False})
                 return
             if path == "/api/projects":
