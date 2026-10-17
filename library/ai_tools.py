@@ -615,7 +615,7 @@ class ToolRegistry:
             filename = arguments.get("filename")
             source = arguments.get("source")
             if (not isinstance(filename, str)
-                    or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,70}\\.cuk", filename)
+                    or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,70}\.cuk", filename)
                     or not isinstance(source, str) or not source.strip()):
                 return {"ok": False, "error": "CUK_PROGRAM_INPUT_INVALID"}
             checked = self.execute("cuk_compile_check", {"source": source})
@@ -632,8 +632,8 @@ class ToolRegistry:
                     return {"ok": False, "error": "CUK_OUTPUT_PATH_REJECTED", "saved": False}
                 output_path = output_dir / filename
                 # Exclusive create prevents overwriting and races with another request.
-                with output_path.open("x", encoding="utf-8", newline="\\n") as stream:
-                    stream.write(source if source.endswith("\\n") else source + "\\n")
+                with output_path.open("x", encoding="utf-8", newline="\n") as stream:
+                    stream.write(source if source.endswith("\n") else source + "\n")
             except FileExistsError:
                 return {"ok": False, "error": "CUK_OUTPUT_EXISTS", "saved": False}
             except OSError:
