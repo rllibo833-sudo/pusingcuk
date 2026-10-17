@@ -1,7 +1,7 @@
 {
   "schema_version": "pusingcuk.knowledge-index.v1",
-  "index_version": 3,
-  "purpose": "Indeks pengetahuan primer milik PusingCuk AI. Ringkasan ditulis untuk indeks ini; sumber merujuk ke snapshot immutable PusingCuk yang telah memuat indeks lokal-only dan kebijakan grounding yang berlaku.",
+  "index_version": 4,
+  "purpose": "Indeks pengetahuan primer milik PusingCuk AI. Memuat sumber terkurasi dan contoh edukasi publik; contoh kode yang belum diverifikasi tidak boleh diperlakukan sebagai spesifikasi normatif.",
   "policy": {
     "max_documents": 100,
     "only_public_safe": true,
@@ -679,6 +679,120 @@
       ],
       "summary": "Kontrak integrasi menjadikan CukAccount proyek latihan pertama untuk memperkuat bahasa .cuk dan mengevaluasi PusingCuk AI lokal melalui aturan deterministik, contoh sintetis, hasil compiler/runtime, dan regresi. Dart/SQLite tetap sumber kebenaran posting dan laporan; lulus fixture tidak berarti seluruh aplikasi dikompilasi dari .cuk.",
       "excerpt": "Acceptance for stronger integration requires evidence that a .cuk rule's expected output maps to a corresponding domain case in CukAccount. Passing the current equation fixture alone does not establish full accounting semantics or backend parity."
+    },
+    {
+      "id": "pusingcuk-warung-language-contract-example",
+      "title": "Contoh .cuk untuk kontrak input dan diagnostik",
+      "path": "examples/warung_bahasa/warung_kontrak.cuk",
+      "url": "https://github.com/rllibo833-sudo/pusingcuk/blob/e7bd44ac6d42e556819e48eddc94291997b07ec3/examples/warung_bahasa/warung_kontrak.cuk",
+      "source_repository": "rllibo833-sudo/pusingcuk",
+      "source_commit": "e7bd44ac6d42e556819e48eddc94291997b07ec3",
+      "authority": "PUSINGCUK",
+      "evidence_type": "educational-code-example",
+      "claim_status": "unverified-example-not-normative-contract",
+      "visibility": "public-safe",
+      "topics": [
+        "bahasa .cuk",
+        "validasi input",
+        "diagnostik compiler",
+        "aturan deterministik"
+      ],
+      "keywords": [
+        "warung bahasa",
+        "validasi rentang",
+        "klasifikasi diagnostik",
+        "nama tidak dikenal",
+        "tipe tidak cocok",
+        "source"
+      ],
+      "summary": "Contoh edukasi .cuk untuk validasi rentang dan pemetaan status source serta diagnostik. Sintaks dan perilaku runtime harus diverifikasi sebelum contoh dipakai sebagai kontrak normatif.",
+      "excerpt": "Contoh ini mengklasifikasikan status yang diberikan; ia tidak menjalankan compiler atau membuktikan validitas source."
+    },
+    {
+      "id": "pusingcuk-warung-evidence-example",
+      "title": "Contoh .cuk untuk bukti kompilasi, runtime, dan fixture",
+      "path": "examples/warung_bahasa/warung_bukti.cuk",
+      "url": "https://github.com/rllibo833-sudo/pusingcuk/blob/e7bd44ac6d42e556819e48eddc94291997b07ec3/examples/warung_bahasa/warung_bukti.cuk",
+      "source_repository": "rllibo833-sudo/pusingcuk",
+      "source_commit": "e7bd44ac6d42e556819e48eddc94291997b07ec3",
+      "authority": "PUSINGCUK",
+      "evidence_type": "educational-code-example",
+      "claim_status": "unverified-example-not-conformance-proof",
+      "visibility": "public-safe",
+      "topics": [
+        "konformansi",
+        "fixture",
+        "runtime",
+        "native C",
+        "kompilasi"
+      ],
+      "keywords": [
+        "bukti fitur",
+        "status runtime",
+        "status fixture",
+        "paritas target",
+        "hasil yang diharapkan"
+      ],
+      "summary": "Contoh edukasi yang memisahkan status kompilasi, runtime, dan fixture. Jumlah fixture yang sama lulus tidak membuktikan output target identik; hasil tiap fixture harus dibandingkan.",
+      "excerpt": "Kompilasi lolos saja bukan bukti perilaku runtime atau paritas lintas target."
+    },
+    {
+      "id": "pusingcuk-warung-priority-example",
+      "title": "Contoh .cuk untuk prioritas perbaikan bahasa",
+      "path": "examples/warung_bahasa/warung_prioritas.cuk",
+      "url": "https://github.com/rllibo833-sudo/pusingcuk/blob/e7bd44ac6d42e556819e48eddc94291997b07ec3/examples/warung_bahasa/warung_prioritas.cuk",
+      "source_repository": "rllibo833-sudo/pusingcuk",
+      "source_commit": "e7bd44ac6d42e556819e48eddc94291997b07ec3",
+      "authority": "PUSINGCUK",
+      "evidence_type": "educational-code-example",
+      "claim_status": "unverified-policy-example",
+      "visibility": "public-safe",
+      "topics": [
+        "prioritas pengembangan",
+        "regresi",
+        "semantik",
+        "compiler"
+      ],
+      "keywords": [
+        "triase",
+        "urgensi",
+        "dampak",
+        "risiko",
+        "P0",
+        "P1",
+        "perbaikan"
+      ],
+      "summary": "Contoh kebijakan deterministik untuk mengklasifikasikan prioritas perbaikan berdasarkan skor dan status regresi. Ini contoh kebijakan, bukan prioritas proyek resmi atau bukti otomatis.",
+      "excerpt": "Regresi yang terkonfirmasi diarahkan ke prioritas tertinggi; skor lain harus berada pada rentang 1–5."
+    },
+    {
+      "id": "pusingcuk-warung-evolution-example",
+      "title": "Contoh .cuk untuk gerbang evolusi fitur bahasa",
+      "path": "examples/warung_bahasa/warung_evolusi.cuk",
+      "url": "https://github.com/rllibo833-sudo/pusingcuk/blob/e7bd44ac6d42e556819e48eddc94291997b07ec3/examples/warung_bahasa/warung_evolusi.cuk",
+      "source_repository": "rllibo833-sudo/pusingcuk",
+      "source_commit": "e7bd44ac6d42e556819e48eddc94291997b07ec3",
+      "authority": "PUSINGCUK",
+      "evidence_type": "educational-code-example",
+      "claim_status": "unverified-example-not-release-approval",
+      "visibility": "public-safe",
+      "topics": [
+        "spesifikasi bahasa",
+        "evolusi fitur",
+        "fixture",
+        "rilis",
+        "kompatibilitas"
+      ],
+      "keywords": [
+        "semantik jelas",
+        "implementasi tersedia",
+        "fixture gagal",
+        "klaim portabel",
+        "target Python",
+        "native C"
+      ],
+      "summary": "Contoh gerbang keputusan yang memisahkan kejelasan spesifikasi, status implementasi, fixture, dan batas klaim rilis. Kelulusan fixture yang disediakan tidak otomatis membuktikan semua target atau seluruh fitur.",
+      "excerpt": "Fitur tidak boleh disebut portabel hanya karena implementasi atau contoh kodenya tersedia."
     }
   ]
 }
