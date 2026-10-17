@@ -14,12 +14,14 @@
 # @field date:Tanggal:date:required
 # @field description:Keterangan:text:required
 # @field account:Akun:select:required
+# @field counter_account:Akun Lawan:select:required
 # @field category:Kategori:select:required
 # @field debit:Debit Rupiah:integer:min=0
 # @field credit:Kredit Rupiah:integer:min=0
 # @action add_line:Tambah Baris
 # @action validate:Validasi Jurnal
 # @action save_draft:Simpan Draft
+# @action post_journal:Posting Jurnal
 # @end
 # @screen ledger:Buku Besar
 # @filter account:Akun:select
