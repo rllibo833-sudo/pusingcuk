@@ -1466,6 +1466,68 @@
         "reference": "required",
         "native": "required"
       }
+    },
+    {
+      "id": "builtins.length-text-list-dictionary-range",
+      "source": "builtins_length_shapes.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "length",
+        "strings",
+        "lists",
+        "dictionaries",
+        "ranges"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "3\n3\n2\n3\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "collections.dictionary-overwrite-preserves-size",
+      "source": "collections_dictionary_overwrite.cuk",
+      "profile": "core",
+      "requires": [
+        "dictionaries",
+        "mutation",
+        "key-lookup",
+        "length"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "7\n2\n2\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "control.nested-range-loops",
+      "source": "control_nested_range_loops.cuk",
+      "profile": "core",
+      "requires": [
+        "loops",
+        "ranges",
+        "nested-control-flow",
+        "arithmetic"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "11\n12\n21\n22\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
     }
   ]
 }
