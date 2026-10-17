@@ -1,0 +1,88 @@
+# CukAccount frontend interaction contract, executable in PusingCuk reference runtime.
+# This is UI state/validation logic, not a native visual renderer yet.
+jancuk
+fungsi route_for(menu)
+    njir menu == "home"
+        balek "BERANDA"
+    kampret
+        njir menu == "transactions"
+            balek "TRANSAKSI"
+        kampret
+            njir menu == "reports"
+                balek "LAPORAN"
+            kampret
+                njir menu == "accounts"
+                    balek "AKUN"
+                kampret
+                    njir menu == "periods"
+                        balek "PERIODE"
+                    kampret
+                        balek "RUTE_TIDAK_DIKENAL"
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+fungsi validate_journal_form(total_debit, total_kredit, jumlah_baris, akun_valid, periode_terbuka)
+    njir bukan akun_valid
+        balek "AKUN_TIDAK_VALID"
+    selesai njir
+    njir bukan periode_terbuka
+        balek "PERIODE_TERTUTUP"
+    selesai njir
+    njir jumlah_baris < 2
+        balek "MINIMAL_DUA_BARIS"
+    selesai njir
+    njir total_debit <= 0 atau total_kredit <= 0
+        balek "NILAI_DEBIT_KREDIT_HARUS_POSITIF"
+    selesai njir
+    njir total_debit != total_kredit
+        balek "JURNAL_TIDAK_SEIMBANG"
+    kampret
+        balek "FORMULIR_VALID"
+    selesai njir
+selesai fungsi
+fungsi resolve_submit(action, validation)
+    njir action == "save_draft"
+        balek "DRAFT_DISIMPAN_SETELAH_VALIDASI_STRUKTUR"
+    selesai njir
+    njir action == "post"
+        njir validation == "FORMULIR_VALID"
+            balek "SIAP_DITERUSKAN_KE_USE_CASE_POSTING"
+        kampret
+            balek "POSTING_DITOLAK_VALIDASI"
+        selesai njir
+    selesai njir
+    balek "AKSI_TIDAK_DIKENAL"
+selesai fungsi
+fungsi normalize_theme(theme)
+    njir theme == "dark"
+        balek "TEMA_GELAP"
+    kampret
+        njir theme == "light"
+            balek "TEMA_TERANG"
+        kampret
+            balek "TEMA_SISTEM"
+        selesai njir
+    selesai njir
+selesai fungsi
+hedeh route_for("home")
+hedeh route_for("transactions")
+hedeh route_for("reports")
+hedeh route_for("accounts")
+hedeh route_for("periods")
+hedeh route_for("unknown")
+hedeh validate_journal_form(100, 100, 2, benar, benar)
+hedeh validate_journal_form(100, 99, 2, benar, benar)
+hedeh validate_journal_form(100, 100, 1, benar, benar)
+hedeh validate_journal_form(100, 100, 2, salah, benar)
+hedeh validate_journal_form(100, 100, 2, benar, salah)
+hedeh validate_journal_form(0, 0, 2, benar, benar)
+hedeh resolve_submit("post", "FORMULIR_VALID")
+hedeh resolve_submit("post", "JURNAL_TIDAK_SEIMBANG")
+hedeh resolve_submit("unknown", "FORMULIR_VALID")
+hedeh normalize_theme("dark")
+hedeh normalize_theme("light")
+hedeh normalize_theme("auto")
+selesai jancuk
