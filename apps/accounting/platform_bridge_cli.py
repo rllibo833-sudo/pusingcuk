@@ -1,6 +1,8 @@
 """One-request JSON entry point for the Electron host. No arbitrary SQL or paths."""
 import json, os, sys
 from pathlib import Path
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
 from apps.accounting.platform_bridge import create_sqlite_bridge
 
 def main():
