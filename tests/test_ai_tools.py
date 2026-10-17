@@ -30,6 +30,46 @@ class ToolInputContractTests(unittest.TestCase):
     def setUp(self):
         self.registry = ToolRegistry([])
 
+    def test_cuk_create_program_compiles_and_creates_only_new_cuk_file(self):
+        output = ROOT / "generated" / "test-ai-create-program.cuk"
+        output.parent.mkdir(exist_ok=True)
+        output.unlink(missing_ok=True)
+        source = "jancuk\\nlah angka = 40 + 2\\nhedeh angka\\nselesai jancuk\\n"
+        try:
+            result = self.registry.execute("cuk_create_program", {
+                "filename": output.name, "source": source,
+            })
+            self.assertTrue(result["ok"], result)
+            self.assertTrue(result["saved"])
+            self.assertEqual(result["path"], "generated/" + output.name)
+            self.assertEqual(result["compile_evidence"], "KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI")
+            self.assertFalse(result["runtime_tested"])
+            self.assertEqual(output.read_text(encoding="utf-8"), source)
+            duplicate = self.registry.execute("cuk_create_program", {
+                "filename": output.name, "source": source,
+            })
+            self.assertFalse(duplicate["ok"])
+            self.assertEqual(duplicate["error"], "CUK_OUTPUT_EXISTS")
+        finally:
+            output.unlink(missing_ok=True)
+
+    def test_cuk_create_program_rejects_invalid_source_and_unsafe_paths(self):
+        invalid = self.registry.execute("cuk_create_program", {
+            "filename": "invalid-program.cuk",
+            "source": "jancuk\\nhedeh fungsi_yang_tidak_ada(1)\\nselesai jancuk",
+        })
+        self.assertFalse(invalid["ok"])
+        self.assertEqual(invalid["error"], "CUK_PROGRAM_NOT_COMPILE_VALID")
+        self.assertFalse(invalid["saved"])
+        for filename in ("../escape.cuk", "folder/name.cuk", "file.py", ".cuk"):
+            with self.subTest(filename=filename):
+                result = self.registry.execute("cuk_create_program", {
+                    "filename": filename,
+                    "source": "jancuk\\nselesai jancuk",
+                })
+                self.assertFalse(result["ok"])
+                self.assertEqual(result["error"], "CUK_PROGRAM_INPUT_INVALID")
+
     def test_cuk_compile_check_compiles_without_executing_or_persisting_source(self):
         source = "jancuk\nlah angka = 40 + 2\nhedeh angka\nselesai jancuk\n"
         result = self.registry.execute("cuk_compile_check", {"source": source})
