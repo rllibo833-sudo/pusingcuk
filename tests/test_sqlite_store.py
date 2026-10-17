@@ -38,6 +38,15 @@ class SQLiteStoreTests(unittest.TestCase):
         again=self.store.post_journal({"entry_id":"j1","idempotency_key":"post-j1"})
         self.assertTrue(again["idempotent_replay"])
         self.assertEqual(len(self.store.audit_trail("j1")),2)
+    def test_idempotency_key_cannot_be_reused_for_another_journal(self):
+        self.draft()
+        self.store.post_journal({"entry_id":"j1","idempotency_key":"shared-key"})
+        self.store.save_journal_draft({"entry_id":"j2","date":"2026-10-17","description":"Setoran kedua","lines":[
+          {"account_id":"cash","debit":200,"credit":0},{"account_id":"capital","debit":0,"credit":200}]})
+        with self.assertRaises(STORE.StorageError) as caught:
+            self.store.post_journal({"entry_id":"j2","idempotency_key":"shared-key"})
+        self.assertEqual(caught.exception.code,"IDEMPOTENCY_CONFLICT")
+        self.assertEqual(self.store.db.execute("SELECT status FROM journal_entries WHERE id='j2'").fetchone()[0],"draft")
     def test_integer_only_money_and_inactive_or_unknown_accounts_rejected(self):
         with self.assertRaises(STORE.StorageError): self.draft(True,100)
         with self.assertRaises(STORE.StorageError):
