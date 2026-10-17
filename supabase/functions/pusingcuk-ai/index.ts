@@ -8,17 +8,35 @@ const corsHeaders = {
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: corsHeaders });
 }
-function getVerifiedUserClaims(req: Request) {
+async function getVerifiedUserClaims(req: Request): Promise<{ sub: string; role: "authenticated" } | null> {
   const authorization = req.headers.get("Authorization") || "";
-  const match = authorization.match(/^Bearer\s+([A-Za-z0-9._~-]+)$/i);
-  if (!match) return null;
-  const parts = match[1].split(".");
-  if (parts.length !== 3) return null;
+  const match = authorization.match(/^Bearer\\s+([^\\s]+)$/i);
+  if (!match || match[1].length > 8192) return null;
+
+  // Never trust decoded JWT claims: verify the access token through Supabase Auth.
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")?.trim().replace(/\\/+$/, "");
+  const apiKey = Deno.env.get("SUPABASE_ANON_KEY")?.trim()
+    || Deno.env.get("SUPABASE_PUBLISHABLE_KEY")?.trim();
+  if (!supabaseUrl || !apiKey) return null;
+
   try {
-    const payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
-    if (payload.role !== "authenticated" || typeof payload.sub !== "string") return null;
-    return payload;
-  } catch { return null; }
+    const response = await fetch(supabaseUrl + "/auth/v1/user", {
+      method: "GET",
+      headers: {
+        "apikey": apiKey,
+        "Authorization": "Bearer " + match[1],
+        "Accept": "application/json"
+      },
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!response.ok) return null;
+    const user = await response.json();
+    if (!user || typeof user.id !== "string" || !user.id) return null;
+    return { sub: user.id, role: "authenticated" };
+  } catch {
+    // Fail closed on network errors, timeouts, or invalid responses.
+    return null;
+  }
 }
 const requestWindows = new Map<string, number[]>();
 const dailyRequestWindows = new Map<string, number[]>();
@@ -34,7 +52,7 @@ const systemPrompt = [
 ].join("\n");
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  const claims = getVerifiedUserClaims(req);
+  const claims = await getVerifiedUserClaims(req);
   if (!claims) return json({ error: "Sesi login tidak valid. Keluar lalu login kembali." }, 401);
   // Read-only configuration check. It does not call the model and cannot consume inference credits.
   if (req.method === "GET") {
