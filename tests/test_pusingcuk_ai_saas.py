@@ -208,13 +208,13 @@ class SaaSHttpFlowTests(unittest.TestCase):
             "evidence_status": "COMPILE_CHECK_PASSED", "diagnostic_location": None,
             "failure_category": None,
         }
-        with patch("library.knowledge_grounding.load_index", return_value=[]), \\
+        with patch("library.knowledge_grounding.load_index", return_value=[]), \
              patch("library.ai_tools.ToolRegistry.execute", side_effect=[failed_check, passed_check]) as compiler:
             status, _, body = self.request("/api/workspace/assist", {
                 "request": "Buat penjumlahan sederhana", "source": ""
             })
         self.assertEqual(status, 200, body)
-        self.assertEqual(body["candidate_source"], "print(1 + 2)\\n")
+        self.assertEqual(body["candidate_source"], "print(1 + 2)\n")
         self.assertFalse(body["saved"])
         self.assertTrue(body["compile_check"]["ok"])
         self.assertEqual(body["compile_check"]["repair_attempts"], 1)
