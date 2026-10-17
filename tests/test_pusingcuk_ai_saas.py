@@ -13,7 +13,7 @@ import unittest
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import HTTPCookieProcessor, Request, build_opener
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 SOURCE = Path(__file__).resolve().parents[1] / "apps" / "pusingcuk-ai-saas" / "server.py"
 SPEC = importlib.util.spec_from_file_location("pusingcuk_saas", SOURCE)
@@ -192,8 +192,8 @@ class SaaSHttpFlowTests(unittest.TestCase):
 
     def test_workspace_retries_real_compiler_diagnostic_without_saving(self):
         self.assertEqual(self.register()[0], 201)
-        assistant = next(iter(self.server._assistants.values()))
-        assistant.ask = __import__("unittest").mock.Mock(side_effect=[
+        assistant = self.server.assistant_for("user-1")
+        assistant.ask = Mock(side_effect=[
             "Usulan awal. <CUK>print(1 + )</CUK>",
             "Diperbaiki berdasarkan diagnostik. <CUK>print(1 + 2)</CUK>",
         ])
