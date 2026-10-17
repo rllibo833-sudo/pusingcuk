@@ -1,12 +1,12 @@
 # PusingCuk AI SaaS MVP
 
-Status: **initial implementation / not production-ready**. This folder adds a responsive browser workspace and a small account/chat API that calls the existing `PusingCukAssistant`, knowledge index, and registered `ToolRegistry`. It does not introduce a second AI engine.
+Status: **deployment candidate; verify live URL, auth, persistence, and provider before calling it production-ready**. This folder adds a responsive browser workspace and a small account/chat API that calls the existing `PusingCukAssistant`, knowledge index, and registered `ToolRegistry`. It does not introduce a second AI engine.
 
 ## What's in this MVP
 
 - Responsive Indonesian web workspace for desktop and mobile.
 - Email + password registration/login, hashed passwords (PBKDF2-HMAC-SHA256), opaque server-side sessions, HttpOnly/SameSite cookie.
-- SQLite user/session/message persistence. Each user has a separate conversation context in process memory; stored transcript rows are capped at the latest 200 messages per user.
+- Supabase Auth for account registration/login and Supabase Postgres + RLS for durable chat transcripts. No service-role key is used by the application.
 - Origin check on every POST, bounded JSON payloads, generic provider errors, and simple per-process rate limits.
 - Existing provider adapters only: Ollama (loopback-only) or the repository's existing optional Gemini adapter. Gemini is a provider choice, not a new assistant/engine.
 
@@ -25,7 +25,7 @@ python apps/pusingcuk-ai-saas/server.py
 
 Ollama and the selected model must already be running on the same host. Open `http://127.0.0.1:8088`. Use only test data for local development.
 
-For a cloud deployment, configure `PUSINGCUK_SAAS_PUBLIC_ORIGIN` to the exact HTTPS origin (scheme + host, no trailing slash), enable secure cookies (default), and provide a **persistent disk** for `PUSINGCUK_SAAS_DB`. The server itself speaks plain HTTP and must sit behind a trusted HTTPS reverse proxy. Do not expose the process directly to the public internet without that proxy.
+For Render, use repository root as Docker context and `apps/pusingcuk-ai-saas/Dockerfile` as Dockerfile. Configure `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `PUSINGCUK_SAAS_PUBLIC_ORIGIN` (exact HTTPS origin), `PUSINGCUK_AI_PROVIDER=gemini`, and `GEMINI_API_KEY`. The service listens on Render's `PORT` and relies on Render's HTTPS edge.
 
 ## Required production work before accepting real users
 
