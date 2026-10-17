@@ -9,10 +9,35 @@
     "prestart": "npm run build:rules",
     "pretest:core": "npm run build:rules",
     "start": "electron .",
-    "test:core": "node --test test-accounting-core.cjs",
+    "test:core": "node --test test-accounting-core.cjs && cd ../.. && python -m unittest tests.test_cuk_ui_runtime tests.test_platform_bridge -v",
     "predist:win": "npm run build:rules",
-    "dist:win": "electron-builder --win portable"
+    "dist:win": "electron-builder --win portable",
+    "render:ui": "cd ../.. && python tools/cuk_ui_runtime.py apps/accounting/cukaccount_frontend.cuk --output apps/accounting/dist/index.html",
+    "test:ui": "python -m unittest tests.test_cuk_ui_runtime tests.test_platform_bridge -v",
+    "pretest:ui": "npm run render:ui"
   },
-  "devDependencies": {"electron": "33.2.1", "electron-builder": "25.1.8"},
-  "build": {"appId": "id.pusingcuk.accounting", "productName": "PusingCuk Accounting", "asar": true, "files": ["main.cjs", "index.html", "accounting-core.js", "accounting-rules.generated.js", "package.json"], "win": {"target": ["portable"], "artifactName": "PusingCuk-Accounting-${version}.${ext}"}}
+  "devDependencies": {
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "id.pusingcuk.accounting",
+    "productName": "PusingCuk Accounting",
+    "asar": true,
+    "files": [
+      "main.cjs",
+      "index.html",
+      "accounting-core.js",
+      "accounting-rules.generated.js",
+      "package.json",
+      "dist/index.html",
+      "platform_bridge.py"
+    ],
+    "win": {
+      "target": [
+        "portable"
+      ],
+      "artifactName": "PusingCuk-Accounting-${version}.${ext}"
+    }
+  }
 }
