@@ -66,7 +66,7 @@ class PusingCukAssistant:
     def ask(self, query: str, *, style: str = "adaptif") -> str:
         # Internal workspace prompts may include bounded source and compiler diagnostics.
         # The public chat endpoint keeps its stricter 300-character limit separately.
-        if not isinstance(query, str) or not query.strip() or len(query.encode("utf-8")) > 16 * 1024:
+        if not isinstance(query, str) or not query.strip() or len(query.encode("utf-8")) > 24 * 1024:
             raise ValueError("AI_QUERY_INVALID")
         if not isinstance(style, str) or style not in _STYLE_INSTRUCTIONS:
             raise ValueError("AI_STYLE_INVALID")
