@@ -2,7 +2,7 @@ name: Tes Pusingcuk
 
 on:
   push:
-    branches: [main, "audit/**", "in-this-economy"]
+    branches: [main, "audit/**", "in-this-economy", "warung-pusingcuk", "warungpusingcuk"]
     paths:
       - ".github/workflows/tests.yml"
       - "pusingcuk_new.py"
@@ -81,6 +81,14 @@ jobs:
           node-version: "22"
       - name: Jalankan suite regresi Python
         run: python -m unittest discover -s tests -v
+      - name: Uji kontrak .cuk dan siklus diagnostik PusingCuk AI
+        run: |
+          set -euo pipefail
+          python pusingcuk_new.py --check apps/accounting/cukaccount_frontend.cuk
+          python pusingcuk_new.py --check apps/accounting/cukaccount_backend.cuk
+          python tools/diagnostic_repair_loop.py apps/accounting/cukaccount_frontend.cuk --frontend-contract --json
+          python tools/diagnostic_repair_loop.py apps/accounting/cukaccount_backend.cuk --expected apps/accounting/cukaccount_backend.expected.txt --json
+          python -m unittest tests.test_diagnostic_repair_loop -v
       - name: Build and smoke-test standalone JS artifact from registered .cuk rule
         if: matrix.python-version == '3.12'
         run: |
@@ -107,7 +115,7 @@ jobs:
           set -euo pipefail
           python pusingcuk_new.py --check examples/accounting/report_equation.cuk
           output="$(python pusingcuk_new.py examples/accounting/report_equation.cuk)"
-          printf '%s\\n' "$output"
+          printf '%s\n' "$output"
           test "$output" = "CUKACCOUNT_REPORT_EQUATION_BALANCED"
       - name: Uji contoh file I/O dengan input dummy
         run: |
@@ -301,18 +309,18 @@ jobs:
       - name: Uji pembatasan file PVM dan kesetaraan backend
         run: bash tests/test_all.sh
 
-      - name: Compile and regression-test CukAccount .cuk domain rules
-        run: |
-          set -euo pipefail
-          python pusingcuk_new.py --check apps/accounting/cukaccount_rules.cuk
-          actual="$(python pusingcuk_new.py apps/accounting/cukaccount_rules.cuk)"
-          diff -u apps/accounting/cukaccount_rules.expected.txt <(printf '%s\n' "$actual")
-          echo "PASS: CukAccount .cuk accounting rules match all expected cases."
-
       - name: Compile and regression-test CukAccount frontend .cuk interaction rules
         run: |
           set -euo pipefail
           python pusingcuk_new.py --check apps/accounting/cukaccount_frontend.cuk
           actual="$(python pusingcuk_new.py apps/accounting/cukaccount_frontend.cuk)"
-          diff -u apps/accounting/cukaccount_frontend.expected.txt <(printf '%s\\n' "$actual")
+          diff -u apps/accounting/cukaccount_frontend.expected.txt <(printf '%s\n' "$actual")
           echo "PASS: CukAccount frontend routes, form validation, submit actions, and theme rules match expected cases."
+
+      - name: Compile and regression-test CukAccount backend .cuk domain rules
+        run: |
+          set -euo pipefail
+          python pusingcuk_new.py --check apps/accounting/cukaccount_backend.cuk
+          actual="$(python pusingcuk_new.py apps/accounting/cukaccount_backend.cuk)"
+          diff -u apps/accounting/cukaccount_backend.expected.txt <(printf '%s\n' "$actual")
+          echo "PASS: journal, ledger balance, period, report classification, tax arithmetic, and sharia flag rules match fixtures."

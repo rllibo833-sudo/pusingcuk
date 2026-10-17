@@ -1,27 +1,39 @@
-# CukAccount rules written in .cuk
+# CukAccount — frontend dan backend PusingCuk
 
-This directory is the first executable domain slice for CukAccount written in
-PusingCuk syntax. It deliberately covers deterministic rules only; the existing
-Flutter/Dart implementation remains authoritative for production posting and
-money persistence until the full runtime, exact-money representation, database,
-and integration tests are proven.
+Branch `warungpusingcuk` mengunci satu contoh produk untuk mengembangkan bahasa `.cuk` dan PusingCuk AI. Sumber domain aplikasi berada di dua file kanonis:
 
-## Files
-- `cukaccount_rules.cuk`: accounting equation, journal balance validation,
-  and normal-balance calculation.
-- `cukaccount_rules.expected.txt`: expected stdout for regression checks.
+- `cukaccount_frontend.cuk` — kontrak layar, navigasi, field formulir, aksi, dan fungsi validasi formulir.
+- `cukaccount_backend.cuk` — aturan domain deterministik: persamaan akuntansi, validasi jurnal, saldo normal, periode, klasifikasi laporan, aritmetika pajak dasar, dan penanda awal pemeriksaan syariah.
+- `cukaccount_backend.expected.txt` — output yang dikunci untuk regresi backend.
+- `cukaccount_frontend.expected.txt` — output yang dikunci untuk rute dan validasi formulir.
+- `tools/diagnostic_repair_loop.py` — pemeriksaan compiler/runtime, hash sumber, perbandingan fixture, dan laporan diagnostik untuk ditinjau PusingCuk AI.
 
-## Run
-From the PusingCuk repository root, run the reference interpreter against
-`apps/accounting/cukaccount_rules.cuk` using the same invocation documented
-in the root README for a `.cuk` program.
+## Jalankan pemeriksaan
 
-## Scope and safety
-- No imports/modules are assumed; current language spec says system modules are
-  not available in the native runtime.
-- This is a deterministic domain prototype, not a replacement for SQLite,
-  audit trail, period closing, tax, sharia accounting review, or the production
-  Dart posting path.
-- Do not use binary floating point for production money. These rules accept
-  numeric values and are for semantic/conformance learning until exact integer
-  constraints are enforced end-to-end.
+Dari root repository:
+
+```sh
+python pusingcuk_new.py --check apps/accounting/cukaccount_frontend.cuk
+python pusingcuk_new.py apps/accounting/cukaccount_frontend.cuk
+python pusingcuk_new.py --check apps/accounting/cukaccount_backend.cuk
+python pusingcuk_new.py apps/accounting/cukaccount_backend.cuk
+python tools/diagnostic_repair_loop.py apps/accounting/cukaccount_backend.cuk --expected apps/accounting/cukaccount_backend.expected.txt --json
+python -m unittest tests.test_diagnostic_repair_loop -v
+```
+
+## Kontrak dan batas saat ini
+
+- Komentar `# @...` di file frontend adalah metadata kontrak sumber. Interpreter PusingCuk saat ini mengabaikan komentar tersebut; file ini **belum dirender menjadi UI aplikasi** dan belum mengklaim memiliki runtime UI.
+- Kode fungsi di kedua file adalah sintaks `.cuk` yang benar-benar diperiksa dan dijalankan oleh interpreter referensi.
+- Backend ini adalah aturan domain latihan, bukan mesin akuntansi produksi. Fungsi pajak hanya aritmetika generik dan bukan interpretasi hukum pajak Indonesia. Pemeriksaan syariah hanya penanda awal dan bukan fatwa atau validasi kepatuhan.
+- Fixture yang lulus membuktikan output pada interpreter yang diuji; tidak membuktikan kesetaraan semua runtime, integrasi database, APK Android, atau kesiapan pembukuan resmi.
+- Siklus diagnostik menghasilkan laporan dan saran yang dapat dikonsumsi AI, tetapi tidak mengedit kode atau menerapkan patch otomatis. Perubahan harus melewati compiler, fixture regresi, dan tinjauan.
+- Flutter/Dart dan SQLite pada repo CukAccount tetap bagian dari produk yang ada; branch ini berfokus pada sumber `.cuk` dan jalur pengembangan PusingCuk AI, bukan mengganti diam-diam fondasi aplikasi produksi.
+
+## Prinsip kontribusi
+
+1. Ubah sumber `.cuk`, jangan menutupi kegagalan dengan mengubah expected output secara otomatis.
+2. Tambahkan kasus normal, batas, dan negatif untuk setiap aturan baru.
+3. Jalankan `--check`, eksekusi interpreter, dan tes diagnostik sebelum menyatakan perubahan selesai.
+4. Pertahankan output diagnostik yang dapat direproduksi dan hash sumber.
+5. Jangan mengklaim fitur produksi tanpa integrasi dan bukti tes yang sesuai.
