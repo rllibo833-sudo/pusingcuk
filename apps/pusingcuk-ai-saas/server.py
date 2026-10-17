@@ -212,7 +212,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
-        self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
+        self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; worker-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Connection", "close")
         headers = dict(extra_headers or {})
@@ -345,12 +345,19 @@ class Handler(BaseHTTPRequestHandler):
         if not target.is_file():
             self._json(404, {"error": "NOT_FOUND"})
             return
-        if target.suffix != ".html":
+        content_types = {
+            ".html": "text/html; charset=utf-8",
+            ".js": "text/javascript; charset=utf-8",
+            ".webmanifest": "application/manifest+json; charset=utf-8",
+            ".svg": "image/svg+xml",
+        }
+        content_type = content_types.get(target.suffix)
+        if content_type is None:
             self._json(404, {"error": "NOT_FOUND"})
             return
         body = target.read_bytes()
         self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Type", content_type)
         self.send_header("Cache-Control", "no-cache")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
