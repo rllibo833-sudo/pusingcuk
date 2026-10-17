@@ -397,6 +397,20 @@ class Handler(BaseHTTPRequestHandler):
                         pass
                 self._json(200, {"ok": True}, self._cookie_headers(None, clear=True))
                 return
+            if path == "/api/workspace/check":
+                self._auth_required()
+                source = payload.get("source")
+                if set(payload) != {"source"} or not isinstance(source, str) or len(source.encode("utf-8")) > 16 * 1024:
+                    raise SaaSError("WORKSPACE_SOURCE_INVALID")
+                try:
+                    from library.ai_tools import ToolRegistry
+                    from library.knowledge_grounding import load_index
+                    documents = load_index(Path(os.environ.get("PUSINGCUK_AI_INDEX", str(ROOT / "library" / "knowledge_index.json"))))
+                    result = ToolRegistry(documents).execute("cuk_compile_check", {"source": source})
+                except Exception:
+                    raise SaaSError("WORKSPACE_CHECK_UNAVAILABLE", 503) from None
+                self._json(200, {"check": result})
+                return
             if path == "/api/chat":
                 user = self._auth_required()
                 _rate_limit("chat:" + user["id"], 20)
