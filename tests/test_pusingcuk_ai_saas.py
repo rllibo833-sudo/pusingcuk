@@ -156,6 +156,13 @@ class SaaSPrimitiveTests(unittest.TestCase):
         self.assertNotEqual(token, saas._token_hash(token))
         self.assertEqual(saas._token_hash(token), saas._token_hash(token))
 
+    def test_workspace_inline_javascript_has_no_escaped_code_separator(self):
+        html = (Path(__file__).resolve().parents[1] / "apps" / "pusingcuk-ai-saas" / "index.html").read_text(encoding="utf-8")
+        # A literal backslash-n between JS declarations is not a JavaScript line break
+        # and makes the entire inline script fail to parse in the browser.
+        self.assertNotIn(r"\\nasync function loadHistory", html)
+        self.assertIn("\\nasync function loadHistory", html)
+
 
 if __name__ == "__main__":
     unittest.main()
