@@ -21,6 +21,7 @@ function getVerifiedUserClaims(req: Request) {
   } catch { return null; }
 }
 const requestWindows = new Map<string, number[]>();
+const dailyRequestWindows = new Map<string, number[]>();
 const systemPrompt = [
   "Kamu adalah PusingCuk AI, asisten pembangun aplikasi dan pengembang bahasa .cuk.",
   "Bantu pengguna membuat aplikasi dari instruksi sehari-hari, menyusun struktur proyek, menghasilkan isi file, memperbaiki kode, dan menjelaskan keputusan teknis dalam bahasa Indonesia yang jelas.",
@@ -38,9 +39,13 @@ Deno.serve(async (req: Request) => {
   if (!claims) return json({ error: "Sesi login tidak valid. Keluar lalu login kembali." }, 401);
   const now = Date.now();
   const recentRequests = (requestWindows.get(claims.sub) || []).filter((stamp) => now - stamp < 60000);
-  if (recentRequests.length >= 12) return json({ error: "Batas 12 permintaan per menit tercapai. Tunggu sebentar lalu coba lagi." }, 429);
+  if (recentRequests.length >= 4) return json({ error: "Batas hemat biaya: maksimal 4 permintaan per menit. Tunggu sebentar lalu coba lagi." }, 429);
+  const dailyRequests = (dailyRequestWindows.get(claims.sub) || []).filter((stamp) => now - stamp < 86400000);
+  if (dailyRequests.length >= 20) return json({ error: "Batas hemat biaya harian tercapai (20 permintaan). Coba lagi besok." }, 429);
   recentRequests.push(now);
+  dailyRequests.push(now);
   requestWindows.set(claims.sub, recentRequests);
+  dailyRequestWindows.set(claims.sub, dailyRequests);
   let body: unknown;
   try {
     const raw = await req.text();
@@ -76,6 +81,8 @@ Deno.serve(async (req: Request) => {
   } else if (openRouterKey) {
     endpoint = "https://openrouter.ai/api/v1/chat/completions";
     model = Deno.env.get("OPENROUTER_MODEL")?.trim() || "qwen/qwen3-4b:free";
+    // Prevent accidental use of paid OpenRouter models from this app.
+    if (!model.endsWith(":free")) return json({ error: "PusingCuk AI hanya mengizinkan model OpenRouter gratis (:free) agar saldo tidak terpakai. Hapus OPENROUTER_MODEL atau set ke model :free." }, 503);
     provider = "openrouter"; apiKey = openRouterKey;
   } else {
     return json({ error: "Mesin AI belum dikonfigurasi. Model milik sendiri: set MODEL_BASE_URL dan MODEL_NAME. Sementara: set OPENROUTER_API_KEY sebagai secret backend." }, 503);
@@ -89,7 +96,7 @@ Deno.serve(async (req: Request) => {
   try {
     const response = await fetch(endpoint, {
       method: "POST", headers,
-      body: JSON.stringify({model, messages, temperature:0.35, max_tokens:2200}),
+      body: JSON.stringify({model, messages, temperature:0.35, max_tokens:700}),
       signal: AbortSignal.timeout(45000)
     });
     if (!response.ok) {
