@@ -19,6 +19,7 @@ python pusingcuk_new.py --check apps/accounting/cukaccount_backend.cuk
 python pusingcuk_new.py apps/accounting/cukaccount_backend.cuk
 python tools/diagnostic_repair_loop.py apps/accounting/cukaccount_backend.cuk --expected apps/accounting/cukaccount_backend.expected.txt --json
 python -m unittest tests.test_diagnostic_repair_loop -v
+python -m unittest tests.test_diagnostic_repair_loop -v
 ```
 
 ## Kontrak dan batas saat ini
@@ -37,3 +38,8 @@ python -m unittest tests.test_diagnostic_repair_loop -v
 3. Jalankan `--check`, eksekusi interpreter, dan tes diagnostik sebelum menyatakan perubahan selesai.
 4. Pertahankan output diagnostik yang dapat direproduksi dan hash sumber.
 5. Jangan mengklaim fitur produksi tanpa integrasi dan bukti tes yang sesuai.
+
+## Handoff ke PusingCuk AI
+
+Saat compiler, runtime, atau fixture gagal, `diagnostic_repair_loop.py` menghasilkan objek `ai_handoff` dengan kontrak `pusingcuk.ai.repair.v1`. Handoff memuat sumber yang diuji, SHA-256 sumber, kode diagnostik, perbandingan output, batas perbaikan, dan instruksi agar AI mengusulkan perubahan minimal. Handoff ini siap dipakai sebagai konteks AI; pemanggilan model dan penerapan patch otomatis **belum** diklaim tersedia.
+
