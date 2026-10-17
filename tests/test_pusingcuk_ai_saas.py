@@ -256,7 +256,8 @@ class SaaSHttpFlowTests(unittest.TestCase):
         self.assertTrue(attempts[1]["ok"], attempts[1])
         self.assertEqual(attempts[1]["evidence_status"], "KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI")
         repair_prompt = assistant.ask.call_args_list[1].args[0]
-        self.assertIn(attempts[0]["diagnostic"], repair_prompt)
+        self.assertIn("Baris 2, kolom 11", repair_prompt)
+        self.assertIn("ekspresi tidak valid", repair_prompt)
 
     def test_post_rejects_wrong_origin_and_oversized_body(self):
         status, _, body = self.request("/api/auth/register", {
