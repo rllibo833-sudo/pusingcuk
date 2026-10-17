@@ -137,6 +137,8 @@ class CukAccountSQLite:
         try:
             self.db.execute("BEGIN IMMEDIATE")
             existing = self.db.execute("SELECT id,status FROM journal_entries WHERE idempotency_key=?",(idem,)).fetchone()
+            if existing and existing["id"] != entry_id:
+                raise StorageError("IDEMPOTENCY_CONFLICT","Idempotency key sudah digunakan oleh jurnal lain.")
             if existing and existing["status"] == "posted":
                 self.db.execute("COMMIT")
                 return {"entry_id":existing["id"],"status":"posted","idempotent_replay":True}
