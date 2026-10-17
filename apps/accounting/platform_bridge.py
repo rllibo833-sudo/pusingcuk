@@ -63,7 +63,7 @@ class PlatformBridge:
         except Exception as exc:
             # Do not leak SQL, paths, or internal exceptions to the UI.
             code=getattr(exc,"code","STORAGE_REJECTED")
-            return {"contract_version":CONTRACT_VERSION,"request_id":req["request_id"],"status":"rejected","diagnostic":{"code":code,"message":str(exc)[:240]}}
+            return {"contract_version":CONTRACT_VERSION,"request_id":req["request_id"],"status":"rejected","diagnostic":{"code":code,"message":"Operasi penyimpanan gagal; detail internal disembunyikan."}}
         return {"contract_version":CONTRACT_VERSION,"request_id":req["request_id"],"status":"succeeded","result":result}
 
 def create_sqlite_bridge(database: str | Path) -> tuple[PlatformBridge, Any]:
