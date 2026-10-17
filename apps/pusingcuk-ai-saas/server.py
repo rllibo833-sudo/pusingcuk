@@ -303,6 +303,24 @@ class Handler(BaseHTTPRequestHandler):
                 raise SaaSError("PROJECT_STORAGE_UNAVAILABLE", 503)
             self._json(200, {"projects": rows})
             return
+        if path == "/api/project-files":
+            user = self._auth_required()
+            query = parse_qs(urlsplit(self.path).query, strict_parsing=True)
+            ids = query.get("project_id", [])
+            if len(query) != 1 or len(ids) != 1 or not re.fullmatch(r"[0-9a-fA-F-]{36}", ids[0]):
+                raise SaaSError("PROJECT_ID_INVALID")
+            project_id = quote(ids[0], safe="")
+            session = getattr(self, "_supabase_session", None) or _session_from_cookie(self)
+            token = session.get("access_token", "") if session else ""
+            owner = quote(user["id"], safe="")
+            status, owned = _supabase_request("GET", "/rest/v1/pusingcuk_saas_projects?select=id&id=eq." + project_id + "&user_id=eq." + owner + "&limit=1", token=token)
+            if status != 200 or not isinstance(owned, list) or not owned:
+                raise SaaSError("PROJECT_NOT_FOUND", 404)
+            status, rows = _supabase_request("GET", "/rest/v1/pusingcuk_saas_project_files?select=id,path,content,language,updated_at&project_id=eq." + project_id + "&user_id=eq." + owner + "&order=path.asc&limit=100", token=token)
+            if status != 200 or not isinstance(rows, list):
+                raise SaaSError("PROJECT_FILE_STORAGE_UNAVAILABLE", 503)
+            self._json(200, {"files": rows})
+            return
         if path == "/api/messages":
             user = _current_user(self)
             if user is None:
@@ -532,6 +550,40 @@ class Handler(BaseHTTPRequestHandler):
                 if status not in (200, 201) or not isinstance(rows, list) or not rows:
                     raise SaaSError("PROJECT_CREATE_FAILED", 503)
                 self._json(201, {"project": rows[0]})
+                return
+            if path == "/api/project-files":
+                user = self._auth_required()
+                _rate_limit("project-files:" + user["id"], 60)
+                if set(payload) != {"project_id", "path", "content"}:
+                    raise SaaSError("PROJECT_FILE_PAYLOAD_INVALID")
+                project_id, file_path, source = payload["project_id"], payload["path"], payload["content"]
+                if not isinstance(project_id, str) or not re.fullmatch(r"[0-9a-fA-F-]{36}", project_id):
+                    raise SaaSError("PROJECT_ID_INVALID")
+                if not isinstance(file_path, str) or not re.fullmatch(r"[A-Za-z0-9_-][A-Za-z0-9_.-]{0,79}[.]cuk", file_path):
+                    raise SaaSError("PROJECT_FILE_PATH_INVALID")
+                if not isinstance(source, str) or not source.strip() or len(source.encode("utf-8")) > 16 * 1024:
+                    raise SaaSError("PROJECT_FILE_CONTENT_INVALID")
+                session = getattr(self, "_supabase_session", None) or _session_from_cookie(self)
+                token = session.get("access_token", "") if session else ""
+                owner = quote(user["id"], safe="")
+                project_filter = quote(project_id, safe="")
+                status, owned = _supabase_request("GET", "/rest/v1/pusingcuk_saas_projects?select=id&id=eq." + project_filter + "&user_id=eq." + owner + "&limit=1", token=token)
+                if status != 200 or not isinstance(owned, list) or not owned:
+                    raise SaaSError("PROJECT_NOT_FOUND", 404)
+                file_filter = "/rest/v1/pusingcuk_saas_project_files?select=id,path&project_id=eq." + project_filter + "&user_id=eq." + owner + "&path=eq." + quote(file_path, safe="")
+                status, existing = _supabase_request("GET", file_filter + "&limit=1", token=token)
+                if status != 200 or not isinstance(existing, list):
+                    raise SaaSError("PROJECT_FILE_STORAGE_UNAVAILABLE", 503)
+                if existing:
+                    file_id = quote(str(existing[0].get("id", "")), safe="")
+                    status, _ = _supabase_request("PATCH", "/rest/v1/pusingcuk_saas_project_files?id=eq." + file_id + "&user_id=eq." + owner, token=token, body={"content": source, "language": "cuk"})
+                    if status not in (200, 204):
+                        raise SaaSError("PROJECT_FILE_SAVE_FAILED", 503)
+                else:
+                    status, _ = _supabase_request("POST", "/rest/v1/pusingcuk_saas_project_files", token=token, body={"project_id": project_id, "user_id": user["id"], "path": file_path, "content": source, "language": "cuk"})
+                    if status not in (200, 201, 204):
+                        raise SaaSError("PROJECT_FILE_SAVE_FAILED", 503)
+                self._json(200, {"saved": True, "path": file_path})
                 return
             if path == "/api/chat":
                 user = self._auth_required()
