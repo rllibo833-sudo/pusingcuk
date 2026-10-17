@@ -10,11 +10,11 @@ function json(data: unknown, status = 200) {
 }
 async function getVerifiedUserClaims(req: Request): Promise<{ sub: string; role: "authenticated" } | null> {
   const authorization = req.headers.get("Authorization") || "";
-  const match = authorization.match(/^Bearer\\s+([^\\s]+)$/i);
+  const match = authorization.match(/^Bearer\s+([^\s]+)$/i);
   if (!match || match[1].length > 8192) return null;
 
   // Never trust decoded JWT claims: verify the access token through Supabase Auth.
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")?.trim().replace(/\\/+$/, "");
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")?.trim().replace(/\/+$/, "");
   const apiKey = Deno.env.get("SUPABASE_ANON_KEY")?.trim()
     || Deno.env.get("SUPABASE_PUBLISHABLE_KEY")?.trim();
   if (!supabaseUrl || !apiKey) return null;
