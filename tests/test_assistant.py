@@ -83,7 +83,7 @@ class AssistantTests(unittest.TestCase):
         self.assertEqual(answer, "Jawaban berdasarkan dokumen.")
         self.assertEqual(len(self.provider.calls), 1)
 
-    def test_workspace_prompt_rejects_context_over_16_kibibytes(self):
+    def test_workspace_prompt_rejects_context_over_24_kibibytes(self):
         with self.assertRaisesRegex(ValueError, "AI_QUERY_INVALID"):
             self.assistant.ask("x" * (24 * 1024 + 1))
         self.assertEqual(self.provider.calls, [])
