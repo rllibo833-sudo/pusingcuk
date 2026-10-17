@@ -1,5 +1,39 @@
-# CukAccount frontend interaction contract, executable in PusingCuk reference runtime.
-# This is UI state/validation logic, not a native visual renderer yet.
+# CukAccount UI DSL v1: safe directives consumed by tools/cuk_ui_runtime.py.
+# @app CukAccount
+# @theme system
+# @navigation home:Beranda,transactions:Jurnal,ledger:Buku Besar,reports:Laporan,periods:Periode
+# @screen home:Ringkasan Keuangan
+# @text hero:Keuangan rapi, pikiran nggak mumet.
+# @text summary:Catat transaksi, periksa keseimbangan, dan tinjau laporan.
+# @metric total_debit:Total Debit:IDR
+# @metric total_credit:Total Kredit:IDR
+# @metric difference:Selisih Jurnal:IDR
+# @metric row_count:Baris Jurnal:count
+# @end
+# @screen transactions:Jurnal Umum
+# @field date:Tanggal:date:required
+# @field description:Keterangan:text:required
+# @field account:Akun:select:required
+# @field category:Kategori:select:required
+# @field debit:Debit Rupiah:integer:min=0
+# @field credit:Kredit Rupiah:integer:min=0
+# @action add_line:Tambah Baris
+# @action validate:Validasi Jurnal
+# @action save_draft:Simpan Draft
+# @end
+# @screen ledger:Buku Besar
+# @filter account:Akun:select
+# @filter start_date:Dari Tanggal:date
+# @filter end_date:Sampai Tanggal:date
+# @end
+# @screen reports:Laporan Keuangan
+# @report trial_balance:Neraca Saldo
+# @report income_statement:Laba Rugi
+# @report balance_sheet:Posisi Keuangan
+# @end
+# @screen periods:Periode Akuntansi
+# @action preview_close:Tinjau Penutupan Periode
+# @end
 jancuk
 fungsi route_for(menu)
     njir menu == "home"
@@ -8,11 +42,11 @@ fungsi route_for(menu)
         njir menu == "transactions"
             balek "TRANSAKSI"
         kampret
-            njir menu == "reports"
-                balek "LAPORAN"
+            njir menu == "ledger"
+                balek "BUKU_BESAR"
             kampret
-                njir menu == "accounts"
-                    balek "AKUN"
+                njir menu == "reports"
+                    balek "LAPORAN"
                 kampret
                     njir menu == "periods"
                         balek "PERIODE"
@@ -43,46 +77,11 @@ fungsi validate_journal_form(total_debit, total_kredit, jumlah_baris, akun_valid
         balek "FORMULIR_VALID"
     selesai njir
 selesai fungsi
-fungsi resolve_submit(action, validation)
-    njir action == "save_draft"
-        balek "DRAFT_DISIMPAN_SETELAH_VALIDASI_STRUKTUR"
-    selesai njir
-    njir action == "post"
-        njir validation == "FORMULIR_VALID"
-            balek "SIAP_DITERUSKAN_KE_USE_CASE_POSTING"
-        kampret
-            balek "POSTING_DITOLAK_VALIDASI"
-        selesai njir
-    selesai njir
-    balek "AKSI_TIDAK_DIKENAL"
-selesai fungsi
-fungsi normalize_theme(theme)
-    njir theme == "dark"
-        balek "TEMA_GELAP"
-    kampret
-        njir theme == "light"
-            balek "TEMA_TERANG"
-        kampret
-            balek "TEMA_SISTEM"
-        selesai njir
-    selesai njir
-selesai fungsi
 hedeh route_for("home")
 hedeh route_for("transactions")
+hedeh route_for("ledger")
 hedeh route_for("reports")
-hedeh route_for("accounts")
 hedeh route_for("periods")
-hedeh route_for("unknown")
 hedeh validate_journal_form(100, 100, 2, benar, benar)
 hedeh validate_journal_form(100, 99, 2, benar, benar)
-hedeh validate_journal_form(100, 100, 1, benar, benar)
-hedeh validate_journal_form(100, 100, 2, salah, benar)
-hedeh validate_journal_form(100, 100, 2, benar, salah)
-hedeh validate_journal_form(0, 0, 2, benar, benar)
-hedeh resolve_submit("post", "FORMULIR_VALID")
-hedeh resolve_submit("post", "JURNAL_TIDAK_SEIMBANG")
-hedeh resolve_submit("unknown", "FORMULIR_VALID")
-hedeh normalize_theme("dark")
-hedeh normalize_theme("light")
-hedeh normalize_theme("auto")
 selesai jancuk
