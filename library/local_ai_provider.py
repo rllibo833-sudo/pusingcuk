@@ -143,7 +143,7 @@ class OllamaChatProvider:
                     clean.insert(0, {"role": "system", "content": system_prompt.strip()})
         if len(clean) > 20 or sum(len(item["content"]) for item in clean) > 24_000:
             raise LocalAIProviderError("AI_CONTEXT_TOO_LARGE")
-        if tools is not None and (not isinstance(tools, list) or len(tools) > 8):
+        if tools is not None and (not isinstance(tools, list) or len(tools) > 16):
             raise LocalAIProviderError("AI_TOOLS_INVALID")
         # Gemini-specific thought signatures are internal history metadata, not Ollama API fields.
         # Keep the original history intact for orchestration but strip provider-foreign keys on egress.
