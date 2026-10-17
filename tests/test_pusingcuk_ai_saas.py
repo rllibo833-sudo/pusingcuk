@@ -230,6 +230,19 @@ class SaaSPrimitiveTests(unittest.TestCase):
         self.assertIn('value="adaptif"', html)
         self.assertIn("localStorage.setItem('pusingcuk-chat-style',chatStyle)", html)
         self.assertIn("JSON.stringify({query,style:chatStyle})", html)
+        self.assertIn('id="sourceEditor"', html)
+        self.assertIn('id="codingRequest"', html)
+        self.assertIn('id="assistBtn"', html)
+        self.assertIn('id="checkBtn"', html)
+        self.assertIn('id="saveFileBtn"', html)
+        self.assertIn("/api/workspace/assist", html)
+        self.assertIn("/api/workspace/check", html)
+        self.assertIn("/api/project-files", html)
+        server = SOURCE.read_text(encoding="utf-8")
+        self.assertIn('if path == "/api/workspace/assist":', server)
+        self.assertIn('if path == "/api/workspace/check":', server)
+        self.assertIn('if path == "/api/projects":', server)
+        self.assertIn('if path == "/api/project-files":', server)
 
 
 if __name__ == "__main__":
