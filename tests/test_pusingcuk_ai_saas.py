@@ -245,7 +245,7 @@ class SaaSHttpFlowTests(unittest.TestCase):
         self.assertFalse(body["saved"])
         check = body["compile_check"]
         self.assertTrue(check["ok"], check)
-        self.assertEqual(check["evidence_status"], "COMPILE_CHECK_PASSED")
+        self.assertEqual(check["evidence_status"], "KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI")
         self.assertEqual(check["repair_attempts"], 1)
         self.assertEqual(check["repair_stop_reason"], "compiler_passed")
         attempts = check["compile_attempts"]
@@ -254,7 +254,7 @@ class SaaSHttpFlowTests(unittest.TestCase):
         self.assertEqual(attempts[0]["evidence_status"], "SOURCE_DITOLAK_COMPILER")
         self.assertTrue(attempts[0]["diagnostic"])
         self.assertTrue(attempts[1]["ok"], attempts[1])
-        self.assertEqual(attempts[1]["evidence_status"], "COMPILE_CHECK_PASSED")
+        self.assertEqual(attempts[1]["evidence_status"], "KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI")
         repair_prompt = assistant.ask.call_args_list[1].args[0]
         self.assertIn(attempts[0]["diagnostic"], repair_prompt)
 
