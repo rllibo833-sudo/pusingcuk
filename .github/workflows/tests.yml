@@ -2,7 +2,7 @@ name: Tes Pusingcuk
 
 on:
   push:
-    branches: [main, "audit/**", "in-this-economy"]
+    branches: [main, "audit/**", "in-this-economy", "warung-pusingcuk"]
     paths:
       - ".github/workflows/tests.yml"
       - "pusingcuk_new.py"
@@ -81,6 +81,14 @@ jobs:
           node-version: "22"
       - name: Jalankan suite regresi Python
         run: python -m unittest discover -s tests -v
+      - name: Render and test CukAccount frontend .cuk runtime and platform bridge
+        run: |
+          set -euo pipefail
+          python tools/cuk_ui_runtime.py apps/accounting/cukaccount_frontend.cuk --output "$RUNNER_TEMP/cukaccount-ui.html"
+          test -s "$RUNNER_TEMP/cukaccount-ui.html"
+          grep -Fq 'data-screen="transactions"' "$RUNNER_TEMP/cukaccount-ui.html"
+          grep -Fq 'data-route="reports"' "$RUNNER_TEMP/cukaccount-ui.html"
+          python -m unittest tests.test_cuk_ui_runtime tests.test_platform_bridge -v
       - name: Build and smoke-test standalone JS artifact from registered .cuk rule
         if: matrix.python-version == '3.12'
         run: |
