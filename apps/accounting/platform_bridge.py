@@ -80,10 +80,33 @@ def create_sqlite_bridge(database: str | Path) -> tuple[PlatformBridge, Any]:
             try: return getattr(store,method)(payload)
             except module.StorageError as exc: raise BridgeError(exc.code,str(exc)) from exc
         return handler
+    def post_with_cuk(payload):
+        row=store.db.execute("""SELECT e.entry_date,COUNT(l.id) n,
+          COALESCE(SUM(l.debit),0) d,COALESCE(SUM(l.credit),0) c
+          FROM journal_entries e LEFT JOIN journal_lines l ON l.entry_id=e.id
+          WHERE e.id=? GROUP BY e.id""",(payload.get("entry_id"),)).fetchone()
+        if row is None: raise BridgeError("DRAFT_NOT_FOUND","Draft tidak ditemukan.")
+        period=store.db.execute("SELECT is_open FROM periods WHERE starts_on<=? AND ends_on>=? ORDER BY starts_on DESC LIMIT 1",
+                                (row["entry_date"],row["entry_date"])).fetchone()
+        try:
+            domain_path=Path(__file__).with_name("cuk_domain.py")
+            domain_spec=importlib.util.spec_from_file_location("cukaccount_domain",domain_path)
+            if domain_spec is None or domain_spec.loader is None: raise RuntimeError("domain unavailable")
+            domain=importlib.util.module_from_spec(domain_spec)
+            import sys
+            sys.modules[domain_spec.name]=domain; domain_spec.loader.exec_module(domain)
+            verdict=domain.validate_journal(row["d"],row["c"],row["n"],bool(period and period["is_open"]))
+        except Exception as exc:
+            raise BridgeError("CUK_DOMAIN_UNAVAILABLE","Validasi .cuk gagal dijalankan; posting dibatalkan.") from exc
+        if verdict != "JURNAL_VALID":
+            codes={"PERIODE_TERTUTUP":"PERIOD_CLOSED","JURNAL_MINIMAL_DUA_BARIS":"MINIMUM_LINES",
+                   "NOMINAL_HARUS_POSITIF":"JOURNAL_AMOUNT_INVALID","JURNAL_TIDAK_SEIMBANG":"JOURNAL_UNBALANCED"}
+            raise BridgeError(codes.get(verdict,"CUK_DOMAIN_REJECTED"),"Validasi backend .cuk menolak jurnal: "+verdict)
+        return store.post_journal(payload)
     handlers={
       "db.query_accounts":call("query_accounts"),
       "db.save_journal_draft":call("save_journal_draft"),
-      "db.post_journal":call("post_journal"),
+      "db.post_journal":post_with_cuk,
       "db.get_general_ledger":call("get_general_ledger"),
       "db.close_period":call("close_period"),
     }
