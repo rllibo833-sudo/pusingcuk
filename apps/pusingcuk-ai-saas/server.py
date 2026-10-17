@@ -303,7 +303,7 @@ class Handler(BaseHTTPRequestHandler):
             if user is None:
                 self._json(401, {"error": "AUTH_REQUIRED"})
                 return
-            query = parse_qs(urlsplit(self.path).query, strict_parsing=True)
+            query = parse_qs(urlsplit(self.path).query)
             ids = query.get("project_id", [])
             if len(query) != 1 or len(ids) != 1 or not re.fullmatch(r"[0-9a-fA-F-]{36}", ids[0]):
                 raise SaaSError("PROJECT_ID_INVALID")
