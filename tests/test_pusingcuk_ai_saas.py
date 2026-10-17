@@ -81,12 +81,13 @@ class SaaSHttpFlowTests(unittest.TestCase):
     def test_register_login_and_session_identity(self):
         status, headers, body = self.register()
         self.assertEqual(status, 201, body)
+        registered_id = body["user"]["id"]
         self.assertIn("HttpOnly", headers.get("Set-Cookie", ""))
         self.assertIn("pusingcuk_session=", headers.get("Set-Cookie", ""))
         self.assertEqual(body["user"]["email"], "user@example.com")
         status, _, body = self.request("/api/auth/me")
         self.assertEqual(status, 200)
-        self.assertEqual(body["user"]["id"], body["user"]["id"])
+        self.assertEqual(body["user"]["id"], registered_id)
 
         status, _, _ = self.request("/api/auth/logout", {})
         self.assertEqual(status, 200)
@@ -99,7 +100,7 @@ class SaaSHttpFlowTests(unittest.TestCase):
         self.assertEqual(status, 200, body)
         status, _, body = self.request("/api/auth/me")
         self.assertEqual(status, 200)
-        self.assertEqual(body["user"]["email"], "user@example.com")
+        self.assertEqual(body["user"]["id"], registered_id)
 
     def test_duplicate_account_and_invalid_credentials_are_rejected(self):
         self.assertEqual(self.register()[0], 201)
