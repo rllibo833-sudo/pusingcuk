@@ -259,6 +259,24 @@ class SaaSHttpFlowTests(unittest.TestCase):
         self.assertIn("Baris 2, kolom 11", repair_prompt)
         self.assertIn("ekspresi tidak valid", repair_prompt)
 
+    def test_pwa_assets_are_served_with_correct_content_types(self):
+        expected = {
+            "/manifest.webmanifest": "application/manifest+json",
+            "/service-worker.js": "text/javascript",
+            "/icon.svg": "image/svg+xml",
+        }
+        for path, content_type in expected.items():
+            with self.subTest(path=path):
+                with self.opener.open(self.origin + path, timeout=3) as response:
+                    body = response.read().decode("utf-8")
+                    self.assertEqual(response.status, 200)
+                    self.assertIn(content_type, response.headers.get("Content-Type", ""))
+                    self.assertTrue(body.strip())
+        with self.opener.open(self.origin + "/", timeout=3) as response:
+            html = response.read().decode("utf-8")
+            self.assertIn('rel="manifest" href="/manifest.webmanifest"', html)
+            self.assertIn("navigator.serviceWorker.register('/service-worker.js')", html)
+
     def test_post_rejects_wrong_origin_and_oversized_body(self):
         status, _, body = self.request("/api/auth/register", {
             "email": "user@example.com", "password": "a-long-test-password", "display_name": "U"
