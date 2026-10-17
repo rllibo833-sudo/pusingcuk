@@ -293,6 +293,16 @@ class Handler(BaseHTTPRequestHandler):
                 raise SaaSError("PROJECT_STORAGE_UNAVAILABLE", 503)
             self._json(200, {"projects": rows})
             return
+        if path == "/api/projects":
+            user = self._auth_required()
+            session = getattr(self, "_supabase_session", None) or _session_from_cookie(self)
+            token = session.get("access_token", "") if session else ""
+            owner = quote(user["id"], safe="")
+            status, rows = _supabase_request("GET", "/rest/v1/pusingcuk_saas_projects?select=id,name,description,status,updated_at&user_id=eq." + owner + "&order=updated_at.desc&limit=100", token=token)
+            if status != 200 or not isinstance(rows, list):
+                raise SaaSError("PROJECT_STORAGE_UNAVAILABLE", 503)
+            self._json(200, {"projects": rows})
+            return
         if path == "/api/messages":
             user = _current_user(self)
             if user is None:
@@ -507,6 +517,21 @@ class Handler(BaseHTTPRequestHandler):
                     if status not in (200, 201, 204):
                         raise SaaSError("PROJECT_FILE_SAVE_FAILED", 503)
                 self._json(200, {"saved": True, "path": file_path})
+                return
+            if path == "/api/projects":
+                user = self._auth_required()
+                _rate_limit("projects:" + user["id"], 30)
+                if set(payload) != {"name"}:
+                    raise SaaSError("PROJECT_PAYLOAD_INVALID")
+                name = payload.get("name")
+                if not isinstance(name, str) or not name.strip() or name != name.strip() or len(name) > 120:
+                    raise SaaSError("PROJECT_NAME_INVALID")
+                session = getattr(self, "_supabase_session", None) or _session_from_cookie(self)
+                token = session.get("access_token", "") if session else ""
+                status, rows = _supabase_request("POST", "/rest/v1/pusingcuk_saas_projects", token=token, body={"user_id": user["id"], "name": name, "description": ""})
+                if status not in (200, 201) or not isinstance(rows, list) or not rows:
+                    raise SaaSError("PROJECT_CREATE_FAILED", 503)
+                self._json(201, {"project": rows[0]})
                 return
             if path == "/api/chat":
                 user = self._auth_required()
