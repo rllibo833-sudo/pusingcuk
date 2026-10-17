@@ -80,4 +80,6 @@ jobs:
             "https://vcvejjpzklpvknxmymgy.supabase.co/functions/v1/pusingcuk-web" -o "$page"
           grep -q "Pakai kode di editor" "$page"
           grep -q "PusingCuk AI" "$page"
-          echo "Deployed workspace gateway returned the expected interactive frontend."
+          grep -q 'id="aistatus"' "$page"
+          grep -q "checkAiHealth" "$page"
+          echo "Deployed workspace gateway returned the latest frontend and zero-credit AI status check."
