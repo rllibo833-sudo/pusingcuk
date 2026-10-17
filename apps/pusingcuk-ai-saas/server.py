@@ -15,11 +15,16 @@ from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
+import base64
 
 ROOT = Path(__file__).resolve().parents[2]
 WEB_ROOT = Path(__file__).resolve().parent
 DB_PATH = Path(os.environ.get("PUSINGCUK_SAAS_DB", str(WEB_ROOT / "pusingcuk_saas.sqlite3")))
 COOKIE_NAME = "pusingcuk_session"
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
+SUPABASE_PUBLISHABLE_KEY = os.environ.get("SUPABASE_PUBLISHABLE_KEY", "")
 SESSION_TTL = 60 * 60 * 24 * 14
 MAX_BODY = 16 * 1024
 PBKDF2_ROUNDS = 310_000
@@ -88,42 +93,76 @@ def _token_hash(token: str) -> str:
     return hashlib.sha256(token.encode("ascii")).hexdigest()
 
 
-def _cookie_value(handler: BaseHTTPRequestHandler) -> str | None:
-    raw = handler.headers.get("Cookie", "")
+def _supabase_request(method: str, path: str, *, token: str | None = None, body: dict | list | None = None):
+    if not SUPABASE_URL or not SUPABASE_PUBLISHABLE_KEY:
+        raise SaaSError("SUPABASE_NOT_CONFIGURED", 503)
+    payload = None if body is None else json.dumps(body, ensure_ascii=False).encode("utf-8")
+    headers = {"apikey": SUPABASE_PUBLISHABLE_KEY, "Accept": "application/json"}
+    if payload is not None:
+        headers["Content-Type"] = "application/json"
+    if token:
+        headers["Authorization"] = "Bearer " + token
+    request = Request(SUPABASE_URL + path, data=payload, headers=headers, method=method)
+    try:
+        with urlopen(request, timeout=12) as response:
+            raw = response.read(1000000)
+            return response.status, json.loads(raw.decode("utf-8")) if raw else {}
+    except HTTPError as exc:
+        try:
+            raw = exc.read(64000)
+            data = json.loads(raw.decode("utf-8")) if raw else {}
+        except Exception:
+            data = {}
+        return exc.code, data
+    except (URLError, TimeoutError, OSError):
+        raise SaaSError("SUPABASE_UNAVAILABLE", 503) from None
+
+
+def _session_from_cookie(handler: BaseHTTPRequestHandler) -> dict | None:
     cookie = SimpleCookie()
     try:
-        cookie.load(raw)
+        cookie.load(handler.headers.get("Cookie", ""))
+        morsel = cookie.get(COOKIE_NAME)
+        if not morsel:
+            return None
+        value = morsel.value
+        decoded = base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
+        session = json.loads(decoded.decode("utf-8"))
+        return session if isinstance(session, dict) and isinstance(session.get("access_token"), str) else None
     except Exception:
         return None
-    morsel = cookie.get(COOKIE_NAME)
-    return morsel.value if morsel else None
 
 
-def _current_user(handler: BaseHTTPRequestHandler) -> sqlite3.Row | None:
-    token = _cookie_value(handler)
-    if not token or not re.fullmatch(r"[A-Za-z0-9_-]{40,100}", token):
+def _encode_session(session: dict) -> str:
+    raw = json.dumps({"access_token": session.get("access_token", ""),
+                      "refresh_token": session.get("refresh_token", "")},
+                     separators=(",", ":")).encode("utf-8")
+    return base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
+
+
+def _current_user(handler: BaseHTTPRequestHandler) -> dict | None:
+    session = getattr(handler, "_supabase_session", None) or _session_from_cookie(handler)
+    if not session:
         return None
-    now = int(time.time())
-    with _db() as db:
-        row = db.execute(
-            "SELECT u.id,u.email,u.display_name FROM sessions s JOIN users u ON u.id=s.user_id "
-            "WHERE s.token_hash=? AND s.expires_at>?", (_token_hash(token), now)
-        ).fetchone()
-    return row
+    status, result = _supabase_request("GET", "/auth/v1/user", token=session.get("access_token", ""))
+    if status in (401, 403) and session.get("refresh_token"):
+        status, refreshed = _supabase_request("POST", "/auth/v1/token?grant_type=refresh_token",
+                                              body={"refresh_token": session["refresh_token"]})
+        if status == 200 and isinstance(refreshed, dict) and refreshed.get("access_token"):
+            session = refreshed
+            handler._supabase_session = session
+            status, result = _supabase_request("GET", "/auth/v1/user", token=session["access_token"])
+    if status != 200 or not isinstance(result, dict) or not result.get("id"):
+        return None
+    handler._supabase_session = session
+    metadata = result.get("user_metadata") if isinstance(result.get("user_metadata"), dict) else {}
+    return {"id": result["id"], "email": result.get("email", ""),
+            "display_name": metadata.get("display_name") or result.get("email", "").split("@", 1)[0]}
 
 
-def _issue_session(user_id: str) -> str:
-    token = secrets.token_urlsafe(48)
-    now = int(time.time())
-    with _db() as db:
-        db.execute("DELETE FROM sessions WHERE expires_at<=?", (now,))
-        db.execute("INSERT INTO sessions(token_hash,user_id,created_at,expires_at) VALUES(?,?,?,?)",
-                   (_token_hash(token), user_id, now, now + SESSION_TTL))
-    return token
-
-
-def _public_user(user: sqlite3.Row) -> dict[str, str]:
-    return {"id": user["id"], "email": user["email"], "display_name": user["display_name"]}
+def _public_user(user: dict) -> dict[str, str]:
+    return {"id": str(user["id"]), "email": str(user.get("email", "")),
+            "display_name": str(user.get("display_name", ""))}
 
 
 def _assistant_factory():
@@ -140,9 +179,12 @@ def _assistant_factory():
             endpoint=os.environ.get("PUSINGCUK_OLLAMA_ENDPOINT", "http://127.0.0.1:11434/api/chat"),
         )
     elif provider_name == "gemini":
+        api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+        if not api_key:
+            raise SaaSError("AI_PROVIDER_NOT_CONFIGURED", 503)
         provider = GeminiGenerateContentProvider(
-            api_key=os.environ.get("GEMINI_API_KEY", ""),
-            model=model or "gemini-3.8-flash",
+            api_key=api_key,
+            model=model or "gemini-2.5-flash",
         )
     else:
         raise ValueError("SAAS_AI_PROVIDER_INVALID")
@@ -168,20 +210,21 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Connection", "close")
-        for name, value in (extra_headers or {}).items():
+        headers = dict(extra_headers or {})
+        refreshed = getattr(self, "_supabase_session", None)
+        if refreshed and "Set-Cookie" not in headers:
+            headers.update(self._cookie_headers(refreshed))
+        for name, value in headers.items():
             self.send_header(name, value)
         self.end_headers()
         self.wfile.write(body)
         self.close_connection = True
 
-    def _cookie_headers(self, token: str | None, *, clear: bool = False) -> dict[str, str]:
+    def _cookie_headers(self, session: dict | None, *, clear: bool = False) -> dict[str, str]:
         secure = os.environ.get("PUSINGCUK_SAAS_COOKIE_SECURE", "1") != "0"
-        parts = [f"{COOKIE_NAME}={' ' if clear else token}", "Path=/", "HttpOnly", "SameSite=Strict"]
-        if clear:
-            parts[0] = f"{COOKIE_NAME}="
-            parts.append("Max-Age=0")
-        else:
-            parts.append(f"Max-Age={SESSION_TTL}")
+        value = "" if clear or not session else _encode_session(session)
+        parts = [f"{COOKIE_NAME}={value}", "Path=/", "HttpOnly", "SameSite=Strict"]
+        parts.append("Max-Age=0" if clear else f"Max-Age={SESSION_TTL}")
         if secure:
             parts.append("Secure")
         return {"Set-Cookie": "; ".join(parts)}
@@ -243,15 +286,13 @@ class Handler(BaseHTTPRequestHandler):
             if user is None:
                 self._json(401, {"error": "AUTH_REQUIRED"})
                 return
-            with _db() as db:
-                rows = db.execute(
-                    "SELECT role,content,created_at FROM messages WHERE user_id=? "
-                    "ORDER BY created_at DESC LIMIT 100", (user["id"],)
-                ).fetchall()
-            self._json(200, {"messages": [
-                {"role": row["role"], "content": row["content"], "created_at": row["created_at"]}
-                for row in reversed(rows)
-            ]})
+            session = getattr(self, "_supabase_session", None) or _session_from_cookie(self)
+            status, rows = _supabase_request(
+                "GET", "/rest/v1/pusingcuk_saas_messages?select=role,content,created_at&order=created_at.asc&limit=100",
+                token=session.get("access_token", "") if session else "")
+            if status != 200 or not isinstance(rows, list):
+                raise SaaSError("MESSAGE_STORAGE_UNAVAILABLE", 503)
+            self._json(200, {"messages": rows})
             return
         if path == "/healthz":
             self._json(200, {"status": "ok"})
@@ -301,18 +342,28 @@ class Handler(BaseHTTPRequestHandler):
                     raise SaaSError("PASSWORD_LENGTH_INVALID")
                 if len(name) > 80:
                     raise SaaSError("DISPLAY_NAME_INVALID")
-                salt = secrets.token_bytes(16)
-                user_id = uuid.uuid4().hex
-                with _db() as db:
-                    try:
-                        db.execute("INSERT INTO users(id,email,display_name,password_salt,password_hash,created_at) VALUES(?,?,?,?,?,?)",
-                                   (user_id, email, name or email.split("@", 1)[0], salt, _password_hash(password, salt), int(time.time())))
-                    except sqlite3.IntegrityError:
-                        raise SaaSError("ACCOUNT_ALREADY_EXISTS", 409) from None
-                token = _issue_session(user_id)
-                with _db() as db:
-                    user = db.execute("SELECT id,email,display_name FROM users WHERE id=?", (user_id,)).fetchone()
-                self._json(201, {"user": _public_user(user)}, self._cookie_headers(token))
+                status, result = _supabase_request("POST", "/auth/v1/signup",
+                    body={"email": email, "password": password,
+                          "data": {"display_name": name or email.split("@", 1)[0]}})
+                if status not in (200, 201) or not isinstance(result, dict):
+                    message = str(result.get("msg") or result.get("message") or result.get("error_description") or "")
+                    if status == 422 and ("already" in message.casefold() or "registered" in message.casefold()):
+                        raise SaaSError("ACCOUNT_ALREADY_EXISTS", 409)
+                    if status in (400, 422):
+                        raise SaaSError("REGISTRATION_REJECTED")
+                    raise SaaSError("SUPABASE_AUTH_UNAVAILABLE", 503)
+                session = result if result.get("access_token") else result.get("session")
+                if not isinstance(session, dict) or not session.get("access_token"):
+                    self._json(202, {"confirmation_required": True,
+                        "message": "Akun dibuat. Periksa email untuk konfirmasi, lalu masuk."})
+                    return
+                status, profile = _supabase_request("GET", "/auth/v1/user", token=session["access_token"])
+                if status != 200 or not isinstance(profile, dict) or not profile.get("id"):
+                    raise SaaSError("SUPABASE_AUTH_UNAVAILABLE", 503)
+                metadata = profile.get("user_metadata") if isinstance(profile.get("user_metadata"), dict) else {}
+                user = {"id": profile["id"], "email": profile.get("email", email),
+                        "display_name": metadata.get("display_name") or name or email.split("@", 1)[0]}
+                self._json(201, {"user": _public_user(user)}, self._cookie_headers(session))
                 return
             if path == "/api/auth/login":
                 _rate_limit("login:" + (self.client_address[0] if self.client_address else "unknown"), 10)
@@ -320,21 +371,27 @@ class Handler(BaseHTTPRequestHandler):
                     raise SaaSError("AUTH_PAYLOAD_INVALID")
                 email = payload["email"].strip().casefold() if isinstance(payload["email"], str) else ""
                 password = payload["password"] if isinstance(payload["password"], str) else ""
-                with _db() as db:
-                    user = db.execute("SELECT * FROM users WHERE email=?", (email,)).fetchone()
-                valid = False
-                if user and len(password) <= 128:
-                    valid = hmac.compare_digest(_password_hash(password, user["password_salt"]), user["password_hash"])
-                if not valid:
+                if not EMAIL_RE.fullmatch(email) or len(password) > 128 or not password:
                     raise SaaSError("INVALID_CREDENTIALS", 401)
-                token = _issue_session(user["id"])
-                self._json(200, {"user": _public_user(user)}, self._cookie_headers(token))
+                status, session = _supabase_request("POST", "/auth/v1/token?grant_type=password",
+                                                     body={"email": email, "password": password})
+                if status != 200 or not isinstance(session, dict) or not session.get("access_token"):
+                    raise SaaSError("INVALID_CREDENTIALS", 401)
+                status, profile = _supabase_request("GET", "/auth/v1/user", token=session["access_token"])
+                if status != 200 or not isinstance(profile, dict) or not profile.get("id"):
+                    raise SaaSError("INVALID_CREDENTIALS", 401)
+                metadata = profile.get("user_metadata") if isinstance(profile.get("user_metadata"), dict) else {}
+                user = {"id": profile["id"], "email": profile.get("email", email),
+                        "display_name": metadata.get("display_name") or email.split("@", 1)[0]}
+                self._json(200, {"user": _public_user(user)}, self._cookie_headers(session))
                 return
             if path == "/api/auth/logout":
-                token = _cookie_value(self)
-                if token:
-                    with _db() as db:
-                        db.execute("DELETE FROM sessions WHERE token_hash=?", (_token_hash(token),))
+                session = _session_from_cookie(self)
+                if session and session.get("access_token"):
+                    try:
+                        _supabase_request("POST", "/auth/v1/logout", token=session["access_token"], body={})
+                    except SaaSError:
+                        pass
                 self._json(200, {"ok": True}, self._cookie_headers(None, clear=True))
                 return
             if path == "/api/chat":
@@ -361,14 +418,15 @@ class Handler(BaseHTTPRequestHandler):
                 finally:
                     user_lock.release()
                     slot.release()
-                now = int(time.time())
-                with _db() as db:
-                    db.execute("INSERT INTO messages(id,user_id,role,content,created_at) VALUES(?,?,?,?,?)",
-                               (uuid.uuid4().hex, user["id"], "user", query.strip(), now))
-                    db.execute("INSERT INTO messages(id,user_id,role,content,created_at) VALUES(?,?,?,?,?)",
-                               (uuid.uuid4().hex, user["id"], "assistant", answer[:8000], now))
-                    db.execute("DELETE FROM messages WHERE user_id=? AND id NOT IN (SELECT id FROM messages WHERE user_id=? ORDER BY created_at DESC LIMIT 200)",
-                               (user["id"], user["id"]))
+                session = getattr(self, "_supabase_session", None) or _session_from_cookie(self)
+                if not session:
+                    raise SaaSError("AUTH_REQUIRED", 401)
+                status, _ = _supabase_request("POST", "/rest/v1/pusingcuk_saas_messages",
+                    token=session.get("access_token", ""),
+                    body=[{"user_id": user["id"], "role": "user", "content": query.strip()},
+                          {"user_id": user["id"], "role": "assistant", "content": answer[:8000]}])
+                if status not in (200, 201, 204):
+                    raise SaaSError("MESSAGE_STORAGE_UNAVAILABLE", 503)
                 self._json(200, {"request_id": request_id, "answer": answer})
                 return
             self._json(404, {"error": "NOT_FOUND", "request_id": request_id})
@@ -420,17 +478,16 @@ class SaaSServer(ThreadingHTTPServer):
 
 def main() -> int:
     try:
-        init_db()
         host = os.environ.get("PUSINGCUK_SAAS_BIND", "127.0.0.1")
         port = int(os.environ.get("PUSINGCUK_SAAS_PORT", os.environ.get("PORT", "8088")))
         if not 1 <= port <= 65535:
             raise ValueError("SAAS_PORT_INVALID")
         public_origin = os.environ.get("PUSINGCUK_SAAS_PUBLIC_ORIGIN", "").rstrip("/")
         local_dev_origin = public_origin in {"http://127.0.0.1:8088", "http://localhost:8088"} and os.environ.get("PUSINGCUK_SAAS_COOKIE_SECURE") == "0"
-        if not public_origin.startswith("https://") and not local_dev_origin:
+        if public_origin and not public_origin.startswith("https://") and not local_dev_origin:
             raise ValueError("SAAS_PUBLIC_ORIGIN_MUST_BE_HTTPS")
-        # Fail fast on provider configuration, but create a fresh assistant per user.
-        _assistant_factory()
+        if not SUPABASE_URL or not SUPABASE_PUBLISHABLE_KEY:
+            raise ValueError("SUPABASE_CONFIGURATION_REQUIRED")
         server = SaaSServer((host, port), Handler)
     except Exception as exc:
         print("PusingCuk AI SaaS belum siap: " + getattr(exc, "code", str(exc)))
