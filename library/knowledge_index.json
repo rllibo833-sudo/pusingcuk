@@ -61,7 +61,11 @@
         "bahasa",
         "kontrak",
         "error",
-        "nilai"
+        "nilai",
+        "menangani error",
+        "diagnostik error",
+        "error sintaks",
+        "error runtime"
       ],
       "summary": "Spesifikasi bahasa menjadi rujukan utama untuk perilaku program .cuk. Fitur baru harus menjaga kompatibilitas dengan semantik yang disepakati dan diuji, bukan hanya menambah sintaks tanpa kontrak.",
       "excerpt": "Perubahan perilaku bahasa perlu disertai tes yang membedakan hasil benar, error sintaks, dan error runtime."
