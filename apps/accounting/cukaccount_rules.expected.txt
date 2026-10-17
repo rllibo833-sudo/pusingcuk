@@ -1,4 +1,3 @@
-# Expected stdout for apps/accounting/cukaccount_rules.cuk
 PERSAMAAN_SEIMBANG
 PERSAMAAN_TIDAK_SEIMBANG
 INPUT_TIDAK_VALID
