@@ -17,7 +17,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_REQUEST_CHARS = 2_000
-MAX_SOURCE_CHARS = 16_000
+MAX_SOURCE_CHARS = 10_000
 MAX_REPAIRS = 3
 SYSTEM_PROMPT = """Kamu adalah PusingCuk AI Coding Agent. Tulis program menggunakan sintaks .cuk PusingCuk, bukan Python/JavaScript.
 Keluarkan source program lengkap dalam tepat satu fenced code block berlabel cuk, tanpa teks lain di dalam block.
@@ -65,7 +65,7 @@ def check_source(source: str, timeout: float = 8.0) -> dict[str, Any]:
             cwd=ROOT, capture_output=True, text=True, timeout=timeout,
         )
         return {"ok": result.returncode == 0,
-                "diagnostic": (result.stderr or result.stdout).strip()[:6000]}
+                "diagnostic": (result.stderr or result.stdout).strip()[:4000]}
     except subprocess.TimeoutExpired:
         return {"ok": False, "diagnostic": "COMPILER_TIMEOUT"}
     except OSError:
