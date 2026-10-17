@@ -66,8 +66,8 @@ class DocumentationContractTests(unittest.TestCase):
         manifest = json.loads((root / "tests/conformance/manifest.json").read_text(encoding="utf-8"))
         documents = index["documents"]
         source_ids = {item["id"] for item in documents}
-        self.assertEqual(len(documents), 22)
-        self.assertEqual(len(source_ids), 22)
+        self.assertEqual(len(documents), 26)
+        self.assertEqual(len(source_ids), 26)
         self.assertTrue(all(item["source_repository"] == "rllibo833-sudo/pusingcuk" for item in documents))
         self.assertTrue(all(item["visibility"] == "public-safe" for item in documents))
         self.assertTrue(all(len(item["source_commit"]) == 40 for item in documents))
@@ -105,10 +105,10 @@ class DocumentationContractTests(unittest.TestCase):
         readiness = (root / "docs/AI_ENGINE_READINESS.md").read_text(encoding="utf-8")
         ledger = (root / "docs/AI_ENGINE_MIGRATION_LEDGER.md").read_text(encoding="utf-8")
         self.assertIn("22-case baseline currently yields top-1", readiness)
-        self.assertIn("22 curated source records", readiness)
+        self.assertIn("26 curated source records", readiness)
         self.assertNotIn("16-case exact-top-1 retrieval benchmark", readiness)
         self.assertNotIn("16 source records", ledger)
-        self.assertIn("22 dokumen sumber terkurasi", status)
+        self.assertIn("26 dokumen sumber terkurasi", status)
         self.assertIn("22 kasus baseline menghasilkan top-1", status)
         self.assertIn("5/8 (62,5%)", status)
         self.assertIn("6/8 (75%)", status)
