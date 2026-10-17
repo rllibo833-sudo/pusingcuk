@@ -52,7 +52,7 @@ jobs:
           set -euo pipefail
           ASSETS=apps/cukaccount-android/app/src/main/assets
           mkdir -p "$ASSETS"
-          python tools/diagnostic_repair_loop.py --frontend-contract --json > "$RUNNER_TEMP/frontend-contract.json"
+          python tools/diagnostic_repair_loop.py apps/accounting/cukaccount_frontend.cuk --frontend-contract --json > "$RUNNER_TEMP/frontend-contract.json"
           python pusingcuk_new.py --check apps/accounting/cukaccount_frontend.cuk
           python pusingcuk_new.py --check apps/accounting/cukaccount_backend.cuk
           python -m compiler.js_backend apps/accounting/cukaccount_frontend.cuk --module -o "$ASSETS/cukaccount-frontend.generated.js"
@@ -61,6 +61,8 @@ jobs:
           cp apps/accounting/accounting-core.js "$ASSETS/accounting-core.js"
           test -s "$ASSETS/index.html"
           test -s "$ASSETS/accounting-core.js"
+          test -s "$ASSETS/cukaccount-frontend.generated.js"
+          test -s "$ASSETS/cukaccount-backend.generated.js"
           test -s "$ASSETS/accounting-rules.generated.js"
       - name: Build CukAccount debug APK
         working-directory: apps/cukaccount-android
