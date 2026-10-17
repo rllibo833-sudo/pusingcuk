@@ -103,12 +103,17 @@ class CukAccountSQLite:
         desc = _text(payload.get("description"), "description")
         lines = payload.get("lines")
         if not isinstance(lines,list) or not lines: raise StorageError("INVALID_LINES","Baris jurnal wajib berupa daftar.")
-        with self.db:
+        self.db.execute("BEGIN IMMEDIATE")
+        try:
             self.db.execute("INSERT INTO journal_entries(id,entry_date,description,status,idempotency_key) VALUES(?,?,?,'draft',?)",
                             (entry_id,date,desc,payload.get("idempotency_key")))
             for i,line in enumerate(lines,1):
                 self._insert_line(entry_id,i,line)
             self._audit("journal.draft_saved","journal",entry_id,{"line_count":len(lines),"date":date})
+            self.db.execute("COMMIT")
+        except Exception:
+            if self.db.in_transaction: self.db.execute("ROLLBACK")
+            raise
         return {"entry_id":entry_id,"status":"draft","line_count":len(lines)}
 
     def _insert_line(self, entry_id: str, line_no: int, line: Any):
@@ -167,12 +172,19 @@ class CukAccountSQLite:
     def close_period(self, payload: dict) -> dict:
         period_id = _text(payload.get("period_id"),"period_id",80)
         reason = _text(payload.get("reason"),"reason")
-        with self.db:
+        self.db.execute("BEGIN IMMEDIATE")
+        try:
             period=self.db.execute("SELECT * FROM periods WHERE id=?",(period_id,)).fetchone()
             if period is None: raise StorageError("PERIOD_NOT_FOUND","Periode tidak ditemukan.")
-            if not period["is_open"]: return {"period_id":period_id,"status":"closed","already_closed":True}
+            if not period["is_open"]:
+                self.db.execute("COMMIT")
+                return {"period_id":period_id,"status":"closed","already_closed":True}
             self.db.execute("UPDATE periods SET is_open=0 WHERE id=?",(period_id,))
             self._audit("period.closed","period",period_id,{"reason":reason,"starts_on":period["starts_on"],"ends_on":period["ends_on"]})
+            self.db.execute("COMMIT")
+        except Exception:
+            if self.db.in_transaction: self.db.execute("ROLLBACK")
+            raise
         return {"period_id":period_id,"status":"closed","already_closed":False}
 
     def audit_trail(self, entity_id: str | None = None) -> list[dict]:
