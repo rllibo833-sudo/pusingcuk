@@ -300,3 +300,11 @@ jobs:
           NODE
       - name: Uji pembatasan file PVM dan kesetaraan backend
         run: bash tests/test_all.sh
+
+      - name: Compile and regression-test CukAccount .cuk domain rules
+        run: |
+          set -euo pipefail
+          python pusingcuk_new.py --check apps/accounting/cukaccount_rules.cuk
+          actual="$(python pusingcuk_new.py apps/accounting/cukaccount_rules.cuk)"
+          diff -u apps/accounting/cukaccount_rules.expected.txt <(printf '%s\n' "$actual")
+          echo "PASS: CukAccount .cuk accounting rules match all expected cases."
