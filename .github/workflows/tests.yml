@@ -308,3 +308,11 @@ jobs:
           actual="$(python pusingcuk_new.py apps/accounting/cukaccount_rules.cuk)"
           diff -u apps/accounting/cukaccount_rules.expected.txt <(printf '%s\n' "$actual")
           echo "PASS: CukAccount .cuk accounting rules match all expected cases."
+
+      - name: Compile and regression-test CukAccount frontend .cuk interaction rules
+        run: |
+          set -euo pipefail
+          python pusingcuk_new.py --check apps/accounting/cukaccount_frontend.cuk
+          actual="$(python pusingcuk_new.py apps/accounting/cukaccount_frontend.cuk)"
+          diff -u apps/accounting/cukaccount_frontend.expected.txt <(printf '%s\\n' "$actual")
+          echo "PASS: CukAccount frontend routes, form validation, submit actions, and theme rules match expected cases."
