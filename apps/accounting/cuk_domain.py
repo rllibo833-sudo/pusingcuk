@@ -2,7 +2,7 @@
 from __future__ import annotations
 import subprocess, sys, tempfile
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[1]
+ROOT=Path(__file__).resolve().parents[2]
 BACKEND=ROOT/"apps/accounting/cukaccount_backend.cuk"
 
 def _invoke(function: str, args: list[str], timeout: float=3.0) -> str:
