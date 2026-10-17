@@ -287,7 +287,10 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(200, {"user": _public_user(user)})
             return
         if path == "/api/projects":
-            user = self._auth_required()
+            user = _current_user(self)
+            if user is None:
+                self._json(401, {"error": "AUTH_REQUIRED"})
+                return
             session = getattr(self, "_supabase_session", None) or _session_from_cookie(self)
             token = session.get("access_token", "") if session else ""
             status, rows = _supabase_request("GET", "/rest/v1/pusingcuk_saas_projects?select=id,name,description,status,updated_at&user_id=eq." + quote(user["id"], safe="") + "&order=updated_at.desc&limit=100", token=token)
@@ -296,7 +299,10 @@ class Handler(BaseHTTPRequestHandler):
             self._json(200, {"projects": rows})
             return
         if path == "/api/project-files":
-            user = self._auth_required()
+            user = _current_user(self)
+            if user is None:
+                self._json(401, {"error": "AUTH_REQUIRED"})
+                return
             query = parse_qs(urlsplit(self.path).query, strict_parsing=True)
             ids = query.get("project_id", [])
             if len(query) != 1 or len(ids) != 1 or not re.fullmatch(r"[0-9a-fA-F-]{36}", ids[0]):
