@@ -229,8 +229,8 @@ class SaaSHttpFlowTests(unittest.TestCase):
         self.assertEqual(self.register()[0], 201)
         assistant = self.server.assistant_for("user-1")
         assistant.ask = Mock(side_effect=[
-            "Kandidat awal. <CUK>jancuk\\nhedeh 1 + )\\nselesai jancuk</CUK>",
-            "Kandidat diperbaiki. <CUK>jancuk\\nhedeh 1 + 2\\nselesai jancuk</CUK>",
+            "Kandidat awal. <CUK>jancuk\nhedeh 1 + )\nselesai jancuk</CUK>",
+            "Kandidat diperbaiki. <CUK>jancuk\nhedeh 1 + 2\nselesai jancuk</CUK>",
         ])
 
         # Do not mock ToolRegistry.execute: both checks must pass through the
@@ -241,7 +241,7 @@ class SaaSHttpFlowTests(unittest.TestCase):
         })
 
         self.assertEqual(status, 200, body)
-        self.assertEqual(body["candidate_source"], "print(1 + 2)\n")
+        self.assertEqual(body["candidate_source"], "jancuk\nhedeh 1 + 2\nselesai jancuk\n")
         self.assertFalse(body["saved"])
         check = body["compile_check"]
         self.assertTrue(check["ok"], check)
