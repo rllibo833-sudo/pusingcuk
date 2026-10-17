@@ -5,7 +5,7 @@ Status: **deployment candidate; verify live URL, auth, persistence, and provider
 ## What's in this MVP
 
 - Responsive Indonesian web workspace for desktop and mobile.
-- Email + password registration/login, hashed passwords (PBKDF2-HMAC-SHA256), opaque server-side sessions, HttpOnly/SameSite cookie.
+- Email + password registration/login through Supabase Auth; access and refresh tokens are held in an HttpOnly, Secure, SameSite cookie.
 - Supabase Auth for account registration/login and Supabase Postgres + RLS for durable chat transcripts. No service-role key is used by the application.
 - Origin check on every POST, bounded JSON payloads, generic provider errors, and simple per-process rate limits.
 - Existing provider adapters only: Ollama (loopback-only) or the repository's existing optional Gemini adapter. Gemini is a provider choice, not a new assistant/engine.
@@ -17,7 +17,8 @@ From the repository root:
 ```sh
 export PUSINGCUK_SAAS_PUBLIC_ORIGIN=http://127.0.0.1:8088
 export PUSINGCUK_SAAS_COOKIE_SECURE=0
-export PUSINGCUK_SAAS_DB=/tmp/pusingcuk-saas-dev.sqlite3
+export SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+export SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY
 export PUSINGCUK_AI_PROVIDER=ollama
 export PUSINGCUK_AI_MODEL=qwen3:4b
 python apps/pusingcuk-ai-saas/server.py
@@ -29,7 +30,7 @@ For Render, use repository root as Docker context and `apps/pusingcuk-ai-saas/Do
 
 ## Required production work before accepting real users
 
-This is an MVP foundation, not a production SaaS launch. Before launch, add and verify: email verification and password reset, account deletion/export, privacy/retention controls, cross-process rate limiting, durable conversation restoration, bounded/locked per-user inference scheduling, CSRF and deployment-origin integration tests, dependency and security scans, monitoring, backups/restore tests, abuse controls, billing/quotas if monetized, and an independently reviewed deployment boundary. The SQLite file must live on persistent storage and must not be committed. Never execute arbitrary model-generated source in the server process; the existing compiler check is not a sandbox.
+This is an MVP foundation, not a production SaaS launch. Before launch, add and verify: password reset and account deletion/export, privacy/retention controls, cross-process rate limiting, restoration of saved transcripts into the AI's working context, bounded/locked per-user inference scheduling, CSRF and deployment-origin integration tests, dependency and security scans, monitoring, backups/restore tests, abuse controls, billing/quotas if monetized, and an independently reviewed deployment boundary. Never execute arbitrary model-generated source in the server process; the existing compiler check is not a sandbox.
 
 ## Honest capability boundaries
 
