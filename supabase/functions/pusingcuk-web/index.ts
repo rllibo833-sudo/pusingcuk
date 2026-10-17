@@ -6,8 +6,10 @@ Deno.serve(async (req: Request) => {
     });
   }
 
+  // Do not let a CDN serve a stale workspace after the branch has changed.
   const upstream = await fetch("https://raw.githubusercontent.com/rllibo833-sudo/pusingcuk/warungpusingcuk/web/index.html", {
-    headers: { "Accept": "text/html" }
+    headers: { "Accept": "text/html", "Cache-Control": "no-cache" },
+    cache: "no-store"
   });
 
   if (!upstream.ok) {
