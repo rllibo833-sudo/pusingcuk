@@ -50,40 +50,32 @@ def extract_source(text: str) -> str:
 
 def check_source(source: str, timeout: float = 8.0) -> dict[str, Any]:
     """Compile-check in a bounded subprocess; never execute generated source."""
+    import tempfile
+
+    handle = None
     try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", suffix=".cuk",
+            prefix=".pusingcuk-ai-check-", dir=ROOT, delete=False,
+        ) as handle:
+            handle.write(source)
+            temporary_path = Path(handle.name)
         result = subprocess.run(
-            [sys.executable, str(ROOT / "pusingcuk_new.py"), "--check", "-"],
-            input=source, cwd=ROOT, capture_output=True, text=True, timeout=timeout,
-        )
-    except subprocess.TimeoutExpired:
-        return {"ok": False, "diagnostic": "COMPILER_TIMEOUT"}
-    except OSError:
-        return {"ok": False, "diagnostic": "COMPILER_UNAVAILABLE"}
-    # The CLI's stdin support is not assumed. If '-' is not accepted, use a
-    # unique temporary .cuk under the repository and always remove it.
-    if result.returncode == 0:
-        return {"ok": True, "diagnostic": ""}
-    if "No such file" not in (result.stderr + result.stdout) and "tidak ditemukan" not in (result.stderr + result.stdout).lower():
-        return {"ok": False, "diagnostic": (result.stderr or result.stdout).strip()[:6000] or "COMPILER_REJECTED"}
-    temp = ROOT / ".pusingcuk-ai-check.cuk"
-    try:
-        if temp.exists():
-            return {"ok": False, "diagnostic": "CHECK_FILE_ALREADY_EXISTS"}
-        temp.write_text(source, encoding="utf-8")
-        result = subprocess.run(
-            [sys.executable, str(ROOT / "pusingcuk_new.py"), "--check", str(temp)],
+            [sys.executable, str(ROOT / "pusingcuk_new.py"), "--check", str(temporary_path)],
             cwd=ROOT, capture_output=True, text=True, timeout=timeout,
         )
-        return {"ok": result.returncode == 0, "diagnostic": (result.stderr or result.stdout).strip()[:6000]}
+        return {"ok": result.returncode == 0,
+                "diagnostic": (result.stderr or result.stdout).strip()[:6000]}
     except subprocess.TimeoutExpired:
         return {"ok": False, "diagnostic": "COMPILER_TIMEOUT"}
     except OSError:
         return {"ok": False, "diagnostic": "COMPILER_IO_ERROR"}
     finally:
-        try:
-            temp.unlink()
-        except FileNotFoundError:
-            pass
+        if handle is not None:
+            try:
+                temporary_path.unlink()
+            except (OSError, UnboundLocalError):
+                pass
 
 def build_program(provider: Any, request: str, *, max_repairs: int = MAX_REPAIRS,
                   checker=check_source) -> dict[str, Any]:
