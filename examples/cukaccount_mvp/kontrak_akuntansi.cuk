@@ -1,0 +1,185 @@
+# CukAccount MVP — kontrak domain dalam bahasa .cuk
+# Ini prototipe aturan deterministik, bukan sertifikasi pajak atau audit syariah.
+# Tarif pajak tidak ditanam permanen; data aturan wajib datang dari sumber resmi tervalidasi.
+# Enkripsi backup, pengelolaan kunci, dan penyimpanan aman wajib disediakan platform bridge.
+
+jancuk
+
+fungsi status_profil_pajak(profil, jenis_pajak)
+    njir profil == "umkm_orang_pribadi" dan jenis_pajak == "pph"
+        balek "PERIKSA_KELAYAKAN_DAN_ATURAN_BERLAKU"
+    kampret
+        njir profil == "badan_usaha" dan jenis_pajak == "pph"
+            balek "PERIKSA_BENTUK_BADAN_DAN_ATURAN_BERLAKU"
+        kampret
+            njir jenis_pajak == "ppn"
+                balek "PERIKSA_STATUS_PKP_DAN_TRANSAKSI"
+            kampret
+                njir jenis_pajak == "pemotongan_pemungutan"
+                    balek "PERIKSA_JENIS_PENGHASILAN_DAN_PERAN"
+                kampret
+                    balek "JANGAN_ANGGAP_BERLAKU_OTOMATIS"
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi aturan_pajak_siap(sumber_resmi, url, diperiksa, mulai_berlaku, akhir_berlaku, profil, konteks, peninjau)
+    njir sumber_resmi != "terverifikasi"
+        balek "TOLAK_ATURAN_TANPA_SUMBER_RESmi"
+    kampret
+        njir url == "" atau diperiksa == "" atau mulai_berlaku == ""
+            balek "DATA_SUMBER_ATAU_TANGGAL_KURANG"
+        kampret
+            njir profil == "" atau konteks == ""
+                balek "KONTEKS_WAJIB_PAJAK_BELUM_JELAS"
+            kampret
+                njir peninjau != "ditinjau"
+                    balek "PERLU_REVIEW_AKUNTAN_ATAU_KONSULTAN_PAJAK"
+                kampret
+                    balek "ATURAN_SIAP_DIEVALUASI"
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi keputusan_kalkulasi_pajak(sumber, tanggal_transaksi, profil, dasar, tarif, pengecualian, status_review)
+    njir sumber != "ATURAN_RESmi_BERVERSI"
+        balek "JANGAN_HITUNG_PAJAK"
+    kampret
+        njir tanggal_transaksi == "" atau profil == ""
+            balek "BUTUH_TANGGAL_DAN_PROFIL"
+        kampret
+            njir dasar < 0 atau tarif < 0
+                balek "INPUT_PAJAK_TIDAK_VALID"
+            kampret
+                njir pengecualian == "belum_diperiksa"
+                    balek "PERIKSA_PENGECUALIAN"
+                kampret
+                    njir status_review != "ditinjau"
+                        balek "KALKULASI_PERLU_REVIEW"
+                    kampret
+                        balek "BOLEH_HITUNG_DENGAN_ATURAN_BERVERSI"
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi pajak_dari_parameter(dasar, tarif)
+    njir dasar < 0 atau tarif < 0
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        balek dasar * tarif
+    selesai njir
+selesai fungsi
+
+fungsi penyusutan_garis_lurus(biaya, nilai_sisa, umur_tahun)
+    njir biaya < 0 atau nilai_sisa < 0 atau nilai_sisa > biaya atau umur_tahun <= 0
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        balek (biaya - nilai_sisa) / umur_tahun
+    selesai njir
+selesai fungsi
+
+fungsi nilai_masa_depan(nilai_kini, tarif_per_periode, jumlah_periode)
+    njir nilai_kini < 0 atau tarif_per_periode < 0 atau jumlah_periode < 0
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        balek nilai_kini * (1 + tarif_per_periode) ^ jumlah_periode
+    selesai njir
+selesai fungsi
+
+fungsi nilai_kini(nilai_masa_depan, tarif_per_periode, jumlah_periode)
+    njir nilai_masa_depan < 0 atau tarif_per_periode < 0 atau jumlah_periode < 0
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        balek nilai_masa_depan / ((1 + tarif_per_periode) ^ jumlah_periode)
+    selesai njir
+selesai fungsi
+
+fungsi rata_rata_tertimbang(nilai_lama, jumlah_lama, harga_beli, jumlah_beli)
+    njir jumlah_lama < 0 atau jumlah_beli <= 0 atau nilai_lama < 0 atau harga_beli < 0
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        balek ((nilai_lama * jumlah_lama) + (harga_beli * jumlah_beli)) / (jumlah_lama + jumlah_beli)
+    selesai njir
+selesai fungsi
+
+fungsi rasio_keuangan(pembilang, penyebut)
+    njir penyebut == 0
+        balek "PENYEBUT_NOL"
+    kampret
+        balek pembilang / penyebut
+    selesai njir
+selesai fungsi
+
+fungsi klasifikasi_perlakuan_syariah(akad, perlakuan, bukti_review)
+    njir akad == "" atau perlakuan == ""
+        balek "AKAD_DAN_PERLAKUAN_WAJIB_DIDEFINISIKAN"
+    kampret
+        njir bukti_review != "disetujui_peninjau"
+            balek "JANGAN_KLAIM_SESUAI_SYARIAH"
+        kampret
+            balek "PERLAKUAN_DAPAT_DIPAKAI_SESUAI_BATAS_REVIEW"
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi status_backup(enkripsi, kunci_aman, uji_restore, rekonsiliasi, log_sensitif)
+    njir enkripsi != "lulus" atau kunci_aman != "lulus"
+        balek "BACKUP_BELUM_AMAN"
+    kampret
+        njir uji_restore != "lulus" atau rekonsiliasi != "lulus"
+            balek "JANGAN_KLAIM_BACKUP_DAPAT_DIPULIHKAN"
+        kampret
+            njir log_sensitif != "tidak_ada"
+                balek "HENTIKAN_LOG_DATA_FINANSIAL"
+            kampret
+                balek "BACKUP_LOLOS_UJI_YANG_DISEBUTKAN"
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi status_impor(identitas_transaksi, sudah_ada, validasi_file)
+    njir validasi_file != "lulus"
+        balek "TOLAK_FILE_IMPOR"
+    kampret
+        njir identitas_transaksi == ""
+            balek "IDENTITAS_TRANSAKSI_WAJIB"
+        kampret
+            njir sudah_ada == "ya"
+                balek "CEGAH_DUPLIKASI"
+            kampret
+                balek "BOLEH_DILANJUTKAN_KE_VALIDASI_JURNAL"
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+# Contoh hitung yang tidak bergantung pada tarif pajak tertentu.
+# Tarif 0.1 hanya data uji sintetis, bukan tarif pajak Indonesia.
+hedeh penyusutan_garis_lurus(1200000, 200000, 5)
+hedeh nilai_masa_depan(1000000, 0.05, 2)
+hedeh nilai_kini(1102500, 0.05, 2)
+hedeh rata_rata_tertimbang(10000, 10, 12000, 5)
+hedeh rasio_keuangan(250, 100)
+hedeh pajak_dari_parameter(1000000, 0.1)
+
+# Contoh gerbang pajak: belum ada sumber resmi versi tertentu, jangan klaim siap.
+hedeh status_profil_pajak("umkm_orang_pribadi", "pph")
+hedeh aturan_pajak_siap("belum_terverifikasi", "", "", "", "", "", "", "belum_ditinjau")
+hedeh keputusan_kalkulasi_pajak("belum_ada", "", "", 0, 0, "belum_diperiksa", "belum_ditinjau")
+
+# Akad syariah tidak boleh sekadar label pada jurnal umum.
+hedeh klasifikasi_perlakuan_syariah("murabahah", "belum_didefinisikan", "belum_ditinjau")
+
+# Bahasa .cuk mengatur kontrak; enkripsi dan kunci harus dilakukan platform bridge.
+hedeh status_backup("belum_diuji", "belum_diuji", "belum_diuji", "belum_diuji", "tidak_diketahui")
+hedeh status_impor("INV-001", "ya", "lulus")
+
+selesai jancuk
