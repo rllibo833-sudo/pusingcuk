@@ -144,14 +144,17 @@ def _current_user(handler: BaseHTTPRequestHandler) -> dict | None:
     session = getattr(handler, "_supabase_session", None) or _session_from_cookie(handler)
     if not session:
         return None
-    status, result = _supabase_request("GET", "/auth/v1/user", token=session.get("access_token", ""))
-    if status in (401, 403) and session.get("refresh_token"):
-        status, refreshed = _supabase_request("POST", "/auth/v1/token?grant_type=refresh_token",
-                                              body={"refresh_token": session["refresh_token"]})
-        if status == 200 and isinstance(refreshed, dict) and refreshed.get("access_token"):
-            session = refreshed
-            handler._supabase_session = session
-            status, result = _supabase_request("GET", "/auth/v1/user", token=session["access_token"])
+    try:
+        status, result = _supabase_request("GET", "/auth/v1/user", token=session.get("access_token", ""))
+        if status in (401, 403) and session.get("refresh_token"):
+            status, refreshed = _supabase_request("POST", "/auth/v1/token?grant_type=refresh_token",
+                                                  body={"refresh_token": session["refresh_token"]})
+            if status == 200 and isinstance(refreshed, dict) and refreshed.get("access_token"):
+                session = refreshed
+                handler._supabase_session = session
+                status, result = _supabase_request("GET", "/auth/v1/user", token=session["access_token"])
+    except SaaSError:
+        return None
     if status != 200 or not isinstance(result, dict) or not result.get("id"):
         return None
     handler._supabase_session = session
