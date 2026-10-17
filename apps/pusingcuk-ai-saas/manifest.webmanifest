@@ -1,0 +1,19 @@
+{
+  "name": "PusingCuk AI — Workspace",
+  "short_name": "PusingCuk AI",
+  "description": "Workspace untuk membuat dan memeriksa kode .cuk.",
+  "lang": "id",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#10131b",
+  "theme_color": "#10131b",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
