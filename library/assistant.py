@@ -71,7 +71,11 @@ class PusingCukAssistant:
         if not isinstance(style, str) or style not in _STYLE_INSTRUCTIONS:
             raise ValueError("AI_STYLE_INVALID")
         query = query.strip()
-        retrieved = rank_knowledge(self.documents, query, limit=self.retrieval_limit)
+        # Workspace requests can include bounded source and compiler diagnostics;
+        # public retrieval/tool calls retain the default 300-character limit.
+        retrieved = rank_knowledge(
+            self.documents, query, limit=self.retrieval_limit, max_query_chars=24 * 1024
+        )
         context_blocks = []
         for item in retrieved:
             context_blocks.append(
