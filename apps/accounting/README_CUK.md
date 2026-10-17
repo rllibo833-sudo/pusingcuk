@@ -3,7 +3,7 @@
 Branch `warungpusingcuk` mengunci satu contoh produk untuk mengembangkan bahasa `.cuk` dan PusingCuk AI. Sumber domain aplikasi berada di dua file kanonis:
 
 - `cukaccount_frontend.cuk` — kontrak layar, navigasi, field formulir, aksi, dan fungsi validasi formulir.
-- `cukaccount_backend.cuk` — aturan domain deterministik: persamaan akuntansi, validasi jurnal, saldo normal, periode, klasifikasi laporan, aritmetika pajak dasar, dan penanda awal pemeriksaan syariah.
+- `cukaccount_backend.cuk` — aturan domain deterministik: persamaan akuntansi, validasi jurnal, saldo normal, periode, klasifikasi laporan, validasi input pajak tanpa menghitung kewajiban pajak, dan penanda awal pemeriksaan syariah.
 - `cukaccount_backend.expected.txt` — output yang dikunci untuk regresi backend.
 - `cukaccount_frontend.expected.txt` — output yang dikunci untuk rute dan validasi formulir.
 - `tools/diagnostic_repair_loop.py` — pemeriksaan compiler/runtime, hash sumber, perbandingan fixture, dan laporan diagnostik untuk ditinjau PusingCuk AI.
@@ -26,7 +26,7 @@ python -m unittest tests.test_diagnostic_repair_loop -v
 
 - Komentar `# @...` di file frontend adalah metadata kontrak sumber. Interpreter PusingCuk saat ini mengabaikan komentar tersebut; file ini **belum dirender menjadi UI aplikasi** dan belum mengklaim memiliki runtime UI.
 - Kode fungsi di kedua file adalah sintaks `.cuk` yang benar-benar diperiksa dan dijalankan oleh interpreter referensi.
-- Backend ini adalah aturan domain latihan, bukan mesin akuntansi produksi. Fungsi pajak hanya aritmetika generik dan bukan interpretasi hukum pajak Indonesia. Pemeriksaan syariah hanya penanda awal dan bukan fatwa atau validasi kepatuhan.
+- Backend ini adalah aturan domain latihan, bukan mesin akuntansi produksi. Fungsi pajak hanya memvalidasi rentang input; tidak menghitung pajak dan bukan interpretasi hukum pajak Indonesia. Pemeriksaan syariah hanya penanda awal dan bukan fatwa atau validasi kepatuhan.
 - Fixture yang lulus membuktikan output pada interpreter yang diuji; tidak membuktikan kesetaraan semua runtime, integrasi database, APK Android, atau kesiapan pembukuan resmi.
 - Siklus diagnostik menghasilkan laporan dan saran yang dapat dikonsumsi AI, tetapi tidak mengedit kode atau menerapkan patch otomatis. Perubahan harus melewati compiler, fixture regresi, dan tinjauan.
 - Flutter/Dart dan SQLite pada repo CukAccount tetap bagian dari produk yang ada; branch ini berfokus pada sumber `.cuk` dan jalur pengembangan PusingCuk AI, bukan mengganti diam-diam fondasi aplikasi produksi.
