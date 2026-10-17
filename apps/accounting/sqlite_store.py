@@ -50,6 +50,10 @@ CREATE TABLE IF NOT EXISTS audit_events (
 CREATE INDEX IF NOT EXISTS idx_journal_date_status ON journal_entries(status,entry_date);
 CREATE INDEX IF NOT EXISTS idx_lines_entry ON journal_lines(entry_id,line_no);
 CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_events(entity_type,entity_id,id);
+CREATE TRIGGER IF NOT EXISTS audit_no_update BEFORE UPDATE ON audit_events
+BEGIN SELECT RAISE(ABORT,'audit trail is append-only'); END;
+CREATE TRIGGER IF NOT EXISTS audit_no_delete BEFORE DELETE ON audit_events
+BEGIN SELECT RAISE(ABORT,'audit trail is append-only'); END;
 """
 
 def _text(value: Any, field: str, max_len: int = 240) -> str:
