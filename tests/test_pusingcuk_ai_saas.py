@@ -241,7 +241,7 @@ class SaaSHttpFlowTests(unittest.TestCase):
         })
 
         self.assertEqual(status, 200, body)
-        self.assertEqual(body["candidate_source"], "print(1 + 2)\\n")
+        self.assertEqual(body["candidate_source"], "print(1 + 2)\n")
         self.assertFalse(body["saved"])
         check = body["compile_check"]
         self.assertTrue(check["ok"], check)
