@@ -76,7 +76,7 @@ def main():
                         if err or cr != 0:
                             status, reason, observation = "failed", "JavaScript compile failed" + (": " + ce.strip() if ce.strip() else ""), {"compile_stdout": co, "compile_stderr": ce, "compile_exit_code": cr}
                             per_fixture["targets"][target] = {"status": status, "reason": reason, **observation}
-                            raw_lines.append(f"[{item['id']}][{target}] {status}: {reason}\\n{ce}")
+                            raw_lines.append(f"[{item['id']}][{target}] {status}: {reason}\n{ce}")
                             continue
                         command = [node, str(generated)]
                     elif target == "python_transpiler":
@@ -86,7 +86,7 @@ def main():
                         if err or cr != 0:
                             status, reason, observation = "failed", "Python transpiler compile failed" + (": " + ce.strip() if ce.strip() else ""), {"compile_stdout": co, "compile_stderr": ce, "compile_exit_code": cr}
                             per_fixture["targets"][target] = {"status": status, "reason": reason, **observation}
-                            raw_lines.append(f"[{item['id']}][{target}] {status}: {reason}\\n{ce}")
+                            raw_lines.append(f"[{item['id']}][{target}] {status}: {reason}\n{ce}")
                             continue
                         command = [sys.executable, str(generated)]
                     elif target == "vm":
@@ -99,7 +99,7 @@ def main():
                         if err or cr != 0:
                             status, reason, observation = "failed", "VM bytecode compile failed" + (": " + ce.strip() if ce.strip() else ""), {"compile_stdout": co, "compile_stderr": ce, "compile_exit_code": cr}
                             per_fixture["targets"][target] = {"status": status, "reason": reason, **observation}
-                            raw_lines.append(f"[{item['id']}][{target}] {status}: {reason}\\n{ce}")
+                            raw_lines.append(f"[{item['id']}][{target}] {status}: {reason}\n{ce}")
                             continue
                         command = [sys.executable, "-m", "compiler.vm", str(generated)]
                     rc, stdout, stderr, run_error = execute(command, stdin_text)
@@ -115,7 +115,7 @@ def main():
                                    "stderr_class": actual_class, "source_line": actual_line,
                                    "matched": matched}
                 per_fixture["targets"][target] = {"status": status, **({"reason": reason} if reason else {}), **observation}
-                raw_lines.append(f"[{item['id']}][{target}] {status}\\n{json.dumps(per_fixture['targets'][target], ensure_ascii=False)}")
+                raw_lines.append(f"[{item['id']}][{target}] {status}\n{json.dumps(per_fixture['targets'][target], ensure_ascii=False)}")
             rows.append(per_fixture)
     summary = {"schema_version": 1, "fixture_count": len(fixtures), "targets": {}, "python_free_score": None,
                "python_free_method": "Native C only: passed native fixtures divided by fixtures whose manifest marks native required or optional; unsupported excluded. VM excluded because it imports evaluator Python helpers."}
@@ -127,8 +127,8 @@ def main():
     summary["python_free_score"] = {"numerator": passed_native, "denominator": len(eligible),
                                     "percent": round(100 * passed_native / len(eligible), 2) if eligible else None,
                                     "runtime": "native C", "excludes_unsupported": True}
-    (OUT / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\\n", encoding="utf-8")
-    (OUT / "raw.log").write_text("\\n\\n".join(raw_lines) + "\\n", encoding="utf-8")
+    (OUT / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (OUT / "raw.log").write_text("\n\n".join(raw_lines) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2, ensure_ascii=False))
     return 1 if any(v["failed"] or v["timeout"] or v["unavailable"] for k, v in summary["targets"].items() if k in {"reference", "native"}) else 0
 
