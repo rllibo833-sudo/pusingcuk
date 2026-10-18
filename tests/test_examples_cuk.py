@@ -50,34 +50,25 @@ class CukExampleCliTests(unittest.TestCase):
             output,
         )
 
-    def test_reality_engine_runs_all_scenarios_and_detects_conflict(self):
-        output, _, _ = self.run_example("reality_engine.cuk", "")
-        for expected in (
-            "=== KRITIS - KEBUTUHAN DASAR ===",
-            "PRIORITASKAN_KEBUTUHAN_DASAR",
-            "=== KRITIS - NON-ESENSIAL ===",
-            "BATASI_PENGGUNAAN_NON_ESENSIAL",
-            "=== BATAS KRITIS - TEPAT 20% ===",
-            "=== BATAS HEMAT - TEPAT 50% ===",
-            "=== MENURUN ===",
-            "HEMAT_AIR",
-            "=== NORMAL ===",
-            "KONDISI_NORMAL",
-            "=== SIMULASI KONFLIK ===",
-            "KONFLIK_HASIL_DAN_ATURAN",
-            "=== BATAS 20 - KRITIS ===",
-            "=== BATAS 21 - HEMAT ===",
-            "=== BATAS 50 - HEMAT ===",
-            "=== BATAS 51 - NORMAL ===",
-            "=== INPUT DI BAWAH NOL ===",
-            "=== INPUT DI ATAS 100 ===",
-            "MASUKAN_TIDAK_VALID",
-            "Input tidak valid: cadangan harus 0 sampai 100%.",
-        ):
-            with self.subTest(expected=expected):
-                self.assertIn(expected, output)
-        self.assertEqual(output.count("KONSISTEN_DENGAN_ATURAN"), 12)
-        self.assertEqual(output.count("KONFLIK_HASIL_DAN_ATURAN"), 1)
+    def test_reality_engine_uses_live_input_and_explains_decision(self):
+        output, _, _ = self.run_example("reality_engine.cuk", "15\nya\n")
+        self.assertIn("Cadangan air saat ini (0-100%)", output)
+        self.assertIn("Kebutuhan dasar masih harus dipenuhi?", output)
+        self.assertIn("Cadangan air (%):", output)
+        self.assertIn("15", output)
+        self.assertIn("PRIORITASKAN_KEBUTUHAN_DASAR", output)
+        self.assertIn("Cadangan <= 20%; kebutuhan dasar diprioritaskan.", output)
+        self.assertNotIn("SIMULASI KONFLIK", output)
+
+    def test_reality_engine_rejects_out_of_range_reserve(self):
+        output, _, _ = self.run_example("reality_engine.cuk", "101\ntidak\n")
+        self.assertIn("MASUKAN_TIDAK_VALID", output)
+        self.assertIn("Input tidak valid: cadangan harus 0 sampai 100%.", output)
+
+    def test_reality_engine_rejects_invalid_basic_need_answer(self):
+        output, _, _ = self.run_example("reality_engine.cuk", "40\nmungkin\n")
+        self.assertIn("MASUKAN_TIDAK_VALID", output)
+        self.assertIn("jawab kebutuhan dasar dengan ya atau tidak", output)
 
     def test_terminal_bot_handles_interactive_answers(self):
         output, _, _ = self.run_example("terminal_bot.cuk", "Ayu\nbaik\n")
