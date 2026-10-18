@@ -1,14 +1,14 @@
 # CUK REALITY ENGINE
-# Demonstrasi aturan keputusan + jejak alasan + pemeriksaan konsistensi.
-# Ini contoh deterministik: bukan AI, bukan sensor kota sungguhan.
+# Mesin keputusan interaktif: menerima input pengguna, memvalidasi, lalu memberi
+# keputusan dan alasan yang dapat ditelusuri. Tidak terhubung ke sensor nyata.
 
 jancuk
 
 fungsi keputusan_air(cadangan, kebutuhan_dasar)
-    njir cadangan < 0
+    njir cadangan < 0 atau cadangan > 100
         balek "MASUKAN_TIDAK_VALID"
     kampret
-        njir cadangan > 100
+        njir kebutuhan_dasar != "ya" dan kebutuhan_dasar != "tidak"
             balek "MASUKAN_TIDAK_VALID"
         kampret
             njir cadangan <= 20
@@ -29,11 +29,11 @@ fungsi keputusan_air(cadangan, kebutuhan_dasar)
 selesai fungsi
 
 fungsi alasan_air(cadangan, kebutuhan_dasar)
-    njir cadangan < 0
+    njir cadangan < 0 atau cadangan > 100
         balek "Input tidak valid: cadangan harus 0 sampai 100%."
     kampret
-        njir cadangan > 100
-            balek "Input tidak valid: cadangan harus 0 sampai 100%."
+        njir kebutuhan_dasar != "ya" dan kebutuhan_dasar != "tidak"
+            balek "Input tidak valid: jawab kebutuhan dasar dengan ya atau tidak."
         kampret
             njir cadangan <= 20
                 njir kebutuhan_dasar == "ya"
@@ -52,39 +52,17 @@ fungsi alasan_air(cadangan, kebutuhan_dasar)
     selesai njir
 selesai fungsi
 
-fungsi periksa_konsistensi(cadangan, kebutuhan_dasar, hasil_dilaporkan)
-    njir keputusan_air(cadangan, kebutuhan_dasar) == hasil_dilaporkan
-        balek "KONSISTEN_DENGAN_ATURAN"
-    kampret
-        balek "KONFLIK_HASIL_DAN_ATURAN"
-    selesai njir
-selesai fungsi
+tanya cadangan_teks = "Cadangan air saat ini (0-100%): "
+tanya kebutuhan_dasar = "Kebutuhan dasar masih harus dipenuhi? (ya/tidak): "
+lah cadangan = bilangan(cadangan_teks)
+lah keputusan = keputusan_air(cadangan, kebutuhan_dasar)
 
-fungsi tampilkan_skenario(nama, cadangan, kebutuhan_dasar, hasil_dilaporkan)
-    hedeh "=== " + nama + " ==="
-    hedeh "Cadangan air (%):"
-    hedeh cadangan
-    hedeh "Keputusan:"
-    hedeh keputusan_air(cadangan, kebutuhan_dasar)
-    hedeh "Alasan:"
-    hedeh alasan_air(cadangan, kebutuhan_dasar)
-    hedeh "Pemeriksaan:"
-    hedeh periksa_konsistensi(cadangan, kebutuhan_dasar, hasil_dilaporkan)
-selesai fungsi
-
-tampilkan_skenario("KRITIS - KEBUTUHAN DASAR", 12, "ya", "PRIORITASKAN_KEBUTUHAN_DASAR")
-tampilkan_skenario("KRITIS - NON-ESENSIAL", 12, "tidak", "BATASI_PENGGUNAAN_NON_ESENSIAL")
-tampilkan_skenario("BATAS KRITIS - TEPAT 20%", 20, "ya", "PRIORITASKAN_KEBUTUHAN_DASAR")
-tampilkan_skenario("BATAS HEMAT - TEPAT 50%", 50, "tidak", "HEMAT_AIR")
-tampilkan_skenario("MENURUN", 40, "ya", "HEMAT_AIR")
-tampilkan_skenario("NORMAL", 80, "tidak", "KONDISI_NORMAL")
-tampilkan_skenario("SIMULASI KONFLIK", 12, "ya", "KONDISI_NORMAL")
-
-tampilkan_skenario("BATAS 20 - KRITIS", 20, "ya", "PRIORITASKAN_KEBUTUHAN_DASAR")
-tampilkan_skenario("BATAS 21 - HEMAT", 21, "ya", "HEMAT_AIR")
-tampilkan_skenario("BATAS 50 - HEMAT", 50, "tidak", "HEMAT_AIR")
-tampilkan_skenario("BATAS 51 - NORMAL", 51, "tidak", "KONDISI_NORMAL")
-tampilkan_skenario("INPUT DI BAWAH NOL", -1, "ya", "MASUKAN_TIDAK_VALID")
-tampilkan_skenario("INPUT DI ATAS 100", 101, "tidak", "MASUKAN_TIDAK_VALID")
+hedeh "=== HASIL REALITY ENGINE ==="
+hedeh "Cadangan air (%):"
+hedeh cadangan
+hedeh "Keputusan:"
+hedeh keputusan
+hedeh "Alasan:"
+hedeh alasan_air(cadangan, kebutuhan_dasar)
 
 selesai jancuk
