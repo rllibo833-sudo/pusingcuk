@@ -15,6 +15,7 @@ Catatan ringkas perubahan yang sudah dilakukan. Versi paket dan versi bahasa ada
 - Tambahkan [dokumentasi kanonis Reality Engine](docs/REALITY_ENGINE.md), termasuk tabel aturan, alur eksekusi, batas klaim, cara menjalankan, dan fokus pengembangan branch.
 - Tautkan dokumentasi Reality Engine dari README dan indeks dokumentasi pada branch `cuk-reality-engine`, tanpa mengubah `main` atau `warungpusingcuk`.
 - Tambahkan tes regresi terarah untuk batas cadangan 0%, 100%, nilai negatif, dan nilai di atas 100%. Status lulus harus mengikuti hasil CI aktual; perubahan tes sendiri bukan bukti bahwa tes sudah lulus.
+- Ubah alur contoh agar `aturan_air()` dievaluasi sekali; ID yang sama menjadi sumber keputusan, alasan, dan tindakan. Tambahkan regresi konsistensi untuk hasil kebijakan utama dan input tidak valid.
 
 ### Dokumentasi dan tata letak
 
