@@ -101,7 +101,7 @@ selesai fungsi
 
 coba
     tanya cadangan_teks = "Cadangan air saat ini (0-100%): "
-    lah cadangan = bilangan(cadangan_teks)
+    lah cadangan = desimal(cadangan_teks)
     tanya kebutuhan_dasar = "Kebutuhan dasar masih harus dipenuhi? (ya/tidak): "
 
     # Evaluasi kebijakan satu kali. Semua keluaran menggunakan ID yang sama.
