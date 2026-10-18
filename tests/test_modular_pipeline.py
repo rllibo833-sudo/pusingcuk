@@ -296,7 +296,7 @@ hedeh tabel.baris_csv(["a,b", "cuk"])
 selesai jancuk"""
         self.assertEqual(
             capture(source),
-            '9\\n10\\n42\\n{"nama":"cuk"}\\n&lt;b&gt;\\n"a,b",cuk\\n'
+            '9\n10\n42\n{"nama":"cuk"}\n&lt;b&gt;\n"a,b",cuk\n'
         )
 
     def test_namespaced_standard_library_reports_unknown_member(self):
