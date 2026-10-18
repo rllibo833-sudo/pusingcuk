@@ -44,7 +44,12 @@ fungsi keputusan_dari_aturan(aturan)
                 njir aturan == "AIR-03: PENGHEMATAN"
                     balek "HEMAT_AIR"
                 kampret
-                    balek "KONDISI_NORMAL"
+                    njir aturan == "AIR-04: KONDISI_NORMAL"
+                        balek "KONDISI_NORMAL"
+                    kampret
+                        balek "ATURAN_TIDAK_DIKENAL"
+                    selesai njir
+                selesai njir
                 selesai njir
             selesai njir
         selesai njir
@@ -67,7 +72,12 @@ fungsi alasan_dari_aturan(aturan)
                     njir aturan == "AIR-03: PENGHEMATAN"
                         balek "Cadangan <= 50%; terapkan penghematan."
                     kampret
-                        balek "Cadangan di atas 50%; kondisi normal."
+                        njir aturan == "AIR-04: KONDISI_NORMAL"
+                            balek "Cadangan di atas 50%; kondisi normal."
+                        kampret
+                            balek "ID aturan tidak dikenal; jangan ambil keputusan kebijakan."
+                        selesai njir
+                    selesai njir
                     selesai njir
                 selesai njir
             selesai njir
@@ -91,7 +101,12 @@ fungsi tindakan_dari_aturan(aturan)
                     njir aturan == "AIR-03: PENGHEMATAN"
                         balek "Terapkan penghematan, pantau perubahan cadangan, dan tunda pemakaian yang tidak mendesak."
                     kampret
-                        balek "Pertahankan pemantauan berkala dan gunakan air secara wajar."
+                        njir aturan == "AIR-04: KONDISI_NORMAL"
+                            balek "Pertahankan pemantauan berkala dan gunakan air secara wajar."
+                        kampret
+                            balek "Hentikan proses dan periksa ID aturan sebelum tindakan."
+                        selesai njir
+                    selesai njir
                     selesai njir
                 selesai njir
             selesai njir

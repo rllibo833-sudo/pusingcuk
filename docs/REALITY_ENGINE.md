@@ -67,10 +67,11 @@ Contoh masukan:
 - `100.1` lalu `tidak` → ID `AIR-00`, masukan di luar rentang ditolak.
 - `50` lalu `ya` → ID `AIR-03`; `50.1` lalu `ya` → ID `AIR-04`, membuktikan batas 50% secara eksplisit.
 - `NaN`, `inf`, atau `-Infinity` sebagai cadangan → konversi ditolak sebelum keputusan kebijakan.
+- ID aturan yang tidak dikenal tidak boleh diam-diam dipetakan menjadi keputusan normal; pemetaan keputusan, alasan, dan tindakan harus memberi keluaran eksplisit untuk ID tak dikenal.
 - `101` lalu `tidak` → masukan ditolak.
 - `abc` sebagai cadangan → kegagalan konversi ditangani dan program tidak menampilkan keputusan normal.
 
-Tes batas dan konsistensi Reality Engine berada di `tests/test_reality_engine_boundaries.py`, termasuk jawaban kebutuhan dasar yang tidak valid, teks angka yang gagal dikonversi, nilai non-finite, dan batas 50%. Tes contoh umum berada di `tests/test_examples_cuk.py`. Tes yang memeriksa perilaku tertentu membuktikan hanya kasus yang benar-benar dijalankan; keberhasilan satu contoh tidak membuktikan seluruh bahasa atau seluruh backend setara.
+Tes batas dan konsistensi Reality Engine berada di `tests/test_reality_engine_boundaries.py`, termasuk jawaban kebutuhan dasar yang tidak valid, teks angka yang gagal dikonversi, nilai non-finite, batas 50%, dan ID aturan tak dikenal yang tidak boleh jatuh ke keputusan normal. Tes contoh umum berada di `tests/test_examples_cuk.py`. Tes yang memeriksa perilaku tertentu membuktikan hanya kasus yang benar-benar dijalankan; keberhasilan satu contoh tidak membuktikan seluruh bahasa atau seluruh backend setara.
 
 ## Fokus pengembangan di branch ini
 

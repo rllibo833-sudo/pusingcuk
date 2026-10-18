@@ -11,6 +11,8 @@ Catatan ringkas perubahan yang sudah dilakukan. Versi paket dan versi bahasa ada
 
 ### Cuk Reality Engine — branch khusus
 
+- Perketat pemetaan ID: hanya `AIR-04: KONDISI_NORMAL` yang menghasilkan keputusan normal; ID aturan tak dikenal kini menghasilkan status/penjelasan/tindakan eksplisit dan tidak lagi jatuh ke cabang normal. Tambahkan regresi dengan program probe `.cuk` sementara untuk menguji ketiga pemetaan tersebut.
+
 - Tetapkan tujuan Reality Engine sebagai program contoh berbasis aturan untuk mengembangkan dan membuktikan kemampuan bahasa `.cuk`, bukan sebagai proyek pengelolaan air produksi.
 - Tambahkan [dokumentasi kanonis Reality Engine](docs/REALITY_ENGINE.md), termasuk tabel aturan, alur eksekusi, batas klaim, cara menjalankan, dan fokus pengembangan branch.
 - Tautkan dokumentasi Reality Engine dari README dan indeks dokumentasi pada branch `cuk-reality-engine`, tanpa mengubah `main` atau `warungpusingcuk`.
