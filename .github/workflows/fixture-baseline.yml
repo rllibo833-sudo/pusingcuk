@@ -4,6 +4,9 @@ on:
     paths:
       - "tools/ci_fixture_matrix.py"
       - "tools/differential_runner.py"
+      - "tools/generate_compatibility.py"
+      - "docs/COMPATIBILITY.md"
+      - "tests/conformance/baseline_summary.json"
       - ".github/workflows/fixture-baseline.yml"
   workflow_dispatch:
   push:
@@ -38,6 +41,9 @@ jobs:
       - name: Generate differential parity report
         if: always()
         run: python tools/differential_runner.py artifacts/fixture-matrix/results.json --output artifacts/fixture-matrix/differential.json
+      - name: Verify generated compatibility snapshot
+        if: always()
+        run: python tools/generate_compatibility.py --check
       - name: Check fixture pass-count regression
         id: regression
         if: always()
