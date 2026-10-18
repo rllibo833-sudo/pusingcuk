@@ -52,6 +52,30 @@ fungsi alasan_air(cadangan, kebutuhan_dasar)
     selesai njir
 selesai fungsi
 
+fungsi tindakan_air(cadangan, kebutuhan_dasar)
+    njir cadangan < 0 atau cadangan > 100
+        balek "Periksa ulang data cadangan; jangan ambil keputusan dari angka di luar 0-100%."
+    kampret
+        njir kebutuhan_dasar != "ya" dan kebutuhan_dasar != "tidak"
+            balek "Konfirmasi apakah kebutuhan dasar masih harus dipenuhi."
+        kampret
+            njir cadangan <= 20
+                njir kebutuhan_dasar == "ya"
+                    balek "Amankan air untuk minum, sanitasi, dan kebutuhan dasar; hentikan pemakaian yang bisa ditunda."
+                kampret
+                    balek "Batasi pemakaian non-esensial dan periksa kebutuhan dasar sebelum distribusi berikutnya."
+                selesai njir
+            kampret
+                njir cadangan <= 50
+                    balek "Terapkan penghematan, pantau perubahan cadangan, dan tunda pemakaian yang tidak mendesak."
+                kampret
+                    balek "Pertahankan pemantauan berkala dan gunakan air secara wajar."
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
 coba
     tanya cadangan_teks = "Cadangan air saat ini (0-100%): "
     lah cadangan = bilangan(cadangan_teks)
@@ -65,6 +89,8 @@ coba
     hedeh keputusan
     hedeh "Alasan:"
     hedeh alasan_air(cadangan, kebutuhan_dasar)
+    hedeh "Tindakan yang disarankan:"
+    hedeh tindakan_air(cadangan, kebutuhan_dasar)
 ketangkep kesalahan
     hedeh "Input tidak valid: " + kesalahan
     hedeh "Masukkan cadangan sebagai angka yang valid dari 0 sampai 100."
