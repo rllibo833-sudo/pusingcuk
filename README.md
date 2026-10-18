@@ -30,7 +30,7 @@ Indeks dokumentasi: [docs/README.md](docs/README.md). Visi: [docs/VISION.md](doc
 
 ## Bukti dukungan, bukan klaim
 
-Manifest saat ini memuat **77 fixtures**: all 77 are required on the Python reference interpreter, 74 are required on native C, and 3 are explicitly unsupported on native C. Fixture native dijalankan pada GCC dan Clang di CI. Ini membuktikan hanya perilaku yang tercakup fixture, bukan seluruh bahasa atau semua platform.
+Manifest saat ini memuat **78 fixtures**: all 78 are required on the Python reference interpreter, 75 are required on native C, and 3 are explicitly unsupported on native C. Fixture native dijalankan pada GCC dan Clang di CI. Ini membuktikan hanya perilaku yang tercakup fixture, bukan seluruh bahasa atau semua platform.
 
 - **Python reference:** implementasi pembanding utama saat ini; masih membutuhkan Python.
 - **Native C:** dapat menghasilkan executable yang berjalan tanpa Python untuk subset yang didukung; ini belum berarti semua sintaks/built-in sudah mandiri.
@@ -40,6 +40,12 @@ Manifest saat ini memuat **77 fixtures**: all 77 are required on the Python refe
 - **Web, Android, dan SaaS:** prototipe sampai build, autentikasi, integrasi, dan alur utama benar-benar diverifikasi pada target yang sama.
 
 Matriks: [kompatibilitas](docs/COMPATIBILITY.md), [target compiler](docs/COMPILER_TARGETS.md), serta [kontrak built-in](library/builtin_contract.json).
+
+## Program nyata yang diuji lintas runtime
+
+Contoh [kasir warung](tests/conformance/kasir_warung.cuk) menghitung subtotal Rp40.000, diskon Rp4.000, nilai setelah diskon Rp36.000, pajak 11% Rp3.960, dan total Rp39.960. Program yang sama wajib menghasilkan output identik di interpreter referensi Python dan runtime native C; hasilnya diverifikasi oleh suite konformansi CI, bukan sekadar klaim dokumentasi.
+
+Jalankan interpreter referensi dengan `python pusingcuk_new.py tests/conformance/kasir_warung.cuk`. Untuk runtime native, bangun `pusingcuk-native` lalu jalankan `./pusingcuk-native tests/conformance/kasir_warung.cuk`.
 
 ## Prinsip pengembangan
 
