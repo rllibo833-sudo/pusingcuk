@@ -50,7 +50,7 @@ def render(summary: dict) -> str:
         "|---|---:|---:|---:|---:|---:|",
         *rows,
         "",
-        f"- Manifest fixtures: **{fixture_count}**",
+        f"- Fixtures in checked-in baseline summary: **{fixture_count}**",
         f"- Native C Python-free score: **{float(percent):.2f}%** ({numerator}/{denominator}; unsupported fixtures remain in the denominator)",
         END,
     ])
