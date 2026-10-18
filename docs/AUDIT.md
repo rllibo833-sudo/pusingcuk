@@ -763,6 +763,17 @@ Pengelompokan di bawah berasal dari pola pesan kompilasi/eksekusi pada raw.log. 
 
 Kelompok ini menjadi daftar kandidat bug-parity untuk dibahas terpisah. Tidak ada perbaikan backend yang dilakukan sebagai bagian pembaruan baseline ini.
 
+### E.6 Aturan perubahan baseline
+
+Baseline conformance adalah ambang minimum yang dipertahankan, bukan target yang boleh diturunkan untuk membuat CI hijau.
+
+1. Nilai `passed` per target pada `tests/conformance/baseline_summary.json` hanya boleh tetap atau naik; penurunan dilarang tanpa proses evaluasi dan persetujuan maintainer yang eksplisit.
+2. Snapshot baseline hanya boleh diubah melalui **PR terpisah** yang menjelaskan alasan setiap perubahan target, menyertakan hasil conformance terbaru, dan menunjukkan bahwa perubahan bukan penyamaran regresi.
+3. PR yang mengubah implementasi runtime tidak boleh sekaligus menurunkan snapshot baseline agar kegagalannya lolos.
+4. Kenaikan baseline harus didukung oleh hasil CI terukur. Jangan menaikkan angka secara manual tanpa bukti lulus.
+5. Gerbang saat ini memeriksa bahwa hitungan lulus aktual tidak turun di bawah snapshot. Review PR tetap diperlukan untuk memastikan snapshot tidak dinaikkan secara artifisial atau dimanipulasi.
+6. Uji negatif gerbang menggunakan baseline yang sengaja dinaikkan hanya untuk membuktikan CI merah; perubahan uji tersebut tidak boleh masuk ke `main`.
+
 ### E.5 Gerbang regresi dan batas skor
 
 Baseline hasil terukur disimpan sebagai tests/conformance/baseline_summary.json. Workflow matriks membandingkan jumlah passed setiap target dengan snapshot tersebut; CI gagal jika hitungan lulus target mana pun turun. Perubahan baseline di masa mendatang harus ditinjau secara eksplisit, bukan diperbarui otomatis agar kegagalan terlihat hijau.
