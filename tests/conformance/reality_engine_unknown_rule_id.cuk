@@ -1,0 +1,30 @@
+jancuk
+fungsi keputusan_dari_aturan(aturan)
+    njir aturan == "AIR-04: KONDISI_NORMAL"
+        balek "KONDISI_NORMAL"
+    kampret
+        balek "ID_ATURAN_TIDAK_DIKENAL"
+    selesai njir
+selesai fungsi
+
+fungsi alasan_dari_aturan(aturan)
+    njir aturan == "AIR-04: KONDISI_NORMAL"
+        balek "Cadangan di atas 50%; kondisi normal."
+    kampret
+        balek "ID aturan tidak dikenal; alasan kebijakan tidak tersedia."
+    selesai njir
+selesai fungsi
+
+fungsi tindakan_dari_aturan(aturan)
+    njir aturan == "AIR-04: KONDISI_NORMAL"
+        balek "Pertahankan pemantauan berkala dan gunakan air secara wajar."
+    kampret
+        balek "Hentikan keputusan otomatis dan verifikasi ID aturan yang tidak dikenal."
+    selesai njir
+selesai fungsi
+
+lah aturan = "ID-ARBITRER-TIDAK-DIKENAL"
+hedeh keputusan_dari_aturan(aturan)
+hedeh alasan_dari_aturan(aturan)
+hedeh tindakan_dari_aturan(aturan)
+selesai jancuk
