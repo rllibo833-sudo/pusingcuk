@@ -11,6 +11,10 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "tests" / "conformance" / "manifest.json"
 FIXTURE_START = "<!-- BEGIN GENERATED FIXTURE COUNTS -->"
 FIXTURE_END = "<!-- END GENERATED FIXTURE COUNTS -->"
+README_BADGE_START = "<!-- BEGIN GENERATED PYTHON-FREE SCORE BADGE -->"
+README_BADGE_END = "<!-- END GENERATED PYTHON-FREE SCORE BADGE -->"
+SCORE_START = "<!-- BEGIN GENERATED PYTHON-FREE SCORE HISTORY -->"
+SCORE_END = "<!-- END GENERATED PYTHON-FREE SCORE HISTORY -->"
 START = "<!-- BEGIN GENERATED CONFORMANCE SUMMARY -->"
 END = "<!-- END GENERATED CONFORMANCE SUMMARY -->"
 TARGET_ORDER = ("reference", "native", "javascript", "python_transpiler", "html", "vm")
@@ -107,43 +111,157 @@ def validate_summary_against_manifest(summary: dict, manifest: dict) -> None:
         raise ValueError(f"baseline native unsupported count ({native.get('unsupported')!r}) does not match manifest ({expected_native_unsupported})")
 
 
+def score_values(summary: dict) -> tuple[int, int, float]:
+    fixture_count = summary.get("fixture_count")
+    targets = summary.get("targets", {})
+    native = targets.get("native", {}) if isinstance(targets, dict) else {}
+    numerator = native.get("passed")
+    if not isinstance(fixture_count, int) or isinstance(fixture_count, bool) or fixture_count <= 0:
+        raise ValueError("summary.fixture_count must be a positive integer for score history")
+    if not isinstance(numerator, int) or isinstance(numerator, bool) or not 0 <= numerator <= fixture_count:
+        raise ValueError("summary.targets.native.passed must be within the fixture count")
+    return numerator, fixture_count, round(100 * numerator / fixture_count, 2)
+
+
+def render_score_svg(summary: dict) -> str:
+    numerator, denominator, percent = score_values(summary)
+    label = f"Python-Free Score {percent:.2f}% ({numerator}/{denominator})"
+    left = "Python-Free Score"
+    right = f"{percent:.2f}% ({numerator}/{denominator})"
+    left_width = 114
+    right_width = max(82, len(right) * 7 + 16)
+    width = left_width + right_width
+    return "\n".join([
+        '<svg xmlns="http://www.w3.org/2000/svg" width="' + str(width) + '" height="20" role="img" aria-label="' + label + '">',
+        "  <title>" + label + "</title>",
+        '  <linearGradient id="g" x2="0" y2="100%">',
+        '    <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>',
+        '    <stop offset="1" stop-opacity=".1"/>',
+        "  </linearGradient>",
+        '  <clipPath id="r"><rect width="' + str(width) + '" height="20" rx="3"/></clipPath>',
+        '  <g clip-path="url(#r)">',
+        '    <rect width="' + str(left_width) + '" height="20" fill="#555"/>',
+        '    <rect x="' + str(left_width) + '" width="' + str(right_width) + '" height="20" fill="#287d52"/>',
+        '    <rect width="' + str(width) + '" height="20" fill="url(#g)"/>',
+        "  </g>",
+        '  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,sans-serif" font-size="11">',
+        '    <text x="' + str(left_width / 2) + '" y="14">' + left + "</text>",
+        '    <text x="' + str(left_width + right_width / 2) + '" y="14">' + right + "</text>",
+        "  </g>",
+        "</svg>",
+        "",
+    ])
+
+
+def validate_score_history(history: dict, summary: dict) -> list[dict]:
+    records = history.get("records") if isinstance(history, dict) else None
+    if not isinstance(records, list) or not records:
+        raise ValueError("score history must contain at least one record")
+    for index, record in enumerate(records):
+        if not isinstance(record, dict):
+            raise ValueError(f"score history record #{index + 1} must be an object")
+        for key in ("date", "commit", "run_url", "numerator", "denominator", "percent"):
+            if key not in record:
+                raise ValueError(f"score history record #{index + 1} is missing {key}")
+        if not isinstance(record["numerator"], int) or isinstance(record["numerator"], bool) or not isinstance(record["denominator"], int) or isinstance(record["denominator"], bool):
+            raise ValueError(f"score history record #{index + 1} numerator/denominator must be integers")
+        if record["denominator"] <= 0 or not isinstance(record["percent"], (int, float)):
+            raise ValueError(f"score history record #{index + 1} has invalid denominator/percent")
+        expected = round(100 * record["numerator"] / record["denominator"], 2)
+        if round(float(record["percent"]), 2) != expected:
+            raise ValueError(f"score history record #{index + 1} percent does not match numerator/denominator")
+        if not isinstance(record["commit"], str) or len(record["commit"]) != 40:
+            raise ValueError(f"score history record #{index + 1} commit must be a full SHA")
+        if not isinstance(record["run_url"], str) or not record["run_url"].startswith("https://github.com/"):
+            raise ValueError(f"score history record #{index + 1} run_url must be a GitHub URL")
+    numerator, denominator, percent = score_values(summary)
+    latest = records[-1]
+    if (latest["numerator"], latest["denominator"], round(float(latest["percent"]), 2)) != (numerator, denominator, percent):
+        raise ValueError("latest Python-Free Score history record does not match baseline_summary.json; append a new history point before updating the baseline")
+    return records
+
+
+def render_score_history(records: list[dict]) -> str:
+    rows = []
+    for record in records:
+        commit = record["commit"]
+        score = f'{float(record["percent"]):.2f}%'
+        rows.append(
+            f'| {record["date"]} | {score} ({record["numerator"]}/{record["denominator"]}) '
+            f'| [`{commit[:7]}`](https://github.com/rllibo833-sudo/pusingcuk/commit/{commit}) '
+            f'| [fixture matrix]({record["run_url"]}) |'
+        )
+    return "\n".join([
+        SCORE_START,
+        "| Date | Python-Free Score (native C) | Commit | CI evidence |",
+        "|---|---:|---|---|",
+        *rows,
+        SCORE_END,
+    ])
+
+
+def replace_generated_section(document: str, start_marker: str, end_marker: str, generated: str, label: str) -> str:
+    if document.count(start_marker) != 1 or document.count(end_marker) != 1:
+        raise ValueError(f"{label} must contain each generated marker exactly once")
+    before, remainder = document.split(start_marker, 1)
+    _, after = remainder.split(end_marker, 1)
+    return before.rstrip() + "\n\n" + generated + after
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--summary", type=Path, default=ROOT / "tests/conformance/baseline_summary.json")
     parser.add_argument("--manifest", type=Path, default=MANIFEST)
+    parser.add_argument("--score-history", type=Path, default=ROOT / "tests/conformance/python_free_score_history.json")
     parser.add_argument("--document", type=Path, default=ROOT / "docs/COMPATIBILITY.md")
     parser.add_argument("--conformance-document", type=Path, default=ROOT / "docs/CONFORMANCE_FIXTURES.md")
-    parser.add_argument("--check", action="store_true", help="fail if generated docs are stale or summary mismatches manifest")
+    parser.add_argument("--readme", type=Path, default=ROOT / "README.md")
+    parser.add_argument("--score-document", type=Path, default=ROOT / "docs/PYTHON_FREE_SCORE.md")
+    parser.add_argument("--badge-svg", type=Path, default=ROOT / "docs/assets/python-free-score.svg")
+    parser.add_argument("--check", action="store_true", help="fail if generated docs/assets are stale or summary mismatches manifest")
     args = parser.parse_args()
     try:
         summary = json.loads(args.summary.read_text(encoding="utf-8"))
         manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
+        history = json.loads(args.score_history.read_text(encoding="utf-8"))
         validate_summary_against_manifest(summary, manifest)
+        records = validate_score_history(history, summary)
         compatibility = args.document.read_text(encoding="utf-8")
         conformance = args.conformance_document.read_text(encoding="utf-8")
-        generated_compatibility = render(summary)
-        generated_fixtures = render_fixture_counts(manifest)
-        updated_compatibility = replace_generated_section(compatibility, START, END, generated_compatibility, "COMPATIBILITY.md")
-        updated_conformance = replace_generated_section(conformance, FIXTURE_START, FIXTURE_END, generated_fixtures, "CONFORMANCE_FIXTURES.md")
+        readme = args.readme.read_text(encoding="utf-8")
+        score_document = args.score_document.read_text(encoding="utf-8")
+        old_badge_svg = args.badge_svg.read_text(encoding="utf-8")
+        updated_compatibility = replace_generated_section(compatibility, START, END, render(summary), "COMPATIBILITY.md")
+        updated_conformance = replace_generated_section(conformance, FIXTURE_START, FIXTURE_END, render_fixture_counts(manifest), "CONFORMANCE_FIXTURES.md")
+        badge = "[![Python-Free Score](docs/assets/python-free-score.svg)](docs/PYTHON_FREE_SCORE.md)"
+        updated_readme = replace_generated_section(readme, README_BADGE_START, README_BADGE_END, README_BADGE_START + "\n" + badge + "\n" + README_BADGE_END, "README.md")
+        updated_score_document = replace_generated_section(score_document, SCORE_START, SCORE_END, render_score_history(records), "PYTHON_FREE_SCORE.md")
+        updated_badge_svg = render_score_svg(summary)
     except (OSError, json.JSONDecodeError, ValueError, TypeError) as exc:
         print(f"COMPATIBILITY GENERATOR ERROR: {exc}", file=sys.stderr)
         return 2
+    updates = [
+        (args.document, compatibility, updated_compatibility, "COMPATIBILITY.md"),
+        (args.conformance_document, conformance, updated_conformance, "CONFORMANCE_FIXTURES.md"),
+        (args.readme, readme, updated_readme, "README.md"),
+        (args.score_document, score_document, updated_score_document, "PYTHON_FREE_SCORE.md"),
+        (args.badge_svg, old_badge_svg, updated_badge_svg, "python-free-score.svg"),
+    ]
     if args.check:
-        if updated_compatibility != compatibility:
-            print("COMPATIBILITY.md generated section is stale; run tools/generate_compatibility.py", file=sys.stderr)
+        stale = [label for _, original, updated, label in updates if original != updated]
+        if stale:
+            print("Generated content is stale: " + ", ".join(stale) + "; run tools/generate_compatibility.py", file=sys.stderr)
             return 1
-        if updated_conformance != conformance:
-            print("CONFORMANCE_FIXTURES.md generated section is stale; run tools/generate_compatibility.py", file=sys.stderr)
-            return 1
-        print("Generated compatibility and fixture-count sections are current; baseline summary matches manifest.")
+        print("Generated compatibility, fixture counts, score history, README badge and SVG are current; baseline summary matches manifest.")
         return 0
     try:
-        args.document.write_text(updated_compatibility, encoding="utf-8")
-        args.conformance_document.write_text(updated_conformance, encoding="utf-8")
+        for path, _, updated, _ in updates:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(updated, encoding="utf-8")
     except OSError as exc:
-        print(f"COMPATIBILITY GENERATOR ERROR: cannot write generated docs: {exc}", file=sys.stderr)
+        print(f"COMPATIBILITY GENERATOR ERROR: cannot write generated docs/assets: {exc}", file=sys.stderr)
         return 2
-    print("Updated generated compatibility and fixture-count sections.")
+    print("Updated generated compatibility, fixture counts, score history, README badge and SVG.")
     return 0
 
 
