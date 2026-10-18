@@ -118,7 +118,7 @@ class RealityEngineBoundaryTests(unittest.TestCase):
 
     def test_unknown_rule_id_never_defaults_to_normal_decision(self):
         source = EXAMPLE.read_text(encoding="utf-8")
-        function_definitions = source.split("\\ncoba\\n", 1)[0]
+        function_definitions = source.split("coba", 1)[0]
         probe = function_definitions + """
 hedeh keputusan_dari_aturan("UNKNOWN")
 hedeh alasan_dari_aturan("UNKNOWN")
