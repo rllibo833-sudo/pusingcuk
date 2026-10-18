@@ -1,0 +1,65 @@
+# CUK REALITY ENGINE
+# Demonstrasi aturan keputusan + jejak alasan + pemeriksaan konsistensi.
+# Ini contoh deterministik: bukan AI, bukan sensor kota sungguhan.
+
+jancuk
+
+fungsi keputusan_air(cadangan, kebutuhan_dasar)
+    njir cadangan <= 20
+        njir kebutuhan_dasar == "ya"
+            balek "PRIORITASKAN_KEBUTUHAN_DASAR"
+        kampret
+            balek "BATASI_PENGGUNAAN_NON_ESENSIAL"
+        selesai njir
+    kampret
+        njir cadangan <= 50
+            balek "HEMAT_AIR"
+        kampret
+            balek "KONDISI_NORMAL"
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi alasan_air(cadangan, kebutuhan_dasar)
+    njir cadangan <= 20
+        njir kebutuhan_dasar == "ya"
+            balek "Cadangan <= 20%; kebutuhan dasar diprioritaskan."
+        kampret
+            balek "Cadangan <= 20%; penggunaan non-esensial dibatasi."
+        selesai njir
+    kampret
+        njir cadangan <= 50
+            balek "Cadangan <= 50%; terapkan penghematan."
+        kampret
+            balek "Cadangan di atas 50%; kondisi normal."
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi periksa_konsistensi(cadangan, kebutuhan_dasar, hasil_dilaporkan)
+    njir keputusan_air(cadangan, kebutuhan_dasar) == hasil_dilaporkan
+        balek "KONSISTEN_DENGAN_ATURAN"
+    kampret
+        balek "KONFLIK_HASIL_DAN_ATURAN"
+    selesai njir
+selesai fungsi
+
+fungsi tampilkan_skenario(nama, cadangan, kebutuhan_dasar, hasil_dilaporkan)
+    hedeh "=== " + nama + " ==="
+    hedeh "Cadangan air (%):"
+    hedeh cadangan
+    hedeh "Keputusan:"
+    hedeh keputusan_air(cadangan, kebutuhan_dasar)
+    hedeh "Alasan:"
+    hedeh alasan_air(cadangan, kebutuhan_dasar)
+    hedeh "Pemeriksaan:"
+    hedeh periksa_konsistensi(cadangan, kebutuhan_dasar, hasil_dilaporkan)
+selesai fungsi
+
+tampilkan_skenario("KRITIS - KEBUTUHAN DASAR", 12, "ya", "PRIORITASKAN_KEBUTUHAN_DASAR")
+tampilkan_skenario("KRITIS - NON-ESENSIAL", 12, "tidak", "BATASI_PENGGUNAAN_NON_ESENSIAL")
+tampilkan_skenario("MENURUN", 40, "ya", "HEMAT_AIR")
+tampilkan_skenario("NORMAL", 80, "tidak", "KONDISI_NORMAL")
+tampilkan_skenario("SIMULASI KONFLIK", 12, "ya", "KONDISI_NORMAL")
+
+selesai jancuk
