@@ -1,0 +1,50 @@
+name: PusingCuk fixture baseline matrix
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - "phase-1/**"
+permissions:
+  contents: read
+concurrency:
+  group: fixture-baseline-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  fixture-matrix:
+    name: All fixtures by runtime target
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Install native compiler and Node.js
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc clang nodejs
+      - name: Run complete fixture matrix
+        id: matrix
+        continue-on-error: true
+        env:
+          PUSINGCUK_MATRIX_OUT: artifacts/fixture-matrix
+        run: python tools/ci_fixture_matrix.py
+      - name: Check fixture pass-count regression
+        id: regression
+        if: always()
+        run: |
+          python tools/check_fixture_regression.py artifacts/fixture-matrix/summary.json tests/conformance/baseline_summary.json
+      - name: Upload raw logs and JSON summary
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pusingcuk-fixture-baseline-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/fixture-matrix/
+          if-no-files-found: error
+          retention-days: 90
+      - name: Mark baseline or regression failure
+        if: steps.matrix.outcome == 'failure' || steps.regression.outcome == 'failure'
+        run: |
+          echo "Reference/native baseline or fixture pass-count regression failed. Inspect the uploaded raw.log and summary.json artifact."
+          exit 1

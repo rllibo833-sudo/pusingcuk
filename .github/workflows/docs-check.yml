@@ -1,0 +1,44 @@
+name: Documentation checks
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "*.md"
+      - ".github/workflows/docs-check.yml"
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "*.md"
+      - ".github/workflows/docs-check.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: docs-check-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  markdown-basics:
+    name: Required lightweight documentation check
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Validate changed documentation is non-empty and has no conflict markers
+        shell: bash
+        run: |
+          set -euo pipefail
+          files="$(git diff --name-only "${{ github.event.pull_request.base.sha || github.event.before }}" "${{ github.sha }}" -- '*.md' 'docs/**' || true)"
+          if [ -z "$files" ]; then
+            echo "No Markdown files in this event's diff; workflow trigger itself is the check."
+            exit 0
+          fi
+          while IFS= read -r file; do
+            [ -f "$file" ] || continue
+            [ -s "$file" ] || { echo "Empty Markdown file: $file"; exit 1; }
+            if grep -nE '^(<<<<<<< |=======|>>>>>>> )' "$file"; then
+              echo "Merge-conflict marker found in $file"
+              exit 1
+            fi
+          done <<< "$files"
+          echo "Documentation basics passed."
