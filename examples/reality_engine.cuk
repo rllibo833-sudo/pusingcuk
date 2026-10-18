@@ -1,57 +1,10 @@
 # CUK REALITY ENGINE
-# Mesin keputusan interaktif: menerima input pengguna, memvalidasi, lalu memberi
-# keputusan dan alasan yang dapat ditelusuri. Tidak terhubung ke sensor nyata.
+# Mesin keputusan interaktif berbasis satu sumber aturan.
+# Tidak terhubung ke sensor nyata dan bukan pengganti keputusan lapangan.
 
 jancuk
 
-fungsi keputusan_air(cadangan, kebutuhan_dasar)
-    njir cadangan < 0 atau cadangan > 100
-        balek "MASUKAN_TIDAK_VALID"
-    kampret
-        njir kebutuhan_dasar != "ya" dan kebutuhan_dasar != "tidak"
-            balek "MASUKAN_TIDAK_VALID"
-        kampret
-            njir cadangan <= 20
-                njir kebutuhan_dasar == "ya"
-                    balek "PRIORITASKAN_KEBUTUHAN_DASAR"
-                kampret
-                    balek "BATASI_PENGGUNAAN_NON_ESENSIAL"
-                selesai njir
-            kampret
-                njir cadangan <= 50
-                    balek "HEMAT_AIR"
-                kampret
-                    balek "KONDISI_NORMAL"
-                selesai njir
-            selesai njir
-        selesai njir
-    selesai njir
-selesai fungsi
-
-fungsi alasan_air(cadangan, kebutuhan_dasar)
-    njir cadangan < 0 atau cadangan > 100
-        balek "Input tidak valid: cadangan harus 0 sampai 100%."
-    kampret
-        njir kebutuhan_dasar != "ya" dan kebutuhan_dasar != "tidak"
-            balek "Input tidak valid: jawab kebutuhan dasar dengan ya atau tidak."
-        kampret
-            njir cadangan <= 20
-                njir kebutuhan_dasar == "ya"
-                    balek "Cadangan <= 20%; kebutuhan dasar diprioritaskan."
-                kampret
-                    balek "Cadangan <= 20%; penggunaan non-esensial dibatasi."
-                selesai njir
-            kampret
-                njir cadangan <= 50
-                    balek "Cadangan <= 50%; terapkan penghematan."
-                kampret
-                    balek "Cadangan di atas 50%; kondisi normal."
-                selesai njir
-            selesai njir
-        selesai njir
-    selesai njir
-selesai fungsi
-
+# SATU-SATUNYA TEMPAT VALIDASI DAN AMBANG KEBIJAKAN DITENTUKAN.
 fungsi aturan_air(cadangan, kebutuhan_dasar)
     njir cadangan < 0 atau cadangan > 100
         balek "AIR-00: INPUT_CADANGAN_TIDAK_VALID"
@@ -76,24 +29,72 @@ fungsi aturan_air(cadangan, kebutuhan_dasar)
     selesai njir
 selesai fungsi
 
+# Fungsi keluaran hanya menerjemahkan ID aturan; tidak mengulang ambang.
+fungsi keputusan_air(cadangan, kebutuhan_dasar)
+    lah aturan = aturan_air(cadangan, kebutuhan_dasar)
+    njir aturan == "AIR-00: INPUT_CADANGAN_TIDAK_VALID" atau aturan == "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID"
+        balek "MASUKAN_TIDAK_VALID"
+    kampret
+        njir aturan == "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR"
+            balek "PRIORITASKAN_KEBUTUHAN_DASAR"
+        kampret
+            njir aturan == "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL"
+                balek "BATASI_PENGGUNAAN_NON_ESENSIAL"
+            kampret
+                njir aturan == "AIR-03: PENGHEMATAN"
+                    balek "HEMAT_AIR"
+                kampret
+                    balek "KONDISI_NORMAL"
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi alasan_air(cadangan, kebutuhan_dasar)
+    lah aturan = aturan_air(cadangan, kebutuhan_dasar)
+    njir aturan == "AIR-00: INPUT_CADANGAN_TIDAK_VALID"
+        balek "Input tidak valid: cadangan harus 0 sampai 100%."
+    kampret
+        njir aturan == "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID"
+            balek "Input tidak valid: jawab kebutuhan dasar dengan ya atau tidak."
+        kampret
+            njir aturan == "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR"
+                balek "Cadangan <= 20%; kebutuhan dasar diprioritaskan."
+            kampret
+                njir aturan == "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL"
+                    balek "Cadangan <= 20%; penggunaan non-esensial dibatasi."
+                kampret
+                    njir aturan == "AIR-03: PENGHEMATAN"
+                        balek "Cadangan <= 50%; terapkan penghematan."
+                    kampret
+                        balek "Cadangan di atas 50%; kondisi normal."
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
 fungsi tindakan_air(cadangan, kebutuhan_dasar)
-    njir cadangan < 0 atau cadangan > 100
+    lah aturan = aturan_air(cadangan, kebutuhan_dasar)
+    njir aturan == "AIR-00: INPUT_CADANGAN_TIDAK_VALID"
         balek "Periksa ulang data cadangan; jangan ambil keputusan dari angka di luar 0-100%."
     kampret
-        njir kebutuhan_dasar != "ya" dan kebutuhan_dasar != "tidak"
+        njir aturan == "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID"
             balek "Konfirmasi apakah kebutuhan dasar masih harus dipenuhi."
         kampret
-            njir cadangan <= 20
-                njir kebutuhan_dasar == "ya"
-                    balek "Amankan air untuk minum, sanitasi, dan kebutuhan dasar; hentikan pemakaian yang bisa ditunda."
-                kampret
-                    balek "Batasi pemakaian non-esensial dan periksa kebutuhan dasar sebelum distribusi berikutnya."
-                selesai njir
+            njir aturan == "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR"
+                balek "Amankan air untuk minum, sanitasi, dan kebutuhan dasar; hentikan pemakaian yang bisa ditunda."
             kampret
-                njir cadangan <= 50
-                    balek "Terapkan penghematan, pantau perubahan cadangan, dan tunda pemakaian yang tidak mendesak."
+                njir aturan == "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL"
+                    balek "Batasi pemakaian non-esensial dan periksa kebutuhan dasar sebelum distribusi berikutnya."
                 kampret
-                    balek "Pertahankan pemantauan berkala dan gunakan air secara wajar."
+                    njir aturan == "AIR-03: PENGHEMATAN"
+                        balek "Terapkan penghematan, pantau perubahan cadangan, dan tunda pemakaian yang tidak mendesak."
+                    kampret
+                        balek "Pertahankan pemantauan berkala dan gunakan air secara wajar."
+                    selesai njir
                 selesai njir
             selesai njir
         selesai njir
