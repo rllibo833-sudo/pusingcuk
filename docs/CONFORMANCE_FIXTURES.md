@@ -1,6 +1,6 @@
 # Kontrak Fixture Konformansi Pusingcuk
 
-**Versi bahasa:** `0.6-dev`. Manifest berisi 74 fixture: 74 wajib pada reference; 71 wajib dan 3 eksplisit unsupported pada native C.
+**Versi bahasa:** `0.6-dev`. Manifest berisi 79 fixture: 79 wajib pada reference; 76 wajib dan 3 eksplisit unsupported pada native C. Fixture `reality-engine.unknown-rule-id-fails-closed` mengunci fallback fail-closed ID aturan pada kedua runtime.
 
 Harness konformansi aktif ada di `tools/conformance.py` dan dijalankan oleh CI. Manifest membandingkan perilaku yang terlihat pengguna pada interpreter referensi Python dan runtime native C. Fixture kanonis baru memakai ekstensi `.cuk`; contoh lama berekstensi `.pusingcuk` tetap boleh digunakan untuk kompatibilitas.
 
