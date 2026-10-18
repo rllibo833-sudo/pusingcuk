@@ -36,7 +36,7 @@ Indeks dokumentasi: [docs/README.md](docs/README.md). Visi: [docs/VISION.md](doc
 
 ## Bukti dukungan, bukan klaim
 
-Manifest saat ini memuat **78 fixtures**: all 78 are required on the Python reference interpreter, 75 are required on native C, and 3 are explicitly unsupported on native C. Fixture native dijalankan pada GCC dan Clang di CI. Ini membuktikan hanya perilaku yang tercakup fixture, bukan seluruh bahasa atau semua platform.
+Manifest saat ini memuat **79 fixtures**: all 79 are required on the Python reference interpreter, 76 are required on native C, and 3 are explicitly unsupported on native C. Fixture native dijalankan pada GCC dan Clang di CI. Ini membuktikan hanya perilaku yang tercakup fixture, bukan seluruh bahasa atau semua platform.
 
 - **Python reference:** implementasi pembanding utama saat ini; masih membutuhkan Python.
 - **Native C:** dapat menghasilkan executable yang berjalan tanpa Python untuk subset yang didukung; ini belum berarti semua sintaks/built-in sudah mandiri.
