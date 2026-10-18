@@ -9,6 +9,7 @@ Ini indeks kanonis. Pilih bagian sesuai pekerjaan; **jangan membaca semua dokume
 - [Panduan pemula](PEMULA.md) — belajar sintaks.
 - [Spesifikasi bahasa](../SPEC.md) — kontrak sintaks dan perilaku.
 - [Vision](VISION.md) — tujuan dan prinsip proyek.
+- [Cuk Reality Engine](REALITY_ENGINE.md) — tujuan dan status contoh program berbasis aturan pada branch `cuk-reality-engine`; fokus pada pembuktian kemampuan bahasa `.cuk`, bukan sistem air produksi.
 - [Gaya bahasa](GAYA_BAHASA.md), [kamus](KAMUS_PUSINGCUK.md), [kosakata Gen Z](KOSAKATA_GENZ.md), dan [referensi istilah](DICTIONARY.md).
 - [Referensi bahasa](language/README.md) dan [built-in](language/BUILTINS.md).
 - [Contoh program](../examples/README.md), [kompatibilitas contoh](../examples/compat/README.md), dan [contoh bahasa warung](../examples/warung_bahasa/README.md).
