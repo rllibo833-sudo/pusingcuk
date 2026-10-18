@@ -57,6 +57,23 @@ class RealityEngineBoundaryTests(unittest.TestCase):
         self.assertIn("HEMAT_AIR", result.stdout)
         self.assertIn("Terapkan penghematan", result.stdout)
 
+    def test_invalid_basic_needs_answer_uses_invalid_input_rule(self):
+        result = self.run_engine("15\\nmungkin\\n")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID", result.stdout)
+        self.assertIn("MASUKAN_TIDAK_VALID", result.stdout)
+        self.assertIn("jawab kebutuhan dasar dengan ya atau tidak", result.stdout)
+        self.assertIn("Konfirmasi apakah kebutuhan dasar", result.stdout)
+        self.assertNotIn("KONDISI_NORMAL", result.stdout)
+
+    def test_malformed_decimal_is_caught_without_a_policy_decision(self):
+        result = self.run_engine("bukan-angka\\nya\\n")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("Input tidak valid:", result.stdout)
+        self.assertIn("Masukkan cadangan sebagai angka yang valid", result.stdout)
+        self.assertNotIn("AIR-01:", result.stdout)
+        self.assertNotIn("AIR-04:", result.stdout)
+
     def test_one_rule_result_drives_decision_reason_and_action(self):
         cases = (
             ("15\nya\n", "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR", "PRIORITASKAN_KEBUTUHAN_DASAR", "kebutuhan dasar diprioritaskan", "Amankan air untuk minum"),

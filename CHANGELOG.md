@@ -18,6 +18,7 @@ Catatan ringkas perubahan yang sudah dilakukan. Versi paket dan versi bahasa ada
 - Ubah alur contoh agar `aturan_air()` dievaluasi sekali; ID yang sama menjadi sumber keputusan, alasan, dan tindakan. Tambahkan regresi konsistensi untuk hasil kebijakan utama dan input tidak valid.
 - Gunakan `desimal()` untuk membaca persentase cadangan agar nilai pecahan seperti `20.5` dapat melewati parsing dan diuji oleh aturan rentang. `100.1` harus ditolak oleh aturan kebijakan, bukan gagal saat konversi angka.
 - Perbaiki escaping newline pada input tes supaya tiap jawaban benar-benar dikirim sebagai baris stdin terpisah.
+- Tambahkan regresi untuk jawaban kebutuhan dasar di luar `ya`/`tidak` dan teks cadangan non-numerik; dokumentasikan bahwa keduanya tidak boleh menghasilkan keputusan kebijakan normal.
 
 ### Dokumentasi dan tata letak
 

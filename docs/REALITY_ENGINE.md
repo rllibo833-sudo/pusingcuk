@@ -68,7 +68,7 @@ Contoh masukan:
 - `101` lalu `tidak` → masukan ditolak.
 - `abc` sebagai cadangan → kegagalan konversi ditangani dan program tidak menampilkan keputusan normal.
 
-Tes contoh berada di `tests/test_examples_cuk.py`. Tes yang memeriksa perilaku tertentu membuktikan hanya kasus yang benar-benar dijalankan; keberhasilan satu contoh tidak membuktikan seluruh bahasa atau seluruh backend setara.
+Tes batas dan konsistensi Reality Engine berada di `tests/test_reality_engine_boundaries.py`, termasuk jawaban kebutuhan dasar yang tidak valid dan teks angka yang gagal dikonversi. Tes contoh umum berada di `tests/test_examples_cuk.py`. Tes yang memeriksa perilaku tertentu membuktikan hanya kasus yang benar-benar dijalankan; keberhasilan satu contoh tidak membuktikan seluruh bahasa atau seluruh backend setara.
 
 ## Fokus pengembangan di branch ini
 
