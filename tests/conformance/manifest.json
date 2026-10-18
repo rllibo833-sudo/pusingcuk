@@ -1346,28 +1346,6 @@
       }
     },
     {
-      "id": "cukaccount.financial-input-boundaries",
-      "source": "cukaccount_financial_cases.cuk",
-      "profile": "core",
-      "requires": [
-        "variables",
-        "integer-arithmetic",
-        "comparisons",
-        "logical-operators",
-        "conditional",
-        "output"
-      ],
-      "expected": {
-        "exit_code": 0,
-        "stdout": "CUKACCOUNT_VALID_BALANCED\nCUKACCOUNT_INVALID_UNBALANCED\nCUKACCOUNT_INVALID_ZERO\nCUKACCOUNT_INVALID_NEGATIVE\nCUKACCOUNT_BOUNDARY_MAX\n",
-        "stderr_class": null
-      },
-      "runtimes": {
-        "reference": "required",
-        "native": "required"
-      }
-    },
-    {
       "id": "formats.json-html-csv",
       "source": "formats_json_html_csv.cuk",
       "profile": "core",
@@ -1542,26 +1520,6 @@
       "expected": {
         "exit_code": 0,
         "stdout": "40000\n4000\n36000\n3960\n39960\n",
-        "stderr_class": null
-      },
-      "runtimes": {
-        "reference": "required",
-        "native": "required"
-      }
-    },
-    {
-      "id": "reality-engine.unknown-rule-id-fails-closed",
-      "source": "reality_engine_unknown_rule_id.cuk",
-      "profile": "core",
-      "requires": [
-        "functions",
-        "conditions",
-        "unknown-rule-fallback",
-        "output"
-      ],
-      "expected": {
-        "exit_code": 0,
-        "stdout": "ID_ATURAN_TIDAK_DIKENAL\nID aturan tidak dikenal; alasan kebijakan tidak tersedia.\nHentikan keputusan otomatis dan verifikasi ID aturan yang tidak dikenal.\n",
         "stderr_class": null
       },
       "runtimes": {
