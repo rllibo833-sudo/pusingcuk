@@ -30,6 +30,11 @@ jobs:
         env:
           PUSINGCUK_MATRIX_OUT: artifacts/fixture-matrix
         run: python tools/ci_fixture_matrix.py
+      - name: Check fixture pass-count regression
+        id: regression
+        if: always()
+        run: |
+          python tools/check_fixture_regression.py artifacts/fixture-matrix/summary.json tests/conformance/baseline_summary.json
       - name: Upload raw logs and JSON summary
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -38,8 +43,8 @@ jobs:
           path: artifacts/fixture-matrix/
           if-no-files-found: error
           retention-days: 90
-      - name: Mark reference/native baseline result
-        if: steps.matrix.outcome == 'failure'
+      - name: Mark baseline or regression failure
+        if: steps.matrix.outcome == 'failure' || steps.regression.outcome == 'failure'
         run: |
-          echo "Reference or native baseline failed. Inspect the uploaded raw.log and summary.json artifact."
+          echo "Reference/native baseline or fixture pass-count regression failed. Inspect the uploaded raw.log and summary.json artifact."
           exit 1
