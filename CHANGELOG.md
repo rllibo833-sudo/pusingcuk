@@ -4,6 +4,7 @@ Catatan ringkas perubahan yang sudah dilakukan. Versi paket dan versi bahasa ada
 
 - **Kontrak bahasa:** `0.6-dev`
 - **Versi paket:** `0.8.0.dev0`
+- Metadata distribusi kanonis: target paket 0.8.0.dev0.
 - **Status:** pengembangan eksperimental; belum ada klaim bahwa semua backend setara.
 
 ## Unreleased
