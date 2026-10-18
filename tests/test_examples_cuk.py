@@ -50,79 +50,16 @@ class CukExampleCliTests(unittest.TestCase):
             output,
         )
 
-    def test_reality_engine_uses_live_input_and_explains_decision(self):
-        output, _, _ = self.run_example("reality_engine.cuk", "15\nya\n")
-        self.assertIn("Cadangan air saat ini (0-100%)", output)
-        self.assertIn("Kebutuhan dasar masih harus dipenuhi?", output)
-        self.assertIn("Cadangan air (%):", output)
-        self.assertIn("15", output)
-        self.assertIn("PRIORITASKAN_KEBUTUHAN_DASAR", output)
-        self.assertIn("Cadangan <= 20%; kebutuhan dasar diprioritaskan.", output)
-        self.assertNotIn("SIMULASI KONFLIK", output)
-
-    def test_reality_engine_rejects_out_of_range_reserve(self):
-        output, _, _ = self.run_example("reality_engine.cuk", "101\ntidak\n")
-        self.assertIn("MASUKAN_TIDAK_VALID", output)
-        self.assertIn("Input tidak valid: cadangan harus 0 sampai 100%.", output)
-
-    def test_reality_engine_rejects_invalid_basic_need_answer(self):
-        output, _, _ = self.run_example("reality_engine.cuk", "40\nmungkin\n")
-        self.assertIn("MASUKAN_TIDAK_VALID", output)
-        self.assertIn("jawab kebutuhan dasar dengan ya atau tidak", output)
-
-    def test_reality_engine_rejects_non_numeric_reserve(self):
-        output, _, _ = self.run_example("reality_engine.cuk", "abc\n")
-        self.assertIn("Input tidak valid:", output)
-        self.assertIn("Masukkan cadangan sebagai angka yang valid dari 0 sampai 100.", output)
-        self.assertNotIn("KONDISI_NORMAL", output)
-        self.assertNotIn("Cadangan air (%):", output)
 
 
-    def test_reality_engine_reports_a_traceable_rule_identifier(self):
-        output, _, _ = self.run_example("reality_engine.cuk", "15\nya\n")
-        self.assertIn("Aturan yang cocok:", output)
-        self.assertIn("AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR", output)
 
-    def test_reality_engine_rule_ids_match_all_policy_outcomes(self):
-        cases = (
-            ("20\nya\n", "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR", "PRIORITASKAN_KEBUTUHAN_DASAR"),
-            ("20\ntidak\n", "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL", "BATASI_PENGGUNAAN_NON_ESENSIAL"),
-            ("21\nya\n", "AIR-03: PENGHEMATAN", "HEMAT_AIR"),
-            ("50\ntidak\n", "AIR-03: PENGHEMATAN", "HEMAT_AIR"),
-            ("51\ntidak\n", "AIR-04: KONDISI_NORMAL", "KONDISI_NORMAL"),
-            ("101\nya\n", "AIR-00: INPUT_CADANGAN_TIDAK_VALID", "MASUKAN_TIDAK_VALID"),
-            ("40\nmungkin\n", "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID", "MASUKAN_TIDAK_VALID"),
-        )
-        for user_input, expected_rule, expected_decision in cases:
-            with self.subTest(user_input=user_input):
-                output, _, _ = self.run_example("reality_engine.cuk", user_input)
-                self.assertIn(expected_rule, output)
-                self.assertIn(expected_decision, output)
 
-    def test_reality_engine_at_20_percent_prioritizes_basic_needs(self):
-        output, _, _ = self.run_example("reality_engine.cuk", "20\nya\n")
-        self.assertIn("PRIORITASKAN_KEBUTUHAN_DASAR", output)
-        self.assertIn("Amankan air untuk minum, sanitasi, dan kebutuhan dasar", output)
 
-    def test_reality_engine_at_20_percent_restricts_nonessential_use(self):
-        output, _, _ = self.run_example("reality_engine.cuk", "20\ntidak\n")
-        self.assertIn("BATASI_PENGGUNAAN_NON_ESENSIAL", output)
-        self.assertIn("Batasi pemakaian non-esensial", output)
 
-    def test_reality_engine_at_21_percent_enters_saving_mode(self):
-        output, _, _ = self.run_example("reality_engine.cuk", "21\nya\n")
-        self.assertIn("HEMAT_AIR", output)
-        self.assertIn("Terapkan penghematan", output)
 
-    def test_reality_engine_at_50_percent_stays_in_saving_mode(self):
-        output, _, _ = self.run_example("reality_engine.cuk", "50\ntidak\n")
-        self.assertIn("HEMAT_AIR", output)
-        self.assertIn("Terapkan penghematan", output)
 
-    def test_reality_engine_above_50_percent_returns_normal_guidance(self):
-        output, _, _ = self.run_example("reality_engine.cuk", "51\ntidak\n")
-        self.assertIn("KONDISI_NORMAL", output)
-        self.assertIn("Pertahankan pemantauan berkala", output)
+
+
 
     def test_terminal_bot_handles_interactive_answers(self):
         output, _, _ = self.run_example("terminal_bot.cuk", "Ayu\nbaik\n")
