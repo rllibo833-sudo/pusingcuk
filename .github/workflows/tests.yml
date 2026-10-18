@@ -5,6 +5,11 @@ on:
     branches: [main, "audit/**", "in-this-economy", "warung-pusingcuk", "warungpusingcuk"]
     paths:
       - ".github/workflows/tests.yml"
+      - ".github/workflows/release.yml"
+      - "README.md"
+      - "CHANGELOG.md"
+      - "SPEC.md"
+      - "docs/**/*.md"
       - "pusingcuk_new.py"
       - "evaluator.py"
       - "lexer.py"
@@ -30,6 +35,11 @@ on:
   pull_request:
     paths:
       - ".github/workflows/tests.yml"
+      - ".github/workflows/release.yml"
+      - "README.md"
+      - "CHANGELOG.md"
+      - "SPEC.md"
+      - "docs/**/*.md"
       - "pusingcuk_new.py"
       - "evaluator.py"
       - "lexer.py"
