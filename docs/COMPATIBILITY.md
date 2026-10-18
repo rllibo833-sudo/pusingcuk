@@ -36,9 +36,9 @@ Status di atas sengaja memisahkan fondasi internal dari sintaks yang dapat digun
 
 | Contoh Reality Engine | Status |
 |---|---|
-| Python reference | Boundary/regression tests cover policy outcomes, invalid input, and unknown rule IDs. Check the latest branch CI before treating them as passing. |
-| JavaScript target | A test now compiles and runs the same `examples/reality_engine.cuk` source for core valid/invalid cases. This is only proven if the test passes in CI; it does not establish full backend parity. |
-| Native C | Not yet compatible with the whole example because native C does not support `coba/ketangkep`. Do not claim native parity until that feature is implemented with conformance coverage or the example is deliberately reduced to the supported subset. |
+| Python reference | The current 77-fixture manifest has no Reality Engine-specific fixture. Dedicated rule-boundary coverage is not established by the general baseline alone. |
+| JavaScript target | `examples/reality_engine.cuk` is not present on `main`; the earlier source-level parity claim is unverified until the source and test are checked in and CI passes. |
+| Native C | No checked-in Reality Engine source is available on `main` to verify backend parity. Do not infer Reality Engine compatibility from the general fixture score. |
 
 
 | Area | Status sekarang | Makna praktis |
@@ -143,6 +143,6 @@ This table is generated from the supplied machine-readable fixture summary. It i
 | html | 0 | 0 | 0 | 77 | 0 |
 | vm | 28 | 49 | 0 | 0 | 0 |
 
-- Manifest fixtures: **77**
+- Fixtures in checked-in baseline summary: **77**
 - Native C Python-free score: **96.10%** (74/77; unsupported fixtures remain in the denominator)
 <!-- END GENERATED CONFORMANCE SUMMARY -->
