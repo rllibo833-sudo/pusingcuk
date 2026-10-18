@@ -83,6 +83,22 @@ class CukExampleCliTests(unittest.TestCase):
         self.assertIn("Aturan yang cocok:", output)
         self.assertIn("AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR", output)
 
+    def test_reality_engine_rule_ids_match_all_policy_outcomes(self):
+        cases = (
+            ("20\\nya\\n", "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR", "PRIORITASKAN_KEBUTUHAN_DASAR"),
+            ("20\\ntidak\\n", "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL", "BATASI_PENGGUNAAN_NON_ESENSIAL"),
+            ("21\\nya\\n", "AIR-03: PENGHEMATAN", "HEMAT_AIR"),
+            ("50\\ntidak\\n", "AIR-03: PENGHEMATAN", "HEMAT_AIR"),
+            ("51\\ntidak\\n", "AIR-04: KONDISI_NORMAL", "KONDISI_NORMAL"),
+            ("101\\nya\\n", "AIR-00: INPUT_CADANGAN_TIDAK_VALID", "MASUKAN_TIDAK_VALID"),
+            ("40\\nmungkin\\n", "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID", "MASUKAN_TIDAK_VALID"),
+        )
+        for user_input, expected_rule, expected_decision in cases:
+            with self.subTest(user_input=user_input):
+                output, _, _ = self.run_example("reality_engine.cuk", user_input)
+                self.assertIn(expected_rule, output)
+                self.assertIn(expected_decision, output)
+
     def test_reality_engine_at_20_percent_prioritizes_basic_needs(self):
         output, _, _ = self.run_example("reality_engine.cuk", "20\nya\n")
         self.assertIn("PRIORITASKAN_KEBUTUHAN_DASAR", output)
