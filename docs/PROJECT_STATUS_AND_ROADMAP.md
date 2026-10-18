@@ -5,6 +5,9 @@
 **Versi paket Python:** `0.8.0.dev0`  
 **Status:** eksperimental; ringkasan ini bukan bukti bahwa seluruh tes atau target deployment lulus. Audit ini tidak menyatakan bahasa stabil atau AI akurat secara umum.
 
+**AI knowledge/retrieval baseline:** 26 dokumen sumber terkurasi; 22 kasus baseline menghasilkan top-1. Hasil retrieval terdokumentasi terpisah dan bukan bukti model dilatih sendiri.
+**Retrieval baseline historis:** 5/8 (62,5%) dan 6/8 (75%) pada evaluasi yang dicatat; angka ini dipertahankan sebagai hasil historis, bukan klaim kualitas umum.
+
 ## Gambaran yang benar saat ini
 
 **Konformansi saat ini:** 78 fixture: 78 wajib pada interpreter referensi Python, 75 wajib pada native C, dan 3 secara eksplisit tidak didukung native. Contoh aplikasi kasir warung tercakup sebagai tes wajib pada kedua runtime.
