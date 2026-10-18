@@ -17,7 +17,7 @@ Reality Engine menjadi contoh kerja untuk menguji apakah sintaks dan semantik `.
 | Kemampuan yang terlihat | Yang diperlihatkan contoh |
 |---|---|
 | Struktur program dan fungsi | `jancuk`, `fungsi`, parameter, `balek`, dan penutup blok |
-| Masukan dan konversi | `tanya` menerima teks; `bilangan()` mengubahnya menjadi angka |
+| Masukan dan konversi | `tanya` menerima teks; `desimal()` mengubahnya menjadi angka yang dapat mencakup persentase pecahan |
 | Percabangan | `njir` dan `kampret` memilih jalur berdasarkan kondisi |
 | Validasi | Menolak cadangan di luar 0–100 dan jawaban selain `ya`/`tidak` |
 | Aturan deterministik | Fungsi `aturan_air()` memilih satu ID berdasarkan masukan |
@@ -43,7 +43,7 @@ Urutan pemeriksaan penting: input divalidasi sebelum ambang kebijakan digunakan.
 
 1. Pengguna memasukkan persentase cadangan.
 2. Program mengubah teks menjadi angka dan meminta jawaban kebutuhan dasar.
-3. `aturan_air()` memvalidasi masukan dan menentukan ID aturan.
+3. `desimal()` mengonversi angka, termasuk persentase pecahan; `aturan_air()` memvalidasi rentang 0–100 dan menentukan ID aturan.
 4. Fungsi keluaran menerjemahkan ID itu menjadi keputusan, alasan, dan tindakan.
 5. Program menampilkan hasil sehingga pembaca dapat menelusuri alasan keputusan kembali ke aturan yang cocok.
 
@@ -63,6 +63,8 @@ Contoh masukan:
 - `20` lalu `tidak` → ID `AIR-02`, penggunaan non-esensial dibatasi.
 - `21` lalu `ya` → ID `AIR-03`, penghematan.
 - `51` lalu `tidak` → ID `AIR-04`, kondisi normal.
+- `20.5` lalu `ya` → ID `AIR-03`, penghematan.
+- `100.1` lalu `tidak` → ID `AIR-00`, masukan di luar rentang ditolak.
 - `101` lalu `tidak` → masukan ditolak.
 - `abc` sebagai cadangan → kegagalan konversi ditangani dan program tidak menampilkan keputusan normal.
 
