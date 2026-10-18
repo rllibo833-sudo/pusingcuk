@@ -1,0 +1,14 @@
+jancuk
+lah harga_satuan = 10000
+lah jumlah = 4
+lah subtotal = harga_satuan * jumlah
+lah diskon = 4000
+lah setelah_diskon = subtotal - diskon
+lah pajak = bulatkan(setelah_diskon * 11 / 100)
+lah total = setelah_diskon + pajak
+hedeh subtotal
+hedeh diskon
+hedeh setelah_diskon
+hedeh pajak
+hedeh total
+selesai jancuk
