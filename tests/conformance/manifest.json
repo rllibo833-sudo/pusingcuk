@@ -1536,6 +1536,7 @@
       "requires": [
         "variables",
         "arithmetic",
+        "builtins",
         "output"
       ],
       "expected": {
