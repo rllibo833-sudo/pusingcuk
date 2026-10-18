@@ -33,6 +33,19 @@ jobs:
           python -m build --wheel --sdist
           python -m pip install --no-deps dist/*.whl
           pusingcuk --help
+          # Verify the installed wheel outside the repository so source files
+          # cannot accidentally hide missing files in the built package.
+          cd "$RUNNER_TEMP"
+          output="$(pusingcuk "$GITHUB_WORKSPACE/examples/kasir_warung.cuk")"
+          expected="$(printf '40000\\n4000\\n36000\\n3960\\n39960')"
+          test "$output" = "$expected"
+          cd "$GITHUB_WORKSPACE"
+
+      - name: Jalankan regresi bahasa dan konformansi
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -v
+          python tools/conformance.py
 
       - name: Bangun dan uji runtime native Linux
         run: |
