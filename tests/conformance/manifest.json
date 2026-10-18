@@ -1528,6 +1528,25 @@
         "reference": "required",
         "native": "required"
       }
+    },
+    {
+      "id": "application.warung-checkout",
+      "source": "kasir_warung.cuk",
+      "profile": "core",
+      "requires": [
+        "variables",
+        "arithmetic",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "40000\n4000\n36000\n3960\n39960\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
     }
   ]
 }
