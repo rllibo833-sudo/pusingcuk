@@ -67,11 +67,11 @@ Contoh masukan:
 - `100.1` lalu `tidak` → ID `AIR-00`, masukan di luar rentang ditolak.
 - `50` lalu `ya` → ID `AIR-03`; `50.1` lalu `ya` → ID `AIR-04`, membuktikan batas 50% secara eksplisit.
 - `NaN`, `inf`, atau `-Infinity` sebagai cadangan → konversi ditolak sebelum keputusan kebijakan.
-- Fungsi pemetaan menerima ID yang dihasilkan oleh `aturan_air()`. Penolakan ID arbitrer yang tidak dikenal belum dijamin oleh implementasi saat ini; jangan gunakan fungsi pemetaan sebagai batas validasi untuk ID dari sumber luar.
+- Fungsi pemetaan menerima ID yang dihasilkan oleh `aturan_air()`. ID arbitrer yang tidak dikenal sekarang diarahkan ke keputusan `ID_ATURAN_TIDAK_DIKENAL`, alasan bahwa kebijakan tidak tersedia, dan tindakan untuk menghentikan keputusan otomatis. Regresi memasukkan ID asing dengan mengganti hasil aturan; klaim ini tetap bergantung pada hasil CI commit terbaru.
 - `101` lalu `tidak` → masukan ditolak.
 - `abc` sebagai cadangan → kegagalan konversi ditangani dan program tidak menampilkan keputusan normal.
 
-Tes batas dan konsistensi Reality Engine berada di `tests/test_reality_engine_boundaries.py`, termasuk jawaban kebutuhan dasar yang tidak valid, teks angka yang gagal dikonversi, nilai non-finite, dan batas 50%. ID arbitrer yang tidak dikenal belum tercakup sebagai perilaku fail-closed. Tes contoh umum berada di `tests/test_examples_cuk.py`. Tes yang memeriksa perilaku tertentu membuktikan hanya kasus yang benar-benar dijalankan; keberhasilan satu contoh tidak membuktikan seluruh bahasa atau seluruh backend setara.
+Tes batas dan konsistensi Reality Engine berada di `tests/test_reality_engine_boundaries.py`, termasuk jawaban kebutuhan dasar yang tidak valid, teks angka yang gagal dikonversi, nilai non-finite, dan batas 50%. ID arbitrer yang tidak dikenal tercakup oleh regresi `test_unknown_rule_id_fails_closed_for_all_outputs`; hasil kelulusan terbaru tetap harus diperiksa pada CI. Tes contoh umum berada di `tests/test_examples_cuk.py`. Tes yang memeriksa perilaku tertentu membuktikan hanya kasus yang benar-benar dijalankan; keberhasilan satu contoh tidak membuktikan seluruh bahasa atau seluruh backend setara.
 
 ## Sejauh mana menuju kemandirian bahasa .cuk
 
@@ -84,8 +84,8 @@ Tes batas dan konsistensi Reality Engine berada di `tests/test_reality_engine_bo
 | Interaksi input dan validasi | Ada pada interpreter referensi | CLI meminta input, mengonversi angka, menolak rentang yang tidak valid, dan menangani kegagalan konversi. |
 | Regresi perilaku | Ada untuk kasus yang tercakup | Tes batas memeriksa beberapa ambang dan input salah. Tes hanya membuktikan kasus yang benar-benar dijalankan dan lulus di CI. |
 | Mandiri dari Python saat runtime | **Belum** | Contoh dijalankan melalui `python pusingcuk_new.py examples/reality_engine.cuk`; blok `coba/ketangkep` yang dipakai contoh belum didukung runtime native C. |
-| Satu sumber kebijakan tanpa pemetaan default yang berbahaya | **Belum tuntas** | ID aturan tak dikenal belum dijamin ditolak oleh fungsi pemetaan; jangan menerima ID dari sumber luar tanpa validasi. |
-| Paritas native/JS/VM dan lintas platform | **Belum dibuktikan untuk contoh ini** | Keberadaan backend lain bukan bukti bahwa seluruh sintaks contoh didukung atau hasilnya identik. |
+| Pemetaan ID tak dikenal | Implementasi fail-closed + regresi baru | ID asing menghasilkan keputusan `ID_ATURAN_TIDAK_DIKENAL`, alasan tidak tersedia, dan tindakan berhenti; status lulus harus dikonfirmasi dari CI commit terbaru. |
+| Paritas target | **Belum dibuktikan penuh** | Regresi baru mencoba source yang sama pada target JavaScript untuk kasus inti; seluruh matriks input dan parity native/VM belum terbukti. Status CI terbaru harus diperiksa. |
 | Bahasa dapat membangun toolchain-nya sendiri / self-hosting | **Belum** | Contoh ini tidak mengompilasi compiler .cuk, tidak mengganti implementasi Python, dan tidak membuktikan self-hosting. |
 
 ### Apa arti “mandiri” dalam proyek .cuk
@@ -100,9 +100,9 @@ Ada beberapa tingkat yang jangan dicampur:
 ### Urutan kerja yang masuk akal
 
 - Pertama, pertahankan satu ID aturan sebagai hasil kanonis dan tambah tes untuk konsistensi keputusan/alasan/tindakan, termasuk input gagal.
-- Kedua, tutup celah pemetaan ID tak dikenal dengan bentuk yang kompatibel dengan parser; jangan klaim fail-closed sebelum ada tes yang lulus.
-- Ketiga, hilangkan ketergantungan contoh pada fitur yang belum tersedia di target native atau implementasikan fitur itu dengan kontrak dan fixture lintas-runtime.
-- Keempat, jalankan source .cuk yang sama pada interpreter referensi dan target native/JS yang dinyatakan didukung, lalu bandingkan stdout, exit code, dan kelas error.
+- Kedua, fail-closed untuk ID tak dikenal kini diimplementasikan dengan percabangan yang kompatibel dengan parser, dan regresinya ditambahkan; jangan menyebutnya terverifikasi sebelum CI commit terbaru lulus.
+- Ketiga, jalankan source yang sama pada JavaScript (target ini mendukung `coba/ketangkep`) dan native. Native C tetap tidak mendukung blok `coba`; jangan mengklaim parity native untuk program utuh sebelum fitur tersebut tersedia atau contoh sengaja disederhanakan.
+- Keempat, bandingkan source yang sama pada interpreter referensi dan JavaScript untuk kasus valid, input kebijakan tidak valid, dan kegagalan konversi; lalu perluas ke seluruh ID, input batas, exit code, dan kelas error. Native memerlukan dukungan `coba/ketangkep` atau subset contoh yang disengaja.
 - Setelah bukti parity ada, baru naikkan klaim kemandirian target. Self-hosting adalah tahap terpisah yang jauh lebih lanjut.
 
 ## Fokus pengembangan di branch ini
