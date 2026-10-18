@@ -1,0 +1,138 @@
+name: Build package .cuk
+
+on:
+  push:
+    branches: ["warungpusingcuk"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pusingcuk-package-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Ambil kode
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Siapkan Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Bangun wheel dan source package
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install build
+          python -m build --wheel --sdist
+          python -m pip install --no-deps dist/*.whl
+          pusingcuk --help
+
+      - name: Bangun dan uji runtime native Linux
+        run: |
+          set -euo pipefail
+          mkdir -p dist/native
+          make NATIVE_BIN="$PWD/dist/native/pusingcuk-native-linux-x86_64" test-native
+          test -s dist/native/pusingcuk-native-linux-x86_64
+          dist/native/pusingcuk-native-linux-x86_64 --version
+          dist/native/pusingcuk-native-linux-x86_64 examples/native/rekap_anggaran.pusingcuk > dist/native-smoke.txt
+          grep -Fq 'Status: AMAN - target tabungan tercapai' dist/native-smoke.txt
+
+      - name: Bangun CLI mandiri Linux
+        run: |
+          set -euo pipefail
+          python -m pip install pyinstaller==6.11.1
+          pyinstaller --noconfirm --clean --onefile pusingcuk_new.py \
+            --name pusingcuk \
+            --add-data "library/builtin_contract.json:library" \
+            --add-data "library/kosakata.json:library" \
+            --add-data "examples:examples" \
+            --hidden-import evaluator \
+            --hidden-import parser \
+            --hidden-import lexer \
+            --hidden-import ast_nodes \
+            --hidden-import library.stdlib \
+            --hidden-import library.builtin_contract \
+            --hidden-import tools \
+            --hidden-import tools.formatter
+          test -s dist/pusingcuk
+          output="$(./dist/pusingcuk examples/kasir_warung.cuk)"
+          expected="$(printf '40000\n4000\n36000\n3960\n39960')"
+          test "$output" = "$expected"
+
+      - name: Siapkan Android NDK
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Siapkan Android SDK
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
+        with:
+          packages: platform-tools
+
+      - name: Build native Android ARM64
+        run: |
+          set -euo pipefail
+          sdkmanager "platforms;android-35" "ndk;27.2.12479018"
+          mkdir -p dist/android
+          if [[ -f scripts/build-android.sh ]]; then
+            PUSINGCUK_VERSION="0.8.0.dev0-android" bash scripts/build-android.sh dist/android
+          else
+            NDK_BIN="$ANDROID_HOME/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin"
+            "$NDK_BIN/aarch64-linux-android24-clang" -std=c11 -O2 -Wall -Wextra -Werror \
+              -DPUSINGCUK_VERSION='"0.8.0.dev0-android"' \
+              native/pusingcuk.c -lm -o dist/android/pusingcuk-native-android-arm64
+            chmod 755 dist/android/pusingcuk-native-android-arm64
+          fi
+          test -s dist/android/pusingcuk-native-android-arm64
+          file dist/android/pusingcuk-native-android-arm64
+          readelf -h dist/android/pusingcuk-native-android-arm64 | grep -q 'Machine:.*AArch64'
+          strings dist/android/pusingcuk-native-android-arm64 | grep -Fq '0.8.0.dev0-android'
+
+      - name: Siapkan isi paket yang dapat diunduh
+        run: |
+          set -euo pipefail
+          mkdir -p dist/pusingcuk-package
+          cp dist/*.whl dist/*.tar.gz dist/pusingcuk-package/
+          cp dist/pusingcuk dist/pusingcuk-package/pusingcuk-linux-x86_64
+          cp dist/native/pusingcuk-native-linux-x86_64 dist/pusingcuk-package/
+          cp dist/android/pusingcuk-native-android-arm64 dist/pusingcuk-package/
+          cp README.md LICENSE dist/pusingcuk-package/
+          cat > dist/pusingcuk-package/CARA-MENGGUNAKAN.txt <<'TXT'
+          PusingCuk experimental package
+
+          Isi:
+          - pusingcuk-linux-x86_64: CLI interpreter mandiri Linux x86-64 (tidak perlu Python terpasang).
+          - pusingcuk-native-linux-x86_64: runtime native Linux x86-64 untuk subset sintaks yang didukung.
+          - pusingcuk-native-android-arm64: executable native Android ARM64; bukan APK dan perlu dijalankan dari aplikasi terminal Android yang kompatibel.
+          - .whl: paket Python untuk memasang CLI dan library; membutuhkan Python 3.11+.
+          - .tar.gz: source distribution.
+
+          Mulai:
+          1. Linux x86-64: chmod +x pusingcuk-linux-x86_64 lalu jalankan ./pusingcuk-linux-x86_64 --help.
+          2. Native runtime hanya mendukung subset bahasa; tidak semua fitur interpreter tersedia.
+          3. Paket Android ARM64 bukan aplikasi APK dengan ikon/UI.
+          4. Paket ini eksperimental. Verifikasi checksum dan jalankan hanya kode yang dipercaya.
+          TXT
+          (cd dist/pusingcuk-package && sha256sum * > SHA256SUMS)
+          cd dist
+          zip -qr pusingcuk-package.zip pusingcuk-package
+          test -s pusingcuk-package.zip
+          unzip -l pusingcuk-package.zip
+
+      - name: Unggah package sebagai GitHub Actions artifact (tanpa Release)
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: pusingcuk-language-package
+          path: |
+            dist/pusingcuk-package.zip
+            dist/pusingcuk-package/
+          if-no-files-found: error
+          retention-days: 30
