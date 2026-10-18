@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101018">
+<meta name="description" content="Playground eksperimental PusingCuk dengan editor dan output di browser.">
+<title>Playground — PusingCuk</title>
+<style>
+:root{color-scheme:dark;--bg:#101018;--panel:#191923;--panel2:#20202c;--ink:#f5f3ff;--muted:#aaa8bd;--line:#343344;--lime:#d4ff59;--pink:#ff70b8;--violet:#a995ff;--max:1080px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}a{color:var(--lime);text-underline-offset:4px}.wrap{width:min(var(--max),calc(100% - 32px));margin:auto}.top{border-bottom:1px solid var(--line);padding:18px 0}.toprow{display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{font-weight:900;letter-spacing:-.04em;text-decoration:none;color:var(--ink)}.brand b{color:var(--lime)}.back{font-size:.9rem}.hero{padding:42px 0 25px}.eyebrow{color:var(--lime);font-size:.76rem;font-weight:850;letter-spacing:.12em;text-transform:uppercase}h1{font-size:clamp(2.3rem,6vw,4rem);line-height:1.04;letter-spacing:-.065em;margin:10px 0 14px}.hero p{max-width:720px;color:var(--muted);margin:0}.notice{margin:20px 0;padding:15px 17px;border:1px solid #a995ff60;background:#a995ff0d;border-radius:12px;color:#dcd5ff;font-size:.9rem}.notice strong{color:var(--ink)}.workspace{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:16px;padding-bottom:45px}.pane{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:var(--panel);min-width:0}.panehead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);font-size:.84rem;font-weight:800}.file{color:var(--violet);font-family:ui-monospace,monospace;font-size:.78rem}.editor{display:block;width:100%;min-height:330px;resize:vertical;border:0;outline:0;background:#14141d;color:#f1efff;padding:18px;font:14px/1.8 ui-monospace,SFMono-Regular,Consolas,monospace;tab-size:2}.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:13px 15px;border-top:1px solid var(--line)}button{border:1px solid var(--line);border-radius:10px;padding:10px 15px;font:inherit;font-weight:800;cursor:pointer;background:var(--panel2);color:var(--ink)}button:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid var(--lime);outline-offset:3px}button.primary{background:var(--lime);color:#171717;border-color:var(--lime)}button:disabled{opacity:.55;cursor:wait}.status{font-size:.78rem;color:var(--muted)}.output{min-height:330px;margin:0;padding:18px;background:#0b0b11;color:#d4ff59;white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.8 ui-monospace,SFMono-Regular,Consolas,monospace}.output.error{color:#ff9bbf}.panefoot{border-top:1px solid var(--line);padding:12px 15px;color:var(--muted);font-size:.78rem}.fineprint{color:var(--muted);font-size:.82rem;padding-bottom:35px}.fineprint p{margin:.4rem 0}@media(max-width:760px){.workspace{grid-template-columns:1fr}.editor,.output{min-height:260px}.hero{padding-top:32px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap toprow"><a class="brand" href="index.html">pusing<b>cuk</b></a><a class="back" href="index.html">← Kembali ke beranda</a></div></header>
+<main class="wrap">
+<section class="hero"><div class="eyebrow">Playground · Tahap 1</div><h1>Coba kode. Lihat hasilnya.</h1><p>Eksperimen kecil di browser untuk mulai mengenal bentuk kode PusingCuk. Contoh bawaan disamakan dengan <code>site/examples/halo.pusingcuk</code> dan diperiksa lewat interpreter referensi di CI.</p>
+<div class="notice"><strong>Catatan penting:</strong> mesin sementara adalah Python melalui Pyodide <code>0.27.7</code>. Halaman ini hanya menerjemahkan subset contoh sederhana ke Python; ini <strong>bukan</strong> interpreter atau compiler .cuk asli. Kode tidak dikirim ke server.</div></section>
+<section class="workspace" aria-label="Editor playground">
+<div class="pane"><div class="panehead"><span>Editor</span><span class="file">halo.pusingcuk</span></div>
+<textarea id="source" class="editor" spellcheck="false" aria-label="Kode PusingCuk" autocapitalize="off" autocomplete="off">jancuk
+
+lah nama = "Dunia"
+hedeh "Halo, " + nama
+
+selesai jancuk</textarea>
+<div class="actions"><button id="run" class="primary" type="button">▶ Jalankan</button><button id="reset" type="button">Pulihkan contoh</button><span id="status" class="status" role="status">Menunggu dijalankan.</span></div>
+</div>
+<div class="pane"><div class="panehead"><span>Output</span><span class="file">stdout</span></div><pre id="output" class="output" aria-live="polite">Output program akan muncul di sini.</pre><div class="panefoot">Contoh yang diharapkan: <code>Halo, Dunia</code></div></div>
+</section>
+<section class="fineprint"><p><strong>Batas versi pertama:</strong> mendukung pembuka/penutup program, deklarasi sederhana <code>lah</code>, dan output <code>hedeh</code> dengan teks, angka, variabel, serta operator <code>+</code>.</p><p>Versi ini tidak mengeksekusi Python bebas dari editor. Sintaks di luar subset akan ditolak. Pyodide dimuat dari CDN versi tetap; koneksi internet diperlukan untuk memuat mesin pertama kali.</p></section>
+</main>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
+<script>
+"use strict";
+const starter = 'jancuk\n\nlah nama = "Dunia"\nhedeh "Halo, " + nama\n\nselesai jancuk';
+const editor = document.getElementById("source");
+const output = document.getElementById("output");
+const status = document.getElementById("status");
+const runButton = document.getElementById("run");
+let pyodidePromise;
+function tokenizeExpression(source) {
+  const tokens = [];
+  let i = 0;
+  while (i < source.length) {
+    if (/\s/.test(source[i])) { i++; continue; }
+    const rest = source.slice(i);
+    const match = rest.match(/^(?:"(?:\\.|[^"\\])*"|-?\d+(?:\.\d+)?|[A-Za-z_][A-Za-z0-9_]*|\+)/);
+    if (!match) throw new Error("Ekspresi belum didukung di posisi " + (i + 1) + ".");
+    tokens.push(match[0]); i += match[0].length;
+  }
+  if (!tokens.length) throw new Error("Ekspresi tidak boleh kosong.");
+  return tokens;
+}
+function translateSubset(source) {
+  const lines = source.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  if (lines.length < 3 || lines[0] !== "jancuk" || lines[lines.length - 1] !== "selesai jancuk") {
+    throw new Error("Program harus diawali 'jancuk' dan diakhiri 'selesai jancuk'.");
+  }
+  const body = lines.slice(1, -1);
+  const declared = new Set();
+  const py = [];
+  for (const line of body) {
+    let match = line.match(/^lah\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$/);
+    let isPrint = false;
+    if (!match) {
+      match = line.match(/^hedeh\s+(.+)$/);
+      isPrint = true;
+      if (!match) throw new Error("Baris belum didukung: " + line);
+    }
+    const tokens = tokenizeExpression(match[isPrint ? 1 : 2]);
+    let expression = "";
+    for (const token of tokens) {
+      if (token === "+") { expression += " + "; continue; }
+      if (token.startsWith('"')) { JSON.parse(token); expression += token; continue; }
+      if (/^-?\d+(?:\.\d+)?$/.test(token)) { expression += token; continue; }
+      if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(token) || !declared.has(token)) {
+        throw new Error("Variabel belum dideklarasikan atau token tidak valid: " + token);
+      }
+      expression += token;
+    }
+    if (isPrint) py.push("print(" + expression + ")");
+    else {
+      const name = match[1];
+      if (declared.has(name)) throw new Error("Variabel sudah dideklarasikan: " + name);
+      declared.add(name);
+      py.push(name + " = " + expression);
+    }
+  }
+  if (!py.some(line => line.startsWith("print("))) throw new Error("Tambahkan satu baris 'hedeh' untuk menghasilkan output.");
+  return py.join("\n");
+}
+async function getPyodide() {
+  if (!window.loadPyodide) throw new Error("Pyodide belum termuat. Periksa koneksi lalu muat ulang halaman.");
+  if (!pyodidePromise) pyodidePromise = window.loadPyodide({indexURL:"https://cdn.jsdelivr.net/pyodide/v0.27.7/full/"});
+  return pyodidePromise;
+}
+runButton.addEventListener("click", async () => {
+  runButton.disabled = true; status.textContent = "Menyiapkan Python…"; output.classList.remove("error"); output.textContent = "";
+  try {
+    const pythonSource = translateSubset(editor.value);
+    const pyodide = await getPyodide();
+    pyodide.globals.set("_pc_source", pythonSource);
+    const result = await pyodide.runPythonAsync(
+      "import contextlib, io\n_pc_output = io.StringIO()\nwith contextlib.redirect_stdout(_pc_output):\n    exec(compile(_pc_source, '<PusingCuk subset>', 'exec'), {'__builtins__': {'print': print}})\n_pc_output.getvalue()"
+    );
+    output.textContent = result || "(Program selesai tanpa output.)";
+    status.textContent = "Selesai · mesin sementara Python";
+  } catch (error) {
+    output.classList.add("error"); output.textContent = String(error && error.message ? error.message : error);
+    status.textContent = "Belum berhasil dijalankan";
+  } finally { runButton.disabled = false; }
+});
+document.getElementById("reset").addEventListener("click", () => {
+  editor.value = starter; output.classList.remove("error"); output.textContent = "Output program akan muncul di sini."; status.textContent = "Contoh dipulihkan.";
+});
+</script>
+</body>
+</html>
