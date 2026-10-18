@@ -56,23 +56,28 @@ Saya membaca GitHub repository metadata, recursive Git tree, `pyproject.toml`, `
 
 ## 4. Baseline fixture dan target
 
-### 4.1 Baseline eksekusi — Tertunda: dijalankan via CI di Phase 1
+### 4.1 Baseline eksekusi — diukur melalui GitHub Actions
 
-**Status: Tertunda: dijalankan via CI di Phase 1.** Sandbox audit tidak dapat menyelesaikan DNS `github.com` saat mencoba clone repository (exit 128), sehingga runner lokal tidak memiliki checkout dan tidak bisa menghasilkan log mentah. Karena itu, tidak ada angka pass/fail per fixture atau Python-Free Score yang diperkirakan atau dikarang di fase ini. CI yang ada sebelumnya hanya membuktikan job dan target yang dijalankannya; ringkasan job tidak cukup untuk menyimpulkan hasil setiap fixture.
+Baseline dijalankan di runner GitHub Actions, commit `730b3a05fd2510b955ffeee2a21866915f60f5c6`, [run #4](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39127180391). Workflow selesai sukses karena semua target terus dijalankan dan kegagalan target dicatat; **status workflow hijau bukan berarti seluruh backend lulus**.
 
-| Runtime/target | Cakupan manifest yang diketahui | Hasil eksekusi per-fixture | Status audit |
-|---|---|---|---|
-| Python reference interpreter | 77 fixture diwajibkan | Tertunda; workflow Phase 1 akan menghasilkan log | **Tertunda: dijalankan via CI di Phase 1** |
-| Native C | 74 required; 3 unsupported | Tertunda; workflow Phase 1 akan menghasilkan log | **Tertunda: dijalankan via CI di Phase 1** |
-| JavaScript via Node | Dukungan manifest belum ditetapkan | Tertunda; perlu pemetaan fixture/dukungan | **Tertunda: dijalankan via CI di Phase 1** |
-| Python transpiler | Dukungan manifest belum ditetapkan; bukan reference interpreter | Tertunda; perlu pemetaan fixture/dukungan | **Tertunda: dijalankan via CI di Phase 1** |
-| HTML | Dukungan manifest belum ditetapkan | Tertunda; ukur hanya jika target runnable tersedia | **Tertunda: dijalankan via CI di Phase 1** |
-| VM/bytecode | Dukungan manifest belum ditetapkan | Tertunda; VM saat ini bergantung pada helper evaluator Python | **Tertunda: dijalankan via CI di Phase 1** |
-| JSON IR | Bukan runtime eksekusi; jangan dihitung sebagai runtime tanpa Python | Di luar skor runtime; validasi format dapat dilaporkan terpisah | **Bukan skor runtime** |
+| Target | Fixture lulus | Gagal | Timeout | Tidak didukung | Tidak tersedia |
+|---|---:|---:|---:|---:|---:|
+| Python reference interpreter | 77 | 0 | 0 | 0 | 0 |
+| Native C | 74 | 0 | 0 | 3 | 0 |
+| JavaScript via Node | 29 | 48 | 0 | 0 | 0 |
+| Python transpiler | 21 | 56 | 0 | 0 | 0 |
+| HTML | 0 | 0 | 0 | 77 | 0 |
+| VM/bytecode | 28 | 49 | 0 | 0 | 0 |
 
-### 4.2 Persentase Python-free
+Jumlah fixture pada manifest: **77**. Status gagal mencakup kegagalan kompilasi dan ketidakcocokan output/exit code/diagnostik; per fixture lihat log mentah. HTML diberi status tidak didukung karena backend HTML yang dapat dieksekusi tidak ditemukan. Tiga fixture native berstatus unsupported menurut cakupan target.
 
-**Python-Free Score awal: Tertunda sampai workflow Phase 1 berjalan.** Metode yang direncanakan: hitung hanya fixture yang benar-benar lulus pada native C sebagai runtime Python-free, dibagi jumlah fixture yang secara eksplisit didukung/dapat dijalankan pada target native C dalam manifest yang sama, lalu kalikan 100. Fixture berstatus unsupported dikeluarkan dari penyebut dan dilaporkan terpisah. Tidak memakai angka required sebagai pengganti hasil pass. VM **tidak** dihitung Python-free selama implementasinya masih mengimpor helper evaluator Python. Build/harness yang menggunakan Python akan dibedakan dari kebutuhan Python saat menjalankan hasil native. Angka aktual baru ditulis setelah log CI dan ringkasan JSON tersedia.
+**Artifact bukti:** [run #4 dan artifact `pusingcuk-fixture-baseline-39127180391-1`](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39127180391). Artifact berisi `raw.log` (154.662 byte) dan `summary.json`; tersedia untuk diunduh dari bagian **Artifacts** di halaman run. Retensi artifact 90 hari, jadi unduh/simpan salinan bila perlu bukti jangka panjang.
+
+### 4.2 Python-Free Score awal
+
+**Skor: 96,10% (74/77 fixture).** Ini adalah skor cakupan baseline native C, bukan klaim bahwa seluruh fitur bahasa sudah portabel atau bahwa build toolchain tidak memakai Python.
+
+Metode: `Python-Free Score = (jumlah fixture manifest yang benar-benar lulus pada eksekusi native C) / (total seluruh fixture di manifest) × 100`. Pembagi selalu semua 77 fixture. Tiga fixture yang tidak didukung native tetap berada di pembagi dan tidak dihitung lulus. Hanya native C yang dihitung sebagai Python-free pada baseline ini. VM **tidak** dihitung karena masih mengimpor helper evaluator Python. Python yang dipakai runner untuk mengompilasi/mengorkestrasi pengujian dibedakan dari kebutuhan Python pada saat menjalankan executable native.
 
 ### 4.3 Fixture hygiene
 
@@ -667,8 +672,9 @@ Workflow `.github/workflows/tests.yml` memiliki `pull_request.paths` dan `push.p
 
 - [x] Tambahkan temuan filter path CI dan rekomendasi Phase 1.
 - [x] Pembacaan mendalam awal terhadap lexer, parser, evaluator, compiler/, native/, dan library/assistant.py; batas bukti dan risiko dicatat.
-- [ ] Eksekusi nyata seluruh fixture per target dan log mentah setiap target — **belum terpenuhi**, karena sandbox gagal mengakses GitHub dan runner conformance saat ini hanya mendukung reference/native.
-- [ ] Python-Free Score berbasis hasil eksekusi aktual — **belum dapat dihitung**.
-- [ ] CI untuk PR #93 — belum berjalan; baseline run #1134 pada main bukan pengganti CI PR.
+- [x] Baseline seluruh 77 fixture diukur per target pada GitHub Actions; raw log dan JSON ringkasan tersedia sebagai artifact run #4.
+- [x] Python-Free Score dihitung dari hasil nyata dengan pembagi seluruh 77 fixture: 74/77 = 96,10%.
+- [x] PR #93 telah di-merge oleh pemilik. Hasil pengukuran dilampirkan lewat PR dokumentasi terpisah ini.
+- [ ] Perbaikan backend JS, Python transpiler, dan VM berada di luar scope baseline ini; perlu persetujuan terpisah sebelum pekerjaan implementasi berikutnya.
 
-**Karena dua syarat eksekusi dan skor belum terpenuhi, rekomendasi audit adalah TIDAK merge PR #93 saat ini.** Langkah yang benar adalah menjalankan job conformance pada GitHub Actions yang dapat mengakses checkout repository, menambahkan hasil fixture per target yang benar-benar memiliki runner, lalu memperluas runner untuk target yang belum didukung sebagai bagian dari fase CRE yang disetujui. Tidak ada merge atau branch Phase 1 yang dibuat sebelum syarat ini terselesaikan.
+**Keputusan:** Phase 1 mengukur dan melaporkan baseline saja. Tidak dimulai restrukturisasi atau Phase 2 tanpa persetujuan pemilik.
