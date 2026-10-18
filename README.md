@@ -6,8 +6,11 @@
 PusingCuk menggabungkan sintaks yang mudah dikenali penutur Indonesia dengan jalur interpreter, compiler, runtime native, serta alat konformansi.
 
 <!-- BEGIN GENERATED PYTHON-FREE SCORE BADGE -->
-[![Python-Free Score](docs/assets/python-free-score.svg)](docs/PYTHON_FREE_SCORE.md)
-<!-- END GENERATED PYTHON-FREE SCORE BADGE --> Proyek ini ditujukan untuk belajar, eksperimen bahasa, dan pengembangan compiler secara terbuka—bukan untuk mengklaim bahwa semua target sudah setara atau siap produksi.
+[![Python-free runtime · native C · 74/77 fixtures](docs/assets/python-free-score.svg)](docs/PYTHON_FREE_SCORE.md)
+Python-free runtime, native C: **74 dari 77 fixture aktif lulus**. Ini cakupan fixture runtime native C, bukan klaim bahwa seluruh proyek atau proses build bebas Python.
+<!-- END GENERATED PYTHON-FREE SCORE BADGE -->
+
+Proyek ini ditujukan untuk belajar, eksperimen bahasa, dan pengembangan compiler secara terbuka—bukan untuk mengklaim bahwa semua target sudah setara atau siap produksi.
 
 **Status:** kontrak bahasa `0.6-dev`; paket Python `0.8.0.dev0`. **Metadata paket pada `main` adalah `0.8.0.dev0`.** Ini perangkat lunak tahap pengembangan, bukan rilis stabil. Dukungan tiap backend berbeda dan harus diperiksa melalui matriks kompatibilitas serta fixture.
 

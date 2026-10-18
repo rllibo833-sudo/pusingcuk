@@ -125,11 +125,11 @@ def score_values(summary: dict) -> tuple[int, int, float]:
 
 def render_score_svg(summary: dict) -> str:
     numerator, denominator, percent = score_values(summary)
-    label = f"Python-Free Score {percent:.2f}% ({numerator}/{denominator})"
-    left = "Python-Free Score"
-    right = f"{percent:.2f}% ({numerator}/{denominator})"
-    left_width = 114
-    right_width = max(82, len(right) * 7 + 16)
+    label = f"Python-free runtime, native C: {numerator} dari {denominator} fixture"
+    left = "Python-free runtime"
+    right = f"native C {numerator}/{denominator} fixtures"
+    left_width = 120
+    right_width = max(116, len(right) * 7 + 16)
     width = left_width + right_width
     return "\n".join([
         '<svg xmlns="http://www.w3.org/2000/svg" width="' + str(width) + '" height="20" role="img" aria-label="' + label + '">',
@@ -233,8 +233,10 @@ def main() -> int:
         old_badge_svg = args.badge_svg.read_text(encoding="utf-8")
         updated_compatibility = replace_generated_section(compatibility, START, END, render(summary), "COMPATIBILITY.md")
         updated_conformance = replace_generated_section(conformance, FIXTURE_START, FIXTURE_END, render_fixture_counts(manifest), "CONFORMANCE_FIXTURES.md")
-        badge = "[![Python-Free Score](docs/assets/python-free-score.svg)](docs/PYTHON_FREE_SCORE.md)"
-        updated_readme = replace_generated_section(readme, README_BADGE_START, README_BADGE_END, README_BADGE_START + "\n" + badge + "\n" + README_BADGE_END, "README.md")
+        badge = f"[![Python-free runtime · native C · {records[-1]['numerator']}/{records[-1]['denominator']} fixtures](docs/assets/python-free-score.svg)](docs/PYTHON_FREE_SCORE.md)"
+        score_line = f"Python-free runtime, native C: **{records[-1]['numerator']} dari {records[-1]['denominator']} fixture aktif lulus**. Ini cakupan fixture runtime native C, bukan klaim bahwa seluruh proyek atau proses build bebas Python."
+        badge_section = README_BADGE_START + "\n" + badge + "\n" + score_line + "\n" + README_BADGE_END
+        updated_readme = replace_generated_section(readme, README_BADGE_START, README_BADGE_END, badge_section, "README.md")
         updated_score_document = replace_generated_section(score_document, SCORE_START, SCORE_END, render_score_history(records), "PYTHON_FREE_SCORE.md")
         updated_badge_svg = render_score_svg(summary)
     except (OSError, json.JSONDecodeError, ValueError, TypeError) as exc:

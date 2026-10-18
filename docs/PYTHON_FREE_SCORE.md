@@ -1,8 +1,8 @@
 # Python-Free Score
 
-The Python-Free Score measures the checked-in native C runtime's fixture coverage, not whether the build or test toolchain itself uses Python and not whether the entire language is implemented without Python.
+The Python-free runtime score describes fixture coverage for the native C runtime after compilation. It is not a claim that the whole project, compiler, build system, or CI is independent of Python.
 
-**Formula:** native C fixtures that pass ÷ all fixtures in the active manifest × 100. Fixtures marked unsupported remain in the denominator and do not count as passed. The value is a coverage score, not a security certification or a claim of full backend parity.
+**Formula:** native C fixtures that pass ÷ all 77 fixtures in the active manifest × 100 (updated from the manifest when its count changes). Fixtures marked unsupported remain in the denominator and do not count as passed. The value is a coverage score, not a security certification or a claim of full backend parity.
 
 ## History
 
@@ -19,4 +19,4 @@ This is the first tracked snapshot in this history. Earlier scores are not backf
 - Canonical fixture list: [`tests/conformance/manifest.json`](../tests/conformance/manifest.json)
 - Baseline counts: [`tests/conformance/baseline_summary.json`](../tests/conformance/baseline_summary.json)
 - Current history records link to the corresponding commit and fixture-matrix workflow run.
-- Native C can run after compilation without Python, but this score does not claim that the compiler, build, CI, or every PusingCuk backend is Python-free.
+- The label means only that the compiled native C runtime can execute the supported fixture subset without a Python interpreter; it does not claim Python-free compilation, tooling, CI, or other backends.
