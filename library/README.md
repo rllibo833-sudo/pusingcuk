@@ -1,70 +1,35 @@
-# Pusingcuk Examples and Vocabulary Registry
+# Library PusingCuk
 
-This directory contains runnable examples, runtime metadata, built-in registries, and the machine-readable vocabulary registry. It is **not** the complete learner-facing dictionary, a package manager, or a general-purpose importable standard library. For the human-readable language glossary, start at [the language-reference map](../docs/language/README.md).
+Folder ini berisi beberapa jenis aset yang berbeda. **Tidak semua berkas di sini adalah pustaka standar .cuk yang mandiri.**
 
-- [`kosakata.json`](kosakata.json): keyword and alias glossary, meanings, and support-status metadata.
-- [`conditional_logic.pusingcuk`](conditional_logic.pusingcuk): comparisons, booleans, short-circuit logic, and conditionals.
-- [`loops_functions_genz.pusingcuk`](loops_functions_genz.pusingcuk): loops, recursive functions, and newer slang aliases. Run it with the modular interpreter because its text output is not supported by the experimental C source backend subset.
-- [`stdlib.py`](stdlib.py): the implementation registry for built-ins declared in [`builtin_contract.json`](builtin_contract.json). The Python reference interpreter dispatches all 25 contract built-ins through this registry. the JS backend implements all 25 contracted built-ins; Python transpiler and HTML support a separately documented subset, the VM supports six, and native C has fixture-backed support for 17 full-contract built-ins; conversion built-ins have only scalar-subset coverage and are not claimed as fully equivalent to the reference interpreter. See the [full built-in catalogue](../docs/language/BUILTINS.md); registry presence alone does not prove every target supports a built-in.
+| Kelompok | Lokasi | Fungsi |
+|---|---|---|
+| Kontrak built-in | `builtin_contract.json`, `builtin_contract.py` | Nama, aritas, metadata, dan status dukungan per target |
+| Implementasi referensi | `stdlib.py` | Implementasi built-in yang dipakai interpreter Python |
+| Kosakata | `kosakata.json` | Registri keyword/alias dan status |
+| Program .cuk | `*.cuk`, `*.pusingcuk` | Contoh dan aturan yang ditulis dalam bahasa |
+| AI dan grounding | `assistant.py`, `ai_tools.py`, `knowledge_grounding.py`, `knowledge_index.json`, `local_memory.py` | Asisten, tool, indeks, dan konteks pengetahuan |
+| Adapter | `*_provider.py`, `adapters/` | Konektor/adapter model; bukan bagian wajib runtime .cuk |
 
-## Run examples with the Python interpreter
+## Jalankan contoh
 
-From the repository root:
+Dari root repository:
 
 ```sh
 python pusingcuk_new.py library/conditional_logic.pusingcuk
 python pusingcuk_new.py library/loops_functions_genz.pusingcuk
 ```
 
-## Compile the conditional example to C11
+## Aturan perubahan
 
-With Python and a C11 compiler installed:
+1. Periksa `SPEC.md` dan `docs/SEMANTIC_CONTRACT.md` sebelum mengubah perilaku.
+2. Ubah `builtin_contract.json` hanya jika metadata/dukungan kontrak memang berubah; jangan menganggap nama terdaftar berarti implementasi tersedia.
+3. Untuk perubahan keyword/alias, selaraskan lexer, parser bila perlu, `kosakata.json`, contoh, dan tes.
+4. Untuk klaim dukungan target, tambahkan tes/fixture yang benar-benar menjalankan target tersebut.
+5. Database, jaringan, browser, Web3, dan FFI bukan API lintas-runtime hanya karena disebut di metadata; setiap kapabilitas memerlukan adapter, izin, dan bukti target.
 
-```sh
-python -m compiler.c_backend library/conditional_logic.pusingcuk -o /tmp/conditional_logic.c
-cc -std=c11 -Wall -Wextra -Werror /tmp/conditional_logic.c -o /tmp/conditional_logic
-/tmp/conditional_logic
-```
+## Batas runtime
 
-The compiled executable does not require Python at runtime. Python is only used by the compiler front end.
+Interpreter referensi Python mendukung kontrak built-in lebih luas daripada beberapa backend. Native C, JavaScript, transpiler Python/HTML, dan VM memiliki cakupan berbeda. Lihat [kompatibilitas](../docs/COMPATIBILITY.md), [katalog built-in](../docs/language/BUILTINS.md), dan `builtin_contract.json`.
 
-## How to update the vocabulary
-
-When adding or changing a keyword or alias, update all relevant layers together:
-
-1. The lexer/parser or runtime implementation that actually recognizes the word.
-2. The language specification and slang guide.
-3. `kosakata.json`, including the alias's canonical target and honest support-status fields.
-4. Runnable examples and regression tests for the runtimes that claim support.
-
-The JSON registry is a contributor-facing reference, not proof that a feature works. The automated tests should compare its alias mapping with the implementation so the two cannot silently drift.
-
-## Understanding support status
-
-- `native_runtime: tested` means a native-runtime fixture exercises the feature; it does not imply every compiler target supports it.
-- `native_runtime: pending-native-support` means the standalone native runtime does not yet claim support for that alias/feature.
-- `c_backend: supported` or a more specific subset label describes the experimental source-to-C backend only.
-- `c_backend: unsupported` means the feature must not be used in C-backend examples; the compiler should reject it explicitly.
-
-The glossary is a practical index, not a replacement for `SPEC.md`, the semantic contract, or the runtime compatibility matrix. If information differs, report the mismatch and use tests plus the relevant implementation to establish the actual behavior.
-
-
-## Explicit Python statistics subset
-
-The Python importer maps the built-in `sum` to `jumlah`, and maps `statistics.mean` to `rata_rata` and `statistics.median` to `median`. The statistics functions accept a non-empty list of finite, non-boolean numbers within the shared safe-integer range; native C parity is covered by conformance fixtures. The `jumlah` builtin also accepts an empty list (sum is zero) but rejects unsafe integer inputs or integral results. This is a deliberately small Pusingcuk API, not full Python `statistics` compatibility. Other statistics functions, wildcard imports, and VM support are not claimed.
-
-
-## Builtin contract: one metadata source
-
-`builtin_contract.json` owns canonical names, parameters/arity, descriptions, Python import mappings, backend helper names, and support states. `builtin_contract.py` validates and exposes it. The reference registry and backend dispatch tables are derived from this metadata; implementation code remains target-specific. `tools/conformance.py` loads the same contract before running fixtures.
-
-Use only these support labels:
-- `supported`: implementation and tests exist for that target.
-- `unsupported`: the target is known not to implement this builtin.
-- `not-claimed`: support has not been verified; do not promise compatibility.
-
-Database, server, browser, Web3, and blockchain imports must not be added as names alone. They need explicit adapters, capability permissions, offline-friendly development modes, and target-specific tests.
-
-### Platform adapters: planned, not yet implemented
-
-The same contract lists future capability groups such as `data.database`, `server.http`, `net.http`, `web.dom`, `web3.blockchain`, and `backend.ffi`. They are explicitly marked `planned` with no supported targets. The architecture is offline-first: local databases, loopback servers, mocked HTTP transports, and local blockchain development nodes are intended to make development and tests possible without public internet services. These are design goals, not existing Pusingcuk APIs.
+PusingCuk tidak menjamin sandbox OS untuk kode tidak tepercaya.

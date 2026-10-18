@@ -17,7 +17,7 @@ Catatan ringkas perubahan yang sudah dilakukan. Versi paket dan versi bahasa ada
 
 ### Bahasa dan runtime
 
-- Tidak ada klaim fitur bahasa baru hanya dari perubahan dokumentasi.
+- Koreksi backend C: operator `==` dan `!=` pada teks membandingkan isi string dengan `strcmp`, bukan alamat string. Regresi membandingkan hasil backend C dengan interpreter referensi. Backend C subset juga mendukung `teks()` untuk teks, integer, dan boolean scalar, dengan tes parity terhadap interpreter referensi.
 - Prioritas pengembangan berikutnya adalah memperluas dukungan native dan mengunci setiap perubahan semantik dengan fixture positif/negatif lintas-runtime.
 - Bytecode VM tetap eksperimental; implementasi VM berbasis Python tidak dihitung sebagai runtime bebas Python.
 
