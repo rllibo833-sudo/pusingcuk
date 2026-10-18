@@ -70,6 +70,13 @@ class CukExampleCliTests(unittest.TestCase):
         self.assertIn("MASUKAN_TIDAK_VALID", output)
         self.assertIn("jawab kebutuhan dasar dengan ya atau tidak", output)
 
+    def test_reality_engine_rejects_non_numeric_reserve(self):
+        output, _, _ = self.run_example("reality_engine.cuk", "abc\n")
+        self.assertIn("Input tidak valid:", output)
+        self.assertIn("Masukkan cadangan sebagai angka yang valid dari 0 sampai 100.", output)
+        self.assertNotIn("KONDISI_NORMAL", output)
+        self.assertNotIn("Cadangan air (%):", output)
+
     def test_terminal_bot_handles_interactive_answers(self):
         output, _, _ = self.run_example("terminal_bot.cuk", "Ayu\nbaik\n")
         self.assertIn("Halo, Ayu!", output)

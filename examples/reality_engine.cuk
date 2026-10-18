@@ -52,17 +52,22 @@ fungsi alasan_air(cadangan, kebutuhan_dasar)
     selesai njir
 selesai fungsi
 
-tanya cadangan_teks = "Cadangan air saat ini (0-100%): "
-tanya kebutuhan_dasar = "Kebutuhan dasar masih harus dipenuhi? (ya/tidak): "
-lah cadangan = bilangan(cadangan_teks)
-lah keputusan = keputusan_air(cadangan, kebutuhan_dasar)
+coba
+    tanya cadangan_teks = "Cadangan air saat ini (0-100%): "
+    lah cadangan = bilangan(cadangan_teks)
+    tanya kebutuhan_dasar = "Kebutuhan dasar masih harus dipenuhi? (ya/tidak): "
+    lah keputusan = keputusan_air(cadangan, kebutuhan_dasar)
 
-hedeh "=== HASIL REALITY ENGINE ==="
-hedeh "Cadangan air (%):"
-hedeh cadangan
-hedeh "Keputusan:"
-hedeh keputusan
-hedeh "Alasan:"
-hedeh alasan_air(cadangan, kebutuhan_dasar)
+    hedeh "=== HASIL REALITY ENGINE ==="
+    hedeh "Cadangan air (%):"
+    hedeh cadangan
+    hedeh "Keputusan:"
+    hedeh keputusan
+    hedeh "Alasan:"
+    hedeh alasan_air(cadangan, kebutuhan_dasar)
+ketangkep kesalahan
+    hedeh "Input tidak valid: " + kesalahan
+    hedeh "Masukkan cadangan sebagai angka yang valid dari 0 sampai 100."
+selesai coba
 
 selesai jancuk
