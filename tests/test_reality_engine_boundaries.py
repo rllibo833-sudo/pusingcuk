@@ -136,7 +136,7 @@ class RealityEngineBoundaryTests(unittest.TestCase):
             'lah aturan = "ID-ARBITRER-TIDAK-DIKENAL"',
             1,
         )
-        result = self.run_engine("15\\nya\\n", source_text=source)
+        result = self.run_engine("15\nya\n", source_text=source)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("ID_ATURAN_TIDAK_DIKENAL", result.stdout)
         self.assertIn("ID aturan tidak dikenal; alasan kebijakan tidak tersedia.", result.stdout)
