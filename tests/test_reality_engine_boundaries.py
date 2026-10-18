@@ -165,9 +165,9 @@ class RealityEngineBoundaryTests(unittest.TestCase):
             )
             self.assertEqual(compiled.returncode, 0, compiled.stderr)
             cases = (
-                ("15\\nya\\n", "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR", "PRIORITASKAN_KEBUTUHAN_DASAR"),
-                ("40\\nmungkin\\n", "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID", "MASUKAN_TIDAK_VALID"),
-                ("abc\\nya\\n", "Input tidak valid:", "Masukkan cadangan sebagai angka yang valid"),
+                ("15\n\n", "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR", "PRIORITASKAN_KEBUTUHAN_DASAR"),
+                ("40\nmungkin\n", "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID", "MASUKAN_TIDAK_VALID"),
+                ("abc\n\n", "Input tidak valid:", "Masukkan cadangan sebagai angka yang valid"),
             )
             for user_input, expected_rule_or_error, expected_decision_or_message in cases:
                 with self.subTest(user_input=user_input):
