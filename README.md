@@ -43,9 +43,9 @@ Matriks: [kompatibilitas](docs/COMPATIBILITY.md), [target compiler](docs/COMPILE
 
 ## Program nyata yang diuji lintas runtime
 
-Contoh [kasir warung](tests/conformance/kasir_warung.cuk) menghitung subtotal Rp40.000, diskon Rp4.000, nilai setelah diskon Rp36.000, pajak 11% Rp3.960, dan total Rp39.960. Program yang sama wajib menghasilkan output identik di interpreter referensi Python dan runtime native C; hasilnya diverifikasi oleh suite konformansi CI, bukan sekadar klaim dokumentasi.
+Contoh [kasir warung](examples/kasir_warung.cuk) menghitung subtotal Rp40.000, diskon Rp4.000, nilai setelah diskon Rp36.000, pajak 11% Rp3.960, dan total Rp39.960. Program yang sama wajib menghasilkan output identik di interpreter referensi Python dan runtime native C; hasilnya diverifikasi oleh suite konformansi CI, bukan sekadar klaim dokumentasi.
 
-Jalankan interpreter referensi dengan `python pusingcuk_new.py tests/conformance/kasir_warung.cuk`. Untuk runtime native, bangun `pusingcuk-native` lalu jalankan `./pusingcuk-native tests/conformance/kasir_warung.cuk`.
+Jalankan interpreter referensi dengan `python pusingcuk_new.py examples/kasir_warung.cuk`. Untuk runtime native, bangun `pusingcuk-native` lalu jalankan `./pusingcuk-native examples/kasir_warung.cuk`.
 
 ## Prinsip pengembangan
 
