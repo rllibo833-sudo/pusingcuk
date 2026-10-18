@@ -30,7 +30,9 @@ jobs:
         env:
           PUSINGCUK_MATRIX_OUT: artifacts/fixture-matrix
         run: python tools/ci_fixture_matrix.py
-      - name: Verify generated compatibility snapshot\n        run: python tools/generate_compatibility.py --check\n      - name: Check fixture pass-count regression
+      - name: Verify generated compatibility snapshot
+        run: python tools/generate_compatibility.py --check
+      - name: Check fixture pass-count regression
         id: regression
         if: always()
         run: |
