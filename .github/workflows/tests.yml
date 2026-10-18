@@ -2,7 +2,7 @@ name: Tes Pusingcuk
 
 on:
   push:
-    branches: [main, "audit/**", "in-this-economy", "warung-pusingcuk", "warungpusingcuk"]
+    branches: [main, "audit/**", "in-this-economy", "warung-pusingcuk", "warungpusingcuk", "cuk-reality-engine"]
     paths:
       - ".github/workflows/tests.yml"
       - ".github/workflows/release.yml"
