@@ -46,10 +46,17 @@ class RealityEngineBoundaryTests(unittest.TestCase):
         # before the policy function receives a reserve value.
         result = self.run_engine("100.1\ntidak\n")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("Input tidak valid:", result.stdout)
-        self.assertIn("Masukkan cadangan sebagai angka yang valid", result.stdout)
+        self.assertIn("AIR-00: INPUT_CADANGAN_TIDAK_VALID", result.stdout)
+        self.assertIn("MASUKAN_TIDAK_VALID", result.stdout)
         self.assertNotIn("KONDISI_NORMAL", result.stdout)
 
+
+    def test_decimal_reserve_within_range_uses_policy_thresholds(self):
+        result = self.run_engine("20.5\\nya\\n")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("AIR-03: PENGHEMATAN", result.stdout)
+        self.assertIn("HEMAT_AIR", result.stdout)
+        self.assertIn("Terapkan penghematan", result.stdout)
 
     def test_one_rule_result_drives_decision_reason_and_action(self):
         cases = (
