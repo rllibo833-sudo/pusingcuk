@@ -73,6 +73,38 @@ Contoh masukan:
 
 Tes batas dan konsistensi Reality Engine berada di `tests/test_reality_engine_boundaries.py`, termasuk jawaban kebutuhan dasar yang tidak valid, teks angka yang gagal dikonversi, nilai non-finite, dan batas 50%. ID arbitrer yang tidak dikenal belum tercakup sebagai perilaku fail-closed. Tes contoh umum berada di `tests/test_examples_cuk.py`. Tes yang memeriksa perilaku tertentu membuktikan hanya kasus yang benar-benar dijalankan; keberhasilan satu contoh tidak membuktikan seluruh bahasa atau seluruh backend setara.
 
+## Sejauh mana menuju kemandirian bahasa .cuk
+
+**Penilaian jujur: Reality Engine adalah program pembuktian bahasa, bukan runtime/compiler mandiri.** Ia membantu menguji apakah .cuk cukup ekspresif untuk menulis aturan deterministik yang bisa dijelaskan dan diregresikan. Kemandirian bahasa harus dinilai dari pipeline bahasa dan target runtime, bukan dari nama atau kompleksitas contoh aplikasi ini.
+
+| Tingkat | Status pada branch ini | Bukti / batas |
+|---|---|---|
+| Aturan bisnis ditulis dalam .cuk | Ada | `aturan_air()` memvalidasi input dan memilih ID aturan berdasarkan ambang yang eksplisit. |
+| Keputusan dan penjelasan terhubung | Ada | Satu ID aturan dipakai untuk keputusan, alasan, dan tindakan; pemetaan keluaran masih fungsi terpisah. |
+| Interaksi input dan validasi | Ada pada interpreter referensi | CLI meminta input, mengonversi angka, menolak rentang yang tidak valid, dan menangani kegagalan konversi. |
+| Regresi perilaku | Ada untuk kasus yang tercakup | Tes batas memeriksa beberapa ambang dan input salah. Tes hanya membuktikan kasus yang benar-benar dijalankan dan lulus di CI. |
+| Mandiri dari Python saat runtime | **Belum** | Contoh dijalankan melalui `python pusingcuk_new.py examples/reality_engine.cuk`; blok `coba/ketangkep` yang dipakai contoh belum didukung runtime native C. |
+| Satu sumber kebijakan tanpa pemetaan default yang berbahaya | **Belum tuntas** | ID aturan tak dikenal belum dijamin ditolak oleh fungsi pemetaan; jangan menerima ID dari sumber luar tanpa validasi. |
+| Paritas native/JS/VM dan lintas platform | **Belum dibuktikan untuk contoh ini** | Keberadaan backend lain bukan bukti bahwa seluruh sintaks contoh didukung atau hasilnya identik. |
+| Bahasa dapat membangun toolchain-nya sendiri / self-hosting | **Belum** | Contoh ini tidak mengompilasi compiler .cuk, tidak mengganti implementasi Python, dan tidak membuktikan self-hosting. |
+
+### Apa arti “mandiri” dalam proyek .cuk
+
+Ada beberapa tingkat yang jangan dicampur:
+
+1. **Mandiri sebagai bahasa sumber:** program bisnis ditulis di `.cuk` — Reality Engine sudah menunjukkan ini untuk satu contoh.
+2. **Mandiri sebagai executable:** program dikompilasi menjadi executable yang berjalan tanpa Python saat runtime — backend C memiliki kemampuan untuk subset yang didukung, tetapi Reality Engine ini belum dibuktikan pada subset tersebut.
+3. **Mandiri sebagai toolchain:** compiler, runtime, diagnostik, dan pustaka inti tidak lagi bergantung pada implementasi Python untuk membangun/menjalankan bahasa — belum tercapai.
+4. **Self-hosting:** compiler .cuk ditulis dalam .cuk dan dapat membangun versi dirinya sendiri — belum tercapai dan bukan hasil yang bisa disimpulkan dari contoh ini.
+
+### Urutan kerja yang masuk akal
+
+- Pertama, pertahankan satu ID aturan sebagai hasil kanonis dan tambah tes untuk konsistensi keputusan/alasan/tindakan, termasuk input gagal.
+- Kedua, tutup celah pemetaan ID tak dikenal dengan bentuk yang kompatibel dengan parser; jangan klaim fail-closed sebelum ada tes yang lulus.
+- Ketiga, hilangkan ketergantungan contoh pada fitur yang belum tersedia di target native atau implementasikan fitur itu dengan kontrak dan fixture lintas-runtime.
+- Keempat, jalankan source .cuk yang sama pada interpreter referensi dan target native/JS yang dinyatakan didukung, lalu bandingkan stdout, exit code, dan kelas error.
+- Setelah bukti parity ada, baru naikkan klaim kemandirian target. Self-hosting adalah tahap terpisah yang jauh lebih lanjut.
+
 ## Fokus pengembangan di branch ini
 
 1. **Kebenaran contoh:** aturan, ID, keputusan, alasan, dan tindakan harus tetap saling sesuai.
