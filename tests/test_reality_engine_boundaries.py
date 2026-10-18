@@ -58,7 +58,7 @@ class RealityEngineBoundaryTests(unittest.TestCase):
         self.assertIn("Terapkan penghematan", result.stdout)
 
     def test_invalid_basic_needs_answer_uses_invalid_input_rule(self):
-        result = self.run_engine("15\\nmungkin\\n")
+        result = self.run_engine("15\nmungkin\n")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID", result.stdout)
         self.assertIn("MASUKAN_TIDAK_VALID", result.stdout)
@@ -67,7 +67,7 @@ class RealityEngineBoundaryTests(unittest.TestCase):
         self.assertNotIn("KONDISI_NORMAL", result.stdout)
 
     def test_malformed_decimal_is_caught_without_a_policy_decision(self):
-        result = self.run_engine("bukan-angka\\nya\\n")
+        result = self.run_engine("bukan-angka\nya\n")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("Input tidak valid:", result.stdout)
         self.assertIn("Masukkan cadangan sebagai angka yang valid", result.stdout)
