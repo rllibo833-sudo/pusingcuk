@@ -1548,6 +1548,26 @@
         "reference": "required",
         "native": "required"
       }
+    },
+    {
+      "id": "reality-engine.unknown-rule-id-fails-closed",
+      "source": "reality_engine_unknown_rule_id.cuk",
+      "profile": "core",
+      "requires": [
+        "functions",
+        "conditions",
+        "unknown-rule-fallback",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "ID_ATURAN_TIDAK_DIKENAL\nID aturan tidak dikenal; alasan kebijakan tidak tersedia.\nHentikan keputusan otomatis dan verifikasi ID aturan yang tidak dikenal.\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
     }
   ]
 }
