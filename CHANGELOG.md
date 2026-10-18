@@ -12,7 +12,8 @@ Catatan ringkas perubahan yang sudah dilakukan. Versi paket dan versi bahasa ada
 ### Cuk Reality Engine — branch khusus
 
 - Tegaskan status kemandirian .cuk: Reality Engine membuktikan satu program aturan pada interpreter referensi, bukan runtime mandiri, parity semua backend, toolchain mandiri, atau self-hosting.
-- Pertahankan pemetaan keluaran untuk ID yang dihasilkan `aturan_air()`. Penolakan ID arbitrer belum dijamin; dokumentasi tidak lagi mengklaim perilaku yang belum dibuktikan. Perbaikan percabangan yang melampaui batas parser dibatalkan agar contoh kembali memakai struktur yang kompatibel.
+- Ubah fallback pemetaan keputusan, alasan, dan tindakan agar ID aturan yang tidak dikenal menghasilkan status tidak dikenal dan instruksi berhenti, bukan keputusan normal. Tambahkan regresi yang menyuntikkan ID asing ke jalur keluaran.
+- Tambahkan tes target JavaScript untuk menjalankan source Reality Engine yang sama pada kasus inti, termasuk input kebijakan tidak valid dan kegagalan konversi. Hasil target ini belum boleh diklaim lulus sampai CI pada commit terbaru selesai.
 
 - Tetapkan tujuan Reality Engine sebagai program contoh berbasis aturan untuk mengembangkan dan membuktikan kemampuan bahasa `.cuk`, bukan sebagai proyek pengelolaan air produksi.
 - Tambahkan [dokumentasi kanonis Reality Engine](docs/REALITY_ENGINE.md), termasuk tabel aturan, alur eksekusi, batas klaim, cara menjalankan, dan fokus pengembangan branch.
