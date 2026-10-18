@@ -1,4 +1,4 @@
-"""CLI tests for beginner-facing .cuk examples."""
+""""CLI tests for beginner-facing .cuk examples."""
 import subprocess
 import sys
 import tempfile
@@ -50,18 +50,35 @@ class CukExampleCliTests(unittest.TestCase):
             output,
         )
 
+    def test_reality_engine_runs_all_scenarios_and_detects_conflict(self):
+        output, _, _ = self.run_example("reality_engine.cuk", "")
+        for expected in (
+            "=== KRITIS - KEBUTUHAN DASAR ===",
+            "PRIORITASKAN_KEBUTUHAN_DASAR",
+            "=== KRITIS - NON-ESENSIAL ===",
+            "BATASI_PENGGUNAAN_NON_ESENSIAL",
+            "=== MENURUN ===",
+            "HEMAT_AIR",
+            "=== NORMAL ===",
+            "KONDISI_NORMAL",
+            "=== SIMULASI KONFLIK ===",
+            "KONFLIK_HASIL_DAN_ATURAN",
+        ):
+            with self.subTest(expected=expected):
+                self.assertIn(expected, output)
+
     def test_terminal_bot_handles_interactive_answers(self):
-        output, _, _ = self.run_example("terminal_bot.cuk", "Ayu\nbaik\n")
+        output, _, _ = self.run_example("terminal_bot.cuk", "Ayu\\nbaik\\n")
         self.assertIn("Halo, Ayu!", output)
         self.assertIn("Senang mendengarnya", output)
 
     def test_halo_dunia_accepts_interactive_name(self):
-        output, _, _ = self.run_example("halo_dunia.cuk", "Ayu\n")
+        output, _, _ = self.run_example("halo_dunia.cuk", "Ayu\\n")
         self.assertIn("Halo, Ayu!", output)
 
     def test_keuangan_example_runs_and_writes_within_project(self):
         output, note, note_inside_project = self.run_example(
-            "keuangan_sederhana.cuk", "Ayu\n3000000\n1250000\nya\n"
+            "keuangan_sederhana.cuk", "Ayu\\n3000000\\n1250000\\nya\\n"
         )
         self.assertIn("Pemasukan: 3000000", output)
         self.assertIn("Pengeluaran: 1250000", output)
@@ -76,15 +93,15 @@ class CukExampleCliTests(unittest.TestCase):
         self.assertTrue(note_inside_project)
 
     def test_calculator_uses_canonical_keywords_and_adds_numbers(self):
-        output, _, _ = self.run_example("kalkulator.cuk", "20\n+\n22\n")
+        output, _, _ = self.run_example("kalkulator.cuk", "20\\n+\\n22\\n")
         self.assertIn("Hasil: 42", output)
 
     def test_calculator_handles_division_by_zero(self):
-        output, _, _ = self.run_example("kalkulator.cuk", "10\n/\n0\n")
+        output, _, _ = self.run_example("kalkulator.cuk", "10\\n/\\n0\\n")
         self.assertIn("pembagian dengan nol", output)
 
     def test_calculator_reports_non_numeric_input_with_next_step(self):
-        output, _, _ = self.run_example("kalkulator.cuk", "dua puluh\n+\n22\n")
+        output, _, _ = self.run_example("kalkulator.cuk", "dua puluh\\n+\\n22\\n")
         self.assertIn("Input tidak valid:", output)
         self.assertIn("Masukkan bilangan yang valid", output)
 
