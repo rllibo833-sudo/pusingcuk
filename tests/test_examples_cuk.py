@@ -69,10 +69,14 @@ class CukExampleCliTests(unittest.TestCase):
             "=== BATAS 21 - HEMAT ===",
             "=== BATAS 50 - HEMAT ===",
             "=== BATAS 51 - NORMAL ===",
+            "=== INPUT DI BAWAH NOL ===",
+            "=== INPUT DI ATAS 100 ===",
+            "MASUKAN_TIDAK_VALID",
+            "Input tidak valid: cadangan harus 0 sampai 100%.",
         ):
             with self.subTest(expected=expected):
                 self.assertIn(expected, output)
-        self.assertEqual(output.count("KONSISTEN_DENGAN_ATURAN"), 10)
+        self.assertEqual(output.count("KONSISTEN_DENGAN_ATURAN"), 12)
         self.assertEqual(output.count("KONFLIK_HASIL_DAN_ATURAN"), 1)
 
     def test_terminal_bot_handles_interactive_answers(self):
