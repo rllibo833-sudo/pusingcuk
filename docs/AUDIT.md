@@ -722,46 +722,81 @@ Run pertama: [39126748621](https://github.com/rllibo833-sudo/pusingcuk/actions/r
 
 **Ada satu selisih metadata yang disengaja:** artifact run pertama menghitung skor 74/74 = 100% karena fixture unsupported dikeluarkan dari penyebut. Formula itu kemudian diperbaiki sesuai cakupan seluruh manifest. Run kedua dan ketiga mencatat 74/77 = 96,10%; tidak ada perubahan pada hitungan status target. Artifact run ketiga menjadi baseline yang disimpan dalam repo.
 
-### E.4 Kandidat isu bug-parity berdasarkan kelompok kegagalan
+### E.4 Pemecahan mismatch parity berdasarkan hasil aktual
 
-Pengelompokan di bawah berasal dari pola pesan kompilasi/eksekusi pada raw.log. Ini adalah **kelompok kandidat untuk investigasi parity**, bukan bukti bahwa semua kasus dalam satu kelompok memiliki satu akar kode yang sama. Jumlah per kelompok menjumlah ke total gagal tiap target.
+Analisis ini memakai `raw.log` dan `tests/conformance/manifest.json` dari [run #39128628075](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39128628075). Perbandingan stderr memakai output reference fixture sebagai pembanding, ditambah kontrak `stderr_class` dan `source_line` pada manifest.
+
+Bucket yang mutually exclusive:
+- **A — diagnostik/stderr saja:** stdout dan exit code benar, tetapi stderr atau kontrak diagnostik berbeda.
+- **B — stdout salah:** stdout berbeda sementara exit code cocok.
+- **C — exit code salah:** exit code berbeda; bucket ini diprioritaskan jika stdout juga berbeda.
+- **Compile/other:** tidak ada hasil proses yang dapat dibandingkan (misalnya kompilasi gagal), atau kegagalan lain di luar mismatch output yang terstruktur.
+
+| Target | Semua gagal | Mismatch terstruktur | A: diagnostik saja | B: stdout salah | C: exit code salah | Compile/other |
+|---|---:|---:|---:|---:|---:|---:|
+| JavaScript | 48 | 26 | 26 | 0 | 0 | 22 |
+| Python transpiler | 56 | 27 | 24 | 2 | 1 | 29 |
+| VM/bytecode | 49 | 46 | 42 | 0 | 4 | 3 |
+
+Dimensi stdout/exit-code dapat tumpang tindih, jadi jangan menjumlahkan dimensi mentah ini sebagai bucket eksklusif:
+| Target | Mismatch stdout (dimensi) | Mismatch exit code (dimensi) | Baris yang mismatch keduanya |
+|---|---:|---:|---:|
+| JavaScript | 0 | 0 | 0 |
+| Python transpiler | 3 | 1 | 1 |
+| VM/bytecode | 4 | 4 | 4 |
+
+#### Lulus jika hanya stdout dan exit code yang dibandingkan
+
+Angka berikut adalah analisis tambahan, bukan pengganti conformance score utama. Sebuah fixture dihitung lulus di sini bila stdout dan exit code sama dengan manifest; perbedaan stderr/diagnostik diabaikan. Kegagalan kompilasi tanpa hasil eksekusi tetap gagal.
+
+| Target | Lulus utama | Lulus stdout + exit code saja | Persentase dari 77 fixture | Kenaikan dari lulus utama |
+|---|---:|---:|---:|---:|
+| JavaScript | 29/77 | 55/77 | 71,43% | +26 |
+| Python transpiler | 21/77 | 45/77 | 58,44% | +24 |
+| VM/bytecode | 28/77 | 70/77 | 90,91% | +42 |
+
+Interpretasi: pada suite ini, kegagalan terstruktur JavaScript dan VM didominasi oleh stderr/diagnostik, sedangkan Python transpiler juga memiliki dua fixture dengan stdout salah dan satu fixture dengan exit code salah (satu baris Python mempunyai kedua dimensi mismatch). Ini tidak membuktikan akar masalah implementasi yang sama; inspeksi per fixture tetap diperlukan sebelum perubahan kode.
+
+#### Catatan akar masalah kandidat dari klasifikasi audit sebelumnya (dipertahankan)
+
+Klasifikasi A/B/C di atas mengelompokkan jenis mismatch yang teramati, bukan akar implementasi. Agar temuan audit terdahulu tidak hilang, tabel berikut dipertahankan sebagai hipotesis awal dari pembacaan log sebelumnya; angka ini bukan kategori A/B/C dan perlu dikonfirmasi ulang terhadap fixture sebelum perbaikan.
 
 **JavaScript — 48 gagal**
 
-| Pola akar masalah yang terlihat | Jumlah |
+| Kandidat akar masalah | Jumlah sebelumnya |
 |---|---:|
-| Perbedaan kelas diagnostik runtime / mismatch output atau exit code | 22 |
-| Pemeriksaan aritas saat kompilasi berbeda dari diagnostik runtime reference | 10 |
-| Exception host JavaScript bocor, bukan diagnostik .cuk yang stabil dengan lokasi sumber | 4 |
+| Perbedaan diagnostik runtime/output/exit code | 22 |
+| Pemeriksaan aritas kompilasi berbeda dari reference | 10 |
+| Exception host bocor, bukan diagnostik .cuk stabil | 4 |
 | Batas integer aman ditolak saat kompilasi | 4 |
 | Paritas sintaks atau lokasi diagnostik | 3 |
-| Analisis nama statis menolak kasus runtime, short-circuit, atau scope | 3 |
-| Cakupan built-in JSON tidak tersedia | 2 |
+| Analisis nama statis, short-circuit, atau scope | 3 |
+| Cakupan built-in JSON | 2 |
 
 **Python transpiler — 56 gagal**
 
-| Pola akar masalah yang terlihat | Jumlah |
+| Kandidat akar masalah | Jumlah sebelumnya |
 |---|---:|
-| Perbedaan diagnostik runtime / mismatch output atau exit code | 22 |
-| Cakupan built-in/fungsi yang belum dikenali transpiler | 14 |
-| Pemeriksaan aritas saat kompilasi berbeda dari reference | 8 |
+| Perbedaan diagnostik runtime/output/exit code | 22 |
+| Built-in/fungsi belum dikenali transpiler | 14 |
+| Pemeriksaan aritas kompilasi berbeda dari reference | 8 |
 | Paritas sintaks atau lokasi diagnostik | 3 |
-| Analisis nama statis menolak kasus runtime, short-circuit, atau scope | 3 |
-| Exception host Python bocor, bukan diagnostik .cuk yang stabil | 3 |
+| Analisis nama statis, short-circuit, atau scope | 3 |
+| Exception host Python bocor | 3 |
 | Mismatch output/exit code pada built-in numerik | 2 |
 | Kasus compile-time lain | 1 |
 
 **VM/bytecode — 49 gagal**
 
-| Pola akar masalah yang terlihat | Jumlah |
+| Kandidat akar masalah | Jumlah sebelumnya |
 |---|---:|
-| Perbedaan diagnostik runtime / mismatch output atau exit code | 38 |
-| Exception host Python bocor, bukan diagnostik .cuk yang stabil | 6 |
-| Paritas sintaks atau lokasi diagnostik saat kompilasi bytecode | 3 |
+| Perbedaan diagnostik runtime/output/exit code | 38 |
+| Exception host Python bocor | 6 |
+| Paritas sintaks/lokasi diagnostik saat kompilasi bytecode | 3 |
 | Kelas/lokasi diagnostik runtime berbeda | 1 |
-| Semantik operator/tipe, termasuk concatenation koleksi | 1 |
+| Semantik operator/tipe, termasuk penggabungan koleksi | 1 |
 
-Kelompok ini menjadi daftar kandidat bug-parity untuk dibahas terpisah. Tidak ada perbaikan backend yang dilakukan sebagai bagian pembaruan baseline ini.
+Catatan: kategori terdahulu ini berasal dari ringkasan log sebelumnya dan tidak otomatis dipetakan satu-ke-satu ke bucket A/B/C terbaru. Jangan menjumlahkan tabel ini dengan tabel mismatch baru.
 
 ### E.5 Gerbang regresi dan batas skor
 
