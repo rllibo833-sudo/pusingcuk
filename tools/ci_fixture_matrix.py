@@ -122,11 +122,17 @@ def main():
     for target in TARGETS:
         results = [row["targets"][target]["status"] for row in rows]
         summary["targets"][target] = {state: results.count(state) for state in ("passed", "failed", "timeout", "unsupported", "unavailable")}
-    eligible = [row for row in rows if next((item.get("runtimes", {}).get("native") for item, _ in fixtures if item["id"] == row["id"]), None) in {"required", "optional"}]
-    passed_native = sum(row["targets"]["native"]["status"] == "passed" for row in eligible)
-    summary["python_free_score"] = {"numerator": passed_native, "denominator": len(eligible),
-                                    "percent": round(100 * passed_native / len(eligible), 2) if eligible else None,
-                                    "runtime": "native C", "excludes_unsupported": True}
+    # The requested denominator is the entire manifest, including fixtures that
+    # native C cannot run. Unsupported native fixtures therefore count as not passed.
+    passed_native = sum(row["targets"]["native"]["status"] == "passed" for row in rows)
+    summary["python_free_score"] = {
+        "numerator": passed_native,
+        "denominator": len(rows),
+        "percent": round(100 * passed_native / len(rows), 2) if rows else None,
+        "runtime": "native C",
+        "unsupported_native_counted_as_not_passed": True,
+        "method": "Python-Free Score = (number of manifest fixtures whose native C execution passed) / (total number of manifest fixtures across all targets) × 100. All fixtures stay in the denominator, including the three native-unsupported fixtures; unsupported is not counted as passed. Only native C is eligible as Python-free. VM is excluded because it imports Python evaluator helpers."
+    }
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (OUT / "raw.log").write_text("\n\n".join(raw_lines) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2, ensure_ascii=False))
