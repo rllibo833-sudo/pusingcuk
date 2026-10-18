@@ -363,6 +363,9 @@ if _missing_namespace_builtins:
         "fungsi namespace tidak ada dalam kontrak builtin: "
         + ", ".join(sorted(_missing_namespace_builtins))
     )
+
+
+def get_builtin(name: str) -> Builtin | None:
     """Return builtin metadata by exact name, or None when unknown."""
     return BUILTINS.get(name)
 
