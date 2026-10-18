@@ -146,3 +146,15 @@ This table is generated from the supplied machine-readable fixture summary. It i
 - Fixtures in checked-in baseline summary: **77**
 - Native C Python-free score: **96.10%** (74/77; unsupported fixtures remain in the denominator)
 <!-- END GENERATED CONFORMANCE SUMMARY -->
+
+
+## Differential report (latest artifact)
+
+The latest fixture artifact [run #39141856028](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39141856028) reports observable parity categories for the selected differential subset. The categories are exclusive: **match**, **diagnostics only** (stdout and exit code match, diagnostic class or source line differs), and **compile/other** (a usable result is missing or compilation failed).
+
+| Target | Match | Diagnostics only | Compile/other |
+|---|---:|---:|---:|
+| Python transpiler | 24 | 3 | 0 |
+| VM/bytecode | 42 | 4 | 0 |
+
+These counts are not the 77-fixture conformance totals above. The category shifts versus the earlier report (Python transpiler 24/2/1 → 24/3/0; VM 42/0/4 → 42/4/0) follow the observable-result classifier introduced in [commit d36f0bb](https://github.com/rllibo833-sudo/pusingcuk/commit/d36f0bb2c27e1d2fd029c68c8fda3dd13dcfafed); they must not be described as a semantic backend fix without separate evidence.

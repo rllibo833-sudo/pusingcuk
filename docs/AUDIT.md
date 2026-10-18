@@ -73,6 +73,17 @@ Jumlah fixture pada manifest: **77**. Status gagal mencakup kegagalan kompilasi 
 
 **Artifact bukti:** [run #4 dan artifact `pusingcuk-fixture-baseline-39127180391-1`](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39127180391). Artifact berisi `raw.log` (154.662 byte) dan `summary.json`; tersedia untuk diunduh dari bagian **Artifacts** di halaman run. Retensi artifact 90 hari, jadi unduh/simpan salinan bila perlu bukti jangka panjang.
 
+### 4.1a Differential artifact — observable parity
+
+Artifact terbaru [fixture baseline run #47](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39141856028) juga memuat laporan differential yang membandingkan observasi target dengan interpreter referensi. Kategorinya eksklusif: kecocokan penuh, perbedaan diagnostik ketika stdout dan exit code cocok, atau compile/hasil observasi yang tidak tersedia. Karena itu angka ini bukan jumlah semua fixture dalam manifest dan tidak boleh dijumlahkan dengan tabel baseline target di atas.
+
+| Target | Match | Diagnostics only | Compile/other |
+|---|---:|---:|---:|
+| Python transpiler | 24 | 3 | 0 |
+| VM/bytecode | 42 | 4 | 0 |
+
+Perubahan dari laporan sebelumnya adalah **perubahan klasifikasi**, bukan bukti bahwa backend berubah perilaku. Commit [d36f0bb](https://github.com/rllibo833-sudo/pusingcuk/commit/d36f0bb2c27e1d2fd029c68c8fda3dd13dcfafed) menambahkan `tools/differential_runner.py`: output dan exit code dibandingkan terlebih dahulu, lalu kelas diagnostik dan baris sumber. Perbedaan yang sebelumnya terhitung compile/other kini masuk ke diagnostics-only ketika hasil utama sebenarnya tersedia dan cocok. Contohnya, transpiler berubah dari 24/2/1 menjadi 24/3/0; VM dari 42/0/4 menjadi 42/4/0. Tidak ada klaim perbaikan semantik yang dapat ditarik dari perpindahan kategori tersebut saja.
+
 ### 4.2 Python-Free Score awal
 
 **Skor: 96,10% (74/77 fixture).** Ini adalah skor cakupan baseline native C, bukan klaim bahwa seluruh fitur bahasa sudah portabel atau bahwa build toolchain tidak memakai Python.
