@@ -11,7 +11,7 @@ Catatan ringkas perubahan yang sudah dilakukan. Versi paket dan versi bahasa ada
 
 ### Cuk Reality Engine — branch khusus
 
-- Perketat pemetaan ID: ID yang tidak dikenal ditolak sebagai input/aturan tidak valid sebelum pemetaan kebijakan, sehingga tidak jatuh ke keputusan normal. Tambahkan regresi dengan program probe `.cuk` sementara untuk menguji ketiga pemetaan tersebut. Susunan cabang diratakan untuk menjaga batas sintaks parser.
+- Pertahankan pemetaan keluaran untuk ID yang dihasilkan `aturan_air()`. Penolakan ID arbitrer belum dijamin; dokumentasi tidak lagi mengklaim perilaku yang belum dibuktikan. Perbaikan percabangan yang melampaui batas parser dibatalkan agar contoh kembali memakai struktur yang kompatibel.
 
 - Tetapkan tujuan Reality Engine sebagai program contoh berbasis aturan untuk mengembangkan dan membuktikan kemampuan bahasa `.cuk`, bukan sebagai proyek pengelolaan air produksi.
 - Tambahkan [dokumentasi kanonis Reality Engine](docs/REALITY_ENGINE.md), termasuk tabel aturan, alur eksekusi, batas klaim, cara menjalankan, dan fokus pengembangan branch.
