@@ -564,16 +564,17 @@ make test-native
 
 Sumber workflow: `.github/workflows/tests.yml`. `tools/conformance.py` saat ini hanya menerima runtime `reference` dan `native`; runner memanggil `pusingcuk_new.py` untuk reference dan executable hasil kompilasi `native/pusingcuk.c` untuk native. Jadi menjalankan perintah yang sama belum menguji JS, Python transpiler, HTML, atau VM.
 
-### A.4 Python-Free Score
+### A.4 Python-Free Score — definisi yang dibatasi
 
-**Skor belum dapat dihitung dengan bukti yang tersedia.** Rumus yang disarankan untuk CRE:
+Pengukuran terbaru menghasilkan **Runtime Python-Free Score 96,10% (74/77)** untuk suite fixture saat ini. Ini mengukur keberhasilan eksekusi fixture melalui executable native C; ini bukan skor seluruh bahasa dan bukan bukti toolchain bebas Python.
 
-`Python-Free Score = (jumlah fixture yang lulus pada runtime yang benar-benar tidak membutuhkan Python saat eksekusi / jumlah fixture yang ditetapkan sebagai kandidat Python-free) × 100%`
+- **Runtime Python-free:** executable C membaca dan menjalankan file .cuk tanpa memanggil interpreter Python pada jalur eksekusi program.
+- **Toolchain Python-free:** **belum terbukti**. Build fixture-native, orchestration/harness, dan pemeriksaan hasil saat ini memakai Python (tools/conformance.py dan tools/ci_fixture_matrix.py).
+- Rumus skor runtime: jumlah fixture manifest yang lulus pada native C / total fixture manifest × 100. Semua fixture tetap berada dalam penyebut, termasuk fixture native yang unsupported.
+- VM tidak memenuhi definisi runtime Python-free saat ini karena compiler/vm.py mengimpor helper evaluator Python.
+- Skor hanya berlaku untuk suite fixture yang terdaftar pada commit pengukuran. Ia tidak mewakili semua sintaks, built-in, kombinasi fitur, perilaku, platform, atau program pengguna dalam bahasa .cuk.
 
-- Kandidat runtime awal: native C dan VM yang diimplementasikan dalam runtime non-Python. VM saat ini sendiri ditulis dalam Python, sehingga VM sekarang **tidak** memenuhi definisi Python-free saat runtime.
-- Native C dapat memenuhi syarat runtime tanpa Python jika executable dibangun sebelumnya; proses kompilasi fixture dan harness Python tidak boleh dihitung sebagai bagian runtime program.
-- Laporkan numerator, denominator, daftar fixture yang dihitung, commit SHA, compiler/versi, dan log. Jangan memakai `74/77` sebagai skor: itu adalah deklarasi dukungan manifest, bukan bukti hasil eksekusi.
-- Dengan bukti saat ini skor yang dapat dipublikasikan adalah **N/A (belum terukur)**, bukan 0% dan bukan 96,1%.
+Jangan menyebut skor ini sebagai bukti bahwa seluruh proses build, test, atau compiler sudah bebas Python.
 
 ## B. Pembacaan mendalam modul inti
 
@@ -678,3 +679,92 @@ Workflow `.github/workflows/tests.yml` memiliki `pull_request.paths` dan `push.p
 - [ ] Perbaikan backend JS, Python transpiler, dan VM berada di luar scope baseline ini; perlu persetujuan terpisah sebelum pekerjaan implementasi berikutnya.
 
 **Keputusan:** Phase 1 mengukur dan melaporkan baseline saja. Tidak dimulai restrukturisasi atau Phase 2 tanpa persetujuan pemilik.
+
+
+## E. Klarifikasi baseline sebelum merge — 2026-10-18
+
+Bagian ini merupakan klarifikasi terkini atas catatan audit historis yang lebih lama di atas. Tidak ada perubahan semantik runtime dalam pembaruan baseline ini.
+
+### E.1 Jalur native C dan cakupan Python-free
+
+Matriks CI memanggil tools/ci_fixture_matrix.py, yang memakai tools/conformance.py::build_native untuk membangun executable dari native/pusingcuk.c dengan compiler C (CC, default cc), flag C11/optimisasi/warning, dan -lm. Untuk setiap fixture yang didukung, prosesnya menjalankan executable dengan argumen path sumber fixture, lalu membandingkan stdout, kelas stderr, exit code, dan baris sumber terhadap manifest. Runner Python menyiapkan proses dan mengumpulkan hasil, tetapi executable native menjalankan program .cuk itu sendiri tanpa interpreter Python.
+
+| Ukuran | Kesimpulan |
+|---|---|
+| Runtime Python-free | Ya untuk jalur eksekusi native C yang diukur: program .cuk dieksekusi oleh executable C. |
+| Toolchain Python-free | Belum: build orchestration, conformance harness, matriks, dan agregasi hasil masih memakai Python. |
+| VM Python-free | Tidak: VM saat ini bergantung pada helper evaluator Python. |
+
+### E.2 Tiga fixture yang unsupported pada native C
+
+| Fixture | Alasan fitur |
+|---|---|
+| reference.json-invalid-returns-false (json_invalid_returns_false.cuk) | Penguraian JSON dan kontrak hasil parse invalid belum tersedia pada native C. |
+| reference.json-null-returns-none (json_null_is_none.cuk) | Semantik JSON null menjadi nilai None belum tersedia pada native C. |
+| formats.json-html-csv (formats_json_html_csv.cuk) | Memerlukan kombinasi built-in JSON, HTML escaping, dan CSV quoting yang belum didukung pada native C. |
+
+Status ini berasal dari deklarasi native: unsupported di tests/conformance/manifest.json, bukan kegagalan build atau eksekusi yang disamarkan sebagai unsupported.
+
+### E.3 Perbandingan summary antar-run
+
+Run pertama: [39126748621](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39126748621). Run kedua dengan formula yang dikoreksi: [39127088393](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39127088393). Run ketiga/final: [39127180391](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39127180391).
+
+**Semua hitungan status per target identik** pada ketiga artifact:
+
+| Target | Lulus | Gagal | Timeout | Unsupported | Unavailable |
+|---|---:|---:|---:|---:|---:|
+| Reference | 77 | 0 | 0 | 0 | 0 |
+| Native C | 74 | 0 | 0 | 3 | 0 |
+| JavaScript | 29 | 48 | 0 | 0 | 0 |
+| Python transpiler | 21 | 56 | 0 | 0 | 0 |
+| HTML | 0 | 0 | 0 | 77 | 0 |
+| VM | 28 | 49 | 0 | 0 | 0 |
+
+**Ada satu selisih metadata yang disengaja:** artifact run pertama menghitung skor 74/74 = 100% karena fixture unsupported dikeluarkan dari penyebut. Formula itu kemudian diperbaiki sesuai cakupan seluruh manifest. Run kedua dan ketiga mencatat 74/77 = 96,10%; tidak ada perubahan pada hitungan status target. Artifact run ketiga menjadi baseline yang disimpan dalam repo.
+
+### E.4 Kandidat isu bug-parity berdasarkan kelompok kegagalan
+
+Pengelompokan di bawah berasal dari pola pesan kompilasi/eksekusi pada raw.log. Ini adalah **kelompok kandidat untuk investigasi parity**, bukan bukti bahwa semua kasus dalam satu kelompok memiliki satu akar kode yang sama. Jumlah per kelompok menjumlah ke total gagal tiap target.
+
+**JavaScript — 48 gagal**
+
+| Pola akar masalah yang terlihat | Jumlah |
+|---|---:|
+| Perbedaan kelas diagnostik runtime / mismatch output atau exit code | 22 |
+| Pemeriksaan aritas saat kompilasi berbeda dari diagnostik runtime reference | 10 |
+| Exception host JavaScript bocor, bukan diagnostik .cuk yang stabil dengan lokasi sumber | 4 |
+| Batas integer aman ditolak saat kompilasi | 4 |
+| Paritas sintaks atau lokasi diagnostik | 3 |
+| Analisis nama statis menolak kasus runtime, short-circuit, atau scope | 3 |
+| Cakupan built-in JSON tidak tersedia | 2 |
+
+**Python transpiler — 56 gagal**
+
+| Pola akar masalah yang terlihat | Jumlah |
+|---|---:|
+| Perbedaan diagnostik runtime / mismatch output atau exit code | 22 |
+| Cakupan built-in/fungsi yang belum dikenali transpiler | 14 |
+| Pemeriksaan aritas saat kompilasi berbeda dari reference | 8 |
+| Paritas sintaks atau lokasi diagnostik | 3 |
+| Analisis nama statis menolak kasus runtime, short-circuit, atau scope | 3 |
+| Exception host Python bocor, bukan diagnostik .cuk yang stabil | 3 |
+| Mismatch output/exit code pada built-in numerik | 2 |
+| Kasus compile-time lain | 1 |
+
+**VM/bytecode — 49 gagal**
+
+| Pola akar masalah yang terlihat | Jumlah |
+|---|---:|
+| Perbedaan diagnostik runtime / mismatch output atau exit code | 38 |
+| Exception host Python bocor, bukan diagnostik .cuk yang stabil | 6 |
+| Paritas sintaks atau lokasi diagnostik saat kompilasi bytecode | 3 |
+| Kelas/lokasi diagnostik runtime berbeda | 1 |
+| Semantik operator/tipe, termasuk concatenation koleksi | 1 |
+
+Kelompok ini menjadi daftar kandidat bug-parity untuk dibahas terpisah. Tidak ada perbaikan backend yang dilakukan sebagai bagian pembaruan baseline ini.
+
+### E.5 Gerbang regresi dan batas skor
+
+Baseline hasil terukur disimpan sebagai tests/conformance/baseline_summary.json. Workflow matriks membandingkan jumlah passed setiap target dengan snapshot tersebut; CI gagal jika hitungan lulus target mana pun turun. Perubahan baseline di masa mendatang harus ditinjau secara eksplisit, bukan diperbarui otomatis agar kegagalan terlihat hijau.
+
+**Peringatan cakupan:** skor 96,10% dihitung hanya atas suite 77 fixture yang ada pada snapshot ini. Itu bukan persentase kelengkapan bahasa .cuk, bukan sertifikasi paritas semua backend, bukan skor keamanan, dan bukan bukti toolchain Python-free. Backend HTML tetap belum tersedia; seluruh 77 fixture HTML tercatat unsupported, bukan gagal dijalankan.
