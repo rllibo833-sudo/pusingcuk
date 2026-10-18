@@ -47,7 +47,7 @@ Urutan pemeriksaan penting: input divalidasi sebelum ambang kebijakan digunakan.
 4. Fungsi keluaran menerjemahkan ID itu menjadi keputusan, alasan, dan tindakan.
 5. Program menampilkan hasil sehingga pembaca dapat menelusuri alasan keputusan kembali ke aturan yang cocok.
 
-Fungsi keputusan, alasan, dan tindakan saat ini memanggil `aturan_air()` masing-masing. Karena aturan itu deterministik, mereka memilih ID yang sama untuk masukan yang sama. Jika kelak ada lebih banyak keluaran atau kebijakan, penyederhanaan pemanggilan berulang layak dipertimbangkan hanya jika bahasa memiliki cara yang jelas untuk membawa satu hasil aturan ke seluruh keluaran tanpa mengulang logika.
+Program sekarang memanggil `aturan_air()` satu kali per masukan. ID hasil itu kemudian dipakai bersama untuk menghasilkan keputusan, alasan, dan tindakan. Ini menghindari evaluasi aturan yang berulang dan membuat hubungan antara keputusan dan penjelasannya lebih eksplisit. Sumber kebijakan tetap berada di `aturan_air()`; fungsi pemetaan keluaran hanya menerjemahkan ID yang sudah dipilih.
 
 ## Cara menjalankan dan memeriksa
 
