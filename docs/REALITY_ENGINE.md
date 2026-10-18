@@ -73,6 +73,16 @@ Contoh masukan:
 
 Tes batas dan konsistensi Reality Engine berada di `tests/test_reality_engine_boundaries.py`, termasuk jawaban kebutuhan dasar yang tidak valid, teks angka yang gagal dikonversi, nilai non-finite, dan batas 50%. ID arbitrer yang tidak dikenal tercakup oleh regresi `test_unknown_rule_id_fails_closed_for_all_outputs`; hasil kelulusan terbaru tetap harus diperiksa pada CI. Tes contoh umum berada di `tests/test_examples_cuk.py`. Tes yang memeriksa perilaku tertentu membuktikan hanya kasus yang benar-benar dijalankan; keberhasilan satu contoh tidak membuktikan seluruh bahasa atau seluruh backend setara.
 
+## Kontrak regresi fail-closed
+
+ID aturan yang tidak dikenal tidak boleh dipetakan ke keputusan normal. Untuk contoh ini, pemetaan harus menghasilkan ketiga keluaran berikut:
+
+- keputusan: `ID_ATURAN_TIDAK_DIKENAL`;
+- alasan: `ID aturan tidak dikenal; alasan kebijakan tidak tersedia.`;
+- tindakan: `Hentikan keputusan otomatis dan verifikasi ID aturan yang tidak dikenal.`.
+
+Dua lapis regresi menjaga perilaku tersebut. `tests/test_reality_engine_boundaries.py` menyuntikkan ID asing ke source Reality Engine sebenarnya pada interpreter referensi. Fixture `tests/conformance/reality_engine_unknown_rule_id.cuk`, terdaftar sebagai `reality-engine.unknown-rule-id-fails-closed`, mengunci keluaran yang sama pada Python reference dan native C. Fixture menguji pola pemetaan lintas-runtime; ia tidak membuktikan bahwa seluruh program Reality Engine dapat berjalan di native C.
+
 ## Sejauh mana menuju kemandirian bahasa .cuk
 
 **Penilaian jujur: Reality Engine adalah program pembuktian bahasa, bukan runtime/compiler mandiri.** Ia membantu menguji apakah .cuk cukup ekspresif untuk menulis aturan deterministik yang bisa dijelaskan dan diregresikan. Kemandirian bahasa harus dinilai dari pipeline bahasa dan target runtime, bukan dari nama atau kompleksitas contoh aplikasi ini.
