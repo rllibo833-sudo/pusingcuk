@@ -117,8 +117,7 @@ def main():
                 per_fixture["targets"][target] = {"status": status, **({"reason": reason} if reason else {}), **observation}
                 raw_lines.append(f"[{item['id']}][{target}] {status}\n{json.dumps(per_fixture['targets'][target], ensure_ascii=False)}")
             rows.append(per_fixture)
-    summary = {"schema_version": 1, "fixture_count": len(fixtures), "targets": {}, "python_free_score": None,
-               "python_free_method": "Native C only: passed native fixtures divided by fixtures whose manifest marks native required or optional; unsupported excluded. VM excluded because it imports evaluator Python helpers."}
+    summary = {"schema_version": 1, "fixture_count": len(fixtures), "targets": {}, "python_free_score": None}
     for target in TARGETS:
         results = [row["targets"][target]["status"] for row in rows]
         summary["targets"][target] = {state: results.count(state) for state in ("passed", "failed", "timeout", "unsupported", "unavailable")}
