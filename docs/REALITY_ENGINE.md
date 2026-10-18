@@ -67,7 +67,7 @@ Contoh masukan:
 - `100.1` lalu `tidak` → ID `AIR-00`, masukan di luar rentang ditolak.
 - `50` lalu `ya` → ID `AIR-03`; `50.1` lalu `ya` → ID `AIR-04`, membuktikan batas 50% secara eksplisit.
 - `NaN`, `inf`, atau `-Infinity` sebagai cadangan → konversi ditolak sebelum keputusan kebijakan.
-- ID aturan yang tidak dikenal tidak boleh diam-diam dipetakan menjadi keputusan normal; pemetaan keputusan, alasan, dan tindakan harus memberi keluaran eksplisit untuk ID tak dikenal.
+- ID aturan yang tidak dikenal diperlakukan sebagai input/aturan tidak valid di ketiga pemetaan; tidak boleh jatuh ke keputusan normal. Penolakan dilakukan sebelum pemetaan kebijakan agar cabang bersarang tetap sesuai batas parser. Penolakan dilakukan sebelum pemetaan kebijakan agar cabang bersarang tetap sesuai batas parser.
 - `101` lalu `tidak` → masukan ditolak.
 - `abc` sebagai cadangan → kegagalan konversi ditangani dan program tidak menampilkan keputusan normal.
 

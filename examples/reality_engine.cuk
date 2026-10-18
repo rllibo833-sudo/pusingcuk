@@ -32,7 +32,7 @@ selesai fungsi
 # Fungsi berikut hanya memetakan ID hasil aturan menjadi keluaran.
 # Mereka tidak menghitung ulang kebijakan atau membaca masukan mentah.
 fungsi keputusan_dari_aturan(aturan)
-    njir aturan == "AIR-00: INPUT_CADANGAN_TIDAK_VALID" atau aturan == "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID"
+    njir aturan == "AIR-00: INPUT_CADANGAN_TIDAK_VALID" atau aturan == "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID" atau (aturan != "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR" dan aturan != "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL" dan aturan != "AIR-03: PENGHEMATAN" dan aturan != "AIR-04: KONDISI_NORMAL")
         balek "MASUKAN_TIDAK_VALID"
     kampret
         njir aturan == "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR"
@@ -44,12 +44,7 @@ fungsi keputusan_dari_aturan(aturan)
                 njir aturan == "AIR-03: PENGHEMATAN"
                     balek "HEMAT_AIR"
                 kampret
-                    njir aturan == "AIR-04: KONDISI_NORMAL"
-                        balek "KONDISI_NORMAL"
-                    kampret
-                        balek "ATURAN_TIDAK_DIKENAL"
-                    selesai njir
-                selesai njir
+                    balek "KONDISI_NORMAL"
                 selesai njir
             selesai njir
         selesai njir
@@ -57,28 +52,19 @@ fungsi keputusan_dari_aturan(aturan)
 selesai fungsi
 
 fungsi alasan_dari_aturan(aturan)
-    njir aturan == "AIR-00: INPUT_CADANGAN_TIDAK_VALID"
-        balek "Input tidak valid: cadangan harus 0 sampai 100%."
+    njir aturan == "AIR-00: INPUT_CADANGAN_TIDAK_VALID" atau aturan == "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID" atau (aturan != "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR" dan aturan != "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL" dan aturan != "AIR-03: PENGHEMATAN" dan aturan != "AIR-04: KONDISI_NORMAL")
+        balek "Input atau ID aturan tidak valid; jangan ambil keputusan kebijakan."
     kampret
-        njir aturan == "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID"
-            balek "Input tidak valid: jawab kebutuhan dasar dengan ya atau tidak."
+        njir aturan == "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR"
+            balek "Cadangan <= 20%; kebutuhan dasar diprioritaskan."
         kampret
-            njir aturan == "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR"
-                balek "Cadangan <= 20%; kebutuhan dasar diprioritaskan."
+            njir aturan == "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL"
+                balek "Cadangan <= 20%; penggunaan non-esensial dibatasi."
             kampret
-                njir aturan == "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL"
-                    balek "Cadangan <= 20%; penggunaan non-esensial dibatasi."
+                njir aturan == "AIR-03: PENGHEMATAN"
+                    balek "Cadangan <= 50%; terapkan penghematan."
                 kampret
-                    njir aturan == "AIR-03: PENGHEMATAN"
-                        balek "Cadangan <= 50%; terapkan penghematan."
-                    kampret
-                        njir aturan == "AIR-04: KONDISI_NORMAL"
-                            balek "Cadangan di atas 50%; kondisi normal."
-                        kampret
-                            balek "ID aturan tidak dikenal; jangan ambil keputusan kebijakan."
-                        selesai njir
-                    selesai njir
-                    selesai njir
+                    balek "Cadangan di atas 50%; kondisi normal."
                 selesai njir
             selesai njir
         selesai njir
@@ -86,33 +72,25 @@ fungsi alasan_dari_aturan(aturan)
 selesai fungsi
 
 fungsi tindakan_dari_aturan(aturan)
-    njir aturan == "AIR-00: INPUT_CADANGAN_TIDAK_VALID"
-        balek "Periksa ulang data cadangan; jangan ambil keputusan dari angka di luar 0-100%."
+    njir aturan == "AIR-00: INPUT_CADANGAN_TIDAK_VALID" atau aturan == "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID" atau (aturan != "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR" dan aturan != "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL" dan aturan != "AIR-03: PENGHEMATAN" dan aturan != "AIR-04: KONDISI_NORMAL")
+        balek "Periksa input atau ID aturan; jangan ambil tindakan kebijakan."
     kampret
-        njir aturan == "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID"
-            balek "Konfirmasi apakah kebutuhan dasar masih harus dipenuhi."
+        njir aturan == "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR"
+            balek "Amankan air untuk minum, sanitasi, dan kebutuhan dasar; hentikan pemakaian yang bisa ditunda."
         kampret
-            njir aturan == "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR"
-                balek "Amankan air untuk minum, sanitasi, dan kebutuhan dasar; hentikan pemakaian yang bisa ditunda."
+            njir aturan == "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL"
+                balek "Batasi pemakaian non-esensial dan periksa kebutuhan dasar sebelum distribusi berikutnya."
             kampret
-                njir aturan == "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL"
-                    balek "Batasi pemakaian non-esensial dan periksa kebutuhan dasar sebelum distribusi berikutnya."
+                njir aturan == "AIR-03: PENGHEMATAN"
+                    balek "Terapkan penghematan, pantau perubahan cadangan, dan tunda pemakaian yang tidak mendesak."
                 kampret
-                    njir aturan == "AIR-03: PENGHEMATAN"
-                        balek "Terapkan penghematan, pantau perubahan cadangan, dan tunda pemakaian yang tidak mendesak."
-                    kampret
-                        njir aturan == "AIR-04: KONDISI_NORMAL"
-                            balek "Pertahankan pemantauan berkala dan gunakan air secara wajar."
-                        kampret
-                            balek "Hentikan proses dan periksa ID aturan sebelum tindakan."
-                        selesai njir
-                    selesai njir
-                    selesai njir
+                    balek "Pertahankan pemantauan berkala dan gunakan air secara wajar."
                 selesai njir
             selesai njir
         selesai njir
     selesai njir
 selesai fungsi
+
 
 coba
     tanya cadangan_teks = "Cadangan air saat ini (0-100%): "
