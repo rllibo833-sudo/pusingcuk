@@ -1,88 +1,63 @@
-# Pusingcuk Documentation Index
+# Peta Dokumentasi PusingCuk
 
-Use this index to choose the right document. The current engineering baseline is the **Python reference interpreter + native C runtime**. Shared fixtures now cover numerical edge cases, collection boundaries, function scope, and consistent runtime diagnostics, including `akar`, `pangkat`, `sinus`, `kosinus`, `logaritma`, `log10`, `jumlah`, `rata_rata`, and `median` in native C. Compiler and Android app prototypes remain documented, but they are not part of the baseline compatibility promise.
+Dokumen ini adalah **satu pintu masuk** ke dokumentasi. Pilih berdasarkan pekerjaan yang ingin dilakukan; tidak perlu membaca semuanya.
 
-**Canonical language version:** `0.6-dev`. New examples should use `.cuk`; `.pusingcuk` remains accepted for existing programs. The manifest contains 67 fixtures: 67 required reference results, 62 required native results, and 5 explicit native-unsupported cases.
+## 1. Mulai menggunakan .cuk
 
-## Start here
+- [Panduan pemula](PEMULA.md) — sintaks dan contoh dasar.
+- [Spesifikasi bahasa](../SPEC.md) — aturan sintaks/fitur yang dinyatakan didukung.
+- [Kontrak semantik](SEMANTIC_CONTRACT.md) — perilaku yang harus konsisten.
+- [Gaya bahasa](GAYA_BAHASA.md), [kamus](KAMUS_PUSINGCUK.md), dan [kosakata Gen Z](KOSAKATA_GENZ.md) — istilah, keyword, serta alias.
+- [Contoh program](examples/) — contoh yang dapat dipakai sebagai titik awal.
 
-- [Status teknis dan roadmap](PROJECT_STATUS_AND_ROADMAP.md) — status audit bahasa, AI, CI, Supabase, serta urutan pengembangan.
-- [Beginner guide](PEMULA.md) — first program, syntax basics, and guided examples.
-- [Termux guide](termux/README.md) — run Pusingcuk on an Android phone without needing a desktop.
-- [Project vision](VISION.md) — goals, community values, and current engineering priorities.
-- [Repository structure](REPO_STRUCTURE.md) — where code, tests, tools, and documents live.
-- [Legacy source-extension example](../examples/compat/README.md) — why `.pusingcuk` stays supported while new projects use `.cuk`.
-- [Contributor guide](../CONTRIBUTING.md) — changes, tests, and review expectations.
+## 2. Compiler, runtime, dan library
 
-## Language specification and dictionaries
+- [Kompatibilitas](COMPATIBILITY.md) — batas fitur antar-target.
+- [Target compiler](COMPILER_TARGETS.md) — C, JavaScript, Python, Android, dan VM.
+- [Bytecode VM](BYTECODE_VM.md) dan [spesifikasi PVM](PVM_SPEC.md) — format serta batas VM eksperimental.
+- [Kontrak semantik](SEMANTIC_CONTRACT.md), [IR v1](IR_V1.md), dan [kontrak konformansi](CONFORMANCE_FIXTURES.md) — untuk perubahan compiler/runtime.
+- [Sistem modul](MODULE_SYSTEM.md) dan [impor Python](IMPORT_PYTHON.md) — integrasi impor yang memang tersedia.
+- [Peta struktur repo](REPO_STRUCTURE.md) — lokasi kode berdasarkan fungsi.
+- [Panduan library](../library/README.md) — built-in, registri kosakata, adapter, dan contoh.
 
-- [Complete language-reference map](language/README.md) — where to find keywords, aliases, built-ins, and language rules.
-- [Built-in catalogue](language/BUILTINS.md) — full list of built-ins, argument counts, and support states for every target.
-- [Language specification](../SPEC.md) — canonical syntax and intended behavior.
-- [English technical dictionary](DICTIONARY.md) — shared terms for developers and reviewers.
-- [Kamus Pusingcuk (Indonesian)](KAMUS_PUSINGCUK.md) — plain-language explanations.
-- [Slang and alias registry guide](KOSAKATA_GENZ.md) — alias meanings and cultural context.
-- [Language style guide](GAYA_BAHASA.md) — how the language and documentation should be expressed.
-- [Machine-readable vocabulary registry](../library/kosakata.json) — keyword/alias metadata; not proof that every runtime supports each entry.
+## 3. PusingCuk AI
 
-## Consistency and runtime support
+- [Kesiapan engine AI](AI_ENGINE_READINESS.md) — batas kemampuan yang telah dicatat.
+- [Grounding pengetahuan](AI_KNOWLEDGE_GROUNDING.md) — sumber dan konteks jawaban.
+- [Jembatan AI ke evolusi bahasa](AI_LANGUAGE_EVOLUTION_BRIDGE.md) — siklus usulan → diagnostik → fixture.
+- [Layanan AI lokal](AI_LOCAL_SERVICE.md) — menjalankan layanan lokal yang didukung.
 
-- [Semantic contract](SEMANTIC_CONTRACT.md) — rules that implementations must follow.
-- [Compatibility matrix](COMPATIBILITY.md) — which features are verified on which runtime.
-- [Conformance fixtures](CONFORMANCE_FIXTURES.md) — how Python and native C behavior is compared, including common error classes, exit codes, and source lines.
-- [Native C runtime](NATIVE_RUNTIME.md) — supported subset, limits, and build instructions.
-- [Status teknis dan roadmap](PROJECT_STATUS_AND_ROADMAP.md) — ringkasan source of truth untuk bahasa, AI, CI dan Supabase.
-- [AI Engine readiness gates](AI_ENGINE_READINESS.md) — local service boundary, production gates, and incremental knowledge migration.
-- [AI knowledge migration ledger](AI_ENGINE_MIGRATION_LEDGER.md) — rewritten, immutable-provenance concepts from Founder-OS and CORE.
-- [Local AI HTTP service](AI_LOCAL_SERVICE.md) — loopback-only endpoint, request contract, and security limits.
-- [Native Termux setup](NATIVE_TERMUX.md) — source build and installation details.
-- [Android distribution/verification](ANDROID_DISTRIBUTION.md) — separates cross-build, emulator smoke test, and physical Termux validation.
-- [Module system](MODULE_SYSTEM.md) — current import behavior and limitations.
-- [Shared built-in contract](../library/README.md#builtin-contract-one-metadata-source) — machine-readable built-in metadata and update rules.
+AI adalah alat bantu, bukan otoritas semantik. Kode yang dihasilkan harus diperiksa compiler dan runtime. Jangan menganggap konfigurasi prototipe sebagai layanan publik yang siap produksi.
 
-## Development and maintenance
+## 4. Frontend, backend, dan integrasi
 
-- [Development/test gates](development/README.md) — expected commands and rules for claiming compatibility.
-- [Independent review guide](INDEPENDENT_REVIEW.md) — structured technical review.
-- [Tooling notes](TOOLING.md) — CLI and developer tools.
-- [Offline adapters](OFFLINE_ADAPTERS.md) — status of integration experiments; not a claim of production-ready platform APIs.
+- [Web workbench](WEB_WORKBENCH.md) — UI editor berbasis web.
+- [Studio localhost](STUDIO_LOCALHOST.md) — layanan studio lokal.
+- [Integrasi CukAccount](CUKACCOUNT_INTEGRATION.md) — kontrak integrasi aplikasi contoh.
+- [Distribusi Android](ANDROID_DISTRIBUTION.md) dan [Android Studio](ANDROID_STUDIO.md) — prototipe/build Android.
+- [Compiler C](C_BACKEND.md), [backend JavaScript](JS_BACKEND.md), dan [interoperabilitas compiler](COMPILER_INTEROP.md).
 
-## Security and audits
+UI, API, backend, compiler, dan runtime adalah lapisan berbeda. Dokumen integrasi tidak membuktikan bahwa deployment atau build target telah lulus.
 
-- [Security review guide](security/README.md) — threat boundaries, audit procedure, and security-related test expectations.
-- [Official vulnerability-reporting policy](../SECURITY.md) — private reporting and current security limitations.
-- [Native audit note](NATIVE_AUDIT_2026-10-11.md) — dated point-in-time findings, not a certification.
-- [Native secure-ecosystem roadmap](NATIVE_SECURE_ECOSYSTEM_ROADMAP.md) — proposal, not a completed security milestone.
+## 5. Pengujian dan keamanan
 
-## Deferred experiments and future design
+- [Fixture konformansi](CONFORMANCE_FIXTURES.md) — cara mengunci perilaku lintas-runtime.
+- [Panduan tooling](TOOLING.md) — alat pengembangan dan validasi.
+- [Keamanan runner](CORE_SANDBOX_RUNNER.md) dan [review keamanan](SECURITY_REVIEW_2026-10-13.md) — baca sebagai catatan terbatas pada cakupan/tanggalnya.
+- [Uji native di Termux](NATIVE_TERMUX.md) — termasuk hal yang perlu diverifikasi pada perangkat fisik.
 
-The documents below describe prototypes or possible future work. Read them only after understanding the Python/C baseline; their existence does not mean the corresponding target is stable or equivalent.
+**Peringatan:** PusingCuk belum menyediakan sandbox OS yang menjamin kode tidak tepercaya aman. Jangan jalankan program atau bytecode yang tidak dipercaya.
 
-- [Compiler target status](COMPILER_TARGETS.md)
-- [Compiler interoperability design](COMPILER_INTEROP.md)
-- [IR v1](IR_V1.md)
-- [Experimental C source backend](C_BACKEND.md)
-- [Experimental JavaScript backend](JS_BACKEND.md)
-- [Bytecode VM](BYTECODE_VM.md) and [PVM format](PVM_SPEC.md)
-- [Compiler type system / standard-library notes](compiler-type-system-and-stdlib.md)
-- [Android emulator smoke-test workflow](../.github/workflows/android-emulator-smoke.yml) — manual validation, separate from the core CI gate.
-- [Android Studio prototype](ANDROID_STUDIO.md)
-- [Local web workbench](WEB_WORKBENCH.md) and [Termux dashboard](TERMUX_DASHBOARD.md)
-- [Three-repository compiler roadmap](THREE_REPO_COMPILER_ROADMAP.md)
+## 6. Status dan keputusan proyek
 
-## Integrations and data services
+- [Status dan prioritas aktif](PROJECT_STATUS_AND_ROADMAP.md) — ringkasan pendek, bukan arsip setiap langkah.
+- [Vision](VISION.md) — tujuan dan prinsip jangka panjang.
+- [Changelog](../CHANGELOG.md) — perubahan yang telah dicatat.
+- [Tinjauan independen](INDEPENDENT_REVIEW.md) — temuan/rekomendasi pada cakupan tinjauan tersebut.
 
-- [Supabase project map](integrations/SUPABASE_PROJECTS.md) — proyek PusingCuk dan database legacy yang terpisah, status koneksi, kuota Free, dan batas keamanan.
+## Cara menjaga dokumentasi tetap ringan
 
-## About the `library/` directory
-
-The repository's `library/` directory contains examples, vocabulary metadata, the shared built-in contract, and internal runtime helpers. It is not yet a general package manager or a complete, importable standard library. Learner-facing vocabulary explanations are collected through the [language-reference map](language/README.md).
-
-## Report a documentation mismatch
-
-Include the document path, section, command, runtime (Python or C), observed result, and a minimal example. Do not post secrets or details of an unpatched vulnerability publicly; follow [SECURITY.md](../SECURITY.md).
-
-## Validasi perangkat
-
-- [Panduan native Termux](NATIVE_TERMUX.md)
-- [Skrip uji integrasi Termux fisik](../scripts/test-termux-device.sh)
+- Ubah dokumen yang sudah ada sebelum membuat dokumen baru.
+- Simpan **satu sumber kanonis** untuk setiap kontrak; dokumen lain harus merujuk, bukan menyalin seluruh isi.
+- Catatan audit bertanggal adalah snapshot historis, bukan status HEAD terkini.
+- Hapus atau arsipkan dokumen hanya setelah memeriksa tautan masuk, workflow, dan apakah masih menjadi bukti historis.
