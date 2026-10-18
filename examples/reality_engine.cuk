@@ -1,10 +1,10 @@
 # CUK REALITY ENGINE
-# Mesin keputusan interaktif berbasis satu sumber aturan.
-# Tidak terhubung ke sensor nyata dan bukan pengganti keputusan lapangan.
+# Mesin keputusan interaktif berbasis satu evaluasi aturan.
+# Domain air adalah contoh untuk mengembangkan bahasa .cuk, bukan sistem lapangan.
 
 jancuk
 
-# SATU-SATUNYA TEMPAT VALIDASI DAN AMBANG KEBIJAKAN DITENTUKAN.
+# SUMBER KEBIJAKAN: validasi dan ambang batas hanya ditulis di sini.
 fungsi aturan_air(cadangan, kebutuhan_dasar)
     njir cadangan < 0 atau cadangan > 100
         balek "AIR-00: INPUT_CADANGAN_TIDAK_VALID"
@@ -29,9 +29,9 @@ fungsi aturan_air(cadangan, kebutuhan_dasar)
     selesai njir
 selesai fungsi
 
-# Fungsi keluaran hanya menerjemahkan ID aturan; tidak mengulang ambang.
-fungsi keputusan_air(cadangan, kebutuhan_dasar)
-    lah aturan = aturan_air(cadangan, kebutuhan_dasar)
+# Fungsi berikut hanya memetakan ID hasil aturan menjadi keluaran.
+# Mereka tidak menghitung ulang kebijakan atau membaca masukan mentah.
+fungsi keputusan_dari_aturan(aturan)
     njir aturan == "AIR-00: INPUT_CADANGAN_TIDAK_VALID" atau aturan == "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID"
         balek "MASUKAN_TIDAK_VALID"
     kampret
@@ -51,8 +51,7 @@ fungsi keputusan_air(cadangan, kebutuhan_dasar)
     selesai njir
 selesai fungsi
 
-fungsi alasan_air(cadangan, kebutuhan_dasar)
-    lah aturan = aturan_air(cadangan, kebutuhan_dasar)
+fungsi alasan_dari_aturan(aturan)
     njir aturan == "AIR-00: INPUT_CADANGAN_TIDAK_VALID"
         balek "Input tidak valid: cadangan harus 0 sampai 100%."
     kampret
@@ -76,8 +75,7 @@ fungsi alasan_air(cadangan, kebutuhan_dasar)
     selesai njir
 selesai fungsi
 
-fungsi tindakan_air(cadangan, kebutuhan_dasar)
-    lah aturan = aturan_air(cadangan, kebutuhan_dasar)
+fungsi tindakan_dari_aturan(aturan)
     njir aturan == "AIR-00: INPUT_CADANGAN_TIDAK_VALID"
         balek "Periksa ulang data cadangan; jangan ambil keputusan dari angka di luar 0-100%."
     kampret
@@ -105,7 +103,10 @@ coba
     tanya cadangan_teks = "Cadangan air saat ini (0-100%): "
     lah cadangan = bilangan(cadangan_teks)
     tanya kebutuhan_dasar = "Kebutuhan dasar masih harus dipenuhi? (ya/tidak): "
-    lah keputusan = keputusan_air(cadangan, kebutuhan_dasar)
+
+    # Evaluasi kebijakan satu kali. Semua keluaran menggunakan ID yang sama.
+    lah aturan = aturan_air(cadangan, kebutuhan_dasar)
+    lah keputusan = keputusan_dari_aturan(aturan)
 
     hedeh "=== HASIL REALITY ENGINE ==="
     hedeh "Cadangan air (%):"
@@ -113,11 +114,11 @@ coba
     hedeh "Keputusan:"
     hedeh keputusan
     hedeh "Aturan yang cocok:"
-    hedeh aturan_air(cadangan, kebutuhan_dasar)
+    hedeh aturan
     hedeh "Alasan:"
-    hedeh alasan_air(cadangan, kebutuhan_dasar)
+    hedeh alasan_dari_aturan(aturan)
     hedeh "Tindakan yang disarankan:"
-    hedeh tindakan_air(cadangan, kebutuhan_dasar)
+    hedeh tindakan_dari_aturan(aturan)
 ketangkep kesalahan
     hedeh "Input tidak valid: " + kesalahan
     hedeh "Masukkan cadangan sebagai angka yang valid dari 0 sampai 100."
