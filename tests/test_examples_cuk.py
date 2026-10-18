@@ -57,6 +57,8 @@ class CukExampleCliTests(unittest.TestCase):
             "PRIORITASKAN_KEBUTUHAN_DASAR",
             "=== KRITIS - NON-ESENSIAL ===",
             "BATASI_PENGGUNAAN_NON_ESENSIAL",
+            "=== BATAS KRITIS - TEPAT 20% ===",
+            "=== BATAS HEMAT - TEPAT 50% ===",
             "=== MENURUN ===",
             "HEMAT_AIR",
             "=== NORMAL ===",
