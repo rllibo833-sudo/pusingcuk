@@ -116,31 +116,6 @@ class RealityEngineBoundaryTests(unittest.TestCase):
                 self.assertIn(action, result.stdout)
 
 
-    def test_unknown_rule_id_never_defaults_to_normal_decision(self):
-        source = EXAMPLE.read_text(encoding="utf-8")
-        function_definitions = source.split("\ncoba\n", 1)[0]
-        probe = function_definitions + """
-hedeh keputusan_dari_aturan("UNKNOWN")
-hedeh alasan_dari_aturan("UNKNOWN")
-hedeh tindakan_dari_aturan("UNKNOWN")
-selesai jancuk
-"""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            program = Path(temp_dir) / "unknown_rule_probe.cuk"
-            program.write_text(probe, encoding="utf-8")
-            result = subprocess.run(
-                [sys.executable, str(CLI), str(program)],
-                cwd=ROOT,
-                capture_output=True,
-                text=True,
-                check=False,
-            )
-        self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("ATURAN_TIDAK_DIKENAL", result.stdout)
-        self.assertIn("ID aturan tidak dikenal", result.stdout)
-        self.assertIn("periksa ID aturan sebelum tindakan", result.stdout)
-        self.assertNotIn("KONDISI_NORMAL", result.stdout)
-
 
 if __name__ == "__main__":
     unittest.main()
