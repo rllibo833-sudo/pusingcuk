@@ -331,7 +331,38 @@ BUILTINS: dict[str, Builtin] = {
 }
 
 
-def get_builtin(name: str) -> Builtin | None:
+# Namespaced standard-library surface. Every public member resolves to the
+# same canonical builtin contract used by the reference evaluator.
+BUILTIN_NAMESPACES: dict[str, dict[str, str]] = {
+    "matematika": {
+        name: name for name in (
+            "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah",
+            "atas", "pangkat", "sinus", "kosinus", "logaritma", "log10",
+        )
+    },
+    "koleksi": {
+        name: name for name in (
+            "panjang", "rentang", "jumlah", "rata_rata", "median",
+        )
+    },
+    "konversi": {
+        name: name for name in ("teks", "bilangan", "desimal", "logika")
+    },
+    "json": {"teks": "json_teks", "baca": "json_baca"},
+    "web": {"aman_html": "html_aman"},
+    "tabel": {"baris_csv": "csv_baris"},
+}
+_missing_namespace_builtins = {
+    builtin_name
+    for members in BUILTIN_NAMESPACES.values()
+    for builtin_name in members.values()
+    if builtin_name not in BUILTINS
+}
+if _missing_namespace_builtins:
+    raise RuntimeError(
+        "fungsi namespace tidak ada dalam kontrak builtin: "
+        + ", ".join(sorted(_missing_namespace_builtins))
+    )
     """Return builtin metadata by exact name, or None when unknown."""
     return BUILTINS.get(name)
 
