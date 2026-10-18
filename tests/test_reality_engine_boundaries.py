@@ -1,5 +1,6 @@
 """Focused boundary regressions for the Cuk Reality Engine example."""
 
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -143,6 +144,44 @@ class RealityEngineBoundaryTests(unittest.TestCase):
         self.assertIn("Hentikan keputusan otomatis", result.stdout)
         self.assertNotIn("KONDISI_NORMAL", result.stdout)
         self.assertNotIn("Pertahankan pemantauan berkala", result.stdout)
+
+
+
+    def test_reality_engine_js_target_matches_reference_for_core_cases(self):
+        node = shutil.which("node")
+        if node is None:
+            self.skipTest("Node.js is required to verify the JavaScript target")
+        with tempfile.TemporaryDirectory(prefix="reality-engine-js-") as temporary:
+            output = Path(temporary) / "reality_engine.js"
+            compiled = subprocess.run(
+                [
+                    sys.executable, "-m", "compiler", str(EXAMPLE),
+                    "--target", "js", "--output", str(output),
+                ],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(compiled.returncode, 0, compiled.stderr)
+            cases = (
+                ("15\\nya\\n", "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR", "PRIORITASKAN_KEBUTUHAN_DASAR"),
+                ("40\\nmungkin\\n", "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID", "MASUKAN_TIDAK_VALID"),
+                ("abc\\nya\\n", "Input tidak valid:", "Masukkan cadangan sebagai angka yang valid"),
+            )
+            for user_input, expected_rule_or_error, expected_decision_or_message in cases:
+                with self.subTest(user_input=user_input):
+                    result = subprocess.run(
+                        [node, str(output)],
+                        cwd=ROOT,
+                        input=user_input,
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                    )
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertIn(expected_rule_or_error, result.stdout)
+                    self.assertIn(expected_decision_or_message, result.stdout)
 
 
 
