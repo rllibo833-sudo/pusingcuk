@@ -1,5 +1,10 @@
 name: PusingCuk fixture baseline matrix
 on:
+  pull_request:
+    paths:
+      - "tools/ci_fixture_matrix.py"
+      - "tools/differential_runner.py"
+      - ".github/workflows/fixture-baseline.yml"
   workflow_dispatch:
   push:
     branches:
