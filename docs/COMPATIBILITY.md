@@ -34,6 +34,13 @@ Status di atas sengaja memisahkan fondasi internal dari sintaks yang dapat digun
 
 ## Status kompatibilitas saat ini
 
+| Contoh Reality Engine | Status |
+|---|---|
+| Python reference | Boundary/regression tests cover policy outcomes, invalid input, and unknown rule IDs. Check the latest branch CI before treating them as passing. |
+| JavaScript target | A test now compiles and runs the same `examples/reality_engine.cuk` source for core valid/invalid cases. This is only proven if the test passes in CI; it does not establish full backend parity. |
+| Native C | Not yet compatible with the whole example because native C does not support `coba/ketangkep`. Do not claim native parity until that feature is implemented with conformance coverage or the example is deliberately reduced to the supported subset. |
+
+
 | Area | Status sekarang | Makna praktis |
 |---|---|---|
 | Linux dengan compiler C11 | Jalur native diuji di CI Ubuntu GCC/Clang | Bukan bukti otomatis untuk semua distro |
