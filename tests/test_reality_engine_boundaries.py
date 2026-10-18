@@ -42,8 +42,7 @@ class RealityEngineBoundaryTests(unittest.TestCase):
         self.assertNotIn("KONDISI_NORMAL", result.stdout)
 
     def test_fractional_reserve_is_rejected_as_invalid_numeric_input(self):
-        # bilangan() currently accepts integers only; decimal syntax is rejected
-        # before the policy function receives a reserve value.
+        # Decimal input is parsed first, then rejected by the 0–100 policy boundary.
         result = self.run_engine("100.1\ntidak\n")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("AIR-00: INPUT_CADANGAN_TIDAK_VALID", result.stdout)
@@ -52,7 +51,7 @@ class RealityEngineBoundaryTests(unittest.TestCase):
 
 
     def test_decimal_reserve_within_range_uses_policy_thresholds(self):
-        result = self.run_engine("20.5\\nya\\n")
+        result = self.run_engine("20.5\nya\n")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("AIR-03: PENGHEMATAN", result.stdout)
         self.assertIn("HEMAT_AIR", result.stdout)
