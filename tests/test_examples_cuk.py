@@ -78,6 +78,11 @@ class CukExampleCliTests(unittest.TestCase):
         self.assertNotIn("Cadangan air (%):", output)
 
 
+    def test_reality_engine_reports_a_traceable_rule_identifier(self):
+        output, _, _ = self.run_example("reality_engine.cuk", "15\\nya\\n")
+        self.assertIn("Aturan yang cocok:", output)
+        self.assertIn("AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR", output)
+
     def test_reality_engine_at_20_percent_prioritizes_basic_needs(self):
         output, _, _ = self.run_example("reality_engine.cuk", "20\\nya\\n")
         self.assertIn("PRIORITASKAN_KEBUTUHAN_DASAR", output)

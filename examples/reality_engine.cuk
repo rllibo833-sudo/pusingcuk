@@ -52,6 +52,30 @@ fungsi alasan_air(cadangan, kebutuhan_dasar)
     selesai njir
 selesai fungsi
 
+fungsi aturan_air(cadangan, kebutuhan_dasar)
+    njir cadangan < 0 atau cadangan > 100
+        balek "AIR-00: INPUT_CADANGAN_TIDAK_VALID"
+    kampret
+        njir kebutuhan_dasar != "ya" dan kebutuhan_dasar != "tidak"
+            balek "AIR-00: INPUT_KEBUTUHAN_TIDAK_VALID"
+        kampret
+            njir cadangan <= 20
+                njir kebutuhan_dasar == "ya"
+                    balek "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR"
+                kampret
+                    balek "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL"
+                selesai njir
+            kampret
+                njir cadangan <= 50
+                    balek "AIR-03: PENGHEMATAN"
+                kampret
+                    balek "AIR-04: KONDISI_NORMAL"
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
 fungsi tindakan_air(cadangan, kebutuhan_dasar)
     njir cadangan < 0 atau cadangan > 100
         balek "Periksa ulang data cadangan; jangan ambil keputusan dari angka di luar 0-100%."
@@ -87,6 +111,8 @@ coba
     hedeh cadangan
     hedeh "Keputusan:"
     hedeh keputusan
+    hedeh "Aturan yang cocok:"
+    hedeh aturan_air(cadangan, kebutuhan_dasar)
     hedeh "Alasan:"
     hedeh alasan_air(cadangan, kebutuhan_dasar)
     hedeh "Tindakan yang disarankan:"
