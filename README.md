@@ -1,50 +1,53 @@
 # PusingCuk
 
-PusingCuk adalah proyek bahasa pemrograman eksperimental dengan ekstensi utama `.cuk`, kata kunci Indonesia, dan identitas bahasa lokal. Tujuannya: membuat pemrograman mudah dipelajari tanpa mengorbankan aturan yang jelas, diagnostik yang berguna, dan perilaku yang bisa diuji.
+PusingCuk adalah bahasa pemrograman **experimental** dengan ekstensi utama `.cuk`, kata kunci Indonesia, dan identitas bahasa lokal. Tujuannya adalah memudahkan pemrograman tanpa mengorbankan semantik yang jelas, diagnostik yang berguna, dan hasil yang bisa dibuktikan.
 
-**Status versi:** kontrak bahasa `0.6-dev`; versi paket Python `0.8.0.dev0`. Keduanya berbeda. Status ini bukan klaim rilis stabil.
+**Status versi:** kontrak bahasa `0.6-dev`; versi paket Python `0.8.0.dev0`. Keduanya berbeda dan bukan klaim rilis stabil. Metadata paket pada `main` adalah `0.8.0.dev0`; branch ini tetap menggunakan metadata paket yang sama sampai kontrak rilis diperbarui.
 
 ## Mulai cepat
 
-Persyaratan jalur referensi saat ini: Python 3.11+.
+Jalur referensi saat ini memerlukan Python 3.11+:
 
 ```sh
-python pusingcuk_new.py halo.cuk
+python pusingcuk_new.py path/ke/program.cuk
 ```
 
-Untuk melihat contoh lain, mulai dari [examples](examples/) dan [library](library/README.md). Petunjuk perangkat tersedia di [panduan Termux](docs/termux/README.md).
+Contoh program ada di [examples](examples/). Pustaka dan kontraknya dijelaskan di [library](library/README.md); panduan perangkat ada di [Termux](docs/termux/README.md).
 
 ## Struktur proyek
 
-| Bagian | Kegunaan |
+| Area | Tanggung jawab |
 |---|---|
-| `.cuk` | Program pengguna, contoh, dan aturan bisnis yang ditulis dalam bahasa PusingCuk |
-| `lexer.py`, `parser.py`, `evaluator.py` | Jalur referensi saat ini untuk membaca, memvalidasi sintaks, dan menjalankan program |
-| `compiler/` | IR, bytecode/VM eksperimental, serta backend C, JavaScript, Python, dan Android dengan cakupan berbeda |
-| `library/` | Built-in, kontrak mesin, kosakata, adapter, dan modul contoh; bukan semua komponen di sini merupakan modul PusingCuk yang bisa diimpor |
-| `web/`, `site/`, `apps/`, `supabase/` | Prototipe UI, layanan, dan integrasi; tidak otomatis berarti siap produksi |
-| `tests/` | Tes regresi, fixture konformansi, dan pemeriksaan kontrak |
-| `docs/` | Dokumentasi yang dikelompokkan menurut kebutuhan pengguna dan fungsi teknis |
+| `.cuk` | Program pengguna, contoh, fixture, dan aturan bisnis |
+| `lexer.py`, `parser.py`, `evaluator.py` | Jalur referensi untuk parsing dan eksekusi |
+| `compiler/`, `native/` | IR, VM eksperimental, dan backend dengan cakupan berbeda |
+| `library/` | Built-in, kontrak, kosakata, adapter, dan pengetahuan PusingCuk AI |
+| `apps/`, `web/`, `site/`, `supabase/` | Prototipe aplikasi/integrasi; bukan bukti otomatis bahwa SaaS siap produksi |
+| `tests/`, `tests/conformance/` | Regresi dan kontrak perilaku target |
+| `docs/` | Panduan pengguna, arsitektur, kompatibilitas, dan status |
 
-Peta lengkap: [indeks dokumentasi](docs/README.md). Tujuan bahasa: [Vision](docs/VISION.md). Perilaku bahasa yang berlaku: [SPEC.md](SPEC.md) dan [kontrak semantik](docs/SEMANTIC_CONTRACT.md).
+Indeks dokumentasi: [docs/README.md](docs/README.md). Visi: [docs/VISION.md](docs/VISION.md). Spesifikasi: [SPEC.md](SPEC.md). Kontrak semantik: [docs/SEMANTIC_CONTRACT.md](docs/SEMANTIC_CONTRACT.md).
 
-## Apa yang sudah dan belum mandiri?
+## Bukti dukungan, bukan klaim
 
-- **Jalur referensi:** interpreter Python adalah implementasi pembanding utama saat ini.
-- **Native C:** dapat menghasilkan program native tanpa interpreter Python saat program hasil kompilasi dijalankan, tetapi dukungan fiturnya masih subset.
-- **JavaScript/Python transpiler dan bytecode VM:** memiliki batas dukungan tersendiri; jangan menganggap semua fitur setara.
-- **PusingCuk AI:** aplikasi bantu yang memakai engine/provider yang tersedia untuk membantu menulis dan memperbaiki kode. Ini **belum** berarti PusingCuk memiliki foundation model yang dilatih sendiri.
-- **Web, Android, dan layanan SaaS:** sebagian merupakan prototipe. Build, runtime, login, dan integrasi harus dinyatakan siap hanya jika telah dibuktikan pada target yang bersangkutan.
+Manifest saat ini memuat **77 fixtures**: all 77 are required on the Python reference interpreter, 74 are required on native C, and 3 are explicitly unsupported on native C. Fixture native dijalankan pada GCC dan Clang di CI. Ini membuktikan hanya perilaku yang tercakup fixture, bukan seluruh bahasa atau semua platform.
 
-Matriks dukungan yang rinci: [kompatibilitas](docs/COMPATIBILITY.md), [target compiler](docs/COMPILER_TARGETS.md), dan kontrak built-in di `library/builtin_contract.json`.
+- **Python reference:** implementasi pembanding utama saat ini; masih membutuhkan Python.
+- **Native C:** dapat menghasilkan executable yang berjalan tanpa Python untuk subset yang didukung; ini belum berarti semua sintaks/built-in sudah mandiri.
+- **JavaScript, Python transpiler, dan VM:** cakupan target berbeda. Fitur yang belum didukung harus ditandai, bukan diasumsikan setara.
+- **PusingCuk AI:** membantu menulis dan memperbaiki program melalui engine/provider yang tersedia. Ini bukan foundation model yang dilatih sendiri oleh PusingCuk.
+- **PusingCuk AI local service:** `pusingcuk-ai-service` adalah adapter HTTP lokal eksperimen. Baca [docs/AI_LOCAL_SERVICE.md](docs/AI_LOCAL_SERVICE.md); layanan ini bukan public hosted service dan tidak boleh dianggap deployment SaaS.
+- **Web, Android, dan SaaS:** prototipe sampai build, autentikasi, integrasi, dan alur utama benar-benar diverifikasi pada target yang sama.
+
+Matriks: [kompatibilitas](docs/COMPATIBILITY.md), [target compiler](docs/COMPILER_TARGETS.md), serta [kontrak built-in](library/builtin_contract.json).
 
 ## Prinsip pengembangan
 
-1. Satu kontrak bahasa; backend yang belum mendukung fitur harus menolaknya dengan jelas.
-2. Perubahan semantik disertai tes/fixture yang menunjukkan perilaku yang diharapkan.
-3. AI boleh mengusulkan kode, tetapi compiler dan runtime yang menentukan apakah kode valid dan berperilaku benar.
-4. Jangan menyebut eksekusi kode tidak tepercaya aman: runtime saat ini bukan sandbox OS.
-5. Pertahankan bahasa sederhana, ringan, dan ramah pemula; jangan menambah fitur atau dokumen tanpa kegunaan nyata.
+1. Satu kontrak semantik; setiap target yang belum mendukung fitur harus menolaknya dengan jelas.
+2. Fitur baru harus memperlihatkan program nyata, hasil yang dapat diperiksa, dan fixture regresi.
+3. AI boleh mengusulkan kode, tetapi compiler dan runtime menentukan validitasnya.
+4. Runtime bukan sandbox OS untuk kode tidak tepercaya.
+5. Jangan menambah kata kunci atau dokumen tanpa kebutuhan pengguna dan bukti perilaku.
 
 ## Kontribusi dan keamanan
 
