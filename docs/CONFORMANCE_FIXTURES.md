@@ -1,6 +1,13 @@
 # Kontrak Fixture Konformansi Pusingcuk
 
-**Versi bahasa:** `0.6-dev`. Manifest aktif berisi 77 fixture: 77 wajib pada reference; 74 wajib dan 3 eksplisit unsupported pada native C. Manifest saat ini belum memuat fixture khusus Reality Engine; catatan lama di changelog bukan bukti bahwa fixture tersebut ada atau lulus.
+**Versi bahasa:** `0.6-dev`.
+
+<!-- BEGIN GENERATED FIXTURE COUNTS -->
+**Active manifest:** **77 fixtures**; reference required: **77**; native C required: **74**; native C unsupported: **3**.
+These figures are generated directly from `tests/conformance/manifest.json`; CI fails if the checked-in baseline summary disagrees with the manifest count or runtime-status totals.
+<!-- END GENERATED FIXTURE COUNTS -->
+
+Manifest saat ini belum memuat fixture khusus Reality Engine; catatan historis di changelog bukan bukti bahwa fixture tersebut ada atau lulus.
 
 Harness konformansi aktif ada di `tools/conformance.py` dan dijalankan oleh CI. Manifest membandingkan perilaku yang terlihat pengguna pada interpreter referensi Python dan runtime native C. Fixture kanonis baru memakai ekstensi `.cuk`; contoh lama berekstensi `.pusingcuk` tetap boleh digunakan untuk kompatibilitas.
 

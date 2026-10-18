@@ -14,7 +14,6 @@ Catatan ringkas perubahan yang sudah dilakukan. Versi paket dan versi bahasa ada
 - Tegaskan status kemandirian .cuk: Reality Engine membuktikan satu program aturan pada interpreter referensi, bukan runtime mandiri, parity semua backend, toolchain mandiri, atau self-hosting.
 - Ubah fallback pemetaan keputusan, alasan, dan tindakan agar ID aturan yang tidak dikenal menghasilkan status tidak dikenal dan instruksi berhenti, bukan keputusan normal. Tambahkan regresi yang menyuntikkan ID asing ke jalur keluaran.
 - Tambahkan tes target JavaScript untuk menjalankan source Reality Engine yang sama pada kasus inti, termasuk input kebijakan tidak valid dan kegagalan konversi. Hasil target ini belum boleh diklaim lulus sampai CI pada commit terbaru selesai.
-- Tambahkan fixture konformansi `reality-engine.unknown-rule-id-fails-closed`, wajib pada interpreter referensi dan native C, agar keluaran fail-closed ID tak dikenal terikat ke kontrak lintas-runtime. Sinkronkan hitungan manifest menjadi 79 fixture: 79 wajib reference, 76 wajib native, dan 3 unsupported native.
 
 - Tetapkan tujuan Reality Engine sebagai program contoh berbasis aturan untuk mengembangkan dan membuktikan kemampuan bahasa `.cuk`, bukan sebagai proyek pengelolaan air produksi.
 - Tambahkan [dokumentasi kanonis Reality Engine](docs/REALITY_ENGINE.md), termasuk tabel aturan, alur eksekusi, batas klaim, cara menjalankan, dan fokus pengembangan branch.
@@ -38,6 +37,11 @@ Catatan ringkas perubahan yang sudah dilakukan. Versi paket dan versi bahasa ada
 - Koreksi backend C: operator `==` dan `!=` pada teks membandingkan isi string dengan `strcmp`, bukan alamat string. Regresi membandingkan hasil backend C dengan interpreter referensi. Backend C subset juga mendukung `teks()` untuk teks, integer, dan boolean scalar, dengan tes parity terhadap interpreter referensi.
 - Prioritas pengembangan berikutnya adalah memperluas dukungan native dan mengunci setiap perubahan semantik dengan fixture positif/negatif lintas-runtime.
 - Bytecode VM tetap eksperimental; implementasi VM berbasis Python tidak dihitung sebagai runtime bebas Python.
+
+## Catatan historis dan roadmap
+
+- **Historis — klaim baseline 79/76:** catatan lama pernah menyebut 79 fixture, 79 wajib pada reference, dan 76 wajib pada native C dengan 3 unsupported. Klaim itu bukan baseline aktif dan tidak dihapus dari riwayat: fixture `reality-engine.unknown-rule-id-fails-closed` dipensiunkan melalui [commit `c38ce36`](https://github.com/rllibo833-sudo/pusingcuk/commit/c38ce36ed8715ab088ff16aaac35242a50ea1db8). Manifest aktif tetap **77 fixture**; jangan menambahkan fixture pensiun atau menaikkan baseline.
+- **Roadmap — fail-closed untuk ID aturan tak dikenal:** simpan ide ini sebagai kandidat fixture/tes khusus di masa depan. Jika diaktifkan kembali, harus ada keputusan eksplisit, source yang aktif, expected output, dan bukti lulus pada reference serta native C. Tidak termasuk manifest atau klaim konformansi sekarang.
 
 ## Aturan changelog
 
