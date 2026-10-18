@@ -59,8 +59,8 @@ class RealityEngineBoundaryTests(unittest.TestCase):
 
     def test_fifty_percent_boundary_and_just_above(self):
         cases = (
-            ("50\\nya\\n", "AIR-03: PENGHEMATAN", "HEMAT_AIR"),
-            ("50.1\\nya\\n", "AIR-04: KONDISI_NORMAL", "KONDISI_NORMAL"),
+            ("50\nya\n", "AIR-03: PENGHEMATAN", "HEMAT_AIR"),
+            ("50.1\nya\n", "AIR-04: KONDISI_NORMAL", "KONDISI_NORMAL"),
         )
         for user_input, rule, decision in cases:
             with self.subTest(user_input=user_input):
@@ -72,7 +72,7 @@ class RealityEngineBoundaryTests(unittest.TestCase):
     def test_non_finite_decimal_is_rejected_before_policy_decision(self):
         for value in ("NaN", "inf", "-Infinity"):
             with self.subTest(value=value):
-                result = self.run_engine(f"{value}\\nya\\n")
+                result = self.run_engine(f"{value}\nya\n")
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertIn("Input tidak valid:", result.stdout)
                 self.assertIn("Masukkan cadangan sebagai angka yang valid", result.stdout)
