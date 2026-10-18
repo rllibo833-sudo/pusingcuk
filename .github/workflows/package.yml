@@ -37,7 +37,7 @@ jobs:
           # cannot accidentally hide missing files in the built package.
           cd "$RUNNER_TEMP"
           output="$(pusingcuk "$GITHUB_WORKSPACE/examples/kasir_warung.cuk")"
-          expected="$(printf '40000\\n4000\\n36000\\n3960\\n39960')"
+          expected="$(printf '40000\n4000\n36000\n3960\n39960')"
           test "$output" = "$expected"
           cd "$GITHUB_WORKSPACE"
 
