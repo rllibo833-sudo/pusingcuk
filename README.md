@@ -2,7 +2,7 @@
 
 PusingCuk adalah bahasa pemrograman eksperimental dengan ekstensi `.cuk`, kata kunci berbahasa Indonesia, dan identitas sintaks sendiri. Proyek ini berfokus pada bahasa, interpreter, compiler, runtime, dan contoh program yang bisa dijalankan serta dikembangkan oleh kontributor.
 
-**Status:** kontrak bahasa `0.6-dev`; paket Python `0.8.0.dev0`. Ini masih tahap pengembangan, bukan rilis stabil. Dukungan tiap backend berbeda; jangan menganggap semua program berjalan identik di semua target.
+**Status:** kontrak bahasa `0.6-dev`; paket Python `0.8.0.dev0`. Metadata paket pada `main` adalah `0.8.0.dev0`. Ini masih tahap pengembangan, bukan rilis stabil. Dukungan tiap backend berbeda; jangan menganggap semua program berjalan identik di semua target.
 
 ## Coba .cuk
 
