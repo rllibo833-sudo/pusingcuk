@@ -72,7 +72,7 @@ class CukExampleCliTests(unittest.TestCase):
         ):
             with self.subTest(expected=expected):
                 self.assertIn(expected, output)
-        self.assertEqual(output.count("KONSISTEN_DENGAN_ATURAN"), 8)
+        self.assertEqual(output.count("KONSISTEN_DENGAN_ATURAN"), 10)
         self.assertEqual(output.count("KONFLIK_HASIL_DAN_ATURAN"), 1)
 
     def test_terminal_bot_handles_interactive_answers(self):
