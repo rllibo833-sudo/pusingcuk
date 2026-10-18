@@ -70,7 +70,7 @@ Kalau memakai runtime native Termux, ikuti dulu langkah instalasi di `docs/PEMUL
 
 ## 4. Fungsi bawaan
 
-Daftar lengkap 19 built-in, aturan argumen, serta runtime yang mendukungnya tersedia di [katalog built-in](language/BUILTINS.md). Runtime C kini menguji 15 built-in: inti sebelumnya ditambah `sinus`, `kosinus`, `jumlah`, `rata_rata`, dan `median`. Empat fungsi konversi tetap belum diklaim di native. Tabel di bawah adalah ringkasan untuk belajar; fitur tidak otomatis tersedia pada semua runtime.
+Katalog built-in dan status dukungan per target tersedia di [katalog built-in](language/BUILTINS.md) serta `library/builtin_contract.json`. Tabel berikut adalah pilihan fungsi untuk belajar, bukan inventaris lengkap. Runtime C memiliki subset yang diuji; jumlah fungsi yang tercatat di registry tidak berarti semua fungsi didukung secara penuh oleh setiap runtime.
 
 | Fungsi | Gunanya |
 |---|---|

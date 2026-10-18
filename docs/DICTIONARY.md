@@ -80,7 +80,7 @@ The complete and test-checked list of 25 built-ins, argument counts, and per-tar
 | `desimal(value)` | Converts a value to a decimal number in the standard-library registry | Check target support first |
 | `logika(value)` | Converts a value to a boolean in the standard-library registry | Check target support first |
 
-The reference interpreter and experimental JavaScript, Python, and HTML targets implement `rata_rata` and `median`; native C implements those two plus `jumlah`, whose empty-list, finite-value, and safe-integer result rules are tested. VM support is not claimed. VM support is not claimed. This is a small Pusingcuk API, not full Python `statistics` compatibility. For exact implementation status, see [`IMPORT_PYTHON.md`](IMPORT_PYTHON.md), [`compiler-type-system-and-stdlib.md`](compiler-type-system-and-stdlib.md), [`COMPILER_TARGETS.md`](COMPILER_TARGETS.md), and [`NATIVE_RUNTIME.md`](NATIVE_RUNTIME.md).
+The reference interpreter and experimental JavaScript, Python, and HTML targets implement `rata_rata` and `median`; native C implements those two plus `jumlah`, whose empty-list, finite-value, and safe-integer result rules are tested. VM support is not claimed. This is a small Pusingcuk API, not full Python `statistics` compatibility. For exact implementation status, see [`IMPORT_PYTHON.md`](IMPORT_PYTHON.md), [`compiler-type-system-and-stdlib.md`](compiler-type-system-and-stdlib.md), [`COMPILER_TARGETS.md`](COMPILER_TARGETS.md), and [`NATIVE_RUNTIME.md`](NATIVE_RUNTIME.md).
 
 ## 5. A complete small program
 
