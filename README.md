@@ -4,6 +4,12 @@ PusingCuk adalah bahasa pemrograman **experimental** dengan ekstensi utama `.cuk
 
 **Status versi:** kontrak bahasa `0.6-dev`; versi paket Python `0.8.0.dev0`. Keduanya berbeda dan bukan klaim rilis stabil. Metadata paket pada `main` adalah `0.8.0.dev0`; branch ini tetap menggunakan metadata paket yang sama sampai kontrak rilis diperbarui.
 
+## Fokus khusus branch `cuk-reality-engine`
+
+Branch ini memuat **Cuk Reality Engine**, contoh program berbasis aturan yang dipakai untuk mengembangkan dan membuktikan kemampuan bahasa `.cuk`. Contoh domainnya adalah keputusan berdasarkan persentase cadangan air, tetapi tujuan utamanya adalah bahasa: fungsi, validasi masukan, percabangan, keputusan deterministik, ID aturan, penjelasan, dan penanganan kesalahan.
+
+Dokumen kanonis branch ini: [Cuk Reality Engine](docs/REALITY_ENGINE.md). Ini bukan proyek integrasi sensor atau sistem pengelolaan air produksi. Perubahan pada branch ini tidak otomatis mengubah `main` atau `warungpusingcuk`.
+
 ## Mulai cepat
 
 Jalur referensi saat ini memerlukan Python 3.11+:
