@@ -58,6 +58,8 @@ selesai fungsi
 
 tampilkan_skenario("KRITIS - KEBUTUHAN DASAR", 12, "ya", "PRIORITASKAN_KEBUTUHAN_DASAR")
 tampilkan_skenario("KRITIS - NON-ESENSIAL", 12, "tidak", "BATASI_PENGGUNAAN_NON_ESENSIAL")
+tampilkan_skenario("BATAS KRITIS - TEPAT 20%", 20, "ya", "PRIORITASKAN_KEBUTUHAN_DASAR")
+tampilkan_skenario("BATAS HEMAT - TEPAT 50%", 50, "tidak", "HEMAT_AIR")
 tampilkan_skenario("MENURUN", 40, "ya", "HEMAT_AIR")
 tampilkan_skenario("NORMAL", 80, "tidak", "KONDISI_NORMAL")
 tampilkan_skenario("SIMULASI KONFLIK", 12, "ya", "KONDISI_NORMAL")
