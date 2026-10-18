@@ -99,9 +99,9 @@ jobs:
           grep -Fq 'Halo, Budi!' <<< "$output"
           grep -Fq 'selesai' <<< "$output"
           checkout_output="$(./dist/pusingcuk examples/kasir_warung.cuk)"
-          expected_checkout="$(printf '40000\\n4000\\n36000\\n3960\\n39960')"
+          expected_checkout="$(printf '40000\n4000\n36000\n3960\n39960')"
           test "$checkout_output" = "$expected_checkout"
-          printf '%s\\n' "$checkout_output"
+          printf '%s\n' "$checkout_output"
 
       - name: Set up Java for Android NDK
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
