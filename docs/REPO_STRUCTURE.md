@@ -1,100 +1,65 @@
-# Peta Repositori Pusingcuk
+# Struktur Repo Berdasarkan Fungsi
 
-Dokumen ini menunjukkan tempat yang tepat untuk memulai. Lihat [status teknis dan roadmap](PROJECT_STATUS_AND_ROADMAP.md) terlebih dahulu. Baseline yang aktif adalah **interpreter referensi Python + runtime native C**. Folder eksperimen tetap disimpan, tetapi bukan bukti bahwa fitur tersebut sudah stabil atau setara lintas runtime.
+Gunakan peta ini untuk menemukan lokasi yang benar sebelum mengubah kode. Ini bukan daftar setiap berkas.
 
-## Jalur pengguna
+## Bahasa .cuk
 
 | Lokasi | Fungsi |
 |---|---|
-| `README.md` | Ikhtisar dan cara tercepat menjalankan program |
-| `docs/PEMULA.md` | Tutorial dasar |
-| `docs/termux/README.md` | Jalur Termux dengan Python atau executable C native |
-| `SPEC.md` | Sintaks dan perilaku yang dimaksudkan |
-| `docs/language/README.md` | Peta keyword, alias, kamus, built-in, dan kontrak bahasa |
-| `docs/COMPATIBILITY.md` | Status dukungan per runtime |
-| `SECURITY.md` | Kebijakan resmi dan pelaporan kerentanan |
+| `lexer.py` | Membaca token dan alias keyword |
+| `parser.py`, `ast_nodes.py` | Sintaks dan AST |
+| `evaluator.py` | Interpreter referensi dan semantik runtime utama |
+| `SPEC.md` | Kontrak sintaks/fitur yang terlihat oleh pengguna |
+| `docs/SEMANTIC_CONTRACT.md` | Perilaku yang harus konsisten |
+| `examples/`, `*.cuk`, `library/*.cuk` | Program contoh dan aturan yang ditulis dalam .cuk |
 
-## Implementasi bahasa yang dipelihara
+## Compiler dan runtime
 
-| Lokasi | Peran |
+| Lokasi | Fungsi |
 |---|---|
-| `pusingcuk_new.py` | CLI interpreter referensi; `--check` memvalidasi tanpa menjalankan program |
-| `lexer.py` | Tokenisasi sumber dan normalisasi alias |
-| `parser.py` | Parsing token ke AST |
-| `ast_nodes.py` | Struktur AST |
-| `evaluator.py` | Evaluasi AST dan semantik runtime Python |
-| `terminal.py` | Terminal interaktif/REPL |
-| `native/pusingcuk.c` | Runtime C11 mandiri dengan subset fitur teruji |
-| `Makefile` | Target build dan tes runtime C |
-| `library/kosakata.json` | Metadata kosakata dan status alias per target |
-| `library/builtin_contract.json` | Kontrak metadata built-in yang dapat dibaca mesin; bukan package manager |
+| `compiler/ir.py`, `compiler_ir.py` | Representasi perantara dan validasi |
+| `compiler/bytecode.py`, `compiler/vm.py` | Kompilasi bytecode dan VM eksperimental |
+| `compiler/c_backend.py`, `native/` | Backend/runtime C; periksa batas dukungan sebelum mengklaim parity |
+| `compiler/js_backend.py` | Backend JavaScript |
+| `compiler/python_backend.py`, `compiler/import_python.py` | Transpilasi dan interoperabilitas Python |
+| `compiler/android_backend.py`, `android-studio/` | Eksperimen target Android |
+| `tests/conformance/`, `tools/conformance.py` | Fixture dan pemeriksaan perilaku lintas-target |
 
-`interpreter.py` adalah implementasi historis yang terpisah; verifikasi entry point sebelum mengubah perilaku. `compiler/`, `compiler_ir.py`, `src/backends/`, dan `src/c-core/` berisi eksperimen compiler/VM/PVM, bukan jalur kompatibilitas utama. Khusus `src/c-core/`, periksa dokumen PVM karena itu bukan duplikat runtime di `native/pusingcuk.c`.
+## Library dan PusingCuk AI
 
-## AI Engine dan kontrak authoring .cuk
-
-Peta implementasi AI yang sudah ada pada audit 2026-10-15:
-
-| Lokasi | Peran |
+| Lokasi | Fungsi |
 |---|---|
-| `library/assistant.py` | Orkestrasi percakapan CLI |
-| `library/local_ai_provider.py` | Adapter Ollama lokal |
-| `library/gemini_ai_provider.py` | Adapter Gemini yang dipilih secara eksplisit |
-| `library/knowledge_grounding.py` + `library/knowledge_index.json` | Retrieval leksikal dan indeks sumber PusingCuk yang dikurasi |
-| `library/ai_tools.py` | Registry tool host dengan validasi input |
-| `library/local_memory.py` | Catatan lokal yang disimpan secara eksplisit |
-| `library/ai_service.py` | Adapter HTTP lokal eksperimental, loopback-only |
-| `examples/ai/engine_contract.cuk` | **Contoh baru:** prompt, aturan deterministik, dan deklarasi binding tool memakai grammar yang sudah ada |
+| `library/stdlib.py` | Implementasi built-in untuk jalur referensi |
+| `library/builtin_contract.json`, `builtin_contract.py` | Metadata kontrak built-in dan status dukungan target |
+| `library/kosakata.json` | Registri keyword/alias yang dapat dibaca mesin |
+| `library/assistant.py`, `library/ai_tools.py` | Asisten, orkestrasi tool, dan jembatan ke compiler |
+| `library/knowledge_grounding.py`, `knowledge_index.json` | Grounding dan indeks pengetahuan |
+| `library/*_provider.py` | Adapter model yang tersedia; jangan menganggap semuanya wajib/aktif |
+| `library/*.cuk`, `*.pusingcuk` | Contoh atau aturan bahasa, bukan implementasi Python |
 
-Alur yang dipelihara tetap `lexer.py` → `parser.py` → `ast_nodes.py` → `evaluator.py`; native C tetap di `native/pusingcuk.c`. Jangan membuat parser, provider layer, atau indeks AI kedua untuk tujuan yang sama. Deklarasi tool dalam contoh `.cuk` adalah metadata; eksekusi tetap hanya melalui registry host yang mengizinkan tool secara eksplisit. Handler `budget_threshold` saat ini memakai internal `ToolRegistry` untuk menjalankan artefak `.cuk` tetap yang di-hash dan tidak lagi memanggil legacy HTTP runner. `tools/core-rule-runner.mjs` masih menjadi harness kompatibilitas/regresi yang diuji terpisah oleh CI, bukan koneksi runtime AI.
+**Penting:** folder bernama `library` mencampur runtime Python, metadata, adapter, dan contoh .cuk. Tidak semua file di folder tersebut adalah pustaka standar mandiri untuk program .cuk.
 
-## Tes dan bukti kompatibilitas
+## Frontend, backend, dan layanan
 
-- `tests/test_*.py`: unit/integration tests Python.
-- `tests/conformance/manifest.json`: daftar fixture dengan hasil yang diharapkan dan status runtime.
-- `tests/native/`: fixture batas dan error khusus runtime C.
-- `tools/conformance.py`: menjalankan fixture yang sama pada Python dan C sesuai manifest.
-- `make test-native`: membangun dan menguji runtime C lokal.
-- `python -m unittest discover -s tests -v`: menjalankan suite unit Python.
-
-Perilaku baru wajib disertai tes. Klaim kompatibilitas Python/C harus didukung fixture yang berstatus `required` pada keduanya; `unsupported` bukan kelulusan parity.
-
-## Peta dokumentasi
-
-- **Status utama:** `docs/PROJECT_STATUS_AND_ROADMAP.md`.
-- **AI dan Supabase:** `docs/AI_ENGINE_READINESS.md`, `docs/AI_ENGINE_MIGRATION_LEDGER.md`, `docs/AI_LOCAL_SERVICE.md`, `docs/integrations/SUPABASE_PROJECTS.md`.
-- **Bahasa dan kamus:** `docs/language/README.md`, `SPEC.md`, `docs/PEMULA.md`, `docs/DICTIONARY.md`, `docs/KAMUS_PUSINGCUK.md`, `docs/KOSAKATA_GENZ.md`.
-- **Semantik dan kompatibilitas:** `docs/SEMANTIC_CONTRACT.md`, `docs/COMPATIBILITY.md`, `docs/CONFORMANCE_FIXTURES.md`.
-- **Native C dan Termux:** `docs/NATIVE_RUNTIME.md`, `docs/NATIVE_TERMUX.md`, `docs/termux/README.md`.
-- **Keamanan:** `SECURITY.md`, `docs/security/README.md`, dan catatan audit bertanggal.
-- **Eksperimen tertunda:** `docs/COMPILER_TARGETS.md`, `docs/COMPILER_INTEROP.md`, `docs/IR_V1.md`, `docs/PVM_SPEC.md`, `docs/ANDROID_STUDIO.md`, `docs/WEB_WORKBENCH.md`.
-
-Indeks lengkap tersedia di [docs/README.md](README.md).
-
-## Contoh, skrip, dan proyek tambahan
-
-- `examples/`: contoh program pengguna.
-- `examples/native/`: contoh yang ditujukan bagi subset native C.
-- `scripts/`: skrip instalasi dan build; periksa isinya sebelum menjalankannya.
-- `tools/`: conformance runner dan alat developer, termasuk workbench/dasbor opsional.
-- `android-studio/`: aplikasi editor Android eksperimental; build APK tidak menjadi gate baseline dan bukan compiler APK Pusingcuk.
-- `archive/legacy/`: kode lama untuk referensi, bukan titik mulai yang disarankan.
-- `site/` dan `web/`: aset web; periksa workflow publikasi sebelum memindahkan/menghapus.
-- `halo.cuk`: contoh kanonis ringkas untuk memverifikasi CLI.
-- `examples/compat/halo.pusingcuk`: contoh legacy terpisah untuk memastikan ekstensi kompatibilitas tetap terdokumentasi tanpa memenuhi root repo.
-
-## Alur kerja GitHub Actions
-
-| Workflow | Peran |
+| Lokasi | Fungsi |
 |---|---|
-| `.github/workflows/tests.yml` | CI utama: unit test Python, native C, dan konformansi |
-| `.github/workflows/build-test.yml` | Verifikasi paket CLI Python dan executable PyInstaller |
-| `.github/workflows/release.yml` | Build aset rilis untuk tag |
-| `.github/workflows/android-native.yml` | Cross-build dan validasi binary runtime C untuk Android; bukan build aplikasi APK |
-| `.github/workflows/experimental-pvm.yml` | Pemeriksaan PVM manual, di luar gate baseline |
-| `.github/workflows/android-emulator-smoke.yml` | Smoke test emulator Android manual, tidak menahan gate inti | 
-| `.github/workflows/android-studio-apk.yml` | Build APK Studio manual, ditunda dari CI inti |
+| `web/`, `site/` | UI web/prototipe frontend |
+| `apps/` | Aplikasi dan prototipe terpisah |
+| `supabase/` | Skema/fungsi integrasi Supabase yang tersedia di repo |
+| `tools/`, `scripts/` | Utilitas pengembangan, konformansi, dan packaging |
+| `.github/workflows/` | Otomasi CI/build; hasilnya hanya membuktikan job yang benar-benar berjalan |
 
-Artefak build dan cache tidak boleh dimasukkan ke Git. `.gitignore` mengabaikan `__pycache__`, hasil test/coverage, `build/`, `dist/`, metadata paket, output Gradle, dan binary lokal. Cache Actions bersifat eksternal dan harus diatur pada workflow, bukan di-commit ke repositori.
+## Dokumentasi: mana yang harus dibaca?
 
-- `scripts/test-termux-device.sh`: validasi integrasi yang harus dijalankan manual pada perangkat fisik Termux ARM64.
+- Pengguna baru: [README](../README.md) → [PEMULA](PEMULA.md) → [SPEC](../SPEC.md).
+- Mengubah sintaks/semantik: [SPEC](../SPEC.md) → [kontrak semantik](SEMANTIC_CONTRACT.md) → tes/fixture → matriks [kompatibilitas](COMPATIBILITY.md).
+- Mengubah backend: dokumen backend terkait → tes backend → fixture target.
+- Mengubah AI: [kesiapan engine](AI_ENGINE_READINESS.md) → [jembatan evolusi bahasa](AI_LANGUAGE_EVOLUTION_BRIDGE.md) → tes AI.
+- Mengubah UI/API: dokumentasi workbench atau integrasi yang sesuai; jangan mencampur logika bisnis ke frontend.
+
+## Aturan perubahan
+
+1. Perubahan bahasa memperbarui spesifikasi, implementasi, fixture, dan status dukungan secara bersamaan.
+2. Jangan menambah alias/built-in hanya untuk memperbanyak jumlah fitur.
+3. Jangan menyatakan target kompatibel jika fixture target belum lulus.
+4. Catatan audit bertanggal tetap historis. Status aktif harus ditulis hanya berdasarkan commit dan hasil pemeriksaan yang benar-benar tersedia.

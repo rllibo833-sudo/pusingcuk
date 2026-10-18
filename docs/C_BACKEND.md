@@ -1,6 +1,6 @@
 # Backend C eksperimental Pusingcuk
 
-Status: backend source C11 untuk subset integer, boolean, perbandingan/logika, kondisi, loop mumet, dan fungsi pengguna integer. Ini masih subset; bukan semua program Pusingcuk dapat dikompilasi.
+Status: backend source C11 untuk subset integer, teks, boolean, perbandingan/logika, kondisi, loop mumet, dan fungsi pengguna integer. Ini masih subset; bukan semua program Pusingcuk dapat dikompilasi.
 
 ## Pakai
 
@@ -15,7 +15,9 @@ Python dibutuhkan untuk front-end compiler saat menghasilkan C. Executable C has
 - Deklarasi dan assignment variabel yang sudah ada.
 - Literal integer nonnegatif sampai INT64_MAX serta boolean benar/salah (termasuk alias valid/zonk).
 - Aritmetika integer +, -, *, //, %, pemeriksaan overflow, pembagian nol, dan semantik floor division/modulo Python-style.
-- Perbandingan ==, !=, <, <=, >, >=; logika bukan, dan, atau dengan short-circuit.
+- Perbandingan ==, !=, <, <=, >, >=; kesetaraan teks membandingkan isi teks, bukan alamat string. Logika bukan, dan, atau memakai short-circuit.
+- Literal teks, variabel teks, konkatenasi teks dengan +, dan output teks.
+- Built-in `teks(nilai)` untuk teks, integer, dan boolean scalar; nilai boolean menjadi `okelah`/`tidak`.
 - Kondisi njir ... kampret ... selesai njir termasuk bersarang.
 - Loop mumet kondisi ... selesai mumet dengan batas 10.000 iterasi per loop.
 - Fungsi tingkat atas dengan parameter integer, pemanggilan fungsi sebelum definisi, fungsi rekursif, dan balek dengan nilai integer.
@@ -36,7 +38,7 @@ Untuk mengetes backend C, gunakan contoh integer-only:
 
 ## Batas subset yang disengaja
 
-- String, float, list, dictionary, indeks, input, loop untuk, dan fitur lain yang tidak tercantum di atas ditolak saat kompilasi.
+- Float, list, dictionary, indeks, input, loop untuk, dan fitur lain yang tidak tercantum di atas ditolak saat kompilasi. Konversi `teks` untuk koleksi tidak didukung.
 - Parameter dan nilai balek fungsi hanya integer. Fungsi yang berakhir tanpa balek nilai integer menghasilkan error runtime; argumen boolean ditolak.
 - Deklarasi lah di dalam loop ditolak. Deklarasikan variabel sebelum loop, lalu ubah nilainya dengan assignment.
 - Fungsi hanya boleh didefinisikan di tingkat teratas; balek hanya boleh dipakai di dalam fungsi.
@@ -47,4 +49,4 @@ Tes backend:
 
     python -m unittest tests.test_c_backend -v
 
-Backend ini tetap eksperimental. Periksa kesetaraan terhadap interpreter modular dan tunggu seluruh pemeriksaan CI hijau sebelum merge.
+Backend ini tetap eksperimental. Periksa kesetaraan terhadap interpreter modular dan tunggu pemeriksaan CI pada commit yang sama sebelum mengklaim hasil terverifikasi.

@@ -218,5 +218,39 @@ class CBackendTests(unittest.TestCase):
         self.assertEqual(self.compile_and_run(source).stdout, "9\n4\n1\ntidak\n")
 
 
+    def test_string_equality_compares_contents_not_addresses(self):
+        source = (
+            'jancuk\n'
+            'lah a = "cuk" + "lang"\n'
+            'hedeh a == "cuklang"\n'
+            'hedeh "sama" == "sama"\n'
+            'hedeh "beda" != "sama"\n'
+            'hedeh "sama" != "sama"\n'
+            'selesai jancuk'
+        )
+        self.assert_matches_reference(source)
+        self.assertEqual(
+            self.compile_and_run(source).stdout,
+            "okelah\nokelah\nokelah\ntidak\n",
+        )
+
+
+    def test_scalar_teks_builtin_is_supported_without_python_runtime(self):
+        source = (
+            'jancuk\n'
+            'hedeh teks(42)\n'
+            'hedeh teks(benar)\n'
+            'hedeh teks(salah)\n'
+            'hedeh teks("cuk")\n'
+            'lah hasil = teks(7) + "x"\n'
+            'hedeh hasil\n'
+            'selesai jancuk'
+        )
+        self.assert_matches_reference(source)
+        self.assertEqual(
+            self.compile_and_run(source).stdout,
+            "42\nokelah\ntidak\ncuk\n7x\n",
+        )
+
 if __name__ == "__main__":
     unittest.main()

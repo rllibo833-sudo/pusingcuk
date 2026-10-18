@@ -50,6 +50,7 @@ _INDONESIAN_QUERY_ALIASES = {
     "supabse": "supabase",
     "benchmarck": "benchmark",
     "retrival": "retrieval",
+    "random": "acak",
 }
 
 
@@ -139,9 +140,17 @@ def load_index(path: str | Path) -> list[dict[str, Any]]:
 
 def rank_knowledge(
     documents: Iterable[dict[str, Any]], query: str, limit: int = 3,
+    *, max_query_chars: int = 300,
 ) -> list[dict[str, Any]]:
     """Rank curated sources with deterministic lexical weights and stable ties."""
-    if not isinstance(query, str) or not query.strip() or len(query) > 300:
+    if (
+        isinstance(max_query_chars, bool)
+        or not isinstance(max_query_chars, int)
+        or not 1 <= max_query_chars <= 24 * 1024
+        or not isinstance(query, str)
+        or not query.strip()
+        or len(query) > max_query_chars
+    ):
         raise ValueError("KNOWLEDGE_QUERY_INVALID")
     if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 5:
         raise ValueError("KNOWLEDGE_LIMIT_INVALID")

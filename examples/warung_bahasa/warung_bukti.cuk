@@ -1,0 +1,140 @@
+# Warung Bahasa .cuk
+# Penilaian bukti compiler, runtime, dan fixture.
+# Tidak menjalankan compiler atau runtime secara langsung.
+
+jancuk
+
+fungsi status_kompilasi(status)
+    njir status == "lulus"
+        balek "KOMPILASI_LOLOS"
+    kampret
+        njir status == "gagal"
+            balek "KOMPILASI_GAGAL"
+        kampret
+            njir status == "belum_dijalankan"
+                balek "KOMPILASI_BELUM_DIUJI"
+            kampret
+                balek "STATUS_KOMPILASI_TIDAK_VALID"
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi status_runtime(status)
+    njir status == "lulus"
+        balek "RUNTIME_LOLOS"
+    kampret
+        njir status == "gagal"
+            balek "RUNTIME_GAGAL"
+        kampret
+            njir status == "belum_dijalankan"
+                balek "RUNTIME_BELUM_DIUJI"
+            kampret
+                balek "STATUS_RUNTIME_TIDAK_VALID"
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi status_fixture(status)
+    njir status == "lulus"
+        balek "FIXTURE_LOLOS"
+    kampret
+        njir status == "gagal"
+            balek "FIXTURE_GAGAL"
+        kampret
+            njir status == "belum_dijalankan"
+                balek "FIXTURE_BELUM_DIUJI"
+            kampret
+                balek "STATUS_FIXTURE_TIDAK_VALID"
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi bukti_fitur(kompilasi, runtime, fixture)
+    njir kompilasi != "lulus"
+        balek "BUKTI_BELUM_CUKUP_KOMPILASI"
+    kampret
+        njir runtime == "gagal"
+            balek "BUKTI_RUNTIME_GAGAL"
+        kampret
+            njir fixture == "gagal"
+                balek "BUKTI_FIXTURE_GAGAL"
+            kampret
+                njir runtime == "belum_dijalankan"
+                    balek "KOMPILASI_LOLOS_RUNTIME_BELUM_DIUJI"
+                kampret
+                    njir fixture == "belum_dijalankan"
+                        balek "RUNTIME_LOLOS_FIXTURE_BELUM_DIUJI"
+                    kampret
+                        njir runtime == "lulus" dan fixture == "lulus"
+                            balek "FITUR_MEMILIKI_BUKTI_LOLOS"
+                        kampret
+                            balek "STATUS_BUKTI_TIDAK_VALID"
+                        selesai njir
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi hitung_persentase(lulus, total)
+    njir total <= 0
+        balek "TOTAL_HARUS_POSITIF"
+    kampret
+        njir lulus < 0 atau lulus > total
+            balek "JUMLAH_LOLOS_TIDAK_VALID"
+        kampret
+            balek lulus * 100 / total
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi status_paritas(python_lulus, native_lulus, total_fixture)
+    njir total_fixture <= 0
+        balek "TOTAL_FIXTURE_TIDAK_VALID"
+    kampret
+        njir python_lulus < 0 atau python_lulus > total_fixture
+            balek "HASIL_PYTHON_TIDAK_VALID"
+        kampret
+            njir native_lulus < 0 atau native_lulus > total_fixture
+                balek "HASIL_NATIVE_TIDAK_VALID"
+            kampret
+                njir python_lulus == total_fixture dan native_lulus == total_fixture
+                    balek "PARITAS_FIXTURE_PENUH"
+                kampret
+                    njir python_lulus == native_lulus
+                        balek "JUMLAH_LOLOS_SAMA_PERIKSA_OUTPUT"
+                    kampret
+                        balek "ADA_PERBEDAAN_HASIL_TARGET"
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+hedeh status_kompilasi("lulus")
+hedeh status_kompilasi("gagal")
+hedeh status_kompilasi("belum_dijalankan")
+
+hedeh status_runtime("belum_dijalankan")
+hedeh status_fixture("gagal")
+
+hedeh bukti_fitur("lulus", "belum_dijalankan", "belum_dijalankan")
+hedeh bukti_fitur("lulus", "lulus", "gagal")
+hedeh bukti_fitur("lulus", "lulus", "lulus")
+hedeh bukti_fitur("gagal", "lulus", "lulus")
+
+hedeh hitung_persentase(21, 25)
+hedeh hitung_persentase(0, 25)
+hedeh hitung_persentase(5, 0)
+hedeh hitung_persentase(30, 25)
+
+hedeh status_paritas(10, 10, 10)
+hedeh status_paritas(10, 8, 10)
+hedeh status_paritas(8, 8, 10)
+
+selesai jancuk

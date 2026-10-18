@@ -74,7 +74,7 @@ class GeminiGenerateContentProvider:
         clean = validate_messages(messages)
         if system_prompt is not None and (not isinstance(system_prompt, str) or len(system_prompt) > 8000):
             raise LocalAIProviderError("AI_SYSTEM_PROMPT_INVALID")
-        if tools is not None and (not isinstance(tools, list) or len(tools) > 8):
+        if tools is not None and (not isinstance(tools, list) or len(tools) > 16):
             raise LocalAIProviderError("AI_TOOLS_INVALID")
         declarations = []
         for item in tools or []:

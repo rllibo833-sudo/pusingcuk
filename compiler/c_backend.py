@@ -28,6 +28,13 @@ void pc_loop_limit(void) { fputs("Pusingcuk C backend: loop iteration limit reac
 void pc_call_enter(void) { if (pc_call_depth >= 100) { fputs("Pusingcuk C backend: function call depth limit reached\n", stderr); exit(EXIT_FAILURE); } pc_call_depth++; }
 void pc_call_leave(void) { if (pc_call_depth > 0) pc_call_depth--; }
 void pc_missing_return(void) { fputs("Pusingcuk C backend: function ended without balek\n", stderr); exit(EXIT_FAILURE); }
+const char *pc_text_int(int64_t value) {
+    char *out = (char *)malloc(32);
+    if (!out) { fputs("Pusingcuk C backend: out of memory\n", stderr); exit(EXIT_FAILURE); }
+    int written = snprintf(out, 32, "%" PRId64, value);
+    if (written < 0 || written >= 32) { free(out); fputs("Pusingcuk C backend: integer text conversion failed\n", stderr); exit(EXIT_FAILURE); }
+    return out;
+}
 int64_t pc_add(int64_t a, int64_t b) {
     if ((b > 0 && a > INT64_MAX - b) || (b < 0 && a < INT64_MIN - b)) pc_overflow();
     return a + b;
@@ -97,6 +104,13 @@ def generate(document: dict) -> str:
             return names[name],types[name]
         if kind=="Call":
             name,args=f.get("name"),f.get("args")
+            if name=="teks":
+                if len(args)!=1: raise CBackendError(f"baris {line}: teks membutuhkan 1 argumen")
+                value,typ=expression(args[0],names,types)
+                if typ=="str": return value,"str"
+                if typ=="bool": return f'(({value}) ? "okelah" : "tidak")',"str"
+                if typ=="int": return f"pc_text_int((int64_t)({value}))","str"
+                raise CBackendError(f"baris {line}: tipe untuk teks belum didukung backend C")
             if name not in functions: raise CBackendError(f"baris {line}: fungsi {name!r} tidak dikenal atau belum didukung")
             params=functions[name]["fields"]["params"]
             if len(args)!=len(params): raise CBackendError(f"baris {line}: fungsi {name!r} membutuhkan {len(params)} argumen")
@@ -124,6 +138,9 @@ def generate(document: dict) -> str:
             if op in {"dan","atau"}: return f"((({left}) != 0) {'&&' if op=='dan' else '||'} (({right}) != 0))","bool"
             if op in {"==","!="}:
                 if lt!=rt: return f"(((void)({left})), ((void)({right})), {'INT64_C(0)' if op=='==' else 'INT64_C(1)'})","bool"
+                if lt=="str":
+                    comparator = "==" if op=="==" else "!="
+                    return f"(strcmp(({left}), ({right})) {comparator} 0)","bool"
                 return f"(({left}) {op} ({right}))","bool"
             if op in {"<","<=",">",">="}:
                 if lt!="int" or rt!="int": raise CBackendError(f"baris {line}: perbandingan urutan hanya mendukung integer")

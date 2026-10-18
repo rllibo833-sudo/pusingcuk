@@ -1,0 +1,6 @@
+jancuk
+hedeh panjang("cuk")
+hedeh panjang([1, 2, 3])
+hedeh panjang({"a": 1, "b": 2})
+hedeh panjang(rentang(2, 5))
+selesai jancuk

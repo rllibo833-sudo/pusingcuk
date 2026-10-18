@@ -1,0 +1,104 @@
+# Warung Bahasa .cuk
+# Gerbang keputusan untuk evolusi fitur bahasa.
+# Status diberikan oleh maintainer/test runner, bukan ditebak model.
+
+jancuk
+
+fungsi status_implementasi(status)
+    njir status == "belum_ada"
+        balek "IMPLEMENTASI_DIPERLUKAN"
+    kampret
+        njir status == "eksperimental"
+            balek "IMPLEMENTASI_PERLU_DIBATASI"
+        kampret
+            njir status == "tersedia"
+                balek "IMPLEMENTASI_TERSEDIA"
+            kampret
+                balek "STATUS_IMPLEMENTASI_TIDAK_VALID"
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi status_spesifikasi(status)
+    njir status == "belum_didefinisikan"
+        balek "TULIS_SEMANTIK_DULU"
+    kampret
+        njir status == "ambigu"
+            balek "SELESAIKAN_AMBIGUITAS"
+        kampret
+            njir status == "jelas"
+                balek "SPESIFIKASI_JELAS"
+            kampret
+                balek "STATUS_SPESIFIKASI_TIDAK_VALID"
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi keputusan_fitur(spesifikasi, implementasi, fixture)
+    njir status_spesifikasi(spesifikasi) != "SPESIFIKASI_JELAS"
+        balek status_spesifikasi(spesifikasi)
+    kampret
+        njir status_implementasi(implementasi) == "IMPLEMENTASI_DIPERLUKAN"
+            balek "IMPLEMENTASIKAN_SESUAI_SPESIFIKASI"
+        kampret
+            njir status_implementasi(implementasi) == "IMPLEMENTASI_PERLU_DIBATASI"
+                balek "BATASI_KLAIM_DAN_TAMBAH_UJI"
+            kampret
+                njir status_implementasi(implementasi) != "IMPLEMENTASI_TERSEDIA"
+                    balek "PERIKSA_STATUS_IMPLEMENTASI"
+                kampret
+                    njir fixture == "belum_dibuat"
+                        balek "TAMBAHKAN_FIXTURE_POSITIF_DAN_NEGATIF"
+                    kampret
+                        njir fixture == "gagal"
+                            balek "PERBAIKI_REGRESI_FIXTURE"
+                        kampret
+                            njir fixture == "lulus"
+                                balek "FITUR_LOLOS_FIXTURE_YANG_DISEDIAKAN"
+                            kampret
+                                balek "STATUS_FIXTURE_TIDAK_VALID"
+                            selesai njir
+                        selesai njir
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi status_klaim_rilis(spesifikasi, implementasi, fixture, target)
+    njir keputusan_fitur(spesifikasi, implementasi, fixture) != "FITUR_LOLOS_FIXTURE_YANG_DISEDIAKAN"
+        balek "JANGAN_KLAIM_FITUR_PORTABEL"
+    kampret
+        njir target == "python"
+            balek "BUKTI_TERBATAS_PADA_FIXTURE_PYTHON"
+        kampret
+            njir target == "native_c"
+                balek "BUKTI_TERBATAS_PADA_FIXTURE_NATIVE_C"
+            kampret
+                njir target == "lintas_target"
+                    balek "PERLU_FIXTURE_SAMA_DI_SETIAP_TARGET"
+                kampret
+                    balek "TARGET_TIDAK_DIKENAL"
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+hedeh keputusan_fitur("belum_didefinisikan", "belum_ada", "belum_dibuat")
+hedeh keputusan_fitur("ambigu", "eksperimental", "gagal")
+hedeh keputusan_fitur("jelas", "belum_ada", "belum_dibuat")
+hedeh keputusan_fitur("jelas", "eksperimental", "belum_dibuat")
+hedeh keputusan_fitur("jelas", "tersedia", "belum_dibuat")
+hedeh keputusan_fitur("jelas", "tersedia", "gagal")
+hedeh keputusan_fitur("jelas", "tersedia", "lulus")
+
+hedeh status_klaim_rilis("jelas", "tersedia", "lulus", "python")
+hedeh status_klaim_rilis("jelas", "tersedia", "lulus", "native_c")
+hedeh status_klaim_rilis("jelas", "tersedia", "lulus", "lintas_target")
+hedeh status_klaim_rilis("jelas", "eksperimental", "belum_dibuat", "lintas_target")
+
+selesai jancuk

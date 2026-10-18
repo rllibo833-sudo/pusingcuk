@@ -94,6 +94,20 @@ class LocalAIProviderTests(unittest.TestCase):
                 self.provider.generate(self.messages)
         self.assertNotIn("sensitive", str(error.exception))
 
+    def test_accepts_full_registered_ai_tool_set(self):
+        body = json.dumps({"message": {"content": "Siap."}}).encode()
+        tools = [{"type": "function", "function": {
+            "name": f"tool_{index}", "description": "bounded test tool",
+            "parameters": {"type": "object", "properties": {}, "required": [],
+                           "additionalProperties": False},
+        }} for index in range(10)]
+        with patch("library.local_ai_provider.build_opener") as builder:
+            builder.return_value.open.return_value = FakeResponse(body)
+            turn = self.provider.generate_turn(self.messages, tools=tools)
+        self.assertEqual(turn["content"], "Siap.")
+        payload = json.loads(builder.return_value.open.call_args.args[0].data.decode())
+        self.assertEqual(len(payload["tools"]), 10)
+
     def test_generate_turn_parses_a_bounded_tool_call(self):
         body = json.dumps({"message": {"content": "", "tool_calls": [{"id": "call-1", "function": {"name": "knowledge_search", "arguments": {"query": "ollama lokal"}}}]}}).encode()
         with patch("library.local_ai_provider.build_opener") as builder:

@@ -19,7 +19,7 @@ from pathlib import Path, PureWindowsPath
 from datetime import datetime, date
 from ast_nodes import Node
 from parser import parse
-from library.stdlib import BUILTINS, call_builtin
+from library.stdlib import BUILTINS, BUILTIN_NAMESPACES, call_builtin
 
 
 class PusingDict(MutableMapping):
@@ -628,6 +628,18 @@ class Evaluator:
                         self._module_loading_stack.discard(path)
                 if "." in n.name:
                     module_name, function_name = n.name.split(".", 1)
+                    if module_name in BUILTIN_NAMESPACES:
+                        builtin_name = BUILTIN_NAMESPACES[module_name].get(function_name)
+                        if builtin_name is None:
+                            available = ", ".join(sorted(BUILTIN_NAMESPACES[module_name]))
+                            self.fail(
+                                line,
+                                f"library '{module_name}' tidak menyediakan '{function_name}'; tersedia: {available}",
+                            )
+                        try:
+                            return call_builtin(builtin_name, *args)
+                        except (TypeError, ValueError, OverflowError) as exc:
+                            self.fail(line, str(exc))
                     module = env.get(module_name)
                     if not isinstance(module, PusingDict):
                         self.fail(line, f"modul '{module_name}' tidak ditemukan")

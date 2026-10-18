@@ -1,0 +1,91 @@
+# Warung Bahasa .cuk
+# Prioritas perbaikan semantik dan compiler.
+# Tidak melakukan commit atau mengubah repository.
+
+jancuk
+
+fungsi validasi_skor(skor)
+    njir skor < 1 atau skor > 5
+        balek "SKOR_TIDAK_VALID"
+    kampret
+        balek "SKOR_VALID"
+    selesai njir
+selesai fungsi
+
+fungsi prioritas_perbaikan(urgensi, dampak, risiko, ada_regresi)
+    njir validasi_skor(urgensi) != "SKOR_VALID"
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        njir validasi_skor(dampak) != "SKOR_VALID"
+            balek "INPUT_TIDAK_VALID"
+        kampret
+            njir validasi_skor(risiko) != "SKOR_VALID"
+                balek "INPUT_TIDAK_VALID"
+            kampret
+                njir ada_regresi != 0 dan ada_regresi != 1
+                    balek "STATUS_REGRESI_TIDAK_VALID"
+                kampret
+                    njir ada_regresi == 1
+                        balek "P0_REGRESI_HARUS_DITANGANI"
+                    kampret
+                        njir urgensi >= 4 dan dampak >= 4
+                            balek "P1_PRIORITAS_TINGGI"
+                        kampret
+                            njir risiko >= 4 dan dampak >= 4
+                                balek "P2_PERLU_PERLINDUNGAN_REGRESI"
+                            kampret
+                                njir dampak >= 4
+                                    balek "P2_DAMPAK_TINGGI"
+                                kampret
+                                    njir urgensi >= 4
+                                        balek "P3_URGEN"
+                                    kampret
+                                        balek "P4_RUTIN"
+                                    selesai njir
+                                selesai njir
+                            selesai njir
+                        selesai njir
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi rekomendasi_langkah(status_bukti, prioritas)
+    njir status_bukti == "BUKTI_RUNTIME_GAGAL"
+        balek "REPRODUKSI_DAN_PERBAIKI_RUNTIME"
+    kampret
+        njir status_bukti == "BUKTI_FIXTURE_GAGAL"
+            balek "PERBAIKI_SEMANTIK_DAN_FIXTURE"
+        kampret
+            njir status_bukti == "BUKTI_BELUM_CUKUP_KOMPILASI"
+                balek "SELESAIKAN_PEMERIKSAAN_KOMPILASI"
+            kampret
+                njir prioritas == "P0_REGRESI_HARUS_DITANGANI"
+                    balek "UTAMAKAN_REGRESI_TERKONFIRMASI"
+                kampret
+                    njir status_bukti == "FITUR_MEMILIKI_BUKTI_LOLOS"
+                        balek "PERTAHANKAN_FIXTURE_YANG_LOLOS"
+                    kampret
+                        balek "KUMPULKAN_BUKTI_SEBELUM_MENGUBAH"
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+hedeh prioritas_perbaikan(5, 5, 3, 1)
+hedeh prioritas_perbaikan(4, 5, 2, 0)
+hedeh prioritas_perbaikan(2, 5, 5, 0)
+hedeh prioritas_perbaikan(5, 2, 1, 0)
+hedeh prioritas_perbaikan(1, 1, 1, 0)
+hedeh prioritas_perbaikan(9, 3, 2, 0)
+
+hedeh rekomendasi_langkah("BUKTI_RUNTIME_GAGAL", "P1_PRIORITAS_TINGGI")
+hedeh rekomendasi_langkah("BUKTI_FIXTURE_GAGAL", "P2_DAMPAK_TINGGI")
+hedeh rekomendasi_langkah("FITUR_MEMILIKI_BUKTI_LOLOS", "P4_RUTIN")
+hedeh rekomendasi_langkah("STATUS_BUKTI_TIDAK_DIKENAL", "P3_URGEN")
+
+selesai jancuk

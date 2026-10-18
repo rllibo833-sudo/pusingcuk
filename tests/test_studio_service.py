@@ -48,7 +48,7 @@ class StudioServiceTests(unittest.TestCase):
         status, content_type, body = self.request("/")
         self.assertEqual(status, 200)
         self.assertEqual(content_type, "text/html")
-        self.assertIn(b"Pusingcuk", body)
+        self.assertIn(b"PusingCuk", body)
 
     def test_chat_calls_pusingcuk_assistant(self):
         with patch.object(studio_service, "_assistant", return_value=FakeAssistant()):

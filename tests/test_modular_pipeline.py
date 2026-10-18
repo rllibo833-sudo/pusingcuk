@@ -284,5 +284,28 @@ gitu inthiseco"""
             "Pusingcuk native\ntidak\ncabang utama\nadooh aktif\n",
         )
 
+
+    def test_namespaced_standard_library_uses_shared_builtin_contract(self):
+        source = """jancuk
+hedeh matematika.akar(81)
+hedeh koleksi.jumlah([1, 2, 3, 4])
+hedeh konversi.teks(42)
+hedeh json.teks({"nama": "cuk"})
+hedeh web.aman_html("<b>")
+hedeh tabel.baris_csv(["a,b", "cuk"])
+selesai jancuk"""
+        self.assertEqual(
+            capture(source),
+            '9\n10\n42\n{"nama":"cuk"}\n&lt;b&gt;\n"a,b",cuk\n'
+        )
+
+    def test_namespaced_standard_library_reports_unknown_member(self):
+        source = """jancuk
+hedeh matematika.tidak_ada(1)
+selesai jancuk"""
+        with self.assertRaisesRegex(RuntimeError, "library 'matematika' tidak menyediakan 'tidak_ada'"):
+            capture(source)
+
+
 if __name__ == "__main__":
     unittest.main()

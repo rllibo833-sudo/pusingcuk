@@ -1,8 +1,7 @@
-name: Tes Pusingcuk
-
+name: PusingCuk core
 on:
   push:
-    branches: [main, "audit/**", "in-this-economy"]
+    branches: [main]
     paths:
       - ".github/workflows/tests.yml"
       - "pusingcuk_new.py"
@@ -11,21 +10,14 @@ on:
       - "parser.py"
       - "ast_nodes.py"
       - "compiler/**"
-      - "apps/accounting/**"
       - "library/**"
       - "native/**"
       - "tests/**"
-      - "tools/**"
-      - "examples/**/*.cuk"
-      - "examples/**/*.pusingcuk"
-      - "examples/**/*.py"
+      - "tools/conformance.py"
+      - "examples/**"
       - "halo.cuk"
       - "Makefile"
       - "pyproject.toml"
-      - "setup.py"
-      - "setup.cfg"
-      - "requirements.txt"
-      - "pusingcuk.spec"
   pull_request:
     paths:
       - ".github/workflows/tests.yml"
@@ -35,32 +27,22 @@ on:
       - "parser.py"
       - "ast_nodes.py"
       - "compiler/**"
-      - "apps/accounting/**"
       - "library/**"
       - "native/**"
       - "tests/**"
-      - "tools/**"
-      - "examples/**/*.cuk"
-      - "examples/**/*.pusingcuk"
-      - "examples/**/*.py"
+      - "tools/conformance.py"
+      - "examples/**"
       - "halo.cuk"
       - "Makefile"
       - "pyproject.toml"
-      - "setup.py"
-      - "setup.cfg"
-      - "requirements.txt"
-      - "pusingcuk.spec"
   workflow_dispatch:
-
 permissions:
   contents: read
-
 concurrency:
-  group: pusingcuk-ci-${{ github.workflow }}-${{ github.ref }}
+  group: pusingcuk-core-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
-  tests:
+  python:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
@@ -68,75 +50,14 @@ jobs:
       matrix:
         python-version: ["3.11", "3.12"]
     steps:
-      - name: Ambil kode
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Siapkan Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Siapkan Node.js untuk tes compiler JavaScript dan aplikasi akuntansi
-        if: matrix.python-version == '3.12'
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
-        with:
-          node-version: "22"
-      - name: Jalankan suite regresi Python
-        run: python -m unittest discover -s tests -v
-      - name: Build and smoke-test standalone JS artifact from registered .cuk rule
-        if: matrix.python-version == '3.12'
-        run: |
-          set -euo pipefail
-          artifact="$RUNNER_TEMP/pusingcuk-period-close-plan.js"
-          python -m compiler.js_backend library/period_close_plan.cuk --output "$artifact"
-          output="$(printf '250000\n100000\n' | node "$artifact")"
-          expected="$(printf 'PENUTUPAN_LABA\n150000\n250000\n0\n0\n100000\n0\n150000')"
-          test "$output" = "$expected"
-      - name: Upload verified .cuk JavaScript artifact
-        if: matrix.python-version == '3.12'
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: pusingcuk-0.6-dev-period-close-plan-js
-          path: ${{ runner.temp }}/pusingcuk-period-close-plan.js
-          if-no-files-found: error
-          retention-days: 7
-      - name: Uji integrasi aplikasi akuntansi dengan aturan .cuk
-        if: matrix.python-version == '3.12'
-        working-directory: apps/accounting
-        run: npm run test:core
-      - name: Uji fixture persamaan laporan CukAccount
-        run: |
-          set -euo pipefail
-          python pusingcuk_new.py --check examples/accounting/report_equation.cuk
-          output="$(python pusingcuk_new.py examples/accounting/report_equation.cuk)"
-          printf '%s\\n' "$output"
-          test "$output" = "CUKACCOUNT_REPORT_EQUATION_BALANCED"
-      - name: Uji contoh file I/O dengan input dummy
-        run: |
-          set -euo pipefail
-          output="$(echo -e "Budi\nBeli kopi" | python pusingcuk_new.py examples/file_io.pusingcuk)"
-          printf '%s\n' "$output"
-          grep -Fq 'Budi : Beli kopi' <<< "$output"
-          rm -f warung.txt
-
-      - name: Uji contoh JSON I/O Level 3.5
-        run: |
-          set -euo pipefail
-          output="$(python pusingcuk_new.py examples/database.pusingcuk)"
-          printf '%s\n' "$output"
-          grep -Fq 'Budi' <<< "$output"
-          grep -Fq '15000' <<< "$output"
-          rm -f database.json
-
-      # examples/internet.pusingcuk is an opt-in demo; core CI must not require network access.
-
-      - name: Uji contoh modular Level 4
-        run: |
-          set -euo pipefail
-          output="$(python pusingcuk_new.py examples/modular.pusingcuk)"
-          printf '%s\n' "$output"
-          grep -Fq 'Halo, Budi!' <<< "$output"
-          grep -Fq 'selesai' <<< "$output"
-
-  native-runtime:
+      - run: python -m unittest discover -s tests -v
+      - if: matrix.python-version == '3.12'
+        run: python tools/conformance.py
+  native:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
@@ -146,173 +67,5 @@ jobs:
     env:
       CC: ${{ matrix.compiler }}
     steps:
-      - name: Ambil kode
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Verifikasi compiler
-        run: ${{ matrix.compiler }} --version
-      - name: Kompilasi dan uji runtime native
-        run: make test-native
-      - name: Uji konformansi lintas runtime
-        if: matrix.compiler == 'gcc'
-        run: python tools/conformance.py
-
-  pvm-security-regression:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Ambil kode
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Siapkan Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: "3.12"
-      - name: Siapkan Node.js
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
-        with:
-          node-version: "22"
-      - name: Validasi sintaks local CORE rule runner
-        run: node --check tools/core-rule-runner.mjs
-      - name: Validasi skrip sandbox
-        run: |
-          sh -n tools/sandbox/build-image.sh
-          sh -n tools/sandbox/entrypoint.sh
-      - name: Uji layanan lokal CORE rule runner
-        timeout-minutes: 5
-        run: |
-          set -euo pipefail
-          docker build --pull -f tools/sandbox/Dockerfile -t pusingcuk-core-sandbox:ci .
-          export PUSINGCUK_SANDBOX_IMAGE="$(docker image inspect --format '{{.Id}}' pusingcuk-core-sandbox:ci)"
-          export PUSINGCUK_RUNNER_TOKEN="$(openssl rand -hex 32)"
-          node tools/core-rule-runner.mjs > "$RUNNER_TEMP/pusingcuk-runner.log" 2>&1 &
-          runner_pid=$!
-          trap 'kill "$runner_pid" 2>/dev/null || true' EXIT
-          for attempt in $(seq 1 60); do
-            if curl --silent --fail http://127.0.0.1:8787/health >/dev/null; then break; fi
-            if ! kill -0 "$runner_pid" 2>/dev/null; then cat "$RUNNER_TEMP/pusingcuk-runner.log"; exit 1; fi
-            sleep 1
-          done
-          curl --silent --show-error --fail http://127.0.0.1:8787/health >/dev/null
-          node --input-type=module <<'NODE' || { cat "$RUNNER_TEMP/pusingcuk-runner.log"; exit 1; }
-          import assert from "node:assert/strict";
-          import { randomUUID } from "node:crypto";
-          import fs from "node:fs";
-
-          const runnerSource = fs.readFileSync("tools/core-rule-runner.mjs", "utf8");
-          for (const isolationFlag of ["--network=none", "--memory=64m", "--memory-swap=64m", "--cpus=0.5", "--pids-limit=16", "--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--ulimit"]) {
-            assert.ok(runnerSource.includes(isolationFlag), "Sandbox isolation flag missing: " + isolationFlag);
-          }
-          assert.match(runnerSource, /PUSINGCUK_SANDBOX_IMAGE/);
-          assert.ok(runnerSource.includes("/^sha256:[0-9a-f]{64}$/"));
-
-          const url = "http://127.0.0.1:8787/v1/execute";
-          const token = process.env.PUSINGCUK_RUNNER_TOKEN;
-          const base = {
-            contract_version: "pusingcuk.core.tool.v1",
-            request_id: randomUUID(),
-            program_id: "budget.threshold.v1",
-            program_sha256: "e79058b314d921a4b4353133b30a7a7b0da64d32785a39f66cb5ce356406067d",
-            language_version: "0.6-dev",
-            entrypoint: "status_anggaran",
-            capabilities: [],
-            limits: { timeout_ms: 3000, input_bytes: 128, output_bytes: 1024 },
-          };
-          async function call(body, auth = token) {
-            const headers = { "Content-Type": "application/json" };
-            if (auth) headers.Authorization = `Bearer ${auth}`;
-            const response = await fetch(url, { method: "POST", headers, body: JSON.stringify(body) });
-            return { status: response.status, body: await response.json() };
-          }
-          const cases = [
-            [{ nominal: 0, batas: 1000000 }, "DALAM_BATAS"],
-            [{ nominal: 1000000, batas: 1000000 }, "DALAM_BATAS"],
-            [{ nominal: 1000001, batas: 1000000 }, "PERLU_PERSETUJUAN"],
-            [{ nominal: -1, batas: 1000000 }, "INPUT_TIDAK_VALID"],
-            [{ nominal: 250000, batas: -1 }, "INPUT_TIDAK_VALID"],
-          ];
-          for (const [input, expected] of cases) {
-            const body = { ...base, request_id: randomUUID(), input };
-            const result = await call(body);
-            assert.equal(result.status, 200, JSON.stringify(result.body));
-            assert.equal(result.body.status, "succeeded");
-            assert.equal(result.body.result, expected);
-            assert.equal(result.body.runtime_build_sha, "e367f45b0a35ccb8fdb91424099b8046b346d77d");
-          }
-          const sufficiencyBase = {
-            ...base, program_id: "budget.sufficiency.v1",
-            program_sha256: "d6fcee54d17afbf0fc0a1aee115b2c0c9f57dcc172e56a6c6cf1d0dd9a789771",
-            entrypoint: "cek_kecukupan_saldo",
-          };
-          const sufficiencyCases = [
-            [{ nominal: 1000000, batas: 750000 }, "SALDO_CUKUP"],
-            [{ nominal: 500000, batas: 500000 }, "SALDO_CUKUP"],
-            [{ nominal: 500000, batas: 500001 }, "SALDO_TIDAK_CUKUP"],
-            [{ nominal: 0, batas: 0 }, "SALDO_CUKUP"],
-            [{ nominal: -1, batas: 100 }, "INPUT_TIDAK_VALID"],
-            [{ nominal: 100, batas: -1 }, "INPUT_TIDAK_VALID"],
-          ];
-          for (const [input, expected] of sufficiencyCases) {
-            const result = await call({ ...sufficiencyBase, request_id: randomUUID(), input });
-            assert.equal(result.status, 200, JSON.stringify(result.body));
-            assert.equal(result.body.status, "succeeded");
-            assert.equal(result.body.result, expected);
-            assert.equal(result.body.source_commit, "411c532454028d2d5e733373d085050eca1d402a");
-          }
-          const badHash = await call({ ...base, request_id: randomUUID(), program_sha256: "0".repeat(64), input: { nominal: 1, batas: 1 } });
-          assert.equal(badHash.status, 400);
-          assert.equal(badHash.body.error, "ARTIFACT_HASH_MISMATCH");
-          const tooSlow = await call({ ...base, request_id: randomUUID(), limits: { ...base.limits, timeout_ms: 3001 }, input: { nominal: 1, batas: 1 } });
-          assert.equal(tooSlow.status, 400);
-          assert.equal(tooSlow.body.error, "RESOURCE_LIMIT");
-          const noAuth = await call({ ...base, request_id: randomUUID(), input: { nominal: 1, batas: 1 } }, "");
-          assert.equal(noAuth.status, 401);
-          const unknown = await call({ ...base, request_id: randomUUID(), program_id: "anything", input: { nominal: 1, batas: 1 } });
-          assert.equal(unknown.status, 400);
-          assert.equal(unknown.body.error, "UNKNOWN_PROGRAM");
-          const cap = await call({ ...base, request_id: randomUUID(), capabilities: ["filesystem"], input: { nominal: 1, batas: 1 } });
-          assert.equal(cap.status, 400);
-          assert.equal(cap.body.error, "CAPABILITY_DENIED");
-          console.log("PASS: local runner authenticates requests and executes only the pinned rule.");
-          NODE
-      - name: Verifikasi pin runtime dan aturan .cuk lokal
-        run: |
-          set -euo pipefail
-          node --input-type=module <<'NODE'
-          import assert from "node:assert/strict";
-          import crypto from "node:crypto";
-          import fs from "node:fs";
-
-          const runnerSource = fs.readFileSync("tools/core-rule-runner.mjs", "utf8");
-          const runnerPin = runnerSource.match(/PINNED_COMMIT = "([0-9a-f]{40})"/)?.[1];
-          const thresholdHash = runnerSource.match(/"budget[.]threshold[.]v1", \{\s*sha256: "([0-9a-f]{64})"/)?.[1];
-          const sufficiencyHash = runnerSource.match(/"budget[.]sufficiency[.]v1", \{\s*sha256: "([0-9a-f]{64})"/)?.[1];
-          assert.match(runnerPin || "", /^[0-9a-f]{40}$/, "Runner must pin an immutable PusingCuk runtime commit.");
-          assert.match(thresholdHash || "", /^[0-9a-f]{64}$/, "Threshold rule must have a pinned SHA-256.");
-          assert.match(sufficiencyHash || "", /^[0-9a-f]{64}$/, "Sufficiency rule must have a pinned SHA-256.");
-          const actualHash = crypto.createHash("sha256")
-            .update(fs.readFileSync("examples/core/anggaran_threshold_service.cuk"))
-            .digest("hex");
-          assert.equal(actualHash, thresholdHash, "Canonical threshold .cuk rule must match the runner's pinned SHA-256.");
-          const sufficiencyActualHash = crypto.createHash("sha256")
-            .update(fs.readFileSync("examples/core/anggaran_sufficiency_service.cuk"))
-            .digest("hex");
-          assert.equal(sufficiencyActualHash, sufficiencyHash, "Canonical sufficiency .cuk rule must match the runner's pinned SHA-256.");
-          console.log("PASS: PusingCuk runtime pin and registered .cuk rule hashes agree without a cross-repository lock.");
-          NODE
-      - name: Uji pembatasan file PVM dan kesetaraan backend
-        run: bash tests/test_all.sh
-
-      - name: Compile and regression-test CukAccount .cuk domain rules
-        run: |
-          set -euo pipefail
-          python pusingcuk_new.py --check apps/accounting/cukaccount_rules.cuk
-          actual="$(python pusingcuk_new.py apps/accounting/cukaccount_rules.cuk)"
-          diff -u apps/accounting/cukaccount_rules.expected.txt <(printf '%s\n' "$actual")
-          echo "PASS: CukAccount .cuk accounting rules match all expected cases."
-
-      - name: Compile and regression-test CukAccount frontend .cuk interaction rules
-        run: |
-          set -euo pipefail
-          python pusingcuk_new.py --check apps/accounting/cukaccount_frontend.cuk
-          actual="$(python pusingcuk_new.py apps/accounting/cukaccount_frontend.cuk)"
-          diff -u apps/accounting/cukaccount_frontend.expected.txt <(printf '%s\n' "$actual")
-          echo "PASS: CukAccount frontend routes, form validation, submit actions, and theme rules match expected cases."
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: make test-native

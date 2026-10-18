@@ -17,7 +17,29 @@ Pusingcuk harus mudah dimulai oleh pemula, tetap dapat dipakai untuk proyek seri
 5. **Dependensi eksplisit.** File, jaringan, database, lingkungan proses, dan kemampuan OS harus disediakan lewat API yang terdokumentasi. Jangan mengandalkan akses implisit atau efek samping khusus OS.
 6. **Kompatibilitas ke depan.** Perubahan yang mematahkan sintaks atau semantik perlu dicatat dalam changelog dan versi; alias lama tidak boleh dihapus tanpa kebijakan deprekasi yang jelas.
 
+## Semantik tipe dan data
+
+Type model di `compiler/typesystem.py` kini dapat merepresentasikan tipe opsional, `Hasil<Sukses, Gagal>`, struktur bernama, dan enum, termasuk aturan assignability dasar. Ini **belum berarti sintaks sumber `T?`, `mungkin`, `coba/tangkap`, `tipe`, atau deklarasi enum sudah didukung**: model ini belum terhubung ke parser, pemeriksaan semantik, IR, interpreter, C, JavaScript, atau VM. Fitur tersebut tidak boleh diklaim sebagai kemampuan bahasa yang sudah dapat digunakan sampai sintaks, nilai runtime, dan fixture lintas target tersedia.
+
+| Fitur bahasa | Interpreter Python | C native | JavaScript | VM | Status kontrak |
+|---|---|---|---|---|---|
+| Nilai opsional sebagai sintaks bahasa | [X] belum ada kontrak | [X] belum ada kontrak | [X] belum ada kontrak | [X] belum ada kontrak | Model tipe saja |
+| Hasil sukses/gagal bertipe | [X] belum ada kontrak | [X] belum ada kontrak | [X] belum ada kontrak | [X] belum ada kontrak | Model tipe saja |
+| Struktur bernama dan enum di kode sumber | [X] belum ada kontrak | [X] belum ada kontrak | [X] belum ada kontrak | [X] belum ada kontrak | Model tipe saja |
+| `pakai ... sebagai` + `ekspor fungsi` | [X] bukan jalur interpreter | [X] belum diintegrasikan | [!] melalui compiler multi-target, bukan semantik runtime langsung | [!] bergantung pada pipeline compiler | Ekspansi modul compiler awal |
+| `angkut("file.cuk")` | [!] modul dinamis pada evaluator referensi | [X] belum setara | [X] tidak otomatis tersedia | [X] tidak otomatis tersedia | API modul belum lintas-target |
+| Paket eksternal berversi | [X] belum ada package manager | [X] belum ada package manager | [X] belum ada package manager | [X] belum ada package manager | Belum tersedia |
+
+Status di atas sengaja memisahkan fondasi internal dari sintaks yang dapat digunakan pengguna. Namespace built-in yang baru ditambahkan juga hanya terjamin pada interpreter referensi sampai setiap target memiliki pemetaan dan fixture konformansi.
+
 ## Status kompatibilitas saat ini
+
+| Contoh Reality Engine | Status |
+|---|---|
+| Python reference | Boundary/regression tests cover policy outcomes, invalid input, and unknown rule IDs. Check the latest branch CI before treating them as passing. |
+| JavaScript target | A test now compiles and runs the same `examples/reality_engine.cuk` source for core valid/invalid cases. This is only proven if the test passes in CI; it does not establish full backend parity. |
+| Native C | Not yet compatible with the whole example because native C does not support `coba/ketangkep`. Do not claim native parity until that feature is implemented with conformance coverage or the example is deliberately reduced to the supported subset. |
+
 
 | Area | Status sekarang | Makna praktis |
 |---|---|---|

@@ -29,11 +29,17 @@ Alias yang tercantum di bagian alias resmi `SPEC.md` adalah bagian dari permukaa
 
 Backend JavaScript kini memiliki implementasi untuk seluruh built-in terkontrak; fixture positif dan negatif tetap diperlukan untuk menjaga kesetaraan perilaku. JSON/HTML/CSV hanya tersedia pada target yang dinyatakan `supported` di kontrak. Compiler/transpiler lain dan PVM tetap eksperimental. Keduanya tidak mengubah semantik acuan, dan hasilnya tidak dihitung sebagai baseline Python/C.
 
+## Status semantik tipe
+
+`compiler/typesystem.py` merupakan model internal, bukan pemeriksa tipe aktif. Model sekarang mengenali tipe opsional (nilai inti atau `null`), hasil sukses/gagal dengan tipe payload terpisah, struktur bernama, dan enum nominal. Konversi integer-ke-float tetap satu arah; boolean tetap bukan integer. Tipe opsional menerima nilai inti yang cocok atau `null`, tetapi nilai opsional tidak boleh langsung diperlakukan sebagai nilai non-opsional. Struktur dan enum berbeda nama adalah tipe berbeda.
+
+Batas penting: parser, AST/IR, evaluator, C, JavaScript, dan VM belum menerapkan sintaks atau nilai runtime untuk seluruh tipe tersebut. Ini bukan klaim bahwa `T?`, `mungkin`, `Hasil<Sukses, Gagal>`, `coba/tangkap`, `tipe`, atau enum sudah menjadi fitur bahasa lintas-target. Sintaks baru baru boleh diaktifkan setelah analisis semantik dan fixture yang sama memverifikasi perilakunya.
+
 ## Evaluasi dan nilai
 
 - Ekspresi mengikuti precedence dalam SPEC.md dan operand dievaluasi kiri ke kanan.
 - dan / atau menggunakan short-circuit: operand kanan tidak dievaluasi jika hasil sudah ditentukan.
-- Boolean benar dan salah adalah tipe berbeda dari angka. Kesetaraan benar == 1 menghasilkan tidak.
+- Boolean benar dan salah adalah tipe berbeda dari angka. Kesetaraan benar == 1 menghasilkan tidak. Perbandingan teks `==` dan `!=` membandingkan isi teks, bukan identitas/alamat penyimpanan string. Backend C subset mendukung `teks()` untuk teks, integer, dan boolean; konversi koleksi tidak didukung pada backend ini.
 - Output boolean memakai `okelah` dan `tidak`, bukan `True`/`False`. Built-in `teks` juga menggunakan ejaan bahasa Pusingcuk untuk boolean.
 - `json_baca(teks)` menghasilkan kamus yang bisa dibaca dan diubah dengan akses indeks pada interpreter referensi Python dan backend JavaScript. Native C belum mengklaim dukungan JSON; fixture JSON tetap `unsupported` pada target tersebut.
 - Kontrak built-in disimpan di `library/builtin_contract.json`, diuji oleh `tests/test_builtin_contract.py`, dan didokumentasikan di `docs/language/BUILTINS.md`. Interpreter referensi mendukung 25 built-in terdaftar; native C memiliki fixture untuk 17: `panjang`, `rentang`, `mutlak`, `minimum`, `maksimum`, `bulatkan`, `bawah`, `atas`, `akar`, `pangkat`, `logaritma`, `log10`, `sinus`, `kosinus`, `jumlah`, `rata_rata`, dan `median`. Transpiler/VM memiliki subset tersendiri.

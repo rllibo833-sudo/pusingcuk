@@ -42,6 +42,20 @@ class GeminiProviderTests(unittest.TestCase):
         payload = json.loads(request.data.decode())
         self.assertEqual(payload["systemInstruction"]["parts"][0]["text"], "Jawab jujur.")
 
+    def test_accepts_full_registered_ai_tool_set(self):
+        body = json.dumps({"candidates": [{"content": {"parts": [{"text": "Siap."}]}}]}).encode()
+        tools = [{"type": "function", "function": {
+            "name": f"tool_{index}", "description": "bounded test tool",
+            "parameters": {"type": "object", "properties": {}, "required": [],
+                           "additionalProperties": False},
+        }} for index in range(10)]
+        with patch("library.gemini_ai_provider.build_opener") as builder:
+            builder.return_value.open.return_value = FakeResponse(body)
+            turn = self.provider.generate_turn(self.messages, tools=tools)
+        self.assertEqual(turn["content"], "Siap.")
+        payload = json.loads(builder.return_value.open.call_args.args[0].data.decode())
+        self.assertEqual(len(payload["tools"][0]["functionDeclarations"]), 10)
+
     def test_function_call_schema_is_mapped(self):
         body = json.dumps({"candidates": [{"content": {"parts": [{"functionCall": {"id": "call-1", "name": "knowledge_search", "args": {"query": "ollama lokal", "limit": 2}}, "thoughtSignature": "opaque-signature-test"}]}}]}).encode()
         with patch("library.gemini_ai_provider.build_opener") as builder:

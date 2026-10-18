@@ -1,0 +1,7 @@
+jancuk
+lah data = {"kopi": 1, "teh": 2}
+data["kopi"] = 7
+hedeh data["kopi"]
+hedeh data["teh"]
+hedeh panjang(data)
+selesai jancuk

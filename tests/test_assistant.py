@@ -76,6 +76,18 @@ class AssistantTests(unittest.TestCase):
             assistant.ask("Apa itu PusingCuk?")
             self.assertFalse(path.exists())
 
+    def test_bounded_workspace_prompt_can_include_source_beyond_public_chat_limit(self):
+        # The HTTP chat route still enforces 300 characters; the internal assistant
+        # accepts bounded workspace context containing source and compiler diagnostics.
+        answer = self.assistant.ask("x" * 301)
+        self.assertEqual(answer, "Jawaban berdasarkan dokumen.")
+        self.assertEqual(len(self.provider.calls), 1)
+
+    def test_workspace_prompt_rejects_context_over_24_kibibytes(self):
+        with self.assertRaisesRegex(ValueError, "AI_QUERY_INVALID"):
+            self.assistant.ask("x" * (24 * 1024 + 1))
+        self.assertEqual(self.provider.calls, [])
+
     def test_invalid_query_is_rejected_before_provider_call(self):
         with self.assertRaisesRegex(ValueError, "AI_QUERY_INVALID"):
             self.assistant.ask(" ")

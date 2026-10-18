@@ -160,6 +160,27 @@ class BuiltinContractTests(unittest.TestCase):
                     call_builtin(name, *args, None)
 
 
+    def test_length_builtin_covers_all_documented_collection_shapes(self):
+        self.assertEqual(call_builtin("panjang", "PusingCuk"), 9)
+        self.assertEqual(call_builtin("panjang", [1, 2, 3]), 3)
+        self.assertEqual(call_builtin("panjang", {"kopi": 1, "teh": 2}), 2)
+        self.assertEqual(call_builtin("panjang", call_builtin("rentang", 2, 5)), 3)
+        with self.assertRaises((TypeError, ValueError)):
+            call_builtin("panjang", 42)
+
+    def test_minimum_maximum_and_rounding_boundary_contract(self):
+        self.assertEqual(call_builtin("minimum", -9, 0), -9)
+        self.assertEqual(call_builtin("minimum", 0, 0), 0)
+        self.assertEqual(call_builtin("maksimum", -9, 0), 0)
+        self.assertEqual(call_builtin("maksimum", -9, -2), -2)
+        self.assertEqual(call_builtin("bulatkan", 2.5), 2)
+        self.assertEqual(call_builtin("bulatkan", 3.5), 4)
+        self.assertEqual(call_builtin("bulatkan", -2.5), -2)
+        with self.assertRaises(TypeError):
+            call_builtin("minimum", True, 1)
+        with self.assertRaises(TypeError):
+            call_builtin("maksimum", 1, False)
+
     def test_decimal_conversion_rejects_non_finite_values(self):
         for invalid in ("nan", "inf", "-inf", float("nan"), float("inf"), float("-inf")):
             with self.subTest(value=invalid):

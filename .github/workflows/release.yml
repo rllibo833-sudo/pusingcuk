@@ -98,6 +98,10 @@ jobs:
           printf '%s\n' "$output"
           grep -Fq 'Halo, Budi!' <<< "$output"
           grep -Fq 'selesai' <<< "$output"
+          checkout_output="$(./dist/pusingcuk examples/kasir_warung.cuk)"
+          expected_checkout="$(printf '40000\n4000\n36000\n3960\n39960')"
+          test "$checkout_output" = "$expected_checkout"
+          printf '%s\n' "$checkout_output"
 
       - name: Set up Java for Android NDK
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
@@ -138,6 +142,16 @@ jobs:
           strings dist/android/pusingcuk-native-android-arm64 | grep -Fq "$ANDROID_VERSION"
           sha256sum dist/android/pusingcuk-native-android-arm64
 
+      - name: Package source snapshot
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ steps.tag.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+          git archive --format=tar.gz --prefix="pusingcuk-${RELEASE_TAG}/" \
+            --output="dist/pusingcuk-source-${RELEASE_TAG}.tar.gz" "${RELEASE_TAG}"
+          test -s "dist/pusingcuk-source-${RELEASE_TAG}.tar.gz"
+
       - name: Upload validated release assets
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -145,6 +159,7 @@ jobs:
           path: |
             dist/pusingcuk
             dist/android/pusingcuk-native-android-arm64
+            dist/pusingcuk-source-*.tar.gz
           if-no-files-found: error
           retention-days: 7
 
@@ -169,14 +184,15 @@ jobs:
           set -euo pipefail
           test -s dist/pusingcuk
           test -s dist/android/pusingcuk-native-android-arm64
-          notes="$RELEASE_TAG - Linux x86-64 PyInstaller CLI plus Android ARM64 native CLI. The native runtime is a subset, not an OS sandbox; do not run untrusted programs."
+          test -s "dist/pusingcuk-source-${RELEASE_TAG}.tar.gz"
+          notes="$RELEASE_TAG - Experimental Linux x86-64 CLI, Android ARM64 native CLI, and source archive. The native runtime is a subset, not an OS sandbox; do not run untrusted programs."
           # This job does not check out the repository, so pass the target repo explicitly.
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" dist/pusingcuk dist/android/pusingcuk-native-android-arm64 \
+            gh release upload "$RELEASE_TAG" dist/pusingcuk dist/android/pusingcuk-native-android-arm64 "dist/pusingcuk-source-${RELEASE_TAG}.tar.gz" \
               --repo "$GITHUB_REPOSITORY" --clobber
             # Preserve curated title and release notes when retrying an existing release; only replace assets.
           else
-            gh release create "$RELEASE_TAG" dist/pusingcuk dist/android/pusingcuk-native-android-arm64 \
+            gh release create "$RELEASE_TAG" dist/pusingcuk dist/android/pusingcuk-native-android-arm64 "dist/pusingcuk-source-${RELEASE_TAG}.tar.gz" \
               --repo "$GITHUB_REPOSITORY" \
               --title "$RELEASE_TAG" \
               --notes "$notes"
