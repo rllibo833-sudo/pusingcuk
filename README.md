@@ -8,7 +8,7 @@ PusingCuk adalah bahasa pemrograman **experimental** dengan ekstensi utama `.cuk
 
 Branch ini memuat **Cuk Reality Engine**, contoh program berbasis aturan yang dipakai untuk mengembangkan dan membuktikan kemampuan bahasa `.cuk`. Contoh domainnya adalah keputusan berdasarkan persentase cadangan air, tetapi tujuan utamanya adalah bahasa: fungsi, validasi masukan, percabangan, keputusan deterministik, ID aturan, penjelasan, dan penanganan kesalahan.
 
-Dokumen kanonis branch ini: [Cuk Reality Engine](docs/REALITY_ENGINE.md). Ini bukan proyek integrasi sensor atau sistem pengelolaan air produksi. Perubahan pada branch ini tidak otomatis mengubah `main` atau `warungpusingcuk`.
+Dokumen kanonis branch ini: [Cuk Reality Engine](docs/REALITY_ENGINE.md). Batas yang diketahui: fungsi pemetaan belum menjamin penolakan ID aturan arbitrer yang tidak dikenal; jangan gunakan pemetaan sebagai validasi untuk ID dari sumber luar. Ini bukan proyek integrasi sensor atau sistem pengelolaan air produksi. Perubahan pada branch ini tidak otomatis mengubah `main` atau `warungpusingcuk`.
 
 ## Mulai cepat
 
