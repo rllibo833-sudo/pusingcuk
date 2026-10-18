@@ -3,7 +3,7 @@
 **Branch yang dituju untuk pekerjaan ini:** `warungpusingcuk`  
 **Versi kontrak bahasa:** `0.6-dev`  
 **Versi paket Python:** `0.8.0.dev0`  
-**Status:** eksperimental; ringkasan ini bukan bukti bahwa seluruh tes atau target deployment lulus.
+**Status:** eksperimental; ringkasan ini bukan bukti bahwa seluruh tes atau target deployment lulus. Audit ini tidak menyatakan bahasa stabil atau AI akurat secara umum.
 
 ## Gambaran yang benar saat ini
 
