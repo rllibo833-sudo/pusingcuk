@@ -44,7 +44,7 @@ fungsi keputusan_dari_aturan(aturan)
                 njir aturan == "AIR-03: PENGHEMATAN"
                     balek "HEMAT_AIR"
                 kampret
-                    balek "KONDISI_NORMAL"
+                    balek "ID_ATURAN_TIDAK_DIKENAL"
                 selesai njir
             selesai njir
         selesai njir
@@ -67,7 +67,7 @@ fungsi alasan_dari_aturan(aturan)
                     njir aturan == "AIR-03: PENGHEMATAN"
                         balek "Cadangan <= 50%; terapkan penghematan."
                     kampret
-                        balek "Cadangan di atas 50%; kondisi normal."
+                        balek "ID aturan tidak dikenal; alasan kebijakan tidak tersedia."
                     selesai njir
                 selesai njir
             selesai njir
@@ -91,7 +91,7 @@ fungsi tindakan_dari_aturan(aturan)
                     njir aturan == "AIR-03: PENGHEMATAN"
                         balek "Terapkan penghematan, pantau perubahan cadangan, dan tunda pemakaian yang tidak mendesak."
                     kampret
-                        balek "Pertahankan pemantauan berkala dan gunakan air secara wajar."
+                        balek "Hentikan keputusan otomatis dan verifikasi ID aturan yang tidak dikenal."
                     selesai njir
                 selesai njir
             selesai njir
