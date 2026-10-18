@@ -132,7 +132,7 @@ The contract also records platform capability status separately from builtin sup
 <!-- BEGIN GENERATED CONFORMANCE SUMMARY -->
 ## Measured conformance snapshot
 
-This table is generated from `tests/conformance/baseline_summary.json` by `tools/generate_compatibility.py`. It is a snapshot of the checked-in baseline, not a live CI result or a claim of complete language compatibility.
+This table is generated from the supplied machine-readable fixture summary. It is a snapshot, not a live CI result or a claim of complete language compatibility.
 
 | Target | Passed | Failed | Timeout | Unsupported | Unavailable |
 |---|---:|---:|---:|---:|---:|
@@ -145,5 +145,4 @@ This table is generated from `tests/conformance/baseline_summary.json` by `tools
 
 - Manifest fixtures: **77**
 - Native C Python-free score: **96.10%** (74/77; unsupported fixtures remain in the denominator)
-
 <!-- END GENERATED CONFORMANCE SUMMARY -->
