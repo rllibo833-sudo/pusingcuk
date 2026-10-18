@@ -56,22 +56,23 @@ Saya membaca GitHub repository metadata, recursive Git tree, `pyproject.toml`, `
 
 ## 4. Baseline fixture dan target
 
-### 4.1 Apa yang bisa dibuktikan sekarang
+### 4.1 Baseline eksekusi — Tertunda: dijalankan via CI di Phase 1
 
-| Runtime/target | Fixture yang diwajibkan manifest | Hasil baseline yang tersedia | Status audit |
-|---|---:|---|---|
-| Python reference interpreter | 77/77 | CI run #1134 sukses; conformance dijalankan pada job Python 3.12 | **CI pass teramati**, hitungan per-fixture tidak dipublikasikan |
-| Native C | 74 required; 3 unsupported | CI run #1134 `make test-native` sukses pada GCC dan Clang | **CI pass teramati**, detail per-fixture tidak dipublikasikan |
-| JavaScript target | Tidak dinyatakan oleh manifest utama | Unit test backend ada; belum ada hasil matrix fixture penuh yang terlihat | **Belum terukur sebagai matrix** |
-| Python transpiler target | Tidak dinyatakan oleh manifest utama | Unit test backend ada; jangan disamakan dengan reference interpreter | **Belum terukur sebagai matrix** |
-| HTML target | Tidak dinyatakan oleh manifest utama | Ada implementasi/dukungan compiler yang didokumentasikan; hasil per-fixture tidak tersedia | **Belum terukur sebagai matrix** |
-| JSON IR | Tidak dinyatakan oleh manifest utama | IR/CLI ada, format belum dibekukan sebagai ABI stabil | **Belum terukur sebagai matrix** |
-| VM/bytecode | Tidak dinyatakan oleh manifest utama | Unit test VM dan workflow PVM eksperimental tersedia | **Belum terukur sebagai matrix** |
-| Runtime tanpa Python | 74 fixture ditandai native required, tetapi status required bukan hasil pass individual | CI native hijau membuktikan job yang berjalan; tidak ada Python-Free Score yang dipublikasikan | **Persentase tidak boleh diklaim dari data yang ada** |
+**Status: Tertunda: dijalankan via CI di Phase 1.** Sandbox audit tidak dapat menyelesaikan DNS `github.com` saat mencoba clone repository (exit 128), sehingga runner lokal tidak memiliki checkout dan tidak bisa menghasilkan log mentah. Karena itu, tidak ada angka pass/fail per fixture atau Python-Free Score yang diperkirakan atau dikarang di fase ini. CI yang ada sebelumnya hanya membuktikan job dan target yang dijalankannya; ringkasan job tidak cukup untuk menyimpulkan hasil setiap fixture.
+
+| Runtime/target | Cakupan manifest yang diketahui | Hasil eksekusi per-fixture | Status audit |
+|---|---|---|---|
+| Python reference interpreter | 77 fixture diwajibkan | Tertunda; workflow Phase 1 akan menghasilkan log | **Tertunda: dijalankan via CI di Phase 1** |
+| Native C | 74 required; 3 unsupported | Tertunda; workflow Phase 1 akan menghasilkan log | **Tertunda: dijalankan via CI di Phase 1** |
+| JavaScript via Node | Dukungan manifest belum ditetapkan | Tertunda; perlu pemetaan fixture/dukungan | **Tertunda: dijalankan via CI di Phase 1** |
+| Python transpiler | Dukungan manifest belum ditetapkan; bukan reference interpreter | Tertunda; perlu pemetaan fixture/dukungan | **Tertunda: dijalankan via CI di Phase 1** |
+| HTML | Dukungan manifest belum ditetapkan | Tertunda; ukur hanya jika target runnable tersedia | **Tertunda: dijalankan via CI di Phase 1** |
+| VM/bytecode | Dukungan manifest belum ditetapkan | Tertunda; VM saat ini bergantung pada helper evaluator Python | **Tertunda: dijalankan via CI di Phase 1** |
+| JSON IR | Bukan runtime eksekusi; jangan dihitung sebagai runtime tanpa Python | Di luar skor runtime; validasi format dapat dilaporkan terpisah | **Bukan skor runtime** |
 
 ### 4.2 Persentase Python-free
 
-**Belum ada skor Python-free yang sah untuk dipublikasikan.** Pembilang harus berupa jumlah fixture yang benar-benar lulus pada runtime native/VM tanpa Python di jalur runtime; penyebut dan kebijakan fixture harus didefinisikan konsisten. Angka `74/77` adalah jumlah status manifest, **bukan** 96,1% lulus. Selain itu, compile/build bisa tetap memakai Python meskipun eksekusi program native tidak.
+**Python-Free Score awal: Tertunda sampai workflow Phase 1 berjalan.** Metode yang direncanakan: hitung hanya fixture yang benar-benar lulus pada native C sebagai runtime Python-free, dibagi jumlah fixture yang secara eksplisit didukung/dapat dijalankan pada target native C dalam manifest yang sama, lalu kalikan 100. Fixture berstatus unsupported dikeluarkan dari penyebut dan dilaporkan terpisah. Tidak memakai angka required sebagai pengganti hasil pass. VM **tidak** dihitung Python-free selama implementasinya masih mengimpor helper evaluator Python. Build/harness yang menggunakan Python akan dibedakan dari kebutuhan Python saat menjalankan hasil native. Angka aktual baru ditulis setelah log CI dan ringkasan JSON tersedia.
 
 ### 4.3 Fixture hygiene
 
