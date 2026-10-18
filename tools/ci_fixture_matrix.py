@@ -132,6 +132,7 @@ def main():
         "unsupported_native_counted_as_not_passed": True,
         "method": "Python-Free Score = (number of manifest fixtures whose native C execution passed) / (total number of manifest fixtures across all targets) × 100. All fixtures stay in the denominator, including the three native-unsupported fixtures; unsupported is not counted as passed. Only native C is eligible as Python-free. VM is excluded because it imports Python evaluator helpers."
     }
+    (OUT / "results.json").write_text(json.dumps(rows, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (OUT / "raw.log").write_text("\n\n".join(raw_lines) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2, ensure_ascii=False))
