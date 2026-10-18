@@ -12,15 +12,25 @@ EXAMPLE = ROOT / "examples" / "reality_engine.cuk"
 
 
 class RealityEngineBoundaryTests(unittest.TestCase):
-    def run_engine(self, user_input):
-        return subprocess.run(
-            [sys.executable, str(CLI), str(EXAMPLE)],
-            cwd=ROOT,
-            input=user_input,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
+    def run_engine(self, user_input, source_text=None):
+        temporary = None
+        source_path = EXAMPLE
+        if source_text is not None:
+            temporary = tempfile.TemporaryDirectory(prefix="reality-engine-")
+            source_path = Path(temporary.name) / "reality_engine.cuk"
+            source_path.write_text(source_text, encoding="utf-8")
+        try:
+            return subprocess.run(
+                [sys.executable, str(CLI), str(source_path)],
+                cwd=ROOT,
+                input=user_input,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+        finally:
+            if temporary is not None:
+                temporary.cleanup()
 
     def test_zero_percent_is_valid_and_uses_low_reserve_rule(self):
         result = self.run_engine("0\nya\n")
@@ -114,6 +124,25 @@ class RealityEngineBoundaryTests(unittest.TestCase):
                 self.assertIn(decision, result.stdout)
                 self.assertIn(reason, result.stdout)
                 self.assertIn(action, result.stdout)
+
+
+
+    def test_unknown_rule_id_fails_closed_for_all_outputs(self):
+        source = EXAMPLE.read_text(encoding="utf-8")
+        original = "lah aturan = aturan_air(cadangan, kebutuhan_dasar)"
+        self.assertIn(original, source)
+        source = source.replace(
+            original,
+            'lah aturan = "ID-ARBITRER-TIDAK-DIKENAL"',
+            1,
+        )
+        result = self.run_engine("15\\nya\\n", source_text=source)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("ID_ATURAN_TIDAK_DIKENAL", result.stdout)
+        self.assertIn("ID aturan tidak dikenal; alasan kebijakan tidak tersedia.", result.stdout)
+        self.assertIn("Hentikan keputusan otomatis", result.stdout)
+        self.assertNotIn("KONDISI_NORMAL", result.stdout)
+        self.assertNotIn("Pertahankan pemantauan berkala", result.stdout)
 
 
 
