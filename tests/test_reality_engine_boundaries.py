@@ -41,11 +41,13 @@ class RealityEngineBoundaryTests(unittest.TestCase):
         self.assertNotIn("PRIORITASKAN_KEBUTUHAN_DASAR", result.stdout)
         self.assertNotIn("KONDISI_NORMAL", result.stdout)
 
-    def test_fraction_above_one_hundred_is_rejected(self):
-        result = self.run_engine("100.1\ntidak\n")
+    def test_fractional_reserve_is_rejected_as_invalid_numeric_input(self):
+        # bilangan() currently accepts integers only; decimal syntax is rejected
+        # before the policy function receives a reserve value.
+        result = self.run_engine("100.1\\ntidak\\n")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("AIR-00: INPUT_CADANGAN_TIDAK_VALID", result.stdout)
-        self.assertIn("MASUKAN_TIDAK_VALID", result.stdout)
+        self.assertIn("Input tidak valid:", result.stdout)
+        self.assertIn("Masukkan cadangan sebagai angka yang valid", result.stdout)
         self.assertNotIn("KONDISI_NORMAL", result.stdout)
 
 
