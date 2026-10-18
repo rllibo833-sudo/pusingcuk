@@ -44,7 +44,7 @@ class RealityEngineBoundaryTests(unittest.TestCase):
     def test_fractional_reserve_is_rejected_as_invalid_numeric_input(self):
         # bilangan() currently accepts integers only; decimal syntax is rejected
         # before the policy function receives a reserve value.
-        result = self.run_engine("100.1\\ntidak\\n")
+        result = self.run_engine("100.1\ntidak\n")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("Input tidak valid:", result.stdout)
         self.assertIn("Masukkan cadangan sebagai angka yang valid", result.stdout)
