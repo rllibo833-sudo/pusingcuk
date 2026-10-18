@@ -19,6 +19,7 @@ Catatan ringkas perubahan yang sudah dilakukan. Versi paket dan versi bahasa ada
 - Gunakan `desimal()` untuk membaca persentase cadangan agar nilai pecahan seperti `20.5` dapat melewati parsing dan diuji oleh aturan rentang. `100.1` harus ditolak oleh aturan kebijakan, bukan gagal saat konversi angka.
 - Perbaiki escaping newline pada input tes supaya tiap jawaban benar-benar dikirim sebagai baris stdin terpisah.
 - Tambahkan regresi untuk jawaban kebutuhan dasar di luar `ya`/`tidak` dan teks cadangan non-numerik; dokumentasikan bahwa keduanya tidak boleh menghasilkan keputusan kebijakan normal.
+- Kunci batas kebijakan 50% dengan kasus tepat pada ambang dan tepat di atasnya; pastikan `NaN`, `inf`, dan `-Infinity` ditolak oleh konversi `desimal()` sebelum keputusan dibuat.
 
 ### Dokumentasi dan tata letak
 

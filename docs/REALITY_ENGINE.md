@@ -43,7 +43,7 @@ Urutan pemeriksaan penting: input divalidasi sebelum ambang kebijakan digunakan.
 
 1. Pengguna memasukkan persentase cadangan.
 2. Program mengubah teks menjadi angka dan meminta jawaban kebutuhan dasar.
-3. `desimal()` mengonversi angka, termasuk persentase pecahan; `aturan_air()` memvalidasi rentang 0–100 dan menentukan ID aturan.
+3. `desimal()` mengonversi angka finite, termasuk persentase pecahan; teks yang bukan angka dan nilai non-finite seperti `NaN`/`inf` ditangani sebagai input tidak valid. Setelah konversi berhasil, `aturan_air()` memvalidasi rentang 0–100 dan menentukan ID aturan.
 4. Fungsi keluaran menerjemahkan ID itu menjadi keputusan, alasan, dan tindakan.
 5. Program menampilkan hasil sehingga pembaca dapat menelusuri alasan keputusan kembali ke aturan yang cocok.
 
@@ -65,10 +65,12 @@ Contoh masukan:
 - `51` lalu `tidak` → ID `AIR-04`, kondisi normal.
 - `20.5` lalu `ya` → ID `AIR-03`, penghematan.
 - `100.1` lalu `tidak` → ID `AIR-00`, masukan di luar rentang ditolak.
+- `50` lalu `ya` → ID `AIR-03`; `50.1` lalu `ya` → ID `AIR-04`, membuktikan batas 50% secara eksplisit.
+- `NaN`, `inf`, atau `-Infinity` sebagai cadangan → konversi ditolak sebelum keputusan kebijakan.
 - `101` lalu `tidak` → masukan ditolak.
 - `abc` sebagai cadangan → kegagalan konversi ditangani dan program tidak menampilkan keputusan normal.
 
-Tes batas dan konsistensi Reality Engine berada di `tests/test_reality_engine_boundaries.py`, termasuk jawaban kebutuhan dasar yang tidak valid dan teks angka yang gagal dikonversi. Tes contoh umum berada di `tests/test_examples_cuk.py`. Tes yang memeriksa perilaku tertentu membuktikan hanya kasus yang benar-benar dijalankan; keberhasilan satu contoh tidak membuktikan seluruh bahasa atau seluruh backend setara.
+Tes batas dan konsistensi Reality Engine berada di `tests/test_reality_engine_boundaries.py`, termasuk jawaban kebutuhan dasar yang tidak valid, teks angka yang gagal dikonversi, nilai non-finite, dan batas 50%. Tes contoh umum berada di `tests/test_examples_cuk.py`. Tes yang memeriksa perilaku tertentu membuktikan hanya kasus yang benar-benar dijalankan; keberhasilan satu contoh tidak membuktikan seluruh bahasa atau seluruh backend setara.
 
 ## Fokus pengembangan di branch ini
 
