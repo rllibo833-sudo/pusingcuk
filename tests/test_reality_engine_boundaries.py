@@ -51,11 +51,11 @@ class RealityEngineBoundaryTests(unittest.TestCase):
 
     def test_one_rule_result_drives_decision_reason_and_action(self):
         cases = (
-            ("15\\nya\\n", "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR", "PRIORITASKAN_KEBUTUHAN_DASAR", "kebutuhan dasar diprioritaskan", "Amankan air untuk minum"),
-            ("20\\ntidak\\n", "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL", "BATASI_PENGGUNAAN_NON_ESENSIAL", "penggunaan non-esensial dibatasi", "Batasi pemakaian non-esensial"),
-            ("21\\nya\\n", "AIR-03: PENGHEMATAN", "HEMAT_AIR", "terapkan penghematan", "Terapkan penghematan"),
-            ("51\\ntidak\\n", "AIR-04: KONDISI_NORMAL", "KONDISI_NORMAL", "kondisi normal", "Pertahankan pemantauan berkala"),
-            ("101\\nya\\n", "AIR-00: INPUT_CADANGAN_TIDAK_VALID", "MASUKAN_TIDAK_VALID", "cadangan harus 0 sampai 100%", "Periksa ulang data cadangan"),
+            ("15\nya\n", "AIR-01: CADANGAN_RENDAH_KEBUTUHAN_DASAR", "PRIORITASKAN_KEBUTUHAN_DASAR", "kebutuhan dasar diprioritaskan", "Amankan air untuk minum"),
+            ("20\ntidak\n", "AIR-02: CADANGAN_RENDAH_BATASI_NON_ESENSIAL", "BATASI_PENGGUNAAN_NON_ESENSIAL", "penggunaan non-esensial dibatasi", "Batasi pemakaian non-esensial"),
+            ("21\nya\n", "AIR-03: PENGHEMATAN", "HEMAT_AIR", "terapkan penghematan", "Terapkan penghematan"),
+            ("51\ntidak\n", "AIR-04: KONDISI_NORMAL", "KONDISI_NORMAL", "kondisi normal", "Pertahankan pemantauan berkala"),
+            ("101\nya\n", "AIR-00: INPUT_CADANGAN_TIDAK_VALID", "MASUKAN_TIDAK_VALID", "cadangan harus 0 sampai 100%", "Periksa ulang data cadangan"),
         )
         for user_input, rule, decision, reason, action in cases:
             with self.subTest(user_input=user_input):
