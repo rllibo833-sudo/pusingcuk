@@ -314,5 +314,5 @@ jobs:
           set -euo pipefail
           python pusingcuk_new.py --check apps/accounting/cukaccount_frontend.cuk
           actual="$(python pusingcuk_new.py apps/accounting/cukaccount_frontend.cuk)"
-          diff -u apps/accounting/cukaccount_frontend.expected.txt <(printf '%s\\n' "$actual")
+          diff -u apps/accounting/cukaccount_frontend.expected.txt <(printf '%s\n' "$actual")
           echo "PASS: CukAccount frontend routes, form validation, submit actions, and theme rules match expected cases."
