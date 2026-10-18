@@ -29,6 +29,12 @@ Alias yang tercantum di bagian alias resmi `SPEC.md` adalah bagian dari permukaa
 
 Backend JavaScript kini memiliki implementasi untuk seluruh built-in terkontrak; fixture positif dan negatif tetap diperlukan untuk menjaga kesetaraan perilaku. JSON/HTML/CSV hanya tersedia pada target yang dinyatakan `supported` di kontrak. Compiler/transpiler lain dan PVM tetap eksperimental. Keduanya tidak mengubah semantik acuan, dan hasilnya tidak dihitung sebagai baseline Python/C.
 
+## Status semantik tipe
+
+`compiler/typesystem.py` merupakan model internal, bukan pemeriksa tipe aktif. Model sekarang mengenali tipe opsional (nilai inti atau `null`), hasil sukses/gagal dengan tipe payload terpisah, struktur bernama, dan enum nominal. Konversi integer-ke-float tetap satu arah; boolean tetap bukan integer. Tipe opsional menerima nilai inti yang cocok atau `null`, tetapi nilai opsional tidak boleh langsung diperlakukan sebagai nilai non-opsional. Struktur dan enum berbeda nama adalah tipe berbeda.
+
+Batas penting: parser, AST/IR, evaluator, C, JavaScript, dan VM belum menerapkan sintaks atau nilai runtime untuk seluruh tipe tersebut. Ini bukan klaim bahwa `T?`, `mungkin`, `Hasil<Sukses, Gagal>`, `coba/tangkap`, `tipe`, atau enum sudah menjadi fitur bahasa lintas-target. Sintaks baru baru boleh diaktifkan setelah analisis semantik dan fixture yang sama memverifikasi perilakunya.
+
 ## Evaluasi dan nilai
 
 - Ekspresi mengikuti precedence dalam SPEC.md dan operand dievaluasi kiri ke kanan.

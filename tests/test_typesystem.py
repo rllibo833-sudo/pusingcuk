@@ -1,8 +1,8 @@
 import unittest
 
 from compiler.typesystem import (
-    ANY, BOOL, FLOAT, INT, STRING, TypeKind, common_type, infer_type,
-    is_assignable, list_of, map_of,
+    ANY, BOOL, FLOAT, INT, NULL, STRING, TypeKind, common_type, infer_type,
+    is_assignable, list_of, map_of, optional_of, result_of, struct_of, enum_of,
 )
 from library.stdlib import BUILTINS, call_builtin, get_builtin
 
@@ -34,6 +34,32 @@ class TypeSystemTests(unittest.TestCase):
     def test_common_type(self):
         self.assertEqual(common_type(INT, FLOAT), FLOAT)
         self.assertEqual(common_type(STRING, INT).kind, TypeKind.ANY)
+
+    def test_optional_type_is_explicit_and_null_assignable(self):
+        maybe_int = optional_of(INT)
+        self.assertEqual(str(maybe_int), "int?")
+        self.assertTrue(is_assignable(maybe_int, INT))
+        self.assertTrue(is_assignable(maybe_int, NULL))
+        self.assertFalse(is_assignable(INT, maybe_int))
+        self.assertEqual(common_type(INT, maybe_int), maybe_int)
+
+    def test_result_type_keeps_success_and_error_types(self):
+        outcome = result_of(INT, STRING)
+        self.assertEqual(str(outcome), "Hasil[int, string]")
+        self.assertTrue(is_assignable(outcome, result_of(INT, STRING)))
+        self.assertFalse(is_assignable(outcome, result_of(STRING, INT)))
+
+    def test_named_struct_and_enum_are_nominal(self):
+        account = struct_of("Akun", {"saldo": FLOAT, "aktif": BOOL})
+        other_account = struct_of("Akun", {"saldo": FLOAT, "aktif": BOOL})
+        other_shape = struct_of("Profil", {"saldo": FLOAT, "aktif": BOOL})
+        status = enum_of("Status", ["Aktif", "Arsip"])
+        self.assertEqual(str(account), "Akun")
+        self.assertTrue(is_assignable(account, other_account))
+        self.assertFalse(is_assignable(account, other_shape))
+        self.assertEqual(status.variants, ("Aktif", "Arsip"))
+        with self.assertRaises(ValueError):
+            enum_of("Status", ["Aktif", "Aktif"])
 
     def test_builtin_registry_is_explicit(self):
         self.assertIsNotNone(get_builtin("panjang"))
