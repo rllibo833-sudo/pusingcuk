@@ -63,9 +63,15 @@ class CukExampleCliTests(unittest.TestCase):
             "KONDISI_NORMAL",
             "=== SIMULASI KONFLIK ===",
             "KONFLIK_HASIL_DAN_ATURAN",
+            "=== BATAS 20 - KRITIS ===",
+            "=== BATAS 21 - HEMAT ===",
+            "=== BATAS 50 - HEMAT ===",
+            "=== BATAS 51 - NORMAL ===",
         ):
             with self.subTest(expected=expected):
                 self.assertIn(expected, output)
+        self.assertEqual(output.count("KONSISTEN_DENGAN_ATURAN"), 8)
+        self.assertEqual(output.count("KONFLIK_HASIL_DAN_ATURAN"), 1)
 
     def test_terminal_bot_handles_interactive_answers(self):
         output, _, _ = self.run_example("terminal_bot.cuk", "Ayu\nbaik\n")
