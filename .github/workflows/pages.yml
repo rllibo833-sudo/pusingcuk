@@ -42,13 +42,18 @@ jobs:
           # The previous run failed because Pages was not enabled/configured.
           # Ask configure-pages to enable it instead of failing at the initial lookup.
           enablement: true
+        # GitHub Actions token cannot enable Pages in this repo (403 Resource not accessible).
+        # Keep building/uploading the static artifact until Pages is enabled in repository settings.
+        continue-on-error: true
       - name: Upload static site
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: site
   deploy:
-    if: github.event_name != 'pull_request'
+    # Temporarily disabled: GitHub Pages is not enabled and the Actions token cannot enable it.
+    # Re-enable after Settings > Pages is configured to build and deploy with GitHub Actions.
+    if: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
