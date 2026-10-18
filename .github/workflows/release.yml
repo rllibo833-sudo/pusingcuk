@@ -148,7 +148,7 @@ jobs:
           RELEASE_TAG: ${{ steps.tag.outputs.release_tag }}
         run: |
           set -euo pipefail
-          git archive --format=tar.gz --prefix="pusingcuk-${RELEASE_TAG}/" \\
+          git archive --format=tar.gz --prefix="pusingcuk-${RELEASE_TAG}/" \
             --output="dist/pusingcuk-source-${RELEASE_TAG}.tar.gz" "${RELEASE_TAG}"
           test -s "dist/pusingcuk-source-${RELEASE_TAG}.tar.gz"
 
