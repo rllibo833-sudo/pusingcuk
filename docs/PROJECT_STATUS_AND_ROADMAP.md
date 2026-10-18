@@ -7,6 +7,8 @@
 
 ## Gambaran yang benar saat ini
 
+**Konformansi saat ini:** 78 fixture: 78 wajib pada interpreter referensi Python, 75 wajib pada native C, dan 3 secara eksplisit tidak didukung native. Contoh aplikasi kasir warung tercakup sebagai tes wajib pada kedua runtime.
+
 - **Bahasa:** lexer, parser, AST, interpreter referensi, spesifikasi, kontrak built-in, dan fixture tersedia. Jalur referensi masih bergantung pada Python.
 - **Native C:** ada backend/runtime mandiri untuk sebagian bahasa. Fitur yang tidak tercakup dalam tes native belum boleh diklaim kompatibel.
 - **Bytecode/VM:** ada compiler bytecode dan VM eksperimental. Ini belum sama dengan runtime native yang bebas dari Python.
