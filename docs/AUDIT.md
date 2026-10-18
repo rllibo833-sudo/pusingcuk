@@ -757,6 +757,47 @@ Angka berikut adalah analisis tambahan, bukan pengganti conformance score utama.
 
 Interpretasi: pada suite ini, kegagalan terstruktur JavaScript dan VM didominasi oleh stderr/diagnostik, sedangkan Python transpiler juga memiliki dua fixture dengan stdout salah dan satu fixture dengan exit code salah (satu baris Python mempunyai kedua dimensi mismatch). Ini tidak membuktikan akar masalah implementasi yang sama; inspeksi per fixture tetap diperlukan sebelum perubahan kode.
 
+#### Catatan akar masalah kandidat dari klasifikasi audit sebelumnya (dipertahankan)
+
+Klasifikasi A/B/C di atas mengelompokkan jenis mismatch yang teramati, bukan akar implementasi. Agar temuan audit terdahulu tidak hilang, tabel berikut dipertahankan sebagai hipotesis awal dari pembacaan log sebelumnya; angka ini bukan kategori A/B/C dan perlu dikonfirmasi ulang terhadap fixture sebelum perbaikan.
+
+**JavaScript — 48 gagal**
+
+| Kandidat akar masalah | Jumlah sebelumnya |
+|---|---:|
+| Perbedaan diagnostik runtime/output/exit code | 22 |
+| Pemeriksaan aritas kompilasi berbeda dari reference | 10 |
+| Exception host bocor, bukan diagnostik .cuk stabil | 4 |
+| Batas integer aman ditolak saat kompilasi | 4 |
+| Paritas sintaks atau lokasi diagnostik | 3 |
+| Analisis nama statis, short-circuit, atau scope | 3 |
+| Cakupan built-in JSON | 2 |
+
+**Python transpiler — 56 gagal**
+
+| Kandidat akar masalah | Jumlah sebelumnya |
+|---|---:|
+| Perbedaan diagnostik runtime/output/exit code | 22 |
+| Built-in/fungsi belum dikenali transpiler | 14 |
+| Pemeriksaan aritas kompilasi berbeda dari reference | 8 |
+| Paritas sintaks atau lokasi diagnostik | 3 |
+| Analisis nama statis, short-circuit, atau scope | 3 |
+| Exception host Python bocor | 3 |
+| Mismatch output/exit code pada built-in numerik | 2 |
+| Kasus compile-time lain | 1 |
+
+**VM/bytecode — 49 gagal**
+
+| Kandidat akar masalah | Jumlah sebelumnya |
+|---|---:|
+| Perbedaan diagnostik runtime/output/exit code | 38 |
+| Exception host Python bocor | 6 |
+| Paritas sintaks/lokasi diagnostik saat kompilasi bytecode | 3 |
+| Kelas/lokasi diagnostik runtime berbeda | 1 |
+| Semantik operator/tipe, termasuk penggabungan koleksi | 1 |
+
+Catatan: kategori terdahulu ini berasal dari ringkasan log sebelumnya dan tidak otomatis dipetakan satu-ke-satu ke bucket A/B/C terbaru. Jangan menjumlahkan tabel ini dengan tabel mismatch baru.
+
 ### E.5 Gerbang regresi dan batas skor
 
 Baseline hasil terukur disimpan sebagai tests/conformance/baseline_summary.json. Workflow matriks membandingkan jumlah passed setiap target dengan snapshot tersebut; CI gagal jika hitungan lulus target mana pun turun. Perubahan baseline di masa mendatang harus ditinjau secara eksplisit, bukan diperbarui otomatis agar kegagalan terlihat hijau.
