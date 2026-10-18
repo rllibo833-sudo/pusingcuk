@@ -5,33 +5,49 @@
 jancuk
 
 fungsi keputusan_air(cadangan, kebutuhan_dasar)
-    njir cadangan <= 20
-        njir kebutuhan_dasar == "ya"
-            balek "PRIORITASKAN_KEBUTUHAN_DASAR"
-        kampret
-            balek "BATASI_PENGGUNAAN_NON_ESENSIAL"
-        selesai njir
+    njir cadangan < 0
+        balek "MASUKAN_TIDAK_VALID"
     kampret
-        njir cadangan <= 50
-            balek "HEMAT_AIR"
+        njir cadangan > 100
+            balek "MASUKAN_TIDAK_VALID"
         kampret
-            balek "KONDISI_NORMAL"
+            njir cadangan <= 20
+                njir kebutuhan_dasar == "ya"
+                    balek "PRIORITASKAN_KEBUTUHAN_DASAR"
+                kampret
+                    balek "BATASI_PENGGUNAAN_NON_ESENSIAL"
+                selesai njir
+            kampret
+                njir cadangan <= 50
+                    balek "HEMAT_AIR"
+                kampret
+                    balek "KONDISI_NORMAL"
+                selesai njir
+            selesai njir
         selesai njir
     selesai njir
 selesai fungsi
 
 fungsi alasan_air(cadangan, kebutuhan_dasar)
-    njir cadangan <= 20
-        njir kebutuhan_dasar == "ya"
-            balek "Cadangan <= 20%; kebutuhan dasar diprioritaskan."
-        kampret
-            balek "Cadangan <= 20%; penggunaan non-esensial dibatasi."
-        selesai njir
+    njir cadangan < 0
+        balek "Input tidak valid: cadangan harus 0 sampai 100%."
     kampret
-        njir cadangan <= 50
-            balek "Cadangan <= 50%; terapkan penghematan."
+        njir cadangan > 100
+            balek "Input tidak valid: cadangan harus 0 sampai 100%."
         kampret
-            balek "Cadangan di atas 50%; kondisi normal."
+            njir cadangan <= 20
+                njir kebutuhan_dasar == "ya"
+                    balek "Cadangan <= 20%; kebutuhan dasar diprioritaskan."
+                kampret
+                    balek "Cadangan <= 20%; penggunaan non-esensial dibatasi."
+                selesai njir
+            kampret
+                njir cadangan <= 50
+                    balek "Cadangan <= 50%; terapkan penghematan."
+                kampret
+                    balek "Cadangan di atas 50%; kondisi normal."
+                selesai njir
+            selesai njir
         selesai njir
     selesai njir
 selesai fungsi
@@ -68,5 +84,7 @@ tampilkan_skenario("BATAS 20 - KRITIS", 20, "ya", "PRIORITASKAN_KEBUTUHAN_DASAR"
 tampilkan_skenario("BATAS 21 - HEMAT", 21, "ya", "HEMAT_AIR")
 tampilkan_skenario("BATAS 50 - HEMAT", 50, "tidak", "HEMAT_AIR")
 tampilkan_skenario("BATAS 51 - NORMAL", 51, "tidak", "KONDISI_NORMAL")
+tampilkan_skenario("INPUT DI BAWAH NOL", -1, "ya", "MASUKAN_TIDAK_VALID")
+tampilkan_skenario("INPUT DI ATAS 100", 101, "tidak", "MASUKAN_TIDAK_VALID")
 
 selesai jancuk
