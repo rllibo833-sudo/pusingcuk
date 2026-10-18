@@ -77,6 +77,32 @@ class CukExampleCliTests(unittest.TestCase):
         self.assertNotIn("KONDISI_NORMAL", output)
         self.assertNotIn("Cadangan air (%):", output)
 
+
+    def test_reality_engine_at_20_percent_prioritizes_basic_needs(self):
+        output, _, _ = self.run_example("reality_engine.cuk", "20\\nya\\n")
+        self.assertIn("PRIORITASKAN_KEBUTUHAN_DASAR", output)
+        self.assertIn("Amankan air untuk minum, sanitasi, dan kebutuhan dasar", output)
+
+    def test_reality_engine_at_20_percent_restricts_nonessential_use(self):
+        output, _, _ = self.run_example("reality_engine.cuk", "20\\ntidak\\n")
+        self.assertIn("BATASI_PENGGUNAAN_NON_ESENSIAL", output)
+        self.assertIn("Batasi pemakaian non-esensial", output)
+
+    def test_reality_engine_at_21_percent_enters_saving_mode(self):
+        output, _, _ = self.run_example("reality_engine.cuk", "21\\nya\\n")
+        self.assertIn("HEMAT_AIR", output)
+        self.assertIn("Terapkan penghematan", output)
+
+    def test_reality_engine_at_50_percent_stays_in_saving_mode(self):
+        output, _, _ = self.run_example("reality_engine.cuk", "50\\ntidak\\n")
+        self.assertIn("HEMAT_AIR", output)
+        self.assertIn("Terapkan penghematan", output)
+
+    def test_reality_engine_above_50_percent_returns_normal_guidance(self):
+        output, _, _ = self.run_example("reality_engine.cuk", "51\\ntidak\\n")
+        self.assertIn("KONDISI_NORMAL", output)
+        self.assertIn("Pertahankan pemantauan berkala", output)
+
     def test_terminal_bot_handles_interactive_answers(self):
         output, _, _ = self.run_example("terminal_bot.cuk", "Ayu\nbaik\n")
         self.assertIn("Halo, Ayu!", output)
