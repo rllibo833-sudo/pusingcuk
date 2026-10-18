@@ -128,3 +128,21 @@ The contract is not a package manager and does not imply network access. Databas
 
 
 The contract also records platform capability status separately from builtin support. Database, HTTP server/client, browser DOM, Web3/blockchain, and stable FFI are currently `planned` with no target claimed. Offline-first modes such as local database files, loopback services, mock network transport, and local development chains are design targets only until adapter implementations and tests land.
+
+<!-- BEGIN GENERATED CONFORMANCE SUMMARY -->
+## Measured conformance snapshot
+
+This table is generated from the supplied machine-readable fixture summary. It is a snapshot, not a live CI result or a claim of complete language compatibility.
+
+| Target | Passed | Failed | Timeout | Unsupported | Unavailable |
+|---|---:|---:|---:|---:|---:|
+| reference | 77 | 0 | 0 | 0 | 0 |
+| native | 74 | 0 | 0 | 3 | 0 |
+| javascript | 29 | 48 | 0 | 0 | 0 |
+| python_transpiler | 21 | 56 | 0 | 0 | 0 |
+| html | 0 | 0 | 0 | 77 | 0 |
+| vm | 28 | 49 | 0 | 0 | 0 |
+
+- Manifest fixtures: **77**
+- Native C Python-free score: **96.10%** (74/77; unsupported fixtures remain in the denominator)
+<!-- END GENERATED CONFORMANCE SUMMARY -->
