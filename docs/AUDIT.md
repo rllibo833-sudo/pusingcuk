@@ -503,3 +503,171 @@ Jumlah file dari recursive tree: **383**. Kolom tujuan di bawah adalah klasifika
 | `tools/termux_dashboard.sh` | Tooling pengembangan/diagnostik/runner; bukan otomatis bagian runtime. |
 | `tools/web_workbench.py` | Tooling pengembangan/diagnostik/runner; bukan otomatis bagian runtime. |
 | `web/index.html` | UI/playground web; target dan subset harus diverifikasi terpisah. |
+
+
+---
+
+# Addendum — syarat pemilik sebelum merge (2026-10-18)
+
+> **Status: syarat belum terpenuhi sepenuhnya. PR #93 tidak boleh di-merge dulu.** Audit sumber telah diperdalam berdasarkan isi file yang tersedia lewat GitHub. Eksekusi penuh seluruh fixture di sandbox tidak dapat dilakukan karena sandbox tidak dapat menyelesaikan DNS `github.com`; log mentah kegagalan akses dicantumkan di bawah. Saya tidak mengganti hasil yang tidak tersedia dengan angka perkiraan.
+
+## A. Eksekusi nyata per target dan log
+
+### A.1 Hasil yang benar-benar tersedia
+
+| Target | Perintah/eksekusi yang dapat diverifikasi | Lulus | Gagal | Tidak didukung | Status yang jujur |
+|---|---|---:|---:|---:|---|
+| Interpreter referensi | CI main run #1134 menjalankan `python tools/conformance.py` di Python 3.12 | Tidak ada hitungan per fixture di ringkasan job | Tidak ada hitungan per fixture di ringkasan job | Belum ada agregat per target yang disimpan | Job conformance **success** |
+| Native C | CI main run #1134 menjalankan `make test-native` pada GCC dan Clang; conformance harness juga membangun C ketika dijalankan | Tidak ada hitungan per fixture di ringkasan job | Tidak ada hitungan per fixture di ringkasan job | Manifest menyatakan 3 fixture native unsupported | Job GCC/Clang **success**; hasil fixture individual belum diekspor |
+| JavaScript | Tidak ada runner conformance lintas target yang bisa dijalankan dari lingkungan audit ini | Belum diukur | Belum diukur | Belum diukur | **Tidak diukur** |
+| Python transpiler | Tidak ada runner conformance lintas target yang bisa dijalankan dari lingkungan audit ini | Belum diukur | Belum diukur | Belum diukur | **Tidak diukur**; jangan campur dengan reference interpreter |
+| HTML | Tidak ditemukan file `compiler/html_backend.py` dalam tree; backend HTML yang berdiri sendiri belum terbukti ada | 0 terukur | 0 terukur | Tidak dapat ditentukan tanpa pemetaan CLI/target | **Keberadaan target HTML belum terverifikasi** |
+| VM/bytecode | Unit test VM ada, tetapi conformance manifest saat ini hanya mengizinkan `reference` dan `native` | Belum diukur | Belum diukur | Belum dinyatakan di manifest | **Tidak diukur** |
+
+**Penting:** “tidak diukur” tidak sama dengan nol lulus, gagal, atau unsupported. Angka harus dihasilkan dari log runner yang benar-benar dijalankan. Run #1134 membuktikan job CI berhasil pada commit main yang diperiksa, tetapi ringkasan job tidak memberi agregat pass/fail per fixture untuk ditranskripsi secara akurat.
+
+### A.2 Percobaan sandbox audit — log mentah
+
+Perintah yang dijalankan dari sandbox audit:
+
+```console
+$ git clone --depth 1 --branch audit/phase-0-baseline https://github.com/rllibo833-sudo/pusingcuk.git /tmp/pusingcuk-audit
+Cloning into '/tmp/pusingcuk-audit'...
+fatal: unable to access 'https://github.com/rllibo833-sudo/pusingcuk.git/': Could not resolve host: github.com
+```
+
+Exit status: `128`. Akibatnya tidak ada working tree lokal, sehingga perintah berikut **tidak dijalankan** di sandbox ini:
+
+```console
+python tools/conformance.py
+python -m unittest discover -s tests -v
+make test-native
+```
+
+Tidak ada log mentah per-fixture untuk JS, Python transpiler, HTML, atau VM karena tidak ada runner terpadu yang menjalankannya di lingkungan ini. Mengarang log tersebut akan melanggar prinsip evidence-over-claims.
+
+### A.3 Perintah reproduksi yang tersedia bagi CI
+
+Dari root repository, workflow core menggunakan:
+
+```console
+python -m unittest discover -s tests -v
+python tools/conformance.py
+make test-native
+```
+
+Sumber workflow: `.github/workflows/tests.yml`. `tools/conformance.py` saat ini hanya menerima runtime `reference` dan `native`; runner memanggil `pusingcuk_new.py` untuk reference dan executable hasil kompilasi `native/pusingcuk.c` untuk native. Jadi menjalankan perintah yang sama belum menguji JS, Python transpiler, HTML, atau VM.
+
+### A.4 Python-Free Score
+
+**Skor belum dapat dihitung dengan bukti yang tersedia.** Rumus yang disarankan untuk CRE:
+
+`Python-Free Score = (jumlah fixture yang lulus pada runtime yang benar-benar tidak membutuhkan Python saat eksekusi / jumlah fixture yang ditetapkan sebagai kandidat Python-free) × 100%`
+
+- Kandidat runtime awal: native C dan VM yang diimplementasikan dalam runtime non-Python. VM saat ini sendiri ditulis dalam Python, sehingga VM sekarang **tidak** memenuhi definisi Python-free saat runtime.
+- Native C dapat memenuhi syarat runtime tanpa Python jika executable dibangun sebelumnya; proses kompilasi fixture dan harness Python tidak boleh dihitung sebagai bagian runtime program.
+- Laporkan numerator, denominator, daftar fixture yang dihitung, commit SHA, compiler/versi, dan log. Jangan memakai `74/77` sebagai skor: itu adalah deklarasi dukungan manifest, bukan bukti hasil eksekusi.
+- Dengan bukti saat ini skor yang dapat dipublikasikan adalah **N/A (belum terukur)**, bukan 0% dan bukan 96,1%.
+
+## B. Pembacaan mendalam modul inti
+
+Penilaian berikut berdasarkan pembacaan isi file dari GitHub pada branch audit, bukan eksekusi dinamis. “Tidak ditemukan” berarti tidak terlihat pada area yang diperiksa, bukan bukti formal seluruh repository.
+
+### B.1 Lexer — `lexer.py`
+
+**Status:** modul inti aktif, reference lexer.
+
+- Memiliki kelas `Lexer`, `Token`, `LexerError`, pemindai angka/identifier/string, operator dan alias keyword. Token menyimpan baris dan kolom.
+- Alias bahasa disatukan ke `KEYWORD_ALIASES`, tetapi daftar keyword dan alias tetap dua sumber data yang harus diuji terhadap SPEC/kosakata. Perubahan alias dapat memengaruhi program lama.
+- Risiko: posisi diagnostik, escape string, eksponen, operator multi-karakter, Unicode identifier, dan alias keyword perlu fixture positif/negatif. Klaim coverage harus berasal dari fixture.
+- Duplikasi: tidak ada bukti cukup untuk menyatakan lexer mati/duplikat; ia adalah dependency parser utama.
+- Status kode mati: belum dibuktikan melalui analisis coverage/dead-code; jangan tandai kode sebagai mati berdasarkan nama saja.
+
+### B.2 Parser — `parser.py`
+
+**Status:** modul inti aktif, parser recursive-descent/precedence.
+
+- Memakai `lex` dari lexer dan pembuat node AST dari `ast_nodes`; menangani statement, ekspresi, pemanggilan fungsi, serta format/saran diagnostik.
+- Parser dan lexer masih di root, bukan package `src/pusingcuk/`; import absolut antarmodul membuat restrukturisasi berisiko bila dilakukan tanpa uji backward compatibility.
+- Risiko: grammar, prioritas operator, diagnostik line/column, blok bersarang, serta error pemulihan harus terikat ke SPEC dan fixture. Pesan diagnostik tidak boleh dijadikan kontrak semantik kecuali kontrak menyatakannya.
+- Duplikasi: fungsi diagnostic helper berada di parser; sebelum dipindah ke modul bersama, cek consumer dan output fixture. Tidak ada bukti cukup untuk menyebut parser dead code.
+
+### B.3 Evaluator — `evaluator.py`
+
+**Status:** reference runtime aktif; modul besar (~43 KB) dengan banyak tanggung jawab.
+
+- Menjalankan AST, memelihara semantik nilai/dictionary, modul, file I/O, HTTP, dan pemanggilan command yang opt-in. Batas resource yang terlihat termasuk ukuran HTTP request/response, ukuran file modul dan kedalaman modul; beberapa operasi memakai timeout.
+- Duplikasi nyata: `Path` diimpor dua kali (`from pathlib import Path`, kemudian `from pathlib import Path, PureWindowsPath`). Ini redundan dan layak dibersihkan pada fase yang tepat tanpa mengubah perilaku.
+- Risiko keamanan: evaluator mengandung akses filesystem, jaringan, dan subprocess. Eksekusi command dibatasi oleh environment flag `PUSINGCUK_ENABLE_EXECUTION=1`, memakai `shell=False` dan timeout 30 detik; hal ini **bukan** sandbox OS dan bukan capability sandbox menyeluruh. Pengamanan URL dan path adalah defense-in-depth yang perlu pengujian adversarial, bukan jaminan isolasi.
+- Risiko maintainability: modul monolitik membuat review regresi lebih sulit; pemecahan hanya boleh dilakukan setelah contract/fixture menutupi perilaku.
+- Status kode mati: belum ada bukti coverage/dead-code report yang dapat mengonfirmasi fungsi mana tidak dipakai. Tidak menandai fungsi sebagai dead tanpa bukti call graph dan coverage.
+
+### B.4 `compiler/`
+
+**Status:** kumpulan backend/alat campuran; tidak satu target seragam.
+
+- File yang terdaftar: `__init__.py`, `__main__.py`, `android_backend.py`, `bytecode.py`, `c_backend.py`, `import_python.py`, `ir.py`, `js_backend.py`, `python_backend.py`, `typesystem.py`, `vm.py`.
+- `ir.py` menyatakan IR v1 deterministik dan AST-preserving; memiliki validasi ukuran/depth/node/collection. Headernya sendiri menegaskan IR bukan bytecode executable.
+- `bytecode.py` memiliki daftar opcode, compiler dari IR, dan validator bytecode. `vm.py` memvalidasi bytecode dan menerapkan step limit serta depth limit, tetapi mengimpor `PusingDict` dan `language_equal` dari evaluator. Jadi VM belum terisolasi dari modul reference Python.
+- `js_backend.py` dan `python_backend.py` ada, tetapi keberadaan file bukan bukti parity runtime. Manifest/harness utama belum menjalankan fixture terhadap keduanya.
+- File `compiler/html_backend.py` **tidak ada** pada tree yang diperiksa. Jangan mengiklankan backend HTML mandiri sampai jalur target dan tes aktual ditemukan.
+- `c_backend.py` ada sebagai backend terpisah dari `native/pusingcuk.c`; perlu dipetakan apakah keduanya memiliki peran berbeda (transpiler C vs interpreter native) agar istilah “target C” tidak ambigu.
+- Risiko: format IR/bytecode belum boleh disebut ABI stabil hanya karena memiliki versi angka; perlu spesifikasi, kompatibilitas dan fixture lintas versi.
+- Duplikasi: ada beberapa lapisan eksekusi/terjemahan (reference evaluator, C native interpreter, C backend, JS, Python transpiler, VM). Itu adalah beberapa implementasi semantik yang berpotensi divergen; belum cukup bukti untuk menyebut salah satunya kode mati.
+- Rekomendasi: CRE perlu mengklasifikasikan target per runner yang nyata, dan menampilkan `unsupported` hanya jika ada deklarasi eksplisit; kegagalan build harus `unavailable` atau `fail`, bukan unsupported.
+
+### B.5 `native/`
+
+**Status:** runtime C native aktif untuk subset yang diuji.
+
+- `native/pusingcuk.c` adalah implementasi mandiri dengan batas statis/eksplisit: jumlah variabel, item list/dict, fungsi/parameter, jumlah baris dan jumlah langkah. Header mengakui file I/O belum tersedia pada C runtime.
+- `native/Makefile` mengaktifkan `-Wall -Wextra -Werror`, yang baik untuk menemukan warning pada kompilasi.
+- Risiko parity: batas kapasitas dan semantik bisa berbeda dari evaluator Python; perbedaan harus berupa fixture/parity issue, bukan klaim ekuivalensi.
+- Risiko maintainability: satu file C besar dengan parser/evaluator dan banyak state global meningkatkan biaya review; jangan refactor tanpa fixture yang mengunci perilaku.
+- Status kode mati: TODO file I/O adalah keterbatasan yang dinyatakan, bukan kode mati. Belum ada laporan dead-code yang dapat diverifikasi.
+
+### B.6 `library/assistant.py`
+
+**Status:** CLI asisten AI yang menggunakan provider eksternal/lokal; bukan model dasar yang dilatih sendiri.
+
+- Mengimpor Gemini provider dan provider Ollama lokal, retrieval knowledge grounding, tool registry, serta local memory. Default CLI memilih Ollama, sedangkan Gemini dapat dipilih melalui argumen/environment.
+- Batas tool terlihat: maksimal 5 putaran dan 8 pemanggilan tool per permintaan. Batas ini mengurangi loop tak berujung, tetapi tidak menggantikan validasi izin masing-masing tool.
+- Risiko reliabilitas: `ask()` menangkap `Exception` secara luas. Periksa apakah error dilaporkan secara cukup diagnostik dan apakah kegagalan provider/tool tidak tersamarkan sebagai jawaban sukses. Perubahan penanganan error harus ditopang tes.
+- Risiko privasi: CLI mempunyai `LocalMemoryStore` yang mendukung penyimpanan catatan lokal. Dokumentasi UX perlu menjelaskan bahwa catatan tersimpan berbeda dari konteks percakapan in-process; jangan menyebut seluruh data tidak pernah persisten.
+- Risiko klaim: adanya provider Gemini/Ollama dan retrieval tidak membuktikan model PusingCuk dilatih/fine-tuned sendiri. Klaim publik harus menyebut lapisan aplikasi/provider secara eksplisit.
+- Duplikasi/dead code: tidak dapat diputuskan dari file tunggal; perlu call graph dan test coverage. Tidak ditemukan bukti cukup untuk menandai modul ini mati.
+
+### B.7 Ringkasan risiko dan prioritas
+
+| Prioritas | Temuan | Rekomendasi |
+|---|---|---|
+| Tinggi | Belum ada eksekusi fixture satu matriks untuk seluruh target | Phase 3: jalankan per target, simpan log dan JSON hasil per fixture |
+| Tinggi | VM Python mengimpor helper evaluator Python | Jangan klaim VM Python-free; hilangkan coupling hanya dengan fixture parity |
+| Tinggi | Evaluator memiliki filesystem/network/subprocess | Tetapkan scope izin; jangan menyebutnya OS sandbox |
+| Tinggi | Klaim HTML target belum ditopang backend/runner yang ditemukan | Temukan implementasi aktual atau labeli roadmap |
+| Sedang | Reference evaluator dan native C terpisah, backend C tambahan | Definisikan istilah target dan jalur build/run |
+| Sedang | Import `Path` ganda dan evaluator besar | Bersihkan/refactor hanya setelah baseline tes tersedia |
+| Sedang | AI provider/tool/memory memiliki beberapa jalur | Tambahkan tes error, privasi, batas tool dan dokumentasi provider |
+| Belum dapat ditentukan | Kode mati secara formal | Perlu coverage, call graph, dan analisis dinamis; tidak menebak dari nama |
+
+## C. Filter path CI tidak mencakup docs-only PR
+
+Workflow `.github/workflows/tests.yml` memiliki `pull_request.paths` dan `push.paths` yang mencakup file kode, tes, examples, README, CHANGELOG dan konfigurasi tertentu, tetapi **tidak mencakup `docs/**`**. Akibatnya, perubahan dokumentasi saja seperti PR #93 tidak memicu workflow core. Ini adalah gap tata kelola: dokumen bukti dapat berubah tanpa pemeriksaan otomatis yang diharapkan, dan PR berisiko tertahan tanpa status check yang memberi umpan balik.
+
+### Solusi yang direkomendasikan untuk Phase 1
+
+1. Tambahkan `docs/**` ke filter `pull_request.paths` dan `push.paths` workflow core; minimal jalankan unit tests + conformance untuk docs-only PR, atau pisahkan workflow `docs-validation.yml` yang memeriksa tautan/format dan memvalidasi output yang digenerate.
+2. Pastikan CI wajib yang tepat selalu berjalan pada PR; hati-hati bahwa GitHub dapat meninggalkan required check dalam status “Expected” bila filter path melewati workflow. Jika path filtering tetap digunakan, buat check aggregator yang selalu berjalan dan melaporkan status dengan benar.
+3. Tambahkan validasi dokumen berbasis sumber: periksa tautan file/anchor, contoh runnable yang memang didaftarkan sebagai fixture, dan stale generated artifacts. Jangan jalankan semua compiler untuk setiap perubahan typo jika waktu CI menjadi berlebihan; gunakan job docs terpisah plus core CI untuk perubahan kode/fixture.
+4. Terapkan ruleset/branch protection di pengaturan GitHub secara manual oleh owner; perubahan workflow tidak mengaktifkan proteksi branch secara otomatis.
+5. Verifikasi dengan PR docs-only, PR code-only, dan PR campuran bahwa check yang dimaksud benar-benar muncul dan berhasil.
+
+## D. Keputusan atas syarat merge
+
+- [x] Tambahkan temuan filter path CI dan rekomendasi Phase 1.
+- [x] Pembacaan mendalam awal terhadap lexer, parser, evaluator, compiler/, native/, dan library/assistant.py; batas bukti dan risiko dicatat.
+- [ ] Eksekusi nyata seluruh fixture per target dan log mentah setiap target — **belum terpenuhi**, karena sandbox gagal mengakses GitHub dan runner conformance saat ini hanya mendukung reference/native.
+- [ ] Python-Free Score berbasis hasil eksekusi aktual — **belum dapat dihitung**.
+- [ ] CI untuk PR #93 — belum berjalan; baseline run #1134 pada main bukan pengganti CI PR.
+
+**Karena dua syarat eksekusi dan skor belum terpenuhi, rekomendasi audit adalah TIDAK merge PR #93 saat ini.** Langkah yang benar adalah menjalankan job conformance pada GitHub Actions yang dapat mengakses checkout repository, menambahkan hasil fixture per target yang benar-benar memiliki runner, lalu memperluas runner untuk target yang belum didukung sebagai bagian dari fase CRE yang disetujui. Tidak ada merge atau branch Phase 1 yang dibuat sebelum syarat ini terselesaikan.
