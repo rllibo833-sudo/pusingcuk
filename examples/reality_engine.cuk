@@ -62,4 +62,9 @@ tampilkan_skenario("MENURUN", 40, "ya", "HEMAT_AIR")
 tampilkan_skenario("NORMAL", 80, "tidak", "KONDISI_NORMAL")
 tampilkan_skenario("SIMULASI KONFLIK", 12, "ya", "KONDISI_NORMAL")
 
+tampilkan_skenario("BATAS 20 - KRITIS", 20, "ya", "PRIORITASKAN_KEBUTUHAN_DASAR")
+tampilkan_skenario("BATAS 21 - HEMAT", 21, "ya", "HEMAT_AIR")
+tampilkan_skenario("BATAS 50 - HEMAT", 50, "tidak", "HEMAT_AIR")
+tampilkan_skenario("BATAS 51 - NORMAL", 51, "tidak", "KONDISI_NORMAL")
+
 selesai jancuk
