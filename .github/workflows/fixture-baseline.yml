@@ -1,5 +1,10 @@
 name: PusingCuk fixture baseline matrix
 on:
+  pull_request:
+    paths:
+      - "tools/ci_fixture_matrix.py"
+      - "tools/differential_runner.py"
+      - ".github/workflows/fixture-baseline.yml"
   workflow_dispatch:
   push:
     branches:
@@ -30,6 +35,9 @@ jobs:
         env:
           PUSINGCUK_MATRIX_OUT: artifacts/fixture-matrix
         run: python tools/ci_fixture_matrix.py
+      - name: Generate differential parity report
+        if: always()
+        run: python tools/differential_runner.py artifacts/fixture-matrix/results.json --output artifacts/fixture-matrix/differential.json
       - name: Check fixture pass-count regression
         id: regression
         if: always()
