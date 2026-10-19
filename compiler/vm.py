@@ -8,6 +8,7 @@ from pathlib import Path
 from compiler.bytecode import BytecodeError, validate_bytecode
 from evaluator import PusingDict, language_equal
 from library.builtin_contract import BUILTIN_BY_NAME
+from compiler.sandbox import CapabilityPolicy, ResourceBudget, ResourceLimitExceeded
 
 
 class VMError(RuntimeError):
@@ -15,21 +16,31 @@ class VMError(RuntimeError):
 
 
 class VirtualMachine:
-    def __init__(self, document, *, input_stream=None, output_stream=None, max_steps=100000):
+    def __init__(self, document, *, input_stream=None, output_stream=None, max_steps=100000,\n                 max_memory_bytes=16 * 1024 * 1024, time_limit_seconds=2.0,\n                 permissions=(), cwd=None):
         self.document = validate_bytecode(document)
         self.functions = document["functions"]
         self.input = input_stream or sys.stdin
         self.output = output_stream or sys.stdout
         self.max_steps = max_steps
         self.steps = 0
+        self.capabilities = CapabilityPolicy(permissions, cwd=cwd)
+        self.budget = ResourceBudget(\n            fuel=max_steps, memory_bytes=max_memory_bytes, time_seconds=time_limit_seconds\n        )
 
     def fail(self, line, message):
         raise VMError(f"Baris {line}: {message}")
 
-    def tick(self, line):
+    def require_capability(self, capability, target=None):
+        """Check a host capability before any future VM host operation."""
+        return self.capabilities.require(capability, target)
+
+    def tick(self, line, *live_values):
         self.steps += 1
         if self.steps > self.max_steps:
-            self.fail(line, "batas total instruksi tercapai")
+            self.fail(line, "batas total instruksi tercapai (fuel)")
+        try:
+            self.budget.tick(*live_values)
+        except ResourceLimitExceeded as exc:
+            self.fail(line, str(exc))
 
     @staticmethod
     def pop(stack, line):
@@ -44,7 +55,7 @@ class VirtualMachine:
         stack, iterators, pc = [], {}, 0
         while pc < len(code):
             op, arg, line = code[pc]
-            self.tick(line)
+            self.tick(line, env, stack, iterators)
             pc += 1
             if op == "CONST":
                 stack.append(arg)
@@ -227,12 +238,16 @@ class VirtualMachine:
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Jalankan bytecode PusingCuk portabel.")
+    parser.add_argument("--izin", action="append", default=[], metavar="KAPABILITAS:TARGET",\n                        help="beri izin eksplisit; dapat diulang, mis. --izin=baca:./data")
+    parser.add_argument("--fuel", type=int, default=100000, help="batas instruksi VM (default: 100000)")
+    parser.add_argument("--memori-byte", type=int, default=16 * 1024 * 1024, help="anggaran estimasi objek VM dalam byte")
+    parser.add_argument("--waktu-detik", type=float, default=2.0, help="batas waktu yang diperiksa pada setiap instruksi")
     parser.add_argument("file", help="file bytecode JSON yang dihasilkan target vm")
     args = parser.parse_args(argv)
     try:
         with Path(args.file).open(encoding="utf-8") as stream:
             document = json.load(stream)
-        VirtualMachine(document).run()
+        VirtualMachine(document, max_steps=args.fuel, max_memory_bytes=args.memori_byte,\n                       time_limit_seconds=args.waktu_detik, permissions=args.izin).run()
     except (OSError, json.JSONDecodeError, BytecodeError, VMError, TypeError, ValueError) as exc:
         print(f"VM PusingCuk: {exc}", file=sys.stderr)
         return 1
