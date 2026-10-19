@@ -19,8 +19,25 @@ def main() -> int:
     entries = [{"title": source.stem.replace("_", " ").replace("-", " ").title(), "file": source.name, "url": "examples/playground/" + source.name} for source in sorted(examples_dir.glob("*.pusingcuk"))]
     if not 5 <= len(entries) <= 10:
         raise SystemExit(f"Galeri harus berisi 5-10 contoh .pusingcuk; ditemukan {len(entries)}")
-    (RUNTIME / "playground-examples.json").write_text(json.dumps(entries, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Bundled {len(RUNTIME_FILES)} interpreter runtime files and {len(entries)} examples.")
+    manifest = RUNTIME / "playground-examples.json"
+    manifest.write_text(json.dumps(entries, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    # builtin_contract.py reads this adjacent JSON file at import time. Missing
+    # it makes every browser example fail before user code can execute.
+    contract = RUNTIME / "library" / "builtin_contract.json"
+    if not contract.is_file():
+        raise SystemExit("Missing bundled library/builtin_contract.json")
+    try:
+        contract_data = json.loads(contract.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"Invalid bundled builtin contract: {exc}") from exc
+    if contract_data.get("schema_version") != 1 or not contract_data.get("builtins"):
+        raise SystemExit("Bundled builtin contract failed its schema smoke check")
+    for entry in entries:
+        if not (SITE / entry["url"]).is_file():
+            raise SystemExit(f"Missing gallery source: {entry['url']}")
+        if not (SITE / "examples" / "playground" / Path(entry["file"]).with_suffix(".expected.txt").name).is_file():
+            raise SystemExit(f"Missing expected output for {entry['file']}")
+    print(f"Bundled {len(RUNTIME_FILES)} interpreter runtime files and {len(entries)} examples; builtin contract verified.")
     return 0
 if __name__ == "__main__":
     raise SystemExit(main())
