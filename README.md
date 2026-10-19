@@ -9,7 +9,7 @@ PusingCuk combines approachable Indonesian syntax with a reference interpreter, 
 
 <!-- BEGIN GENERATED PYTHON-FREE SCORE BADGE -->
 [![Python-free runtime · native C · 74/77 fixtures](docs/assets/python-free-score.svg)](docs/PYTHON_FREE_SCORE.md)
-Python-free native runtime: **74 of 77 active fixtures pass**. This describes the tested native C runtime fixture set, not a claim that the entire project or build process is Python-free.
+Python-free runtime, native C: **74 dari 77 fixture aktif lulus**. Ini cakupan fixture runtime native C, bukan klaim bahwa seluruh proyek atau proses build bebas Python.
 <!-- END GENERATED PYTHON-FREE SCORE BADGE -->
 
 **Status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. Development software, not a stable release. Backend support differs; check the compatibility matrix and fixtures.
