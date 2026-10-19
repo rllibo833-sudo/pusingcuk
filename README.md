@@ -8,8 +8,8 @@ PusingCuk menggabungkan sintaks yang mudah dikenali penutur Indonesia dengan jal
 **[Coba di browser →](https://rllibo833-sudo.github.io/pusingcuk/playground.html)** — playground eksperimental tahap awal; mesin sementaranya Python melalui Pyodide, bukan runtime .cuk asli.
 
 <!-- BEGIN GENERATED PYTHON-FREE SCORE BADGE -->
-[![Python-free runtime · native C · 74/77 fixtures](docs/assets/python-free-score.svg)](docs/PYTHON_FREE_SCORE.md)
-Python-free runtime, native C: **74 dari 77 fixture aktif lulus**. Ini cakupan fixture runtime native C, bukan klaim bahwa seluruh proyek atau proses build bebas Python.
+[![Python-free runtime · native C · 74/77 fixtures](docs/assets/python-free-score.svg)](docs/COMPATIBILITY.md)
+Python-free runtime, native C: **74 dari 77 fixture (96.10%)**. Skor ini hanya mengukur fixture native C yang lulus; bukan klaim seluruh toolchain bebas Python.
 <!-- END GENERATED PYTHON-FREE SCORE BADGE -->
 
 Proyek ini ditujukan untuk belajar, eksperimen bahasa, dan pengembangan compiler secara terbuka—bukan untuk mengklaim bahwa semua target sudah setara atau siap produksi.
