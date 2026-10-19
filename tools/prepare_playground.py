@@ -7,10 +7,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
 RUNTIME = SITE / "runtime"
-MODULES = ("pusingcuk_new.py", "evaluator.py", "parser.py", "lexer.py", "ast_nodes.py", "library/stdlib.py", "library/builtin_contract.py")
+RUNTIME_FILES = ("pusingcuk_new.py", "evaluator.py", "parser.py", "lexer.py", "ast_nodes.py", "library/stdlib.py", "library/builtin_contract.py", "library/builtin_contract.json")
 def main() -> int:
     RUNTIME.mkdir(parents=True, exist_ok=True)
-    for relative in MODULES:
+    for relative in RUNTIME_FILES:
         source, destination = ROOT / relative, RUNTIME / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, destination)
@@ -20,7 +20,7 @@ def main() -> int:
     if not 5 <= len(entries) <= 10:
         raise SystemExit(f"Galeri harus berisi 5-10 contoh .pusingcuk; ditemukan {len(entries)}")
     (RUNTIME / "playground-examples.json").write_text(json.dumps(entries, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Bundled {len(MODULES)} interpreter modules and {len(entries)} examples.")
+    print(f"Bundled {len(RUNTIME_FILES)} interpreter runtime files and {len(entries)} examples.")
     return 0
 if __name__ == "__main__":
     raise SystemExit(main())
