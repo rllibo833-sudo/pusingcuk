@@ -1,177 +1,87 @@
-# Pusingcuk dari Nol
+# PusingCuk from Zero — Beginner Guide
 
-Yuk mulai dari program kecil, lalu naik pelan-pelan ke fungsi dan proyek mini. Panduan ini memakai ekstensi kanonis `.cuk` untuk program baru dan mengutamakan executable native supaya kamu bisa menjalankan program tanpa Python setelah Pusingcuk dibangun. Berkas `.pusingcuk` lama tetap didukung. Runtime native masih berkembang dan hanya mendukung fitur yang tercantum di [matriks kemampuan](NATIVE_RUNTIME.md).
+Start with a small program, then move gradually to functions and a mini project. New programs should use the canonical `.cuk` extension; legacy `.pusingcuk` files remain supported. The native runtime is still under development and supports only the features listed in [Native Runtime](NATIVE_RUNTIME.md).
 
-Gaya dokumentasi mengikuti [Panduan Gaya Bahasa](GAYA_BAHASA.md): santai, jelas, dan tidak mengorbankan ketepatan teknis.
+The documentation style aims to be friendly and conversational without sacrificing technical accuracy.
 
-## 1. Siapkan alat di Android / Termux
+## 1. Prepare the tools on Android / Termux
 
-Versi bahasa saat ini `0.6-dev`, sedangkan versi paket pengembangan `0.8.0.dev0`. Kontrak memiliki 25 built-in; 17 di antaranya didukung runtime native C.
+The current language contract is `0.6-dev`; the Python development package is `0.8.0.dev0`. The exact built-in count and native support must be read from the [built-in contract](../library/builtin_contract.json) and [compatibility evidence](COMPATIBILITY.md), rather than copied into this tutorial as a second source of truth.
 
-Gunakan Termux dari sumber yang terpelihara. Jalankan perintah berikut di shell Termux:
+Install the tools in Termux:
 
 ```sh
 pkg update
 pkg install git clang make
 ```
 
-Unduh kode sumber:
+Clone the repository:
 
 ```sh
 git clone https://github.com/rllibo833-sudo/pusingcuk.git
 cd pusingcuk
 ```
 
-Bangun dan pasang executable native:
+Build and install the native executable:
 
 ```sh
 bash scripts/install-termux.sh
 ```
 
-Selesai build, executable dipasang sebagai `pusingcuk-native`. Compiler dibutuhkan saat membangun ulang, bukan setiap kali menjalankan program.
+After a successful build, the executable is installed as `pusingcuk-native`. The compiler is needed to rebuild the executable, not for each run of a successfully built native program.
 
-## 2. Jalankan contoh pertama
+## 2. Run a first example
 
 ```sh
 pusingcuk-native examples/native/rekap_anggaran.pusingcuk
 ```
 
-Program contoh menghitung anggaran menggunakan kamus, perulangan, kondisi, dan fungsi. Beberapa hasil yang diharapkan adalah total pengeluaran `2535000`, saldo bulan ini `965000`, persentase pendapatan terpakai `72`, dan status target tabungan tercapai.
+The example calculates a budget using dictionaries, loops, conditions, and functions. Expected output values are part of the checked-in example and its tests; consult those sources when changing the example.
 
-Kalau ingin memastikan build dan fixture native lulus, jalankan:
+To build and run the native test suite:
 
 ```sh
 make test-native
 ```
 
-## 3. Buat program halo
+## 3. Create a hello-world program
 
-Buat file baru:
+Create a new file named `halo.cuk` and add:
 
-```sh
-nano halo.cuk
-```
-
-Isi dengan kode ini:
-
-```pusingcuk
+```cuk
 jancuk
-lah nama = "Pusingcuk"
+lah nama = "PusingCuk"
 hedeh "Halo, " + nama
 selesai jancuk
 ```
 
-Simpan di nano dengan **Ctrl+O**, tekan **Enter**, lalu keluar dengan **Ctrl+X**. Jalankan:
+Run it with the reference interpreter:
 
 ```sh
-pusingcuk-native halo.cuk
+python pusingcuk_new.py halo.cuk
 ```
 
-Hasilnya:
-
-```text
-Halo, Pusingcuk
-```
-
-**Bedah singkat:**
-- `jancuk` menandai awal program.
-- `lah nama = ...` membuat variabel bernama `nama`.
-- `hedeh` menampilkan nilai.
-- `selesai jancuk` menandai akhir program.
-
-## 4. Buat fungsi pertamamu
-
-Fungsi adalah blok kode yang bisa dipanggil kembali. Contoh berikut menjumlahkan dua angka:
-
-```pusingcuk
-jancuk
-fungsi tambah(a, b)
-    balek a + b
-selesai fungsi
-
-hedeh tambah(20, 22)
-selesai jancuk
-```
-
-Simpan sebagai `fungsi.cuk`, lalu jalankan:
+Check syntax without treating that result as proof of runtime correctness:
 
 ```sh
-pusingcuk-native fungsi.cuk
+python pusingcuk_new.py --check halo.cuk
 ```
 
-Hasil yang diharapkan adalah `42`.
+The reference interpreter requires Python. The native executable has a different feature subset, so a program that works on one target must still be checked against the target's documented support.
 
-**Mini-challenge:** ganti `20` dan `22` dengan dua angka lain. Sebelum menjalankan program, coba tebak hasilnya.
+## 4. Learn in this order
 
-## 5. Minta input dan pilih respons
+1. Variables and basic values.
+2. Output and input.
+3. Arithmetic and comparisons.
+4. Conditions and loops.
+5. Lists and dictionaries.
+6. Functions and return values.
+7. Built-ins and error handling.
+8. Conformance fixtures and runtime differences.
 
-```pusingcuk
-jancuk
-tanya nama = "Siapa nama kamu? "
-njir nama == ""
-    hedeh "Nama belum diisi"
-kampret
-    hedeh "Halo, " + nama
-selesai njir
-selesai jancuk
-```
+Use the [language specification](../SPEC.md) for exact syntax, the [semantic contract](SEMANTIC_CONTRACT.md) for required behavior, and the [compatibility snapshot](COMPATIBILITY.md) for measured target support.
 
-Program membaca satu baris teks. Jika input kosong, program menampilkan pesan bahwa nama belum diisi. Jika tidak kosong, program menyapa nama tersebut.
+## Safety note
 
-**Mini-challenge:** ubah kalimat sapaan. Jalankan lagi dan lihat apakah output berubah sesuai editmu.
-
-## 5.1 Kalkulator sederhana
-
-Repositori juga menyediakan kalkulator interaktif yang meminta dua angka dan operasi `+`, `-`, `*`, atau `/`:
-
-```sh
-python pusingcuk_new.py examples/kalkulator.cuk
-```
-
-Kalkulator ini memakai keyword resmi `njir`, `kampret`, dan `selesai njir`, bukan keyword `jika`. Ia juga menunjukkan penanganan input nonnumerik dan pembagian dengan nol. Contoh tersebut memakai built-in konversi yang belum tersedia di runtime native C, jadi jalankan dengan interpreter Python. Perbedaan ini disengaja dan dijelaskan dalam [matriks kompatibilitas](COMPATIBILITY.md).
-
-## 6. Coba perulangan
-
-```pusingcuk
-jancuk
-lah i = 1
-mumet i <= 3
-    hedeh i
-    i = i + 1
-selesai mumet
-selesai jancuk
-```
-
-Program menampilkan angka 1, 2, dan 3. Variabel `i` bertambah satu pada setiap putaran. Kondisi `i <= 3` membuat perulangan berhenti setelah angka 3.
-
-## 7. Kalau program gagal jalan
-
-- Baca pesan `Kesalahan baris ...`; nomor baris membantu menemukan masalah.
-- Pastikan file sudah disimpan dan path-nya benar.
-- Periksa apakah fitur yang digunakan termasuk fitur native teruji di [matriks runtime](NATIVE_RUNTIME.md).
-- Jika diminta memasukkan teks, ketik input di terminal lalu tekan Enter.
-- Saat meminta bantuan, kirim pesan error dan contoh kode terkecil yang masih memunculkan masalah. Hapus token, kata sandi, dan data pribadi dari log.
-
-Runtime native bukan sandbox. Jangan menjalankan program yang tidak dipercaya dengan hak akses penting.
-
-## 8. Perbarui Pusingcuk
-
-Di shell Termux, dari direktori repositori:
-
-```sh
-cd ~/pusingcuk
-git pull --ff-only
-bash scripts/install-termux.sh
-```
-
-Jika kamu mengubah kode sumber sendiri, simpan atau commit perubahanmu sebelum menarik pembaruan. Opsi `--ff-only` mencegah Git membuat merge commit otomatis saat riwayat lokal dan remote berbeda.
-
-## 9. Apakah Python diperlukan?
-
-- **Menjalankan executable native:** tidak membutuhkan Python.
-- **Membangun executable:** membutuhkan `clang` dan `make`.
-- **Menjalankan interpreter modular dan unit test Python:** membutuhkan Python.
-- **Menjalankan Pusingcuk Studio saat ini:** bridge web lokal membutuhkan Python; program yang dieksekusi tetap melalui runtime native C.
-- **Sistem modul, pustaka standar lengkap, dan tooling tingkat lanjut:** belum tersedia sepenuhnya di runtime native.
-
-Langkah berikutnya setelah nyaman dengan contoh dasar adalah mempelajari [kosakata slang](KOSAKATA_GENZ.md), [kemampuan runtime native](NATIVE_RUNTIME.md), dan [kontrak kompatibilitas](COMPATIBILITY.md). Jangan menganggap fitur dari Python atau JavaScript otomatis tersedia di Pusingcuk.
+The interpreter, compiler, and VM are not operating-system sandboxes. Run only code you trust in a sensitive environment. A VM budget is not a hard OS-level security boundary.

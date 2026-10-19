@@ -1,19 +1,17 @@
-# PusingCuk — Ikhtisar Proyek
+# PusingCuk — Project Overview
 
-> **Bahasa warung. Mesin serius.**
+> **Warung-language feel. Serious machinery.**
 
-**Tanggal snapshot dokumentasi:** 18 Oktober 2026  
-**Kontrak bahasa:** `0.6-dev`  
-**Versi paket Python:** `0.8.0.dev0`  
-**Kematangan:** eksperimental / alpha — bukan rilis stabil.
+**Documentation snapshot:** 19 October 2026  
+**Language contract:** `0.6-dev`  
+**Python package:** `0.8.0.dev0`  
+**Maturity:** experimental / alpha; not a stable release.
 
-Dokumen ini merangkum fungsi repositori untuk pembaca, kontributor, dan calon pengguna. Status implementasi dapat berubah; gunakan matriks kompatibilitas dan fixture dari commit yang sedang dipakai untuk keputusan teknis.
+This page summarizes the repository for readers, contributors, and potential users. For current claims, check the compatibility snapshot and CI evidence for the exact commit in use.
 
-## Apa itu PusingCuk?
+## What is PusingCuk?
 
-PusingCuk adalah eksperimen bahasa pemrograman dengan ekstensi utama `.cuk`, kata kunci Indonesia, dan identitas kosakata yang terinspirasi bahasa percakapan. Tujuannya adalah membuat proses belajar sintaks terasa akrab sekaligus menjadi laboratorium terbuka untuk interpreter, compiler, runtime, dan alat pengembangan.
-
-Contoh:
+PusingCuk is an experimental programming language with the canonical `.cuk` extension, Indonesian-inspired keywords, and a vocabulary rooted in conversational language. The project explores an approachable learning experience while building real interpreter, compiler, runtime, and developer-tool infrastructure.
 
 ```cuk
 jancuk
@@ -25,69 +23,36 @@ hedeh sapa(nama)
 selesai jancuk
 ```
 
-## Peta fungsi repositori
+## Repository map
 
-| Komponen | Kegunaan | Batas penting |
+| Component | Purpose | Important limit |
 |---|---|---|
-| `lexer.py`, `parser.py`, `ast_nodes.py` | Mengubah teks sumber menjadi token dan struktur program | Harus tetap sesuai SPEC dan fixture |
-| `evaluator.py`, `pusingcuk_new.py` | Jalur interpreter Python referensi | Membutuhkan Python untuk jalur referensi |
-| `compiler/` | IR dan backend eksperimental | Tiap target mendukung subset berbeda |
-| `native/` | Runtime C untuk subset yang diuji | Belum setara penuh dengan interpreter referensi |
-| `library/` | Kontrak built-in, kosakata mesin, fungsi dan adapter | Registry tidak berarti semua target sudah mendukung semuanya |
-| `tests/`, `tools/conformance.py` | Tes unit dan bukti konformansi | Hasil hanya berlaku untuk tes dan commit yang berjalan |
-| `examples/` | Contoh untuk belajar dan uji coba | Contoh bukan jaminan kesiapan produksi |
-| `library/assistant.py` dan modul terkait | Alat PusingCuk AI untuk membantu alur .cuk | Tidak membuktikan model fondasi dilatih sendiri atau semua output benar |
-| `web/`, `site/`, `android-studio/` | UI, situs, dan prototipe distribusi yang ada di repo | Keberadaan kode tidak sama dengan layanan/aplikasi produksi |
-| `.github/workflows/` | Otomasi tes, build, dan packaging | Workflow dapat berbeda pemicu dan cakupan; cek hasil terbaru |
+| `lexer.py`, `parser.py`, `ast_nodes.py` | Tokenization, parsing, and syntax-tree construction | Must remain aligned with the language specification and fixtures |
+| `evaluator.py`, `pusingcuk_new.py` | Python reference interpreter | The reference execution path requires Python |
+| `compiler/` | IR, bytecode, and experimental compiler backends | Each target supports a different subset |
+| `native/` | Native C runtime and C bytecode VM | They are separate execution paths and must be measured separately |
+| `library/` | Built-in contracts, vocabulary metadata, assistant, provider adapters, and tools | Registry entries do not prove support in every runtime |
+| `tests/`, `tools/conformance.py` | Unit tests and reproducible behavior checks | Results apply only to the targets and commit actually tested |
+| `examples/` | Learning examples and compatibility programs | An example is not proof of full target compatibility |
 
-## Contoh penggunaan yang masuk akal
+## Current measured baseline
 
-- Belajar struktur program, variabel, kondisi, loop, fungsi, koleksi, dan built-in yang tercantum.
-- Menguji desain bahasa melalui spesifikasi dan fixture.
-- Menghasilkan artefak target eksperimental untuk subset yang didukung.
-- Menjalankan subset program melalui runtime C setelah build yang sesuai.
-- Menggunakan contoh dan alat AI yang tersedia untuk mempercepat eksperimen .cuk, dengan validasi compiler/runtime sebagai sumber bukti.
+The checked-in compatibility snapshot reports 77 fixtures: 77 pass on the reference interpreter, while native C passes 74 and explicitly marks 3 unsupported. The reported 96.10% score applies only to the native C source runtime against that fixture set.
 
-## Cara membaca klaim fitur
+The native C bytecode VM has a separate targeted test with six valid Python/C output-parity examples and four invalid-input rejection cases. This does not yet prove full-language VM parity.
 
-Gunakan empat tingkat berikut secara konsisten:
+PusingCuk AI has a local-first assistant, model-provider adapters, curated retrieval, citations, local memory, and compiler-check tools. It is an assistant layer over a selected provider model, not a foundation model trained by this project. The Phase 6 repair-loop core is implemented, but production provider, persistent fixture, and full-matrix callbacks are still pending integration.
 
-1. **Ada di repo** — file atau implementasi ditemukan.
-2. **Berfungsi pada jalur tertentu** — ada contoh atau hasil uji yang sesuai.
-3. **Terverifikasi** — fixture/pengujian target yang relevan lulus pada commit yang sama.
-4. **Siap produksi** — memerlukan bukti tambahan untuk keamanan, ketahanan, deployment, pemantauan, dan lingkungan nyata.
+## Recommended reading
 
-Jangan menyamakan keempat tingkat tersebut. Target compiler, contoh Android, antarmuka web, adapter, dan modul AI masing-masing harus dinilai menurut jalur eksekusinya sendiri.
+- [Project vision](VISION.md)
+- [Language specification](../SPEC.md)
+- [Semantic contract](SEMANTIC_CONTRACT.md)
+- [Compatibility evidence](COMPATIBILITY.md)
+- [Conformance fixtures](CONFORMANCE_FIXTURES.md)
+- [AI readiness](AI_ENGINE_READINESS.md)
+- [Current project status](PROJECT_STATUS_AND_ROADMAP.md)
 
-## Kekurangan dan risiko saat ini
+## Security boundary
 
-- **Belum stabil:** versi kontrak `0.6-dev` dan paket `0.8.0.dev0` menunjukkan jalur pengembangan, bukan jaminan API stabil.
-- **Paritas terbatas:** interpreter referensi, runtime C, JavaScript, Python, HTML, dan VM tidak otomatis memiliki cakupan identik.
-- **Jalur referensi bergantung pada Python:** runtime C mandiri hanya mencakup subset bahasa yang dinyatakan dan diuji.
-- **Ekosistem belum lengkap:** sistem modul lintas-runtime, ABI/FFI stabil, WebAssembly, binding browser lengkap, serta integrasi database/blockchain produksi tidak boleh dipasarkan sebagai kemampuan yang sudah selesai.
-- **Batas keamanan:** eksekusi kode bukan sandbox OS; kode tak tepercaya dapat berisiko mengakses sumber daya proses.
-- **AI bukan oracle:** output AI harus diperiksa oleh compiler, tes, dan runtime. Modul asisten tidak sama dengan model fondasi yang dilatih sendiri.
-- **Kesiapan distribusi berbeda:** build yang berhasil tidak membuktikan instalasi dan penggunaan berhasil pada semua perangkat sasaran.
-- **Dokumentasi historis:** catatan audit/roadmap bertanggal harus dibedakan dari status aktif dan tidak boleh dijadikan klaim tunggal.
-
-## Rekomendasi prioritas
-
-1. Jadikan `SPEC.md`, kontrak semantik, kontrak built-in, fixture, dan matriks kompatibilitas sebagai satu rantai bukti.
-2. Perbaiki kegagalan CI yang dapat direproduksi sebelum menambah fitur.
-3. Perluas dukungan runtime berdasarkan celah semantik dan tes yang spesifik, bukan jumlah fitur.
-4. Pertahankan kamus dan panduan pemula sebagai jalur belajar, sementara detail implementasi ditempatkan di dokumen teknis.
-5. Labeli fitur AI, UI, packaging, dan target compiler sesuai bukti terbaru.
-6. Jalankan pemeriksaan keamanan workflow dan uji distribusi pada target nyata sebelum membuat klaim produksi.
-
-## Bukan bagian dari janji produk
-
-Dokumen ini tidak menjanjikan bahasa stabil, kompatibilitas penuh semua target, model AI buatan sendiri, sandbox keamanan umum, layanan SaaS siap pakai, atau dukungan produksi untuk integrasi yang masih berupa roadmap.
-
-## Referensi kanonis
-
-- [Spesifikasi bahasa](../SPEC.md)
-- [Kontrak semantik](SEMANTIC_CONTRACT.md)
-- [Kompatibilitas](COMPATIBILITY.md)
-- [Kontrak built-in](../library/builtin_contract.json)
-- [Fixture konformansi](CONFORMANCE_FIXTURES.md)
-- [Kamus Bahasa Warung](KAMUS_PUSINGCUK.md)
+The interpreter, compiler, and VM are not operating-system sandboxes. Capability strings do not mediate host operations unless the operations explicitly invoke the policy. Resource budgets are runtime guardrails, not hard OS-level isolation.
