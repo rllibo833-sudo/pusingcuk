@@ -130,7 +130,7 @@ def _render_compat(matrix):
         f"- Fixtures: **{matrix['fixture_count']}**",
         f"- Reference: **{matrix['counts']['reference']['pass']} PASS**, {matrix['counts']['reference']['fail']} FAIL",
         f"- Native C: **{matrix['counts']['native']['pass']} PASS**, {matrix['counts']['native']['fail']} FAIL, {matrix['counts']['native']['unsupported']} UNSUPPORTED",
-        f"- Python-Free Score (native required fixtures): **{score['percent']:.2f}%** ({score['passed_required_fixtures']}/{score['total_required_fixtures']})",
+        f"- Python-Free Score (native C / all fixtures): **{score['percent']:.2f}%** ({score['passed_required_fixtures']}/{score['total_required_fixtures']})",
         "", "## Fixture evidence", "",
         "| Fixture | Reference | Native C | Overall |",
         "|---|---:|---:|---:|",
@@ -160,7 +160,7 @@ def _render_readme(matrix):
     score = matrix["python_free_score"]
     generated = (
         f'[![Python-free runtime · native C · {score["passed_required_fixtures"]}/{score["total_required_fixtures"]} fixtures](docs/assets/python-free-score.svg)](docs/COMPATIBILITY.md)\n'
-        f'Python-free runtime, native C: **{score["passed_required_fixtures"]} dari {score["total_required_fixtures"]} fixture wajib ({score["percent"]:.2f}%)**. '
+        f'Python-free runtime, native C: **{score["passed_required_fixtures"]} dari {score["total_required_fixtures"]} fixture ({score["percent"]:.2f}%)**. '
         'Skor ini hanya mengukur fixture native C yang lulus; bukan klaim seluruh toolchain bebas Python.\n'
     )
     text = README.read_text(encoding="utf-8")
