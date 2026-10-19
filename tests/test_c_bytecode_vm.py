@@ -6,10 +6,10 @@ from compiler.bytecode import compile_source
 from compiler.vm import VirtualMachine
 ROOT=Path(__file__).resolve().parents[1]
 FIXTURES=[
- ("declare-print", 'bikin angka = 40 + 2\nspill(angka)\n', "42\n"),
- ("branch", 'bikin x = 3\nkalo x > 2:\n    spill("yes")\nkalau:\n    spill("no")\n', "yes\n"),
- ("loop", 'bikin x = 0\nselama x < 3:\n    spill(x)\n    x = x + 1\n', "0\n1\n2\n"),
- ("logic", 'bikin x = bukan salah\nspill(x)\n', "okelah\n"),
+ ("declare-print", 'jancuk\nlah angka = 40 + 2\nhedeh angka\nselesai jancuk\n', "42\n"),
+ ("branch", 'jancuk\nlah x = 3\nnek x > 2:\n    hedeh "yes"\nnekora:\n    hedeh "no"\nselesai nek\nselesai jancuk\n', "yes\n"),
+ ("loop", 'jancuk\nlah x = 0\nselama x < 3:\n    hedeh x\n    x = x + 1\nselesai selama\nselesai jancuk\n', "0\n1\n2\n"),
+ ("logic", 'jancuk\nlah x = bukan salah\nhedeh x\nselesai jancuk\n', "okelah\n"),
 ]
 def main():
  with tempfile.TemporaryDirectory() as td:
