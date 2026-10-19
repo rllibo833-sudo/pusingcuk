@@ -25,5 +25,15 @@ def main():
    assert c.returncode==0,(name,c.stderr)
    assert c.stdout==pyout.getvalue(),(name,"C VM",repr(c.stdout),repr(pyout.getvalue()))
    print("PASS",name)
- print(f"Python/C VM fixtures: {len(FIXTURES)}/{len(FIXTURES)}")
+  invalid_cases = [
+   ("malformed-json", "{"),
+   ("unknown-opcode", json.dumps({"format":"pusingcuk-bytecode","bytecode_version":1,"language_version":"0.6-dev","source_name":"bad.cuk","functions":{},"code":[["NOT_REAL",None,1]]})),
+   ("bad-jump", json.dumps({"format":"pusingcuk-bytecode","bytecode_version":1,"language_version":"0.6-dev","source_name":"bad.cuk","functions":{},"code":[["JUMP",999,1]]})),
+  ]
+  for name,payload in invalid_cases:
+   path.write_text(payload,encoding="utf-8")
+   c=subprocess.run([str(ROOT/"native"/"cuk-bytecode-vm"),str(path)],capture_output=True,text=True)
+   assert c.returncode != 0,(name,"invalid bytecode unexpectedly accepted")
+   print("PASS reject",name)
+ print(f"Python/C VM fixtures: {len(FIXTURES)}/{len(FIXTURES)}; invalid-input checks: {len(invalid_cases)}")
 if __name__=="__main__":main()
