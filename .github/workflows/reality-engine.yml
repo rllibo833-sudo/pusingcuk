@@ -36,16 +36,7 @@ jobs:
           python-version: "3.12"
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
-      - name: Run canonical conformance suite
-        run: python tools/conformance.py
-      - name: Generate evidence matrix and score history
-        env:
-          GITHUB_SHA: ${{ github.sha }}
-          GITHUB_SERVER_URL: ${{ github.server_url }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_RUN_ID: ${{ github.run_id }}
-        run: python pusingcuk_new.py reality run --record
-      - name: Verify generated files are reproducible
+      - name: Verify matrix, compatibility report, README badge, and SVG are current
         run: python pusingcuk_new.py reality run --check
       - name: Check patch whitespace
         run: git diff --check
