@@ -1,48 +1,48 @@
-# Start Here — Panduan Kontributor PusingCuk
+# Start Here — PusingCuk Contributor Guide
 
-Kamu tidak perlu menjadi programmer profesional untuk membantu proyek ini. Mulai dari contoh kecil, dokumentasi, atau laporan bug yang bisa direproduksi.
+You do not need to be a professional programmer to help. Start with a small example, documentation improvement, or reproducible bug report.
 
-## Yang bisa dikerjakan
+## Ways to contribute
 
-### 1. Menulis contoh .cuk
-Tambahkan contoh untuk kasus nyata seperti kalkulator, catatan nilai, kuis, atau anggaran di `examples/nama.cuk`. Periksa sintaks dengan:
+### 1. Write a .cuk example
+Add a practical example—such as a calculator, grade tracker, quiz, or budget—to `examples/name.cuk`. Check its syntax with:
 
 ```sh
-python pusingcuk_new.py --check examples/nama.cuk
+python pusingcuk_new.py --check examples/name.cuk
 ```
 
-### 2. Memperbaiki dokumentasi
-Bantu merapikan atau menerjemahkan dokumentasi dan kamus. Jangan mengubah spesifikasi atau klaim dukungan target tanpa bukti.
+### 2. Improve documentation
+Help clarify or translate the docs and dictionaries. Do not change the language specification or target-support claims without evidence.
 
-### 3. Melaporkan bug
-Sertakan kode minimum, perintah yang dijalankan, output aktual, output yang diharapkan, dan versi/target yang digunakan. Hindari laporan yang hanya mengatakan “tidak jalan”.
+### 3. Report a bug
+Include the smallest reproducing program, exact command, actual output, expected output, and version/target. Avoid reports that only say “it does not work.”
 
-### 4. Mengusulkan kosakata
-Usulan alias slang dibahas melalui issue berlabel `spec-discussion`. Jangan menambahkan keyword atau alias langsung tanpa keputusan yang sesuai dengan SPEC.
+### 4. Propose vocabulary
+Slang aliases are discussed through issues labeled `spec-discussion`. Do not add keywords or aliases directly without a decision consistent with `SPEC.md`.
 
-### 5. Memeriksa playground
-Coba https://rllibo833-sudo.github.io/pusingcuk/playground.html. Playground saat ini bersifat eksperimental; jangan menyamakan runtime playground dengan runtime native.
+### 5. Check the playground
+Try https://rllibo833-sudo.github.io/pusingcuk/playground.html. The playground is experimental; its runtime must not be confused with the native runtime.
 
-## Alur kontribusi dari HP
+## Contribution workflow from a phone
 
-1. Buka https://github.com/rllibo833-sudo/pusingcuk.
-2. Buka file atau folder yang relevan.
-3. Untuk perubahan kode, gunakan fork/branch sesuai aturan kontribusi repo.
-4. Jalankan pemeriksaan yang tersedia atau minta bantuan untuk memeriksa reproduksi.
-5. Jelaskan alasan perubahan dan hasil yang benar-benar telah diverifikasi.
+1. Open https://github.com/rllibo833-sudo/pusingcuk.
+2. Navigate to the relevant file or directory.
+3. For code changes, use a fork/branch according to the repository contribution rules.
+4. Run the available checks or provide a reproducible case for review.
+5. Explain the reason for the change and state exactly what was verified.
 
-## Jangan dilakukan tanpa diskusi
+## Do not do these without discussion
 
-- Mengubah semantik bahasa atau menambah keyword/alias.
-- Mengklaim backend kompatibel tanpa fixture.
-- Menambahkan dependensi jaringan untuk fitur yang seharusnya lokal.
-- Mengubah hasil laporan secara manual agar tampak hijau.
-- Menganggap CI hijau sebagai bukti semua target siap produksi.
+- Change language semantics or add keywords/aliases.
+- Claim backend compatibility without fixtures.
+- Add network dependencies to features intended to work locally.
+- Manually alter reported results to make them look green.
+- Treat a green CI run as proof that every target is production-ready.
 
-## Laporan bug yang baik
+## A useful bug report
 
-- **Kode reproduksi:** program .cuk sekecil mungkin.
-- **Perintah:** perintah lengkap yang dijalankan.
-- **Aktual:** output atau diagnostic yang terlihat.
-- **Harapan:** hasil yang seharusnya.
-- **Target:** interpreter, native C, VM, atau backend lain.
+- **Reproducer:** the smallest possible .cuk program.
+- **Command:** the full command used.
+- **Actual:** observed output or diagnostic.
+- **Expected:** intended behavior.
+- **Target:** reference interpreter, native C, VM, or another backend.
