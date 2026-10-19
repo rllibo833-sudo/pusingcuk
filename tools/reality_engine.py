@@ -256,22 +256,28 @@ def diff_file(path_text):
         return (item["status"], item["exit_code"], item["stdout"], item["stderr_class"], item["source_line"])
 
     def compare_text(candidate_text):
-        candidate_path = Path(tmp) / "candidate.cuk"
-        candidate_path.write_text(candidate_text, encoding="utf-8")
-        found = {}
-        for name, command in (
-            ("reference", [sys.executable, str(ROOT / "pusingcuk_new.py"), str(candidate_path)]),
-            ("native", [str(native), str(candidate_path)]),
-        ):
-            code, stdout, stderr, run_error = _run(command)
-            found[name] = {
-                "status": "UNAVAILABLE" if run_error else "OK",
-                "exit_code": code, "stdout": stdout,
-                "stderr_class": classify_stderr(code, stderr) if not run_error else None,
-                "source_line": source_line_from_stderr(stderr) if not run_error else None,
-                "error": run_error,
-            }
-        return normalized(found["reference"]) != normalized(found["native"]), found
+        with tempfile.TemporaryDirectory(prefix="cuk-reality-minimize-") as candidate_tmp:
+            candidate_root = Path(candidate_tmp)
+            candidate_path = candidate_root / "candidate.cuk"
+            native_candidate = candidate_root / "pusingcuk-native"
+            ready, _ = build_native(native_candidate)
+            if not ready:
+                return False, observations
+            candidate_path.write_text(candidate_text, encoding="utf-8")
+            found = {}
+            for name, command in (
+                ("reference", [sys.executable, str(ROOT / "pusingcuk_new.py"), str(candidate_path)]),
+                ("native", [str(native_candidate), str(candidate_path)]),
+            ):
+                code, stdout, stderr, run_error = _run(command)
+                found[name] = {
+                    "status": "UNAVAILABLE" if run_error else "OK",
+                    "exit_code": code, "stdout": stdout,
+                    "stderr_class": classify_stderr(code, stderr) if not run_error else None,
+                    "source_line": source_line_from_stderr(stderr) if not run_error else None,
+                    "error": run_error,
+                }
+            return normalized(found["reference"]) != normalized(found["native"]), found
 
     original_text = source.read_text(encoding="utf-8")
     mismatch = normalized(observations["reference"]) != normalized(observations["native"])
