@@ -1,6 +1,6 @@
 # Phase 5 — Capability Sandbox (VM-level, honest scope)
 
-**Status: foundation only; not yet an end-to-end sandbox.**
+**Status: VM budget integration started; capability operations and hard isolation remain incomplete.**
 
 ## Security boundary
 
@@ -22,17 +22,20 @@ No grants are present by default. Grants are exact for network, process, and env
 
 ## Resource budgets
 
-The resource primitive supports:
-- fuel: maximum VM instruction ticks;
-- elapsed-time deadline checked at VM ticks;
-- approximate accounting for VM-visible Python objects.
+The bytecode VM now accepts per-run limits through its CLI:
+- `--fuel 100000` — maximum VM instruction ticks;
+- `--memori-byte 16777216` — approximate accounting for VM-visible Python objects;
+- `--waktu-detik 2` — elapsed-time deadline checked at VM instruction ticks;
+- repeatable `--izin=baca:./data` (or `tulis`, `jaringan`, `proses`, `env`) to provide an explicit grant.
+
+Example: `python -m compiler.vm --fuel 50000 --memori-byte 8388608 --waktu-detik 1.5 --izin=baca:./data program.bytecode.json`. These grants are parsed into the VM policy; they do not create host I/O features. No file/network/process/environment operation is currently exposed by bytecode, so there is no capability-enabled I/O to grant yet.
 
 The memory estimate is not a hard RSS limit: it does not include all interpreter/native allocations and cannot reliably stop a single expensive host call. A hard time or memory ceiling requires an external supervisor/OS boundary. Integration into each VM execution loop and negative integration tests are still required.
 
 ## Completion gates
 
 - [ ] Wire the policy into every host-capability entry point in each claimed VM target.
-- [ ] Add CLI flags for per-run grants and fuel/memory/time limits.
+- [x] Add CLI flags for per-run grants and fuel/memory/time limits (limits are VM-level estimates, not hard OS limits).
 - [ ] Enforce path containment and document permission syntax.
 - [ ] Negative tests: denied file/network/process/env operations, path traversal, symlink escape, malformed permission, fuel exhaustion, time exhaustion, and memory-budget exhaustion.
 - [ ] Run the negative tests in CI and publish the exact supported target(s).
