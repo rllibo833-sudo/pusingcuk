@@ -1,7 +1,7 @@
 name: Cuk Reality Engine
 on:
   push:
-    branches: [core-cuk-engine]
+    branches: [cuk-reality-engine]
     paths:
       - ".github/workflows/reality-engine.yml"
       - "README.md"
@@ -36,6 +36,8 @@ jobs:
           python-version: "3.12"
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
+      - name: Run capability sandbox negative tests
+        run: python -m unittest tests.test_capability_sandbox -v
       - name: Run canonical conformance suite
         run: python tools/conformance.py
       - name: Build C bytecode VM
