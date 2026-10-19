@@ -9,8 +9,8 @@ from compiler.bytecode import compile_source
 from compiler.vm import VirtualMachine
 FIXTURES=[
  ("declare-print", 'jancuk\nlah angka = 40 + 2\nhedeh angka\nselesai jancuk\n', "42\n"),
- ("branch", 'jancuk\nlah x = 3\nnek x > 2:\n    hedeh "yes"\nnekora:\n    hedeh "no"\nselesai nek\nselesai jancuk\n', "yes\n"),
- ("loop", 'jancuk\nlah x = 0\nselama x < 3:\n    hedeh x\n    x = x + 1\nselesai selama\nselesai jancuk\n', "0\n1\n2\n"),
+ ("branch", 'jancuk\nlah x = 3\nnjir x > 2\n    hedeh "yes"\nkampret\n    hedeh "no"\nselesai njir\nselesai jancuk\n', "yes\n"),
+ ("loop", 'jancuk\nlah x = 0\nmumet x < 3\n    hedeh x\n    x = x + 1\nselesai mumet\nselesai jancuk\n', "0\n1\n2\n"),
  ("logic", 'jancuk\nlah x = bukan salah\nhedeh x\nselesai jancuk\n', "okelah\n"),
 ]
 def main():
