@@ -12,6 +12,7 @@ FIXTURES=[
  ("branch", 'jancuk\nlah x = 3\nnjir x > 2\n    hedeh "yes"\nkampret\n    hedeh "no"\nselesai njir\nselesai jancuk\n', "yes\n"),
  ("loop", 'jancuk\nlah x = 0\nmumet x < 3\n    hedeh x\n    x = x + 1\nselesai mumet\nselesai jancuk\n', "0\n1\n2\n"),
  ("logic", 'jancuk\nlah x = bukan salah\nhedeh x\nselesai jancuk\n', "okelah\n"),
+ ("dict-index", 'jancuk\nlah data = {"a": 10, "b": 20}\nhedeh data["b"]\nselesai jancuk\n', "20\n"),
  ("list-index", 'jancuk\nlah data = [10, 20, 30]\nhedeh data[1]\nselesai jancuk\n', "20\n"),
 ]
 def main():
