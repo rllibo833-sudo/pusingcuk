@@ -1,0 +1,62 @@
+name: Cuk Reality Engine
+on:
+  push:
+    branches: [core-cuk-engine]
+    paths:
+      - ".github/workflows/reality-engine.yml"
+      - "README.md"
+      - "pusingcuk_new.py"
+      - "tools/reality_engine.py"
+      - "tools/conformance.py"
+      - "tests/**"
+      - "native/**"
+      - "compiler/**"
+      - "evaluator.py"
+      - "lexer.py"
+      - "parser.py"
+      - "ast_nodes.py"
+      - "reports/**"
+      - "docs/COMPATIBILITY.md"
+      - "docs/assets/python-free-score.svg"
+      - "pyproject.toml"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cuk-reality-engine-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Run canonical conformance suite
+        run: python tools/conformance.py
+      - name: Generate evidence matrix and score history
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: python pusingcuk_new.py reality run --record
+      - name: Verify generated files are reproducible
+        run: python pusingcuk_new.py reality run --check
+      - name: Check patch whitespace
+        run: git diff --check
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: cuk-reality-engine-evidence
+          path: |
+            reports/matrix.json
+            reports/history.json
+            docs/COMPATIBILITY.md
+            docs/assets/python-free-score.svg
+          if-no-files-found: error
