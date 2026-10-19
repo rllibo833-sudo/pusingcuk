@@ -1,67 +1,64 @@
-#!/usr/bin/env python3
-import time, subprocess, json, os
+import time, subprocess, json, re
 from pathlib import Path
 from parser import parse
 from evaluator import run
 
-print("[DATACENTER V3] Evolusi Bahasa Mandiri FIX")
+def patch_parser(new_word, target):
+    p = Path("parser.py").read_text()
+    # cari if self.at("hedeh"):  ->  if self.at("hedeh") or self.at("cetak"):
+    pattern = f'self.at("{target}")'
+    if f'self.at("{new_word}")' in p:
+        return False
+    # ganti baris pertama yang ada target nya
+    new_p = p.replace(f'if self.at("{target}"):',
+                      f'if self.at("{target}") or self.at("{new_word}"): ', 1)
+    if new_p != p:
+        Path("parser.py").write_text(new_p)
+        print(f"[PATCH] parser.py: {target} sekarang juga menerima '{new_word}'")
+        return True
+    return False
+
+print("[DATACENTER V3] Patch Parser + Evolusi")
 
 while True:
-    p_file = Path("next_prompt.txt")
-    prompt = p_file.read_text().strip() if p_file.exists() else "bikin halo dunia"
+    prompt = Path("next_prompt.txt").read_text().strip()
     print(f"\n[LOOP] Prompt: {prompt}")
 
-    # === EVOLUSI LANGSUNG TANPA AI DULU (BIAR KELIATAN MANDIRI) ===
-    evolved = False
     if "tambah alias" in prompt.lower():
-        # contoh prompt: tambah alias cetak untuk hedeh
         parts = prompt.lower().split()
-        try:
-            # cari kata setelah "alias"
-            idx = parts.index("alias")
-            new_word = parts[idx+1]
-            target = parts[idx+3] if len(parts) > idx+3 else "hedeh"
+        idx = parts.index("alias")
+        new_word = parts[idx+1].strip('"')
+        target = parts[idx+3].strip('"') if len(parts)>idx+3 else "hedeh"
+
+        kos_path = Path("library/kosakata.json")
+        kos = json.loads(kos_path.read_text()) if kos_path.exists() else {}
+        
+        if new_word not in kos:
+            kos[new_word] = target
+            kos_path.write_text(json.dumps(kos, indent=2, ensure_ascii=False))
+            patch_parser(new_word, target)
             
-            kos_path = Path("library/kosakata.json")
-            kos = json.loads(kos_path.read_text()) if kos_path.exists() else {}
-            if new_word not in kos:
-                kos[new_word] = target
-                kos_path.write_text(json.dumps(kos, indent=2, ensure_ascii=False))
-                print(f"[EVOLUSI] Bahasa berkembang! {new_word} -> {target}")
-                print(f"[EVOLUSI] Isi kosakata.json: {kos}")
-                
-                # bikin test file buat reality engine
-                test_code = f'jancuk\n{new_word} "Tes {new_word} OK"\nselesai jancuk'
-                Path("app.cuk").write_text(test_code)
-                parse(test_code)  # test pake parser asli lu, bukan dummy
+            test_code = f'jancuk\n{new_word} "Tes {new_word} OK"\nselesai jancuk'
+            Path("app.cuk").write_text(test_code)
+            try:
+                # reload parser biar patch kepake
+                import importlib, parser
+                importlib.reload(parser)
+                parser.parse(test_code)
                 run(test_code)
-                evolved = True
-            else:
-                print(f"[EVOLUSI] Alias {new_word} sudah ada")
-        except Exception as e:
-            print(f"[EVOLUSI] Gagal parse prompt alias: {e}")
+                print(f"[ENGINE] OK! Bahasa baru '{new_word}' jalan!")
+            except Exception as e:
+                print(f"[ENGINE] Masih error: {e}")
+        else:
+            print(f"[EVOLUSI] Alias {new_word} sudah ada, skip")
 
-    if not evolved:
-        # fallback halo dunia biasa
-        r = subprocess.run(["python","pusingcuk_adapter.py",prompt], capture_output=True, text=True)
-        Path("app.cuk").write_text(r.stdout.strip())
-        try:
-            parse(Path("app.cuk").read_text())
-            run(Path("app.cuk").read_text())
-            print("[ENGINE] OK")
-        except Exception as e:
-            print(f"[ENGINE] ERROR: {e}")
-
-    # === PUSH HANYA KALO ADA PERUBAHAN (ANTI Everything up-to-date) ===
-    status = subprocess.run(["git","status","--porcelain"], capture_output=True, text=True).stdout.strip()
-    if status:
-        print(f"[GIT] Ada perubahan:\n{status}")
+    status = subprocess.run(["git","status","--porcelain"], capture_output=True, text=True).stdout
+    if status.strip():
         subprocess.run(["git","add","-A"])
         subprocess.run(["git","commit","-m",f"evolve: {prompt}"])
         subprocess.run(["git","push"])
-        print("[GIT] Pushed -> cek Actions > android-studio-apk.yml buat download APK")
+        print("[GIT] Pushed -> Actions bakal build APK otomatis")
     else:
-        print("[GIT] Skip push, gak ada perubahan (biar gak spam)")
+        print("[GIT] Skip push")
 
-    print("Tidur 10 detik... ganti next_prompt.txt kalo mau evolusi lain")
     time.sleep(10)
