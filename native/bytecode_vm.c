@@ -1,0 +1,44 @@
+/* Minimal, strict JSON bytecode VM stage 1. No third-party dependency. */
+#include <ctype.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define TOKENS 200000
+#define STACK_MAX 100000
+#define VARS_MAX 10000
+typedef enum { J_OBJ,J_ARR,J_STR,J_NUM,J_BOOL,J_NULL } JT;
+typedef struct { JT t; int start,end,parent,next,size; } Tok;
+static Tok ts[TOKENS]; static int nt; static const char *src;
+static void ws(int *p){while(src[*p]&&isspace((unsigned char)src[*p]))(*p)++;}
+static int parseval(int *p,int parent){ws(p);if(nt>=TOKENS)return -1;int id=++nt;Tok*t=&ts[id];t->start=*p;t->parent=parent;t->size=0;char c=src[*p];
+ if(c=='{'||c=='['){t->t=c=='{'?J_OBJ:J_ARR;(*p)++;ws(p);while(src[*p]&&src[*p]!=(c=='{'?'}':']')){if(src[*p]==','||src[*p]==':'){(*p)++;continue;}if(parseval(p,id)<0)return -1;t->size++;ws(p);}if(!src[*p])return -1;(*p)++;t->end=*p;
+ }else if(c=='"'){t->t=J_STR;(*p)++;while(src[*p]){if(src[*p]=='\\'){(*p)+=2;continue;}if(src[(*p)++]=='"')break;}if(src[*p-1]!='"')return -1;t->end=*p;
+ }else{while(src[*p]&&!strchr(",]} \r\n\t",src[*p]))(*p)++;if(*p==t->start)return -1;char tmp[128];int n=*p-t->start;if(n>=128)return -1;memcpy(tmp,src+t->start,n);tmp[n]=0;if(!strcmp(tmp,"true")||!strcmp(tmp,"false"))t->t=J_BOOL;else if(!strcmp(tmp,"null"))t->t=J_NULL;else{char*e;strtod(tmp,&e);if(*e)return -1;t->t=J_NUM;}t->end=*p;}t->next=nt+1;return id;}
+static int eq(int i,const char*s){return i>0&&ts[i].t==J_STR&&ts[i].end-ts[i].start==(int)strlen(s)+2&&!memcmp(src+ts[i].start+1,s,strlen(s));}
+static int member(int o,const char*k){for(int i=o+1;i<ts[o].next;){int v=i+1;if(eq(i,k))return v;i=ts[v].next;}return 0;}
+static int arrat(int a,int n){int i=a+1;while(n-->0&&i<ts[a].next)i=ts[i].next;return i<ts[a].next?i:0;}
+static char* stringval(int i){if(!i||ts[i].t!=J_STR)return NULL;int n=ts[i].end-ts[i].start-2;char*s=calloc((size_t)n+1,1);if(s)memcpy(s,src+ts[i].start+1,(size_t)n);return s;}
+typedef enum{V_NULL,V_NUM,V_BOOL,V_STR}VT;typedef struct{VT t;double n;int b;char*s;}V;
+static V stack[STACK_MAX];static int sp;static struct{char*n;V v;}vars[VARS_MAX];static int nv;static long steps;
+static V popv(void){if(!sp){fprintf(stderr,"VM C: stack underflow\n");exit(1);}return stack[--sp];}
+static void push(V v){if(sp>=STACK_MAX){fprintf(stderr,"VM C: stack limit\n");exit(1);}stack[sp++]=v;}
+static int truth(V v){if(v.t==V_NULL)return 0;if(v.t==V_BOOL)return v.b;if(v.t==V_NUM)return v.n!=0;if(v.t==V_STR)return v.s&&*v.s;return 1;}
+static int findvar(const char*n){for(int i=nv-1;i>=0;i--)if(!strcmp(vars[i].n,n))return i;return -1;}
+static V getvar(const char*n){int i=findvar(n);if(i<0){fprintf(stderr,"VM C: variable '%s' missing\n",n);exit(1);}return vars[i].v;}
+static void setvar(const char*n,V v,int decl){int i=findvar(n);if(decl&&i>=0){fprintf(stderr,"VM C: duplicate variable\n");exit(1);}if(!decl&&i<0){fprintf(stderr,"VM C: variable missing\n");exit(1);}if(i<0){if(nv>=VARS_MAX)exit(1);i=nv++;vars[i].n=strdup(n);}vars[i].v=v;}
+static V tokenval(int i){V v={0};if(!i){v.t=V_NULL;return v;}if(ts[i].t==J_NULL)v.t=V_NULL;else if(ts[i].t==J_BOOL){v.t=V_BOOL;v.b=src[ts[i].start]=='t';}else if(ts[i].t==J_NUM){v.t=V_NUM;char tmp[128];int n=ts[i].end-ts[i].start;if(n>=128)exit(1);memcpy(tmp,src+ts[i].start,n);tmp[n]=0;v.n=strtod(tmp,NULL);}else if(ts[i].t==J_STR){v.t=V_STR;v.s=stringval(i);}else{fprintf(stderr,"VM C: complex constant unsupported in stage 1\n");exit(1);}return v;}
+static void printv(V v){if(v.t==V_NULL)printf("null");else if(v.t==V_BOOL)printf("%s",v.b?"okelah":"tidak");else if(v.t==V_STR)printf("%s",v.s?v.s:"");else if(v.n==floor(v.n)&&fabs(v.n)<9e15)printf("%.0f",v.n);else printf("%.15g",v.n);putchar('\n');}
+static int integer(int i){if(!i||ts[i].t!=J_NUM)return 0;V v=tokenval(i);return floor(v.n)==v.n;}
+static void execute(int code){int count=ts[code].size,pc=0;while(pc<count){if(++steps>1000000){fprintf(stderr,"VM C: step limit\n");exit(1);}int ins=arrat(code,pc),opid=arrat(ins,0),arg=arrat(ins,1);char*op=stringval(opid);int next=pc+1;if(!op){fprintf(stderr,"VM C: invalid opcode\n");exit(1);}
+ if(!strcmp(op,"CONST"))push(tokenval(arg));
+ else if(!strcmp(op,"LOAD")){char*n=stringval(arg);push(getvar(n));free(n);}
+ else if(!strcmp(op,"DECLARE")||!strcmp(op,"STORE")){char*n=stringval(arg);V v=popv();setvar(n,v,!strcmp(op,"DECLARE"));free(n);}
+ else if(!strcmp(op,"PRINT"))printv(popv());
+ else if(!strcmp(op,"POP"))(void)popv();
+ else if(!strcmp(op,"TO_BOOL")){V v={.t=V_BOOL,.b=truth(popv())};push(v);}
+ else if(!strcmp(op,"UNARY")){V v=popv();if(eq(arg,"bukan")){V x={.t=V_BOOL,.b=!truth(v)};push(x);}else if(eq(arg,"-")&&v.t==V_NUM){v.n=-v.n;push(v);}else{fprintf(stderr,"VM C: invalid unary operation\n");exit(1);}}
+ else if(!strcmp(op,"BINARY")){V r=popv(),l=popv(),v={0};if(eq(arg,"==")||eq(arg,"!=")){int same=l.t==r.t&&((l.t==V_NUM&&l.n==r.n)||(l.t==V_BOOL&&l.b==r.b)||l.t==V_NULL||(l.t==V_STR&&l.s&&r.s&&!strcmp(l.s,r.s)));v.t=V_BOOL;v.b=eq(arg,"==")?same:!same;}else if(l.t==V_NUM&&r.t==V_NUM){v.t=V_NUM;if(eq(arg,"+"))v.n=l.n+r.n;else if(eq(arg,"-"))v.n=l.n-r.n;else if(eq(arg,"*"))v.n=l.n*r.n;else if(eq(arg,"/")&&r.n!=0)v.n=l.n/r.n;else if(eq(arg,"//")&&r.n!=0)v.n=floor(l.n/r.n);else if(eq(arg,"%")&&r.n!=0)v.n=fmod(l.n,r.n);else if(eq(arg,"<")){v.t=V_BOOL;v.b=l.n<r.n;}else if(eq(arg,"<=")){v.t=V_BOOL;v.b=l.n<=r.n;}else if(eq(arg,">")){v.t=V_BOOL;v.b=l.n>r.n;}else if(eq(arg,">=")){v.t=V_BOOL;v.b=l.n>=r.n;}else{fprintf(stderr,"VM C: invalid arithmetic\n");exit(1);}}else if(eq(arg,"+")&&l.t==V_STR&&r.t==V_STR){size_t n=strlen(l.s)+strlen(r.s)+1;v.t=V_STR;v.s=malloc(n);snprintf(v.s,n,"%s%s",l.s,r.s);}else{fprintf(stderr,"VM C: operand type mismatch\n");exit(1);}if(v.t==V_NUM&&!isfinite(v.n)){fprintf(stderr,"VM C: non-finite number\n");exit(1);}push(v);}
+ else if(!strcmp(op,"JUMP")||!strcmp(op,"JUMP_IF_FALSE")||!strcmp(op,"JUMP_IF_TRUE")){if(!integer(arg)){fprintf(stderr,"VM C: invalid jump target\n");exit(1);}int target=(int)tokenval(arg).n;if(target<0||target>count){fprintf(stderr,"VM C: jump out of range\n");exit(1);}int take=!strcmp(op,"JUMP");if(!take){int t=truth(popv());take=!strcmp(op,"JUMP_IF_TRUE")?t:!t;}if(take)next=target;}
+ else{fprintf(stderr,"VM C: opcode not yet supported: %s\n",op);exit(1);}free(op);pc=next;}}
+int main(int argc,char**argv){if(argc!=2){fprintf(stderr,"usage: cuk-bytecode-vm file.json\n");return 2;}FILE*f=fopen(argv[1],"rb");if(!f){perror(argv[1]);return 2;}fseek(f,0,SEEK_END);long z=ftell(f);rewind(f);if(z<0||z>8*1024*1024){fprintf(stderr,"VM C: input size limit\n");return 2;}char*buf=calloc((size_t)z+1,1);if(!buf||fread(buf,1,(size_t)z,f)!=(size_t)z){fclose(f);return 2;}fclose(f);src=buf;int p=0,root=parseval(&p,0);if(root<0||ts[root].t!=J_OBJ){fprintf(stderr,"VM C: invalid JSON\n");return 2;}int fmt=member(root,"format"),ver=member(root,"bytecode_version"),code=member(root,"code"),funcs=member(root,"functions");if(!eq(fmt,"pusingcuk-bytecode")||!integer(ver)||tokenval(ver).n!=1||!code||ts[code].t!=J_ARR||!funcs||ts[funcs].t!=J_OBJ){fprintf(stderr,"VM C: invalid bytecode envelope/version\n");return 2;}execute(code);return 0;}
