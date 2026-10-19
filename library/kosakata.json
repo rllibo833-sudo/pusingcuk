@@ -1,13 +1,27 @@
 {
-  "hedeh": [
-    "cetak",
-    "tampilkan",
-    "spill"
-  ],
-  "lah": [],
-  "jancuk": [],
-  "selesai": [],
-  "njir": [],
-  "mumet": [],
-  "cetak": "hedeh"
+  "jir": "hedeh",
+  "spill": "hedeh",
+  "cetak": "hedeh",
+  "tampilkan": "hedeh",
+  "bestie": "lah",
+  "gas": "jancuk",
+  "inthiseco": "jancuk",
+  "kelar": "selesai",
+  "gitu": "selesai",
+  "adooh": "kampret",
+  "skip": "kampret",
+  "janggal": "bukan",
+  "valid": "benar",
+  "zonk": "salah",
+  "kepo": "tanya",
+  "simpen": "tulis",
+  "bongkar": "baca",
+  "simpen_json": "tulis_json",
+  "bongkar_json": "baca_json",
+  "impor": "angkut",
+  "waktu": "jam",
+  "gas_api": "kepo_internet",
+  "stalking": "kepo_internet",
+  "kirim_gosip": "kirim_api",
+  "parse_json": "jadi_json"
 }
