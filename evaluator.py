@@ -513,6 +513,15 @@ class Evaluator:
                 if n.name not in env:
                     self.fail(line, f"variabel '{n.name}' belum dibuat")
                 return env[n.name]
+            if k == "Attribute":
+                obj = self.expr(n.object, env, depth)
+                member = n.name
+                if isinstance(obj, PusingDict):
+                    try:
+                        return obj[member]
+                    except KeyError:
+                        self.fail(line, f"kunci '{member}' tidak ditemukan di kamus")
+                self.fail(line, f"akses anggota '{member}' hanya didukung pada kamus atau modul")
             if k == "List":
                 return [self.expr(x, env, depth) for x in n.items]
             if k == "Dict":
