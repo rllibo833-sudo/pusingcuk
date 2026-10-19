@@ -47,6 +47,12 @@ jobs:
         run: python tools/check_playground_examples.py
       - name: Bundle reference interpreter modules for Pyodide
         run: python tools/prepare_playground.py
+      - name: Verify generated browser runtime is deployable
+        run: |
+          grep -q 'ssl = None' site/runtime/evaluator.py
+          test -s site/runtime/library/builtin_contract.json
+          grep -q 'library/builtin_contract.json' site/playground.html
+          grep -q 'BUILD_ID=' site/playground.html
       - name: Verify reference interpreter example
         run: |
           python pusingcuk_new.py site/examples/halo.pusingcuk > /tmp/halo-reference.txt
