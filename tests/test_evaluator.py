@@ -8,6 +8,17 @@ def program(body):
 
 
 class EvaluatorTests(unittest.TestCase):
+
+    def test_dictionary_attribute_access(self):
+        self.assertEqual(capture(program(
+            'lah data = {"nama": "Budi", "skor": 99}\n'
+            'hedeh data.nama\nhedeh data.skor'
+        )), "Budi\n99\n")
+
+    def test_missing_dictionary_attribute_has_clear_error(self):
+        with self.assertRaisesRegex(RuntimeError, "kunci 'umur' tidak ditemukan"):
+            run(program('lah data = {"nama": "Budi"}\nhedeh data.umur'))
+
     def test_variables_and_math(self):
         self.assertEqual(capture(program(
             "lah x = 2 + 3 * 4\nhedeh x"
