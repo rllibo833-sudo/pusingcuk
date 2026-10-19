@@ -75,6 +75,11 @@ class Token:
         )
 
 
+def _is_ascii_digit(char: str) -> bool:
+    """Accept only ASCII decimal digits as numeric literal characters."""
+    return len(char) == 1 and "0" <= char <= "9"
+
+
 class Lexer:
     def __init__(self, source):
         if not isinstance(source, str):
@@ -116,16 +121,16 @@ class Lexer:
         line, column = self.line, self.column
         start = self.position
 
-        while self._peek().isdigit():
+        while _is_ascii_digit(self._peek()):
             self._advance()
 
         kind = "INTEGER"
 
-        if self._peek() == "." and self._peek(1).isdigit():
+        if self._peek() == "." and _is_ascii_digit(self._peek(1)):
             kind = "FLOAT"
             self._advance()
 
-            while self._peek().isdigit():
+            while _is_ascii_digit(self._peek()):
                 self._advance()
 
         if self._peek() in ("e", "E"):
@@ -135,14 +140,14 @@ class Lexer:
             if self._peek() in ("+", "-"):
                 self._advance()
 
-            if not self._peek().isdigit():
+            if not _is_ascii_digit(self._peek()):
                 self._error(
                     line,
                     max(1, self.column - 1),
                     "eksponen angka tidak valid",
                 )
 
-            while self._peek().isdigit():
+            while _is_ascii_digit(self._peek()):
                 self._advance()
 
         text = self.source[start:self.position]
@@ -262,7 +267,7 @@ class Lexer:
                 tokens.append(self._read_string())
                 continue
 
-            if char.isdigit():
+            if _is_ascii_digit(char):
                 tokens.append(self._read_number())
                 continue
 
