@@ -1,80 +1,87 @@
-# Status Aktif dan Prioritas PusingCuk
+# Project Status and Engineering Priorities
 
-**Branch yang dituju untuk pekerjaan ini:** `warungpusingcuk`  
-**Versi kontrak bahasa:** `0.6-dev`  
-**Versi paket Python:** `0.8.0.dev0`  
-**Status:** eksperimental; ringkasan ini bukan bukti bahwa seluruh tes atau target deployment lulus. Audit ini tidak menyatakan bahasa stabil atau AI akurat secara umum.
+**Status source:** this document is a maintained summary, not a substitute for commit-specific CI evidence. Verify the branch and commit linked below before reusing any measurement.
 
-**AI knowledge/retrieval baseline:** 26 dokumen sumber terkurasi; 22 kasus baseline menghasilkan top-1. Hasil retrieval terdokumentasi terpisah dan bukan bukti model dilatih sendiri.
-**Retrieval baseline historis:** 5/8 (62,5%) dan 6/8 (75%) pada evaluasi yang dicatat; angka ini dipertahankan sebagai hasil historis, bukan klaim kualitas umum.
+## Current evidence snapshot
 
-## Gambaran yang benar saat ini
+- **Working branch for the Reality Engine and Phase 6 work:** `cuk-reality-engine`
+- **Latest verified CI commit at the time of this update:** `c75c3637b02f0ff7d6dcf3a24bd900aa12e16017`
+- **CI result:** successful — [workflow run 39190178886](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39190178886)
+- **Language contract:** `0.6-dev`
+- **Python package:** `0.8.0.dev0`
+- **Checked-in compatibility snapshot:** 77 fixtures; reference interpreter 77 pass; native C source runtime 74 pass and 3 explicitly unsupported; reported native C score 74/77 (96.10%).
+- **Separate C bytecode VM test:** six valid Python/C output-parity examples and four invalid-bytecode rejection cases. This is a small targeted test, not full-language VM conformance.
+- **AI knowledge baseline:** the maintained AI readiness document reports 26 curated source records and 22 Indonesian retrieval regression cases. This is a small regression corpus, not a general accuracy score.
 
-**Konformansi saat ini:** 78 fixture: 78 wajib pada interpreter referensi Python, 75 wajib pada native C, dan 3 secara eksplisit tidak didukung native. Contoh aplikasi kasir warung tercakup sebagai tes wajib pada kedua runtime.
+The compatibility snapshot measures the reference interpreter and native C source runtime. It must not be used as a score for the C bytecode VM, all compiler targets, or an entirely Python-free toolchain.
 
-- **Bahasa:** lexer, parser, AST, interpreter referensi, spesifikasi, kontrak built-in, dan fixture tersedia. Jalur referensi masih bergantung pada Python.
-- **Native C:** ada backend/runtime mandiri untuk sebagian bahasa. Fitur yang tidak tercakup dalam tes native belum boleh diklaim kompatibel.
-- **Bytecode/VM:** ada compiler bytecode dan VM eksperimental. Ini belum sama dengan runtime native yang bebas dari Python.
-- **JavaScript/Python/Android:** ada backend atau prototipe dengan cakupan masing-masing; keberadaan file tidak membuktikan parity atau aplikasi siap distribusi.
-- **PusingCuk AI:** kode asisten dan tool compiler tersedia. Asisten membantu menghasilkan/memperbaiki .cuk, tetapi bukan foundation model yang dilatih sendiri dan tidak boleh mengklaim kode berjalan hanya karena model menghasilkannya.
-- **Frontend/backend SaaS:** UI, layanan, dan integrasi yang ada harus diperlakukan sebagai prototipe sampai jalur build, autentikasi, API, dan runtime dibuktikan pada commit yang sama.
+## Component status
 
-## Urutan prioritas
+| Component | Current implementation | Evidence required before a stronger claim |
+|---|---|---|
+| `.cuk` language | Lexer, parser, AST, reference interpreter, semantic specification, built-in metadata, and conformance fixtures | Shared fixtures for every claimed semantic behavior and target |
+| Native C source runtime | A supported subset runs without Python after native compilation | Fixture parity for each supported feature; build-time Python requirements must be stated separately |
+| Python bytecode VM | Experimental bytecode compiler and VM with resource-budget hooks | VM fixture coverage and explicit target-specific behavior |
+| Native C bytecode VM | C executable reads serialized bytecode and executes a tested subset | Expand the dedicated parity suite; run the full eligible fixture matrix through the C VM before claiming broad compatibility |
+| Compiler backends | JavaScript, Python transpiler, C code generation, IR, and Android-related prototypes exist with different scopes | Build and execution evidence per backend; do not infer support from filenames |
+| PusingCuk AI | Local-first assistant, provider adapters, curated retrieval, citations, local memory, and allowlisted tools | End-to-end integration tests; a selected provider model is not a PusingCuk-trained foundation model |
+| Phase 5 security | Default-deny capability policy and VM-level fuel/time/approximate-memory budgets | Host-operation mediation, negative integration tests, and external OS isolation for hostile code |
+| Phase 6 repair loop | Provider-neutral proposal/validation core with attempt logs and fail-closed evidence gates | Real provider adapter, persisted fixture creation, canonical complete matrix execution, regression gate, and explicit accepted-source persistence |
+| Web/SaaS and mobile | Prototypes and adapters may exist in the repository | Deployed build, authentication, API, end-to-end use, and target-device evidence |
 
-### P0 — Dokumentasi dan kontrak tunggal
+## Branch and integration policy
 
-1. Pertahankan README sebagai pengantar singkat dan `docs/README.md` sebagai indeks.
-2. Gunakan `SPEC.md` untuk perilaku bahasa yang terlihat pengguna, `docs/SEMANTIC_CONTRACT.md` untuk semantik, dan `library/builtin_contract.json` untuk metadata built-in/dukungan target.
-3. Jadikan audit bertanggal sebagai bukti historis, bukan status saat ini. Hindari salinan roadmap yang berbeda-beda.
-4. Setiap klaim dukungan harus menunjuk implementasi dan tes/fixture target.
+This repository currently contains multiple long-lived engineering branches, including `main`, `core-cuk-engine`, `compatibility-generator`, `differential-runner`, and `cuk-reality-engine`. They are not interchangeable releases. The Reality Engine branch contains the latest Phase 5 and Phase 6 changes described above; earlier branches can lack later commits. Do not describe a feature as shared across branches until it has been integrated and verified there.
 
-### P1 — Kurangi ketergantungan Python secara terukur
+Do not merge branches merely to make their names disappear. For each useful change, check its ancestry and diff, integrate the implementation and its tests/fixtures together, then verify the resulting branch. Avoid duplicating an existing implementation or fixture in a second location.
 
-1. Jadikan AST/IR dan kontrak semantik tidak bergantung pada perilaku Python yang tidak disengaja.
-2. Perluas native C berdasarkan celah yang dapat direproduksi, satu perilaku per perubahan; jangan hanya menambah nama built-in.
-3. Untuk setiap celah: fixture positif/negatif → spesifikasi → implementasi target → tes konformansi.
-4. Lengkapi koleksi, fungsi, diagnostik, dan built-in prioritas tinggi lintas reference/native sebelum menyatakan parity.
-5. Ukur ukuran binary, waktu startup, memori, dan kebutuhan runtime agar klaim “ringan” punya dasar.
-6. Pisahkan **kompilasi di mesin pengembang** dari **menjalankan hasil kompilasi**: target mandiri baru terbukti bebas Python ketika artefak dapat berjalan tanpa interpreter Python terpasang.
+## Engineering priorities
 
-### P2 — Siklus PusingCuk AI → .cuk → bukti
+### P0 — One consistent evidence record
 
-1. Gunakan engine/tool PusingCuk yang sudah ada; jangan membuat jalur AI kedua yang tidak diperlukan.
-2. AI mengusulkan program .cuk dan menjelaskan perubahan.
-3. Compiler menghasilkan diagnostik yang terstruktur.
-4. Tool konformansi menjalankan fixture terdaftar dan mengembalikan bukti per-runtime.
-5. AI memperbaiki berdasarkan diagnostik nyata; hasil tetap berstatus belum terverifikasi sampai runtime yang diwajibkan lulus.
-6. Tambahkan fixture baru hanya untuk celah semantik yang benar-benar direproduksi.
+1. Keep this page and the README aligned with the same measured compatibility snapshot.
+2. Generate counts from the manifest and report artifacts rather than hand-editing numbers.
+3. Mark dated audits and old scores as historical; do not silently rewrite historical findings.
+4. Every support claim must name its implementation, test/fixture, target, and limitation.
 
-### P3 — Pemisahan aplikasi
+### P1 — Close the language/runtime gaps
 
-- **Frontend:** tampilan, navigasi, input, validasi antarmuka.
-- **Backend:** autentikasi, API, kebijakan akses, operasi layanan.
-- **Runtime .cuk:** aturan deterministik dan perilaku bahasa.
-- **Library:** fungsi umum dan adapter dengan kontrak jelas.
-- **Platform bridge:** kemampuan perangkat/penyimpanan yang harus diberi izin eksplisit.
+1. Use the Python reference interpreter as an oracle while the native C and bytecode targets expand.
+2. For each real semantic gap, add one focused fixture, implement the behavior, and run the relevant target matrix.
+3. Include compiler diagnostics, source locations, exit codes, collection behavior, functions, and numeric boundaries in parity work.
+4. Keep the built-in contract and user-facing library documentation synchronized when language-visible behavior changes.
+5. Test a native artifact in an environment without Python before claiming that the execution path is Python-free.
 
-Jangan memindahkan aturan bisnis ke UI hanya untuk membuat prototipe tampak selesai.
+### P2 — Make the C bytecode VM measurable
 
-## Bukti yang wajib sebelum menyatakan selesai
+1. Keep the dedicated C VM parity test in CI.
+2. Expand it by reusing eligible manifest fixtures rather than maintaining a duplicate, unrelated test catalogue.
+3. Report the C VM separately from the native C source runtime.
+4. Do not increase the Python-Free Score until the measured score explicitly covers the relevant execution path.
 
-- Perubahan bahasa: tes yang relevan dan fixture reference/native.
-- Backend compiler: tes backend dan fixture yang memang didukung.
-- AI: tes tool dan alur compile/diagnostic/runtime; respons model saja bukan bukti.
-- Web/SaaS: build, API, autentikasi, dan alur utama yang benar-benar dijalankan.
-- Android/desktop: artefak berhasil dibangun dan diuji pada target nyata; file workflow atau APK lama tidak cukup.
+### P3 — Finish the AI-to-code evidence loop
 
-## Batas keamanan
+1. Keep model output as an untrusted proposal.
+2. Require a trusted expected behavior before accepting a new conformance fixture; never infer correctness from the model's own claim.
+3. Persist the fixture, run the actual compiler and complete required matrix, and reject incomplete runs or regressions.
+4. Log each attempt and persist proposed source only after all gates pass.
+5. Keep provider choice separate from language semantics and never store credentials in source, prompts, fixtures, or logs.
 
-Runtime saat ini bukan sandbox OS yang menjamin eksekusi kode tak tepercaya aman. Jangan jalankan kode pengguna tak dikenal dengan hak akses pribadi. Jangan memasukkan kunci API, service-role key, atau kredensial ke source, dokumentasi, log, maupun prompt.
+### P4 — Avoid documentation-only progress
 
-## Sumber kanonis
+A change should deliver at least one of: user-visible behavior, a reproducible test/fixture, a real integration, or a correction to a demonstrably stale claim. Do not add another roadmap when an existing contract can be updated. Do not rerun the entire suite repeatedly when a relevant successful run already proves the unchanged commit; rerun after meaningful code or workflow changes.
 
-- [Visi](VISION.md)
-- [Spesifikasi bahasa](../SPEC.md)
-- [Kontrak semantik](SEMANTIC_CONTRACT.md)
-- [Kompatibilitas target](COMPATIBILITY.md)
-- [Kontrak built-in](../library/builtin_contract.json)
-- [Indeks dokumentasi](README.md)
+## Security boundary
 
-Dokumen audit bertanggal dan catatan integrasi lama dipertahankan hanya sebagai konteks historis sampai referensi masuknya diperiksa; jangan menganggap semua rekomendasi lama masih merupakan prioritas aktif.
+The interpreter, compiler, and VM are not operating-system sandboxes. Capability strings do not mediate host operations unless the operations explicitly call the policy. Memory accounting is approximate and time checks occur at VM instruction boundaries. Use external OS/container isolation for untrusted code.
+
+## Canonical references
+
+- [Language specification](../SPEC.md)
+- [Semantic contract](SEMANTIC_CONTRACT.md)
+- [Built-in contract](../library/builtin_contract.json)
+- [Compatibility snapshot](COMPATIBILITY.md)
+- [Conformance fixtures](CONFORMANCE_FIXTURES.md)
+- [AI readiness](AI_ENGINE_READINESS.md)
+- [Phase 5 capability policy](PHASE5_CAPABILITY_SANDBOX.md)
+- [Phase 6 repair loop](PHASE6_PUSINGCUK_AI_REPAIR_LOOP.md)

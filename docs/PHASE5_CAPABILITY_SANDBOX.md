@@ -1,14 +1,12 @@
-# Phase 5 — Capability Sandbox (VM-level, honest scope)
+# Phase 5 — Capability Policy and VM Resource Budgets
 
-**Status: VM budget integration started; capability operations and hard isolation remain incomplete.**
+**Status: partially implemented.** The current work provides a default-deny capability policy and VM-level resource-budget hooks. It does not provide an operating-system sandbox or safe execution of hostile programs.
 
 ## Security boundary
 
-This phase adds a default-deny capability policy and VM resource-budget primitives. These are guardrails inside the language runtime, **not an operating-system sandbox** and not a security guarantee for hostile code. The Python process, imported modules, host libraries, and interpreter remain outside a hard isolation boundary.
+The Python process, native libraries, imported modules, and host operations remain outside a hard isolation boundary. Do not run untrusted programs with valuable credentials or broad host access. Use a separately configured OS/container boundary for hostile code.
 
-For untrusted programs, run the VM inside a separately configured container or equivalent isolation boundary; consider seccomp and/or a WASM runtime with an explicit capability model. Do not run hostile code with valuable host credentials or broad filesystem access.
-
-## Capabilities
+## Capability policy
 
 The policy recognizes explicit grants:
 
@@ -18,27 +16,31 @@ The policy recognizes explicit grants:
 - `proses:tool-name` — a named process target.
 - `env:LANG` — one named environment variable.
 
-No grants are present by default. Grants are exact for network, process, and environment targets. File targets are resolved before checking containment so a path that escapes the granted root (including through a symlink) is rejected. A permission string does not itself perform I/O: an operation must explicitly call the policy before opening a file, connecting to a host, spawning a process, or reading environment data. The current bytecode VM does not expose these host operations as language built-ins, so Phase 5 must not imply they are already integrated.
+No grants are present by default. Network, process, and environment grants use exact targets. File paths are resolved before containment checks, including checks against path traversal and symlink escapes.
 
-## Resource budgets
+**Important limitation:** a grant string is policy data, not an I/O operation. The current bytecode VM does not expose file, network, process, or environment access as language built-ins, so these grants do not enable or mediate those operations. Any future host-capability entry point must call the policy before performing the operation.
 
-The bytecode VM now accepts per-run limits through its CLI:
-- `--fuel 100000` — maximum VM instruction ticks;
-- `--memori-byte 16777216` — approximate accounting for VM-visible Python objects;
-- `--waktu-detik 2` — elapsed-time deadline checked at VM instruction ticks;
-- repeatable `--izin=baca:./data` (or `tulis`, `jaringan`, `proses`, `env`) to provide an explicit grant.
+## VM resource budgets
 
-Example: `python -m compiler.vm --fuel 50000 --memori-byte 8388608 --waktu-detik 1.5 --izin=baca:./data program.bytecode.json`. These grants are parsed into the VM policy; they do not create host I/O features. No file/network/process/environment operation is currently exposed by bytecode, so there is no capability-enabled I/O to grant yet.
+The bytecode VM accepts per-run controls:
 
-The memory estimate is not a hard RSS limit: it does not include all interpreter/native allocations and cannot reliably stop a single expensive host call. A hard time or memory ceiling requires an external supervisor/OS boundary. Integration into each VM execution loop and negative integration tests are still required.
+- `--fuel 100000` — maximum VM instruction ticks.
+- `--memori-byte 16777216` — approximate accounting for VM-visible Python objects.
+- `--waktu-detik 2` — elapsed-time deadline checked at VM instruction ticks.
+- Repeatable `--izin=baca:./data` or another supported grant string.
 
-## Completion gates
+Example:
 
-- [ ] Wire the policy into every host-capability entry point in each claimed VM target.
-- [x] Add CLI flags for per-run grants and fuel/memory/time limits (limits are VM-level estimates, not hard OS limits).
-- [ ] Enforce path containment and document permission syntax.
-- [ ] Negative tests: denied file/network/process/env operations, path traversal, symlink escape, malformed permission, fuel exhaustion, time exhaustion, and memory-budget exhaustion.
-- [ ] Run the negative tests in CI and publish the exact supported target(s).
-- [ ] Keep the OS-sandbox warning visible in user-facing security documentation.
+```sh
+python -m compiler.vm --fuel 50000 --memori-byte 8388608 --waktu-detik 1.5 --izin=baca:./data program.bytecode.json
+```
 
-Until these gates pass, label Phase 5 **in progress** and do not claim the VM safely executes arbitrary untrusted code.
+These are runtime guardrails, not hard OS-level limits. Memory accounting does not include every interpreter/native allocation, and a time check cannot interrupt an expensive host call between VM ticks.
+
+## Evidence and remaining gates
+
+Implemented and covered by the current Phase 5 test suite: policy decisions, exact targets, path containment checks, symlink-escape rejection, and VM-level fuel/memory budget behavior.
+
+Still incomplete: capability mediation for actual host operations, hard resource isolation, and a security guarantee for arbitrary untrusted code. Do not describe the VM as a secure sandbox.
+
+The CI workflow on `cuk-reality-engine` runs the sandbox tests. The result proves only the tested contracts on that commit; it does not change the security boundary above.

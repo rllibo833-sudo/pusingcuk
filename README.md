@@ -1,82 +1,54 @@
 # PusingCuk
 
-> **Bahasa warung. Mesin serius.**  
-> PusingCuk adalah bahasa pemrograman eksperimental dengan ekstensi `.cuk`, kata kunci berbahasa Indonesia, dan kosakata yang punya identitas sendiri.
+> **Warung language. Serious engineering.**
 
-PusingCuk menggabungkan sintaks yang mudah dikenali penutur Indonesia dengan jalur interpreter, compiler, runtime native, serta alat konformansi.
+PusingCuk is an experimental programming language with the canonical `.cuk` extension, Indonesian-inspired keywords, and a distinct vocabulary shaped by Gen Z and Gen Alpha culture. Its identity is playful; its implementation contracts and evidence standards are deliberately strict.
 
-**[Coba di browser →](https://rllibo833-sudo.github.io/pusingcuk/playground.html)** — playground eksperimental tahap awal; mesin sementaranya Python melalui Pyodide, bukan runtime .cuk asli.
+[Open the experimental browser playground](https://rllibo833-sudo.github.io/pusingcuk/playground.html). The current playground uses Python through Pyodide as a temporary execution path; it is not the native `.cuk` runtime.
 
 <!-- BEGIN GENERATED PYTHON-FREE SCORE BADGE -->
 [![Python-free runtime · native C · 74/77 fixtures](docs/assets/python-free-score.svg)](docs/COMPATIBILITY.md)
-Python-free runtime, native C: **74 dari 77 fixture (96.10%)**. Skor ini hanya mengukur fixture native C yang lulus; bukan klaim seluruh toolchain bebas Python.
+Python-free native C score: **74 of 77 fixtures (96.10%)** in the checked-in compatibility snapshot. This score describes the native C source runtime and its required fixture subset; it does not measure the C bytecode VM or prove that the whole toolchain is Python-free.
 <!-- END GENERATED PYTHON-FREE SCORE BADGE -->
 
-Proyek ini ditujukan untuk belajar, eksperimen bahasa, dan pengembangan compiler secara terbuka—bukan untuk mengklaim bahwa semua target sudah setara atau siap produksi.
+**Development status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. This is experimental software, not a stable release. Support differs by runtime and backend; consult the compatibility evidence for the exact tested scope.
 
-**Status:** kontrak bahasa `0.6-dev`; paket Python `0.8.0.dev0`. **Metadata paket pada `main` adalah `0.8.0.dev0`.** Ini perangkat lunak tahap pengembangan, bukan rilis stabil. Dukungan tiap backend berbeda dan harus diperiksa melalui matriks kompatibilitas serta fixture.
+## What exists today
 
-## Phase 4 — Path Away from Python
+| Component | Verified scope | Important limitation |
+|---|---|---|
+| Language frontend | Lexer, parser, AST, reference interpreter, language specification, semantic contract, built-in contract, and conformance fixtures | The reference path requires Python |
+| Native C runtime | Executes the subset represented by the native C conformance results | It is not feature-equivalent to the reference interpreter |
+| Python bytecode VM | Experimental bytecode compiler and VM | Not a Python-independent deployment runtime |
+| Native C bytecode VM | Loads versioned bytecode and runs a tested subset; six valid parity examples and four invalid-input checks are exercised by a dedicated test | This small test set is not full-language parity; the Python bytecode compiler remains in the test path |
+| Other compiler targets | Experimental JavaScript, Python-transpiler, IR, and Android-related components | File presence does not establish full compatibility or release readiness |
+| PusingCuk AI | Local-first assistant, provider adapters, curated retrieval, citations, local memory, and compiler-check tools | Uses selected model providers; it is not a foundation model trained by this project |
+| AI repair loop | Provider-neutral core with compiler, fixture, and differential-result gates plus JSONL attempt logging | The production model adapter and canonical fixture/matrix callbacks are not yet wired into one end-to-end flow |
 
-Phase 4 is incremental and fixture-gated. The versioned format contracts are documented in [JSON IR v1](docs/IR_SPEC.md) and [bytecode v1](docs/BYTECODE_SPEC.md); the gated plan and honest implementation status are in [Phase 4 roadmap](docs/PHASE4_ROADMAP.md) and [phase4-status.json](reports/phase4-status.json).
+## Start here
 
-**Important:** a native C source runtime is not the same as a C bytecode VM. The C bytecode VM and self-hosted .cuk lexer/parser are not implemented by this branch yet. The Python-Free Score therefore does not increase for those goals until actual C-VM fixtures pass.
+- **New to the language:** [Getting started](docs/PEMULA.md)
+- **Language behavior:** [Language specification](SPEC.md) → [Semantic contract](docs/SEMANTIC_CONTRACT.md)
+- **Measured runtime support:** [Compatibility evidence](docs/COMPATIBILITY.md) and [conformance fixtures](docs/CONFORMANCE_FIXTURES.md)
+- **Language vocabulary:** [English dictionary](docs/DICTIONARY.md) and [Gen Z/Gen Alpha vocabulary](docs/KOSAKATA_GENZ.md)
+- **Project direction and current status:** [Project status](docs/PROJECT_STATUS_AND_ROADMAP.md) · [Documentation index](docs/README.md)
+- **AI architecture:** [AI readiness](docs/AI_ENGINE_READINESS.md) · [Phase 6 repair loop](docs/PHASE6_PUSINGCUK_AI_REPAIR_LOOP.md)
+- **Contribution and security:** [Contributing](CONTRIBUTING.md) · [Security policy](SECURITY.md)
 
-## Coba program pertama
+## Evidence rules
 
-Persyaratan: Python 3.11 atau 3.12.
+- **Implemented** means code exists.
+- **Tested** means a named test ran against a named target at a specific commit.
+- **Compatible** means the relevant shared fixtures passed on the compared targets.
+- **Python-free** applies only to the exact execution path demonstrated to work without Python; it does not automatically apply to the build, compiler, or other runtime.
+- **Production-ready** requires additional security, packaging, operations, and target-environment evidence.
 
-Simpan sebagai `halo.cuk`:
+A passing CI run proves only the checks actually executed by that workflow. It does not prove that every backend is equivalent, that arbitrary code is safe, or that the AI's output is correct.
 
-```cuk
-jancuk
-lah nama = "Dunia"
-hedeh "Halo, " + nama
-selesai jancuk
-```
+## Security boundary
 
-Jalankan dan periksa sintaks:
+The interpreter, compiler, and VM are **not operating-system sandboxes**. Do not run untrusted source or bytecode in a sensitive environment. VM instruction, time, and memory budgets are runtime guardrails, not hard OS-level isolation.
 
-```sh
-python pusingcuk_new.py halo.cuk
-python pusingcuk_new.py --check halo.cuk
-```
+## License
 
-## Apa isi repositori ini?
-
-| Area | Fungsi |
-|---|---|
-| Bahasa inti | Lexer, parser, AST, interpreter referensi, spesifikasi, dan kontrak semantik |
-| Compiler | IR dan target eksperimental JavaScript, Python, HTML, JSON IR, dan VM |
-| Runtime native | Implementasi C untuk subset bahasa yang memiliki pengujian |
-| Pustaka dan kosakata | Built-in, kontrak mesin, kata kunci, dan alias slang |
-| PusingCuk AI | Asisten dan alat bantu untuk alur pengembangan .cuk; bukan bukti bahwa model fondasi dilatih sendiri |
-| Konformansi | Tes otomatis dan fixture untuk membuktikan perilaku pada target yang dinyatakan |
-| Contoh dan dokumentasi | Program belajar, kamus, panduan runtime, batas kompatibilitas, dan catatan pengembangan |
-
-## Jalur membaca
-
-- **Baru mulai:** [Panduan pemula](docs/PEMULA.md)
-- **Aturan bahasa:** [Spesifikasi](SPEC.md) → [Kontrak semantik](docs/SEMANTIC_CONTRACT.md)
-- **Dukungan nyata per target:** [Kompatibilitas](docs/COMPATIBILITY.md) dan [fixture konformansi](docs/CONFORMANCE_FIXTURES.md)
-- **Kamus:** [Kamus Bahasa Warung](docs/KAMUS_PUSINGCUK.md) · [Dictionary (English)](docs/DICTIONARY.md)
-- **Peta dokumentasi:** [docs/README.md](docs/README.md)
-- **Gambaran proyek dan batasnya:** [Ikhtisar proyek](docs/PROJECT_OVERVIEW.md) · [Project overview (English)](docs/PROJECT_OVERVIEW_EN.md)
-- **Kontribusi dan keamanan:** [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md)
-
-## Status fitur: baca dengan konteks
-
-- **Tersedia** berarti ada implementasi di repositori.
-- **Teruji** berarti pengujian tertentu berjalan pada commit dan target yang disebutkan.
-- **Eksperimental** berarti perilaku, cakupan, atau antarmukanya masih dapat berubah.
-- **Siap produksi** membutuhkan bukti tambahan: keamanan, kompatibilitas, packaging, operasi, dan pengujian pada lingkungan sasaran.
-
-Keberadaan file, contoh, workflow, atau backend tidak otomatis membuktikan kesiapan produksi. Untuk perubahan bahasa, selaraskan spesifikasi, implementasi, fixture, dan matriks kompatibilitas.
-
-## Batas keamanan
-
-Interpreter, compiler, dan VM PusingCuk **bukan sandbox sistem operasi**. Jangan menjalankan kode .cuk atau bytecode yang tidak dipercaya pada perangkat atau lingkungan sensitif. Target native yang dapat berjalan tanpa Python setelah dikompilasi tidak berarti proses build-nya bebas Python, dan tidak menjamin isolasi keamanan.
-
-## Lisensi
-
-PusingCuk menggunakan lisensi MIT. Lihat [LICENSE](LICENSE) untuk ketentuannya.
+PusingCuk is distributed under the MIT License. See [LICENSE](LICENSE).
