@@ -1,36 +1,36 @@
-# Identitas PusingCuk — Tiga Komponen, Satu Ekosistem
+# PusingCuk Identity — Three Parts, One Ecosystem
 
-Dokumen ini adalah referensi resmi untuk membedakan tiga komponen utama ekosistem PusingCuk.
+This document is the reference for distinguishing the three main parts of the PusingCuk ecosystem.
 
-## 1. Bahasa .cuk (PusingCuk Language)
+## 1. The .cuk language
 
-Bahasa pemrograman eksperimental dengan ekstensi `.cuk`, keyword berbahasa Indonesia, spesifikasi tertulis, interpreter referensi, runtime native C, dan backend JavaScript.
+An experimental programming language using the `.cuk` extension, Indonesian-language keywords, a written specification, a reference interpreter, a native C runtime, and a JavaScript backend.
 
-**Tujuan:** bahasa yang bisa dipelajari dari HP, berjalan lokal, dan memiliki jalur menuju executable native.
+**Goal:** a language people can learn from a phone, run locally, and eventually use to build native executables.
 
-Prinsip:
-- Spesifikasi adalah sumber kebenaran; implementasi harus mengikutinya.
-- Kosakata dibekukan. Alias baru memerlukan keputusan Founder.
-- Tidak ada klaim siap produksi tanpa bukti fixture konformansi.
+Principles:
+- The specification is authoritative; implementations must follow it.
+- Vocabulary is controlled. New aliases require an explicit project decision.
+- No production-readiness claim without conformance evidence.
 
-Lokasi: `SPEC.md`, `lexer.py`, `parser.py`, `evaluator.py`, `ast_nodes.py`, `pusingcuk_new.py`, `library/`, `native/`, `compiler/`, `tests/`, `examples/`, `site/`.
+Key locations: `SPEC.md`, `lexer.py`, `parser.py`, `evaluator.py`, `ast_nodes.py`, `pusingcuk_new.py`, `library/`, `native/`, `compiler/`, `tests/`, `examples/`, and `site/`.
 
 ## 2. PusingCuk AI
 
-Lapisan asisten yang di-ground dengan spesifikasi, kosakata, kontrak built-in, dan fixture .cuk. Ini bukan model fondasi yang dilatih dari nol dan bukan sumber kebenaran bahasa; SPEC tetap berwenang.
+An assistant grounded in the language specification, vocabulary, built-in contract, and .cuk fixtures. It is not a foundation model trained from scratch and is not the authority on language semantics; `SPEC.md` remains authoritative.
 
-Tujuannya membantu menjawab pertanyaan tentang .cuk, menghasilkan contoh valid, dan menjelaskan diagnostic dengan konteks proyek. Provider AI dapat diganti; klaim kemampuan harus sesuai implementasi yang benar-benar tersedia.
+Its purpose is to answer .cuk questions, produce examples, and explain diagnostics using project context. Providers may vary; capability claims must match the implementation that is actually available.
 
-Lokasi terkait: `library/assistant.py`, `library/ai_tools.py`, `library/knowledge_grounding.py`, `library/knowledge_index.json`, `library/local_memory.py`, provider AI yang tersedia, dan `examples/ai/`.
+Related locations include `library/assistant.py`, `library/ai_tools.py`, `library/knowledge_grounding.py`, `library/knowledge_index.json`, `library/local_memory.py`, available AI providers, and `examples/ai/`.
 
 ## 3. Cuk Reality Engine
 
-Perangkat pembuktian kompatibilitas lintas target: menjalankan fixture, membandingkan output, mencatat perbedaan, dan menghasilkan laporan yang bisa direproduksi. Laporan harus berasal dari eksekusi nyata; file statis atau badge saja bukan bukti bahwa generator berfungsi.
+Conformance tooling for checking behavior across targets: run fixtures, compare outputs, record differences, and generate reproducible reports. Reports must come from real executions; static files or badges alone do not prove a generator works.
 
-Lokasi terkait: `tests/conformance/`, `tools/`, `reports/`, `docs/COMPATIBILITY.md`, serta workflow CI terkait.
+Related locations include `tests/conformance/`, `tools/`, `reports/`, `docs/COMPATIBILITY.md`, and the relevant CI workflows.
 
-## Hubungan ketiganya
+## How they relate
 
-Bahasa .cuk adalah fondasi dan menentukan semantik. PusingCuk AI membantu manusia menggunakan dan mengembangkan bahasa dengan konteks yang benar. Cuk Reality Engine memeriksa apakah klaim kompatibilitas didukung bukti.
+The .cuk language defines the semantics. PusingCuk AI helps people use and develop the language with relevant context. Cuk Reality Engine checks whether compatibility claims are supported by evidence.
 
-Tidak satu pun dari AI atau Reality Engine boleh mengubah spesifikasi bahasa secara diam-diam. Status target harus dibatasi oleh hasil konformansi yang benar-benar tersedia.
+Neither AI nor the Reality Engine may silently change the language specification. Target status must be limited to the conformance evidence actually available.
