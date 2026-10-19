@@ -1,0 +1,3008 @@
+{
+  "schema_version": 1,
+  "engine": "Cuk Reality Engine",
+  "manifest": "tests/conformance/manifest.json",
+  "fixture_count": 77,
+  "targets": [
+    "reference",
+    "native"
+  ],
+  "counts": {
+    "reference": {
+      "pass": 77,
+      "fail": 0,
+      "unsupported": 0
+    },
+    "native": {
+      "pass": 74,
+      "fail": 0,
+      "unsupported": 3
+    }
+  },
+  "python_free_score": {
+    "target": "native C runtime after compilation",
+    "passed_required_fixtures": 74,
+    "total_required_fixtures": 77,
+    "percent": 96.1,
+    "note": "Does not mean compiler, build, tooling, or CI is Python-free."
+  },
+  "fixtures": [
+    {
+      "id": "core.output-arithmetic",
+      "source": "output_arithmetic.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "variables",
+        "arithmetic",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "42\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "42\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "42\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "builtins.logarithms",
+      "source": "logarithms.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "math",
+        "logarithms"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "0\n1\n2\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "0\n1\n2\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "0\n1\n2\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "builtins.logarithm-domain-error",
+      "source": "logarithm_domain_error.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "math",
+        "runtime-errors"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 3
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 3
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 3
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "syntax.malformed-expression",
+      "source": "malformed_expression.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "syntax-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 2,
+        "stdout": "",
+        "stderr_class": "syntax_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 2,
+          "stdout": "",
+          "stderr_class": "syntax_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 2,
+          "stdout": "",
+          "stderr_class": "syntax_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "syntax.actionable-diagnostic-location",
+      "source": "actionable_syntax_error.cuk",
+      "profile": "core",
+      "requires": [
+        "syntax-diagnostics",
+        "source-location"
+      ],
+      "expected": {
+        "exit_code": 2,
+        "stdout": "",
+        "stderr_class": "syntax_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 2,
+          "stdout": "",
+          "stderr_class": "syntax_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 2,
+          "stdout": "",
+          "stderr_class": "syntax_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "functions.return-value",
+      "source": "functions.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "functions",
+        "return",
+        "calls"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "9\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "9\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "9\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "functions.wrong-arity",
+      "source": "function_wrong_arity.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "functions",
+        "arity-check"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 5
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 5
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 5
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "collections.list-index-mutation",
+      "source": "list_index.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "lists",
+        "indexing",
+        "mutation"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "99\n2\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "99\n2\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "99\n2\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "collections.list-concatenation",
+      "source": "list_concatenation.cuk",
+      "profile": "core",
+      "requires": [
+        "lists",
+        "operators",
+        "concatenation",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "4\n1\n4\n2\n2\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "4\n1\n4\n2\n2\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "4\n1\n4\n2\n2\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "collections.boolean-numeric-dictionary-keys",
+      "source": "dictionary_keys.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "dictionaries",
+        "key-identity",
+        "equality"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "angka\nboolean\n2\ntidak\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "angka\nboolean\n2\ntidak\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "angka\nboolean\n2\ntidak\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "control.range-loop",
+      "source": "range_loop.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "loops",
+        "range"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "1\n3\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "1\n3\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "1\n3\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "syntax.alias-keywords",
+      "source": "alias_keywords.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "keyword-aliases",
+        "arithmetic"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "42\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "42\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "42\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "collections.list-structural-equality",
+      "source": "list_equality.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "lists",
+        "equality",
+        "nested-collections"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "okelah\nokelah\nokelah\ntidak\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "okelah\nokelah\nokelah\ntidak\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "okelah\nokelah\nokelah\ntidak\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "logic.short-circuit",
+      "source": "short_circuit.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "boolean",
+        "logical-operators",
+        "short-circuit"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "tidak\nokelah\ntidak\nokelah\ntidak\nokelah\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "tidak\nokelah\ntidak\nokelah\ntidak\nokelah\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "tidak\nokelah\ntidak\nokelah\ntidak\nokelah\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "logic.skipped-operand-still-parses",
+      "source": "short_circuit_malformed.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "logical-operators",
+        "syntax-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 2,
+        "stdout": "",
+        "stderr_class": "syntax_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 2,
+          "stdout": "",
+          "stderr_class": "syntax_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 2,
+          "stdout": "",
+          "stderr_class": "syntax_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "operators.arithmetic-precedence",
+      "source": "arithmetic_precedence.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "arithmetic",
+        "operator-precedence",
+        "parentheses"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "14\n20\n8\n12\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "14\n20\n8\n12\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "14\n20\n8\n12\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "text.utf8-output",
+      "source": "unicode_output.pusingcuk",
+      "profile": "core",
+      "requires": [
+        "strings",
+        "unicode",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "Pusingcuk: selamat pagi 🌾\nBahasa Indonesia\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "Pusingcuk: selamat pagi 🌾\nBahasa Indonesia\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "Pusingcuk: selamat pagi 🌾\nBahasa Indonesia\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "core.cuk-source-extension",
+      "source": "canonical_extension.cuk",
+      "profile": "core",
+      "requires": [
+        "source-extension",
+        "variables",
+        "arithmetic",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "42\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "42\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "42\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "syntax.alias-keywords-extended",
+      "source": "alias_keywords_extended.cuk",
+      "profile": "core",
+      "requires": [
+        "keyword-aliases",
+        "variables",
+        "boolean",
+        "conditionals",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "42\n42\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "42\n42\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "42\n42\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "core.builtins-native-length-range",
+      "source": "builtins_native.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "length",
+        "range",
+        "loops"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "3\n3\n3\n2\n4\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "3\n3\n3\n2\n4\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "3\n3\n3\n2\n4\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.range-zero-step",
+      "source": "range_zero_step.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "range",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.undefined-variable",
+      "source": "undefined_variable.cuk",
+      "profile": "core",
+      "requires": [
+        "variables",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "reference.builtins-standard-library",
+      "source": "builtins_reference.cuk",
+      "profile": "reference",
+      "requires": [
+        "builtins",
+        "type-conversion",
+        "math",
+        "statistics"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "okelah\n42\n1.5\ntidak\n2\n2\n5\n2\n3\n2\n3\n8\n0\n1\n2\n2.5\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "okelah\n42\n1.5\ntidak\n2\n2\n5\n2\n3\n2\n3\n8\n0\n1\n2\n2.5\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "okelah\n42\n1.5\ntidak\n2\n2\n5\n2\n3\n2\n3\n8\n0\n1\n2\n2.5\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "reference.builtins-domain-error",
+      "source": "builtin_domain_error.cuk",
+      "profile": "reference",
+      "requires": [
+        "builtins",
+        "numeric-domain-errors",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "reference.builtins-arity-error",
+      "source": "builtin_arity_error.cuk",
+      "profile": "reference",
+      "requires": [
+        "builtins",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "numbers.negative-floor-division-and-modulo",
+      "source": "numeric_floor_modulo.cuk",
+      "profile": "core",
+      "requires": [
+        "numbers",
+        "floor-division",
+        "modulo"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "-3\n2\n0.5\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "-3\n2\n0.5\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "-3\n2\n0.5\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "builtins.native-numeric-core",
+      "source": "builtins_native_numeric.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-builtins",
+        "rounding"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "4\n3\n8\n2\n4\n-2\n2\n-3\n-2\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "4\n3\n8\n2\n4\n-2\n2\n-3\n-2\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "4\n3\n8\n2\n4\n-2\n2\n-3\n-2\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.numeric-division-by-zero",
+      "source": "division_by_zero.cuk",
+      "profile": "core",
+      "requires": [
+        "arithmetic",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.native-builtin-wrong-arity",
+      "source": "builtin_native_arity_error.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.native-builtin-rejects-boolean",
+      "source": "builtin_native_type_error.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "collections.list-index-boundary",
+      "source": "list_index_out_of_range.cuk",
+      "profile": "core",
+      "requires": [
+        "lists",
+        "indexing",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 3
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 3
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 3
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "collections.dictionary-missing-key",
+      "source": "dictionary_missing_key.cuk",
+      "profile": "core",
+      "requires": [
+        "dictionaries",
+        "key-lookup",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 3
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 3
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 3
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "functions.scope-local-does-not-leak",
+      "source": "function_scope_leak.cuk",
+      "profile": "core",
+      "requires": [
+        "functions",
+        "scope",
+        "local-variables",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 7
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 7
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 7
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "collections.mutation-through-function-argument",
+      "source": "collection_mutation_function_arg.cuk",
+      "profile": "core",
+      "requires": [
+        "functions",
+        "lists",
+        "mutation",
+        "aliasing"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "7\n7\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "7\n7\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "7\n7\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "builtins.native-square-root-and-power",
+      "source": "builtins_sqrt_power.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "math",
+        "finite-results",
+        "numeric-format"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "3\n1.4142135623730951\n8\n0.5\n-8\n1.4142135623730951\n0.1\n3\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "3\n1.4142135623730951\n8\n0.5\n-8\n1.4142135623730951\n0.1\n3\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "3\n1.4142135623730951\n8\n0.5\n-8\n1.4142135623730951\n0.1\n3\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.sqrt-negative-domain",
+      "source": "sqrt_negative.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-domain-errors",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.power-negative-fractional-domain",
+      "source": "power_negative_fractional.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-domain-errors",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.power-zero-negative-exponent",
+      "source": "power_zero_negative.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-domain-errors",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.power-nonfinite-result",
+      "source": "power_nonfinite.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-overflow",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.sqrt-wrong-arity",
+      "source": "sqrt_wrong_arity.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.power-wrong-arity",
+      "source": "power_wrong_arity.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.sqrt-rejects-boolean",
+      "source": "sqrt_boolean.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.power-rejects-boolean",
+      "source": "power_boolean.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "builtins.native-trigonometry-and-statistics",
+      "source": "builtins_trig_statistics.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "trigonometry",
+        "statistics",
+        "finite-numbers",
+        "numeric-format"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "0\n1\n0.479425538604203\n0.8775825618903728\n3\n-0.5\n2\n6\n1.5\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "0\n1\n0.479425538604203\n0.8775825618903728\n3\n-0.5\n2\n6\n1.5\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "0\n1\n0.479425538604203\n0.8775825618903728\n3\n-0.5\n2\n6\n1.5\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.sinus-wrong-arity",
+      "source": "sinus_wrong_arity.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.kosinus-wrong-arity",
+      "source": "kosinus_wrong_arity.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.sinus-rejects-boolean",
+      "source": "sinus_boolean.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.kosinus-rejects-boolean",
+      "source": "kosinus_boolean.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.rata-rata-empty-list",
+      "source": "mean_empty.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "statistics",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.median-empty-list",
+      "source": "median_empty.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "statistics",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.rata-rata-rejects-boolean",
+      "source": "mean_boolean.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "statistics",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.median-rejects-boolean",
+      "source": "median_boolean.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "statistics",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.rata-rata-wrong-arity",
+      "source": "mean_wrong_arity.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "statistics",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.median-wrong-arity",
+      "source": "median_wrong_arity.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "statistics",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.rata-rata-unsafe-integer",
+      "source": "mean_unsafe_integer.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "statistics",
+        "numeric-range",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.median-unsafe-integer",
+      "source": "median_unsafe_integer.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "statistics",
+        "numeric-range",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "builtins.native-statistics-and-sum-boundaries",
+      "source": "statistics_sum_boundaries.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "statistics",
+        "sum",
+        "safe-integer-range",
+        "numeric-format"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "0\n9\n0.6000000000000001\n0\n9007199254740991\n0\n9007199254740991\n0.2\n9007199254740991\n0\n5\n0\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "0\n9\n0.6000000000000001\n0\n9007199254740991\n0\n9007199254740991\n0.2\n9007199254740991\n0\n5\n0\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "0\n9\n0.6000000000000001\n0\n9007199254740991\n0\n9007199254740991\n0.2\n9007199254740991\n0\n5\n0\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.jumlah-wrong-arity",
+      "source": "sum_wrong_arity.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "arity-check",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.jumlah-rejects-boolean",
+      "source": "sum_boolean.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.jumlah-rejects-unsafe-input",
+      "source": "sum_unsafe_input.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-range",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.jumlah-result-outside-safe-range",
+      "source": "sum_unsafe_result.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-range",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.jumlah-rejects-non-list",
+      "source": "sum_non_list.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "collection-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.jumlah-intermediate-safe-range",
+      "source": "sum_intermediate_unsafe.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-range",
+        "ordered-accumulation",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "reference.json-invalid-returns-false",
+      "source": "json_invalid_returns_false.cuk",
+      "profile": "reference",
+      "requires": [
+        "json",
+        "json-parse-result"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "tidak\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "unsupported"
+      },
+      "results": {
+        "native": {
+          "status": "UNSUPPORTED",
+          "matched": false
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "tidak\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "reference.json-null-returns-none",
+      "source": "json_null_is_none.cuk",
+      "profile": "reference",
+      "requires": [
+        "json",
+        "json-parse-result"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "None\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "unsupported"
+      },
+      "results": {
+        "native": {
+          "status": "UNSUPPORTED",
+          "matched": false
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "None\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "numbers.round-ties-to-even",
+      "source": "round_ties_even.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-boundary",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "2\n4\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "2\n4\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "2\n4\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.round-rejects-boolean",
+      "source": "round_rejects_boolean.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-types",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "runtime.round-rejects-unsafe-result",
+      "source": "round_unsafe_result.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-boundary",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 2
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "formats.json-html-csv",
+      "source": "formats_json_html_csv.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "json",
+        "html-escaping",
+        "csv-quoting"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "{\"nama\":\"Budi\",\"aktif\":true}\nBudi\nSiti\nokelah\n&lt;b&gt;&amp;&quot;&#x27;\nBudi,\"kopi, susu\",\"dia bilang \"\"hai\"\"\"\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "unsupported"
+      },
+      "results": {
+        "native": {
+          "status": "UNSUPPORTED",
+          "matched": false
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "{\"nama\":\"Budi\",\"aktif\":true}\nBudi\nSiti\nokelah\n&lt;b&gt;&amp;&quot;&#x27;\nBudi,\"kopi, susu\",\"dia bilang \"\"hai\"\"\"\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "builtins.js-expanded-parity",
+      "source": "builtins_js_expanded.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "numeric-conversion",
+        "truthiness",
+        "logarithms",
+        "sum"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "2.5\ntidak\nokelah\n0\n2\n0\n9\n0.6000000000000001\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "2.5\ntidak\nokelah\n0\n2\n0\n9\n0.6000000000000001\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "2.5\ntidak\nokelah\n0\n2\n0\n9\n0.6000000000000001\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "collections.range-index",
+      "source": "range_index.cuk",
+      "profile": "core",
+      "requires": [
+        "ranges",
+        "indexing",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "3\n1\n3\n5\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "3\n1\n3\n5\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "3\n1\n3\n5\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "collections.range-index-out-of-range",
+      "source": "range_index_out_of_range.cuk",
+      "profile": "core",
+      "requires": [
+        "ranges",
+        "indexing",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 3
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 3
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 3
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "collections.range-index-negative",
+      "source": "range_index_negative.cuk",
+      "profile": "core",
+      "requires": [
+        "ranges",
+        "indexing",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 3
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 3
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr_class": "runtime_error",
+          "source_line": 3
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "builtins.length-text-list-dictionary-range",
+      "source": "builtins_length_shapes.cuk",
+      "profile": "core",
+      "requires": [
+        "builtins",
+        "length",
+        "strings",
+        "lists",
+        "dictionaries",
+        "ranges"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "3\n3\n2\n3\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "3\n3\n2\n3\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "3\n3\n2\n3\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "collections.dictionary-overwrite-preserves-size",
+      "source": "collections_dictionary_overwrite.cuk",
+      "profile": "core",
+      "requires": [
+        "dictionaries",
+        "mutation",
+        "key-lookup",
+        "length"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "7\n2\n2\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "7\n2\n2\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "7\n2\n2\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "control.nested-range-loops",
+      "source": "control_nested_range_loops.cuk",
+      "profile": "core",
+      "requires": [
+        "loops",
+        "ranges",
+        "nested-control-flow",
+        "arithmetic"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "11\n12\n21\n22\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "11\n12\n21\n22\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "11\n12\n21\n22\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "application.warung-checkout",
+      "source": "kasir_warung.cuk",
+      "profile": "core",
+      "requires": [
+        "variables",
+        "arithmetic",
+        "builtins",
+        "output"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "40000\n4000\n36000\n3960\n39960\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      },
+      "results": {
+        "native": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "40000\n4000\n36000\n3960\n39960\n",
+          "stderr_class": null,
+          "source_line": null
+        },
+        "reference": {
+          "status": "PASS",
+          "matched": true,
+          "exit_code": 0,
+          "stdout": "40000\n4000\n36000\n3960\n39960\n",
+          "stderr_class": null,
+          "source_line": null
+        }
+      },
+      "status": "PASS"
+    }
+  ]
+}
