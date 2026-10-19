@@ -9,6 +9,10 @@ from parser import ParserError, parse as parse_source
 
 
 def main():
+    # Keep the established CLI intact while exposing the Reality Engine as a subcommand.
+    if len(sys.argv) > 1 and sys.argv[1] == "reality":
+        from tools.reality_engine import main as reality_main
+        return reality_main(sys.argv[2:])
     parser = argparse.ArgumentParser(
         description="Jalankan program Pusingcuk."
     )
