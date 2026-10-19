@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "phase": "Phase 4 - Path Away from Python",
+  "branch": "core-cuk-engine",
+  "updated": "2026-10-19",
+  "gates": [
+    {
+      "id": 1,
+      "name": "Freeze JSON IR and bytecode formats",
+      "status": "DOCUMENTED_NOT_YET_FIXTURE_GATED",
+      "evidence": [
+        "docs/IR_SPEC.md",
+        "docs/BYTECODE_SPEC.md"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "C bytecode VM",
+      "status": "NOT_IMPLEMENTED",
+      "detail": "Python VM executes bytecode; native C runtime has not been shown to load serialized bytecode."
+    },
+    {
+      "id": 3,
+      "name": "Self-host lexer in .cuk",
+      "status": "NOT_IMPLEMENTED",
+      "detail": "Needs tokenization data structures and lexer feature fixtures."
+    },
+    {
+      "id": 4,
+      "name": "Self-host parser in .cuk",
+      "status": "BLOCKED_ON_GATE_3"
+    },
+    {
+      "id": 5,
+      "name": "Compiler on VM; Python optional",
+      "status": "FUTURE_GOAL"
+    }
+  ]
+}
