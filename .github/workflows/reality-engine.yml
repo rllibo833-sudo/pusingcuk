@@ -38,6 +38,8 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Run capability sandbox negative tests
         run: python tests/test_capability_sandbox.py
+      - name: Run PusingCuk AI repair-loop tests
+        run: python tests/test_repair_loop.py
       - name: Run canonical conformance suite
         run: python tools/conformance.py
       - name: Build C bytecode VM

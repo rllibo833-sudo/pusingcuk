@@ -57,19 +57,19 @@ class CapabilityPolicyTests(unittest.TestCase):
                     parse_permission(spec)
 
     def test_vm_enforces_fuel_limit(self):
-        document = compile_source("jancuk\\nlah x = 1\\nhedeh x\\nselesai jancuk\\n")
+        document = compile_source("jancuk\nlah x = 1\nhedeh x\nselesai jancuk\n")
         vm = VirtualMachine(document, max_steps=1)
         with self.assertRaises(VMError):
             vm.run()
 
     def test_vm_enforces_memory_budget(self):
-        document = compile_source('jancuk\\nlah x = "a fairly long value"\\nhedeh x\\nselesai jancuk\\n')
+        document = compile_source('jancuk\nlah x = "a fairly long value"\nhedeh x\nselesai jancuk\n')
         vm = VirtualMachine(document, max_memory_bytes=1)
         with self.assertRaises(VMError):
             vm.run()
 
     def test_vm_exposes_default_deny_capability_check(self):
-        document = compile_source("jancuk\\nhedeh 1\\nselesai jancuk\\n")
+        document = compile_source("jancuk\nhedeh 1\nselesai jancuk\n")
         vm = VirtualMachine(document)
         with self.assertRaises(CapabilityDenied):
             vm.require_capability("baca", "./secret.txt")
