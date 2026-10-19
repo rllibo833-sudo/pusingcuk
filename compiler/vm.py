@@ -17,7 +17,8 @@ class VMError(RuntimeError):
 
 class VirtualMachine:
     def __init__(self, document, *, input_stream=None, output_stream=None, max_steps=100000,
-                 max_memory_bytes=16 * 1024 * 1024, time_limit_seconds=2.0,\n                 permissions=(), cwd=None):
+                 max_memory_bytes=16 * 1024 * 1024, time_limit_seconds=2.0,
+                 permissions=(), cwd=None):
         self.document = validate_bytecode(document)
         self.functions = document["functions"]
         self.input = input_stream or sys.stdin
