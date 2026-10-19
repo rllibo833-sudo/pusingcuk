@@ -16,14 +16,29 @@
     {
       "id": 2,
       "name": "C bytecode VM",
-      "status": "NOT_IMPLEMENTED",
-      "detail": "Python VM executes bytecode; native C runtime has not been shown to load serialized bytecode."
+      "status": "PROTOTYPE_STAGE_1",
+      "detail": "C JSON reader and scalar stack opcodes implemented. Collections, builtins, functions, input, iterators, full validation and diagnostic parity remain gated.",
+      "supported_opcodes": [
+        "CONST",
+        "LOAD",
+        "DECLARE",
+        "STORE",
+        "PRINT",
+        "POP",
+        "TO_BOOL",
+        "UNARY",
+        "BINARY",
+        "JUMP",
+        "JUMP_IF_FALSE",
+        "JUMP_IF_TRUE"
+      ],
+      "test": "tests/test_c_bytecode_vm.py"
     },
     {
       "id": 3,
       "name": "Self-host lexer in .cuk",
       "status": "NOT_IMPLEMENTED",
-      "detail": "Needs tokenization data structures and lexer feature fixtures."
+      "detail": "Blocked until C VM opcode coverage is expanded and stable."
     },
     {
       "id": 4,
