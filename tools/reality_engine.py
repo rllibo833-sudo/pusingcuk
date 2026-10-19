@@ -254,21 +254,58 @@ def diff_file(path_text):
             }
     def normalized(item):
         return (item["status"], item["exit_code"], item["stdout"], item["stderr_class"], item["source_line"])
+
+    def compare_text(candidate_text):
+        candidate_path = Path(tmp) / "candidate.cuk"
+        candidate_path.write_text(candidate_text, encoding="utf-8")
+        found = {}
+        for name, command in (
+            ("reference", [sys.executable, str(ROOT / "pusingcuk_new.py"), str(candidate_path)]),
+            ("native", [str(native), str(candidate_path)]),
+        ):
+            code, stdout, stderr, run_error = _run(command)
+            found[name] = {
+                "status": "UNAVAILABLE" if run_error else "OK",
+                "exit_code": code, "stdout": stdout,
+                "stderr_class": classify_stderr(code, stderr) if not run_error else None,
+                "source_line": source_line_from_stderr(stderr) if not run_error else None,
+                "error": run_error,
+            }
+        return normalized(found["reference"]) != normalized(found["native"]), found
+
+    original_text = source.read_text(encoding="utf-8")
     mismatch = normalized(observations["reference"]) != normalized(observations["native"])
+    minimized_text = original_text
+    minimized_observations = observations
+    if mismatch:
+        # Greedy line-deletion minimization: keep a deletion only when the
+        # same normalized mismatch remains. This is conservative, not AST-aware.
+        lines = minimized_text.splitlines(keepends=True)
+        index = 0
+        while index < len(lines) and len(lines) > 1:
+            candidate = "".join(lines[:index] + lines[index + 1:])
+            still_mismatches, candidate_observations = compare_text(candidate)
+            if still_mismatches:
+                lines.pop(index)
+                minimized_observations = candidate_observations
+            else:
+                index += 1
+        minimized_text = "".join(lines)
     print(json.dumps({"source": str(source), "mismatch": mismatch, "targets": observations}, ensure_ascii=False, indent=2))
     if mismatch:
         REPORTS.mkdir(parents=True, exist_ok=True)
         draft = [
             "## Bug parity: target outputs differ", "",
             f"Source: `{source.name}`", "",
-            "### Reproducer", "", "Copy the complete source below to reproduce the mismatch.", "",
-            "```cuk", source.read_text(encoding="utf-8").rstrip(), "```", "",
-            "### Observed", "", "```json",
+            "### Minimized reproducer (greedy line deletion)", "",
+            "This source was minimized by deleting lines while preserving the normalized mismatch. Review before filing.", "",
+            "```cuk", minimized_text.rstrip(), "```", "",
+            "### Observed on minimized reproducer", "", "```json",
+            json.dumps(minimized_observations, ensure_ascii=False, indent=2), "```", "",
+            "### Original observation", "", "```json",
             json.dumps(observations, ensure_ascii=False, indent=2), "```", "",
-            "### Expected", "",
             "Reference and native C should agree on exit code, stdout, diagnostic class, and source line.",
-            "", "Label: `bug-parity`", "",
-            "> This draft is a reproducible source snapshot, not an automatic token-level minimizer. Review before filing.",
+            "", "Label: `bug-parity`",
         ]
         out = REPORTS / "issue-draft-bug-parity.md"
         out.write_text("\n".join(draft) + "\n", encoding="utf-8")
