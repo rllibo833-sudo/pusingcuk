@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "method": "native C fixtures passed / all fixtures in tests/conformance/manifest.json × 100; unsupported native fixtures remain in the denominator and do not count as passed.",
+  "records": [
+    {
+      "date": "2026-10-18",
+      "commit": "31a39d416245a1c500c0945e0cdd66e00ae6b322",
+      "run_url": "https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39137355887",
+      "numerator": 74,
+      "denominator": 77,
+      "percent": 96.1,
+      "runtime": "native C",
+      "note": "First tracked snapshot; no earlier score series was reconstructed."
+    }
+  ]
+}
