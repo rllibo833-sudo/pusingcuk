@@ -62,7 +62,6 @@ def _observe(command, stdin_text, expected):
         "stdout": stdout,
         "stderr_class": category,
         "source_line": line,
-        "stderr": stderr[:2000],
     }
 
 
@@ -102,7 +101,7 @@ def build_matrix():
                 "results": runtime_results,
                 "status": "PASS" if all(runtime_results.get(name, {}).get("matched") for name in required) else "FAIL",
             })
-    native_required = sum(1 for item, _ in fixtures if item["runtimes"].get("native") == "required")
+    native_required = len(rows)  # Unsupported native fixtures remain in the score denominator.
     native_pass = sum(1 for row in rows if row["runtimes"].get("native") == "required" and row["results"].get("native", {}).get("matched"))
     data = {
         "schema_version": 1,
