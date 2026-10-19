@@ -1,0 +1,15 @@
+#!/usr/bin/env pusingcuk
+# json_demo.cuk — demo fungsi JSON kanonis.
+
+jancuk
+
+lah data = {"nama": "Budi", "skor": 99, "aktif": benar}
+lah hasil_json = json_teks(data)
+hedeh "JSON teks: " + hasil_json
+
+lah kembali = json_baca(hasil_json)
+hedeh "Nama parsed: " + kembali["nama"]
+hedeh "Skor parsed: " + teks(kembali["skor"])
+hedeh "json_demo selesai."
+
+selesai jancuk
