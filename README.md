@@ -16,7 +16,7 @@ Proyek ini ditujukan untuk belajar, eksperimen bahasa, dan pengembangan compiler
 
 **Status:** kontrak bahasa `0.6-dev`; paket Python `0.8.0.dev0`. **Metadata paket pada `main` adalah `0.8.0.dev0`.** Ini perangkat lunak tahap pengembangan, bukan rilis stabil. Dukungan tiap backend berbeda dan harus diperiksa melalui matriks kompatibilitas serta fixture.
 
-## Coba program pertama
+## Tiga komponen ekosistem\n\n- **Bahasa .cuk:** spesifikasi, interpreter, runtime, dan backend. Lihat [IDENTITY.md](IDENTITY.md).\n- **PusingCuk AI:** asisten yang di-ground dengan pengetahuan bahasa; bukan model fondasi yang dilatih dari nol.\n- **Cuk Reality Engine:** alat pembuktian konformansi lintas target; klaim kompatibilitas harus didukung eksekusi fixture.\n\nMulai kontribusi dari HP lewat [START_HERE.md](START_HERE.md). Draft issue rekonstruksi ada di [ISSUES_TO_CREATE.md](ISSUES_TO_CREATE.md); periksa issue yang sudah ada sebelum membuat duplikat.\n\n## Coba program pertama
 
 Persyaratan: Python 3.11 atau 3.12.
 
