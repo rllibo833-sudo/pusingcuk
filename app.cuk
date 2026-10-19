@@ -1,4 +1,5 @@
 jancuk
-lah nama = "Dunia"
-hedeh "Halo, " + nama
+hedeh "tes hedeh jalan"
+cetak "tes cetak jalan"
+tampilkan "tes tampilkan jalan - MANDIRI CUY"
 selesai jancuk

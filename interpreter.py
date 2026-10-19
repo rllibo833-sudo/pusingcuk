@@ -9,6 +9,21 @@ import sys
 import tokenize
 from pathlib import Path
 
+# === AUTO ALIAS MANDIRI dari library/kosakata.json ===
+import json as _alias_json, pathlib as _alias_path
+try:
+    _kos = _alias_json.loads(_alias_path.Path("library/kosakata.json").read_text())
+    _alias_map = {}
+    for canon, aliases in _kos.items():
+        for a in aliases:
+            _alias_map[a] = canon
+    def _norm_cmd(cmd):
+        return _alias_map.get(cmd, cmd)
+except Exception:
+    def _norm_cmd(cmd): return cmd
+# === END AUTO ALIAS ===
+
+
 BINOPS = {
     ast.Add: operator.add,
     ast.Sub: operator.sub,
