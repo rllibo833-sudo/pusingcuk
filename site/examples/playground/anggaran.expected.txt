@@ -1,0 +1,8 @@
+REKAP ANGGARAN BULANAN
+Pendapatan:
+2500000
+Total pengeluaran:
+1200000
+Sisa anggaran:
+1300000
+Status: anggaran aman
