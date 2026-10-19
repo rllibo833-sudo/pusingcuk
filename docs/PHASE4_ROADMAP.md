@@ -1,43 +1,53 @@
 # Phase 4 — Path Away from Python
 
-Goal: make Python optional for end users incrementally, with every step gated by reproducible fixtures. This is a roadmap, not a claim that the end state already exists.
+**Goal:** make Python optional for end users incrementally, with every step gated by reproducible fixtures. This roadmap records partial implementation; it does not claim that the final goal has been reached.
 
-## Gate 1 — Freeze formats (documented in this branch)
+## Gate 1 — Versioned formats
 
-- [x] Specify JSON IR v1 envelope, nodes, limits, and compatibility policy.
-- [x] Specify bytecode v1 envelope, opcodes, and compatibility policy.
-- [ ] Add executable version/schema fixtures and ensure CI runs them before declaring the formats release-stable.\n- [x] Publish the format contracts and compatibility rules in the branch README.
+- [x] Document JSON IR v1 envelope, nodes, limits, and compatibility policy.
+- [x] Document bytecode v1 envelope, opcodes, and compatibility policy.
+- [ ] Add executable schema/version fixtures and require them in CI before declaring either format release-stable.
 
-## Gate 2 — Native C bytecode VM (not complete; no score increase claimed)
+## Gate 2 — Native C bytecode VM
 
-The current Python VM executes bytecode. The current native C target is not demonstrated to load and execute the bytecode format. This gate remains blocked until a C implementation can parse the versioned JSON envelope and execute the required opcode subset without spawning Python. Implement a C bytecode reader/validator/stack VM, starting with CONST, variable operations, arithmetic, output, and branches. Expand only when fixtures prove parity.
+**Status: a tested subset exists; full gate remains open.**
+
+The repository now contains a native C bytecode executable that reads serialized bytecode and executes a limited opcode subset without invoking Python in the C VM process. CI builds the executable and compares six deterministic programs against the Python VM. Four malformed or invalid bytecode cases are expected to be rejected.
+
+This is meaningful progress, but it is not full-language conformance. The Python bytecode compiler is still used to produce the input in the parity test, and the current six examples do not cover every required manifest fixture. The native C source runtime's 74/77 score is a separate measurement and must not be reused as a C bytecode VM score.
 
 Acceptance criteria:
-- C VM loads a serialized bytecode file without invoking Python.
-- Invalid versions/opcodes/jumps fail safely.
-- Reference VM and C VM agree on exit code, stdout, diagnostic class and source line for every fixture marked required on both targets.
-- Python-Free Score is recomputed from actual C-VM executions. Do not award a pass merely because native source execution passes.
 
-## Gate 3 — Self-host the lexer first (not complete; blocked on missing VM and language primitives)
+- [x] Native C VM loads serialized bytecode without invoking Python inside the VM process.
+- [x] Invalid JSON, unknown opcode, invalid jump, and step-limit cases are checked by the dedicated test.
+- [ ] Expand parity coverage by reusing eligible canonical manifest fixtures rather than maintaining a disconnected sample set.
+- [ ] Compare exit code, stdout, diagnostic class, and source line for all fixtures required on the C VM target.
+- [ ] Publish a separate C bytecode VM result; do not increase the native C source-runtime score from VM-only results.
 
-- Define a narrow .cuk subset sufficient to implement the lexer.
-- Write lexer implementation in .cuk; Python may compile/run the bootstrap during the initial stage.
-- Compare token kind, lexeme, line, column and error diagnostics against the Python lexer using checked-in golden fixtures.
-- If the language lacks strings/character handling, data structures, or other required features, file a roadmap issue and add a fixture. Do not use hidden Python helpers to fake self-hosting.
+## Gate 3 — Self-host the lexer
 
-## Gate 4 — Self-host the parser (after lexer gate passes; not started)
+**Status: not implemented.**
 
-- Implement parser in .cuk using the accepted lexer output.
-- Compare normalized AST/IR and parse diagnostics against the Python parser on the same corpus.
-- Do not start until the lexer gate is green and the necessary language features are specified and tested.
+- Define the smallest .cuk subset capable of implementing the lexer.
+- Implement the lexer in .cuk and compare token kind, lexeme, line, column, and diagnostics against the Python lexer using golden fixtures.
+- If required language primitives are missing, add a focused fixture and implement the primitive before expanding the self-hosted lexer.
+- Do not use hidden Python helpers to simulate self-hosting.
 
-## Gate 5 — Compiler on the VM (final goal)
+## Gate 4 — Self-host the parser
 
-The compiler should be written in .cuk and run on the bytecode VM. Python becomes an optional bootstrap/development tool, not a required runtime dependency for users. Release claims require a clean environment test with no Python executable on PATH.
+**Status: not started; blocked on Gate 3.**
+
+Implement the parser in .cuk only after the lexer gate passes. Compare normalized AST/IR and parse diagnostics against the reference parser using the same corpus.
+
+## Gate 5 — Compiler on the VM
+
+**Status: long-term goal.**
+
+The compiler should eventually be written in .cuk and execute on a sufficiently capable bytecode VM. Python may remain a bootstrap/development tool, but must not be required at runtime for a path advertised as Python-free.
 
 ## Release criteria
 
 - Each gate has named fixtures, expected outputs/diagnostics, and a CI job.
-- Unsupported features/targets are recorded as roadmap issues instead of bypasses.
-- Compatibility reports include exact target identity and command.
-- No “Python-free” claim is made for a path that invokes Python at runtime.
+- Unsupported constructs and targets are recorded explicitly rather than silently bypassed.
+- Compatibility reports identify the exact target, command, fixture corpus, and commit.
+- No Python-free claim is made for a path that invokes Python during the claimed execution.

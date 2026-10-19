@@ -34,7 +34,7 @@ class VersionContractTests(unittest.TestCase):
         self.assertEqual(vocabulary["package_version"], expected)
         self.assertEqual(android_match.group(1), expected)
         self.assertIn(f"metadata paket main: {expected}", lexer)
-        self.assertIn(f"Metadata paket pada `main` adalah `{expected}`", readme)
+        self.assertIn(f"Python package version on main: `{expected}`", readme)
         self.assertIn(f"target paket {expected}", changelog)
         self.assertIn("Unreleased", changelog)
 

@@ -11,7 +11,7 @@ PusingCuk is an experimental programming language with the canonical `.cuk` exte
 Python-free native C score: **74 of 77 fixtures (96.10%)** in the checked-in compatibility snapshot. This score describes the native C source runtime and its required fixture subset; it does not measure the C bytecode VM or prove that the whole toolchain is Python-free.
 <!-- END GENERATED PYTHON-FREE SCORE BADGE -->
 
-**Development status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. This is experimental software, not a stable release. Support differs by runtime and backend; consult the compatibility evidence for the exact tested scope.
+**Development status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. Python package version on main: `0.8.0.dev0`. This is experimental software, not a stable release. Support differs by runtime and backend; consult the compatibility evidence for the exact tested scope.
 
 ## What exists today
 
