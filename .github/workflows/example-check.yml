@@ -1,0 +1,50 @@
+name: Example syntax check
+
+on:
+  push:
+    paths:
+      - "examples/**/*.cuk"
+      - "examples/*.cuk"
+      - "pusingcuk_new.py"
+      - "lexer.py"
+      - "parser.py"
+      - "ast_nodes.py"
+      - "SPEC.md"
+      - ".github/workflows/example-check.yml"
+  pull_request:
+    paths:
+      - "examples/**/*.cuk"
+      - "examples/*.cuk"
+      - "pusingcuk_new.py"
+      - "lexer.py"
+      - "parser.py"
+      - "ast_nodes.py"
+      - "SPEC.md"
+      - ".github/workflows/example-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  examples:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check every .cuk example
+        shell: bash
+        run: |
+          set -euo pipefail
+          count=0
+          while IFS= read -r -d '' file; do
+            echo "::group::Checking $file"
+            python pusingcuk_new.py --check "$file"
+            echo "::endgroup::"
+            count=$((count + 1))
+          done < <(find examples -type f -name '*.cuk' -print0 | sort -z)
+          test "$count" -gt 0
+          echo "Checked $count .cuk example files."
