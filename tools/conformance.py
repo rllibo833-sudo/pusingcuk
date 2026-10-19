@@ -97,6 +97,14 @@ def load_manifest():
             if not isinstance(state, str) or state not in ALLOWED_RUNTIME_STATES:
                 raise ManifestError(f"{fixture_id}: status runtime tidak valid: {runtime}")
         validated.append((item, source_path))
+    # Hygiene invariants: every manifest must include at least one explicit
+    # negative diagnostic fixture, and must declare both comparison targets.
+    if not any(item["expected"].get("stderr_class") in {"syntax_error", "runtime_error"} for item, _ in validated):
+        raise ManifestError("manifest wajib memiliki fixture negatif untuk diagnostic")
+    if not any(item["runtimes"].get("reference") == "required" for item, _ in validated):
+        raise ManifestError("manifest wajib menguji target reference")
+    if not any(item["runtimes"].get("native") == "required" for item, _ in validated):
+        raise ManifestError("manifest wajib menguji target native")
     return validated
 
 
