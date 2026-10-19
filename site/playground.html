@@ -33,11 +33,12 @@ selesai jancuk</textarea>
 <script>
 "use strict";
 const $=id=>document.getElementById(id), editor=$("source"), output=$("output"), status=$("status"), runButton=$("run");
+const BUILD_ID="265eff1a";
 let pyodidePromise, gallery=[], selected=null;
 const blocked=new Set(["tanya","tulis","baca","angkut","tulis_json","baca_json","jadi_json","jadi_teks","json_teks","json_baca","kepo_internet","kirim_api","kirim_gosip","gas_api","stalking"]);
 function showError(message){output.classList.add("error");output.textContent=message;status.textContent="Tidak dapat dijalankan";}
 async function getPyodide(){if(!window.loadPyodide)throw new Error("Pyodide belum termuat. Periksa koneksi lalu muat ulang.");if(!pyodidePromise)pyodidePromise=window.loadPyodide({indexURL:"https://cdn.jsdelivr.net/pyodide/v0.27.7/full/"});return pyodidePromise;}
-async function fetchText(url){const response=await fetch(url,{cache:"no-store"});if(!response.ok)throw new Error("Gagal memuat "+url+" (HTTP "+response.status+").");return await response.text();}
+async function fetchText(url){const separator=url.includes("?")?"&":"?";const response=await fetch(url+separator+"v="+BUILD_ID,{cache:"reload"});if(!response.ok)throw new Error("Gagal memuat "+url+" (HTTP "+response.status+").");return await response.text();}
 async function prepareInterpreter(py){
  const files=["pusingcuk_new.py","evaluator.py","parser.py","lexer.py","ast_nodes.py","library/stdlib.py","library/builtin_contract.py","library/builtin_contract.json","library/__init__.py"];
  for(const file of files){const text=await fetchText("runtime/"+file),path="/home/pyodide/pusingcuk/"+file;py.FS.mkdirTree(path.slice(0,path.lastIndexOf("/")));py.FS.writeFile(path,text);}
