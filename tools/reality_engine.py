@@ -157,13 +157,30 @@ def _render_svg(matrix):
 '''
 
 
+def _render_readme(matrix):
+    score = matrix["python_free_score"]
+    generated = (
+        f'[![Python-free runtime · native C · {score["passed_required_fixtures"]}/{score["total_required_fixtures"]} fixtures](docs/assets/python-free-score.svg)](docs/COMPATIBILITY.md)\\n'
+        f'Python-free runtime, native C: **{score["passed_required_fixtures"]} dari {score["total_required_fixtures"]} fixture wajib ({score["percent"]:.2f}%)**. '
+        'Skor ini hanya mengukur fixture native C yang lulus; bukan klaim seluruh toolchain bebas Python.\\n'
+    )
+    text = README.read_text(encoding="utf-8")
+    start = "<!-- BEGIN GENERATED PYTHON-FREE SCORE BADGE -->"
+    end = "<!-- END GENERATED PYTHON-FREE SCORE BADGE -->"
+    if start not in text or end not in text:
+        raise ValueError("README badge markers missing")
+    before, rest = text.split(start, 1)
+    _, after = rest.split(end, 1)
+    return before + start + "\\n" + generated + end + after
+
+
 def render_outputs(matrix):
     return {
-        MATRIX: json.dumps(matrix, ensure_ascii=False, indent=2) + "\n",
+        MATRIX: json.dumps(matrix, ensure_ascii=False, indent=2) + "\\n",
         COMPAT: _render_compat(matrix),
         ROOT / "docs" / "assets" / "python-free-score.svg": _render_svg(matrix),
+        README: _render_readme(matrix),
     }
-
 
 def run_report(check=False, record=False):
     try:
