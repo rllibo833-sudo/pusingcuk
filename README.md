@@ -12,7 +12,7 @@ PusingCuk combines approachable Indonesian syntax with a reference interpreter, 
 Python-free runtime, native C: **74 dari 77 fixture aktif lulus**. Ini cakupan fixture runtime native C, bukan klaim bahwa seluruh proyek atau proses build bebas Python.
 <!-- END GENERATED PYTHON-FREE SCORE BADGE -->
 
-**Status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. Development software, not a stable release. Backend support differs; check the compatibility matrix and fixtures.
+**Status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. Development software, not a stable release.\n\nMetadata paket pada `main` adalah `0.8.0.dev0`. Backend support differs; check the compatibility matrix and fixtures.
 
 ## Run your first program
 
