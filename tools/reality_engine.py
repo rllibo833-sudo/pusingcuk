@@ -160,9 +160,9 @@ def _render_svg(matrix):
 def _render_readme(matrix):
     score = matrix["python_free_score"]
     generated = (
-        f'[![Python-free runtime · native C · {score["passed_required_fixtures"]}/{score["total_required_fixtures"]} fixtures](docs/assets/python-free-score.svg)](docs/COMPATIBILITY.md)\\n'
+        f'[![Python-free runtime · native C · {score["passed_required_fixtures"]}/{score["total_required_fixtures"]} fixtures](docs/assets/python-free-score.svg)](docs/COMPATIBILITY.md)\n'
         f'Python-free runtime, native C: **{score["passed_required_fixtures"]} dari {score["total_required_fixtures"]} fixture wajib ({score["percent"]:.2f}%)**. '
-        'Skor ini hanya mengukur fixture native C yang lulus; bukan klaim seluruh toolchain bebas Python.\\n'
+        'Skor ini hanya mengukur fixture native C yang lulus; bukan klaim seluruh toolchain bebas Python.\n'
     )
     text = README.read_text(encoding="utf-8")
     start = "<!-- BEGIN GENERATED PYTHON-FREE SCORE BADGE -->"
@@ -171,12 +171,12 @@ def _render_readme(matrix):
         raise ValueError("README badge markers missing")
     before, rest = text.split(start, 1)
     _, after = rest.split(end, 1)
-    return before + start + "\\n" + generated + end + after
+    return before + start + "\n" + generated + end + after
 
 
 def render_outputs(matrix):
     return {
-        MATRIX: json.dumps(matrix, ensure_ascii=False, indent=2) + "\\n",
+        MATRIX: json.dumps(matrix, ensure_ascii=False, indent=2) + "\n",
         COMPAT: _render_compat(matrix),
         ROOT / "docs" / "assets" / "python-free-score.svg": _render_svg(matrix),
         README: _render_readme(matrix),
@@ -204,7 +204,7 @@ def run_report(check=False, record=False):
         records = history.setdefault("records", [])
         if not any(x.get("date") == today and x.get("commit") == commit for x in records):
             records.append(record_item)
-        outputs[HISTORY] = json.dumps(history, ensure_ascii=False, indent=2) + "\\n"
+        outputs[HISTORY] = json.dumps(history, ensure_ascii=False, indent=2) + "\n"
     stale = []
     for path, content in outputs.items():
         if check:
