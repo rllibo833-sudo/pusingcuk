@@ -29,6 +29,7 @@ def main():
    ("malformed-json", "{"),
    ("unknown-opcode", json.dumps({"format":"pusingcuk-bytecode","bytecode_version":1,"language_version":"0.6-dev","source_name":"bad.cuk","functions":{},"code":[["NOT_REAL",None,1]]})),
    ("bad-jump", json.dumps({"format":"pusingcuk-bytecode","bytecode_version":1,"language_version":"0.6-dev","source_name":"bad.cuk","functions":{},"code":[["JUMP",999,1]]})),
+   ("step-limit", json.dumps({"format":"pusingcuk-bytecode","bytecode_version":1,"language_version":"0.6-dev","source_name":"loop.cuk","functions":{},"code":[["JUMP",0,1]]})),
   ]
   for name,payload in invalid_cases:
    path.write_text(payload,encoding="utf-8")
