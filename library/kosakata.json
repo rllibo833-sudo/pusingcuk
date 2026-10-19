@@ -496,5 +496,6 @@
     "level4": "Modules, try/catch/finally, jam/waktu and tanggal are supported by the Python reference interpreter only.",
     "level5": "HTTP GET/POST, parsing dan serialisasi JSON, serta warna ANSI tersedia di interpreter referensi Python saja. Permintaan jaringan memakai timeout 10 detik dan mengembalikan salah saat gagal."
   },
-  "package_version": "0.8.0.dev0"
+  "package_version": "0.8.0.dev0",
+  "cetak": "hedeh"
 }

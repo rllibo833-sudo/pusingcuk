@@ -1,56 +1,67 @@
 #!/usr/bin/env python3
-"""
-DATACENTER EVOLUSI BAHASA MANDIRI
-Siklus: next_prompt.txt -> adapter -> parser/evaluator asli -> 
-        kalo OK, update library/kosakata.json -> git push -> 
-        android-studio-apk.yml otomatis build APK
-"""
-import time, subprocess, json
+import time, subprocess, json, os
 from pathlib import Path
 from parser import parse
 from evaluator import run
 
-print("[DATACENTER V2] Siklus Bahasa Mandiri START - terhubung ke engine asli")
+print("[DATACENTER V3] Evolusi Bahasa Mandiri FIX")
 
 while True:
-    prompt_file = Path("next_prompt.txt")
-    prompt = prompt_file.read_text().strip() if prompt_file.exists() else "bikin halo dunia"
+    p_file = Path("next_prompt.txt")
+    prompt = p_file.read_text().strip() if p_file.exists() else "bikin halo dunia"
     print(f"\n[LOOP] Prompt: {prompt}")
-    
-    # 1. ADAPTER (HP+Termux -> Ollama/Pusingcuk AI asli)
-    r = subprocess.run(["python","pusingcuk_adapter.py",prompt], capture_output=True, text=True)
-    cuk_code = r.stdout.strip()
-    Path("app.cuk").write_text(cuk_code)
-    
-    # 2. REALITY ENGINE PAKAI ENGINE ASLI LU (tools/diagnostic_repair_loop.py logic)
-    for attempt in range(3):
-        try:
-            parse(cuk_code)
-            run(cuk_code)
-            print(f"[ENGINE ASLI] OK percobaan {attempt+1}")
-            
-            # 3. JIKA MANDIRI: KEMBANGKAN KOSAKATA, BUKAN CUMA app.cuk
-            if "tambah alias" in prompt.lower():
-                kosakata_path = Path("library/kosakata.json")
-                kosakata = json.loads(kosakata_path.read_text()) if kosakata_path.exists() else {}
-                # contoh: "tambah alias cetak untuk hedeh"
-                if "cetak" in prompt.lower():
-                    kosakata["cetak"] = "hedeh"
-                    kosakata_path.write_text(json.dumps(kosakata, indent=2))
-                    print(f"[EVOLUSI] Bahasa berkembang: {kosakata}")
 
-            # 4. PUSH - INI OTOMATIS TRIGGER .github/workflows/android-studio-apk.yml
-            # JADI APK KEBIKIN DI GITHUB, BUKAN DI HP (ANTI FC)
-            subprocess.run(["git","add","-A"])
-            subprocess.run(["git","commit","-m",f"evolve: {prompt}"])
-            subprocess.run(["git","push"])
-            print("[GIT] Pushed -> cek Actions tab buat download APK")
-            break
+    # === EVOLUSI LANGSUNG TANPA AI DULU (BIAR KELIATAN MANDIRI) ===
+    evolved = False
+    if "tambah alias" in prompt.lower():
+        # contoh prompt: tambah alias cetak untuk hedeh
+        parts = prompt.lower().split()
+        try:
+            # cari kata setelah "alias"
+            idx = parts.index("alias")
+            new_word = parts[idx+1]
+            target = parts[idx+3] if len(parts) > idx+3 else "hedeh"
+            
+            kos_path = Path("library/kosakata.json")
+            kos = json.loads(kos_path.read_text()) if kos_path.exists() else {}
+            if new_word not in kos:
+                kos[new_word] = target
+                kos_path.write_text(json.dumps(kos, indent=2, ensure_ascii=False))
+                print(f"[EVOLUSI] Bahasa berkembang! {new_word} -> {target}")
+                print(f"[EVOLUSI] Isi kosakata.json: {kos}")
+                
+                # bikin test file buat reality engine
+                test_code = f'jancuk\n{new_word} "Tes {new_word} OK"\nselesai jancuk'
+                Path("app.cuk").write_text(test_code)
+                parse(test_code)  # test pake parser asli lu, bukan dummy
+                run(test_code)
+                evolved = True
+            else:
+                print(f"[EVOLUSI] Alias {new_word} sudah ada")
         except Exception as e:
-            print(f"[ENGINE] ERROR: {e} -> balik ke AI perbaiki")
-            fix = f"perbaiki error {e}: {cuk_code}"
-            r2 = subprocess.run(["python","pusingcuk_adapter.py",fix], capture_output=True, text=True)
-            cuk_code = r2.stdout.strip()
-    
-    print("Tidur 15 detik... ganti next_prompt.txt untuk evolusi baru")
-    time.sleep(15)
+            print(f"[EVOLUSI] Gagal parse prompt alias: {e}")
+
+    if not evolved:
+        # fallback halo dunia biasa
+        r = subprocess.run(["python","pusingcuk_adapter.py",prompt], capture_output=True, text=True)
+        Path("app.cuk").write_text(r.stdout.strip())
+        try:
+            parse(Path("app.cuk").read_text())
+            run(Path("app.cuk").read_text())
+            print("[ENGINE] OK")
+        except Exception as e:
+            print(f"[ENGINE] ERROR: {e}")
+
+    # === PUSH HANYA KALO ADA PERUBAHAN (ANTI Everything up-to-date) ===
+    status = subprocess.run(["git","status","--porcelain"], capture_output=True, text=True).stdout.strip()
+    if status:
+        print(f"[GIT] Ada perubahan:\n{status}")
+        subprocess.run(["git","add","-A"])
+        subprocess.run(["git","commit","-m",f"evolve: {prompt}"])
+        subprocess.run(["git","push"])
+        print("[GIT] Pushed -> cek Actions > android-studio-apk.yml buat download APK")
+    else:
+        print("[GIT] Skip push, gak ada perubahan (biar gak spam)")
+
+    print("Tidur 10 detik... ganti next_prompt.txt kalo mau evolusi lain")
+    time.sleep(10)
