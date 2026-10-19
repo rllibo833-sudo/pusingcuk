@@ -1,0 +1,31 @@
+# Deterministic priority rule based on the current .cuk language.
+# Inputs are fixed here so the browser playground needs no interactive input.
+jancuk
+
+fungsi prioritas_tugas(urgensi, dampak)
+    njir urgensi < 1 atau urgensi > 5 atau dampak < 1 atau dampak > 5
+        balek "INPUT_TIDAK_VALID"
+    kampret
+        njir urgensi >= 4 dan dampak >= 4
+            balek "P1_SEGERA"
+        kampret
+            njir dampak >= 4
+                balek "P2_DAMPAK_TINGGI"
+            kampret
+                njir urgensi >= 4
+                    balek "P3_MENDESAK"
+                kampret
+                    balek "P4_RUTIN"
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+hedeh prioritas_tugas(5, 4)
+hedeh prioritas_tugas(2, 5)
+hedeh prioritas_tugas(5, 2)
+hedeh prioritas_tugas(2, 2)
+hedeh prioritas_tugas(0, 5)
+
+selesai jancuk
