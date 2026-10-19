@@ -20,7 +20,7 @@ def main() -> int:
     if not 5 <= len(entries) <= 10:
         raise SystemExit(f"Galeri harus berisi 5-10 contoh .pusingcuk; ditemukan {len(entries)}")
     manifest = RUNTIME / "playground-examples.json"
-    manifest.write_text(json.dumps(entries, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    manifest.write_text(json.dumps(entries, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     # builtin_contract.py reads this adjacent JSON file at import time. Missing
     # it makes every browser example fail before user code can execute.
     contract = RUNTIME / "library" / "builtin_contract.json"
