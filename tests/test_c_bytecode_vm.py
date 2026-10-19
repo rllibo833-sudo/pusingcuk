@@ -2,9 +2,11 @@
 """Compile a deterministic subset and compare Python/C bytecode VM output."""
 import io, json, subprocess, tempfile
 from pathlib import Path
+import sys
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 from compiler.bytecode import compile_source
 from compiler.vm import VirtualMachine
-ROOT=Path(__file__).resolve().parents[1]
 FIXTURES=[
  ("declare-print", 'jancuk\nlah angka = 40 + 2\nhedeh angka\nselesai jancuk\n', "42\n"),
  ("branch", 'jancuk\nlah x = 3\nnek x > 2:\n    hedeh "yes"\nnekora:\n    hedeh "no"\nselesai nek\nselesai jancuk\n', "yes\n"),
