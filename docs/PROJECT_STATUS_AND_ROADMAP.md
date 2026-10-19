@@ -1,80 +1,80 @@
-# Status Aktif dan Prioritas PusingCuk
+# PusingCuk — Current Status and Priorities
 
-**Branch yang dituju untuk pekerjaan ini:** `warungpusingcuk`  
-**Versi kontrak bahasa:** `0.6-dev`  
-**Versi paket Python:** `0.8.0.dev0`  
-**Status:** eksperimental; ringkasan ini bukan bukti bahwa seluruh tes atau target deployment lulus. Audit ini tidak menyatakan bahasa stabil atau AI akurat secara umum.
+**Branch originally targeted by this work:** `warungpusingcuk`  
+**Language contract:** `0.6-dev`  
+**Python package:** `0.8.0.dev0`  
+**Status:** experimental. This summary does not prove that every test or deployment target passes, and it does not claim that the language is stable or that AI is generally accurate.
 
-**AI knowledge/retrieval baseline:** 26 dokumen sumber terkurasi; 22 kasus baseline menghasilkan top-1. Hasil retrieval terdokumentasi terpisah dan bukan bukti model dilatih sendiri.
-**Retrieval baseline historis:** 5/8 (62,5%) dan 6/8 (75%) pada evaluasi yang dicatat; angka ini dipertahankan sebagai hasil historis, bukan klaim kualitas umum.
+**AI knowledge/retrieval baseline:** 26 curated source documents; 22 baseline cases returned a top-1 result. The retrieval report is separate evidence and does not prove that a model was trained from scratch.  
+**Historical retrieval baseline:** 5/8 (62.5%) and 6/8 (75%) in recorded evaluations. These remain historical results, not claims of general quality.
 
-## Gambaran yang benar saat ini
+## Current state
 
-**Konformansi saat ini:** 78 fixture: 78 wajib pada interpreter referensi Python, 75 wajib pada native C, dan 3 secara eksplisit tidak didukung native. Contoh aplikasi kasir warung tercakup sebagai tes wajib pada kedua runtime.
+**Conformance snapshot recorded in this document:** 78 fixtures: 78 required on the Python reference interpreter, 75 required on native C, and 3 explicitly unsupported on native C. The warung cashier example is included as a required test on both runtimes. Re-check the current fixture manifest and CI before relying on these historical counts.
 
-- **Bahasa:** lexer, parser, AST, interpreter referensi, spesifikasi, kontrak built-in, dan fixture tersedia. Jalur referensi masih bergantung pada Python.
-- **Native C:** ada backend/runtime mandiri untuk sebagian bahasa. Fitur yang tidak tercakup dalam tes native belum boleh diklaim kompatibel.
-- **Bytecode/VM:** ada compiler bytecode dan VM eksperimental. Ini belum sama dengan runtime native yang bebas dari Python.
-- **JavaScript/Python/Android:** ada backend atau prototipe dengan cakupan masing-masing; keberadaan file tidak membuktikan parity atau aplikasi siap distribusi.
-- **PusingCuk AI:** kode asisten dan tool compiler tersedia. Asisten membantu menghasilkan/memperbaiki .cuk, tetapi bukan foundation model yang dilatih sendiri dan tidak boleh mengklaim kode berjalan hanya karena model menghasilkannya.
-- **Frontend/backend SaaS:** UI, layanan, dan integrasi yang ada harus diperlakukan sebagai prototipe sampai jalur build, autentikasi, API, dan runtime dibuktikan pada commit yang sama.
+- **Language:** lexer, parser, AST, reference interpreter, specification, built-in contract, and fixtures are present. The reference path still requires Python.
+- **Native C:** a standalone backend/runtime exists for a subset. Features not covered by native tests must not be claimed compatible.
+- **Bytecode/VM:** an experimental bytecode compiler and VM exist. This is not equivalent to a Python-free native runtime.
+- **JavaScript/Python/Android:** backends or prototypes exist with their own coverage. File presence does not prove parity or distribution readiness.
+- **PusingCuk AI:** assistant code and compiler tools exist. The assistant can help generate or repair .cuk, but is not a self-trained foundation model and must not claim code works merely because it generated it.
+- **Frontend/backend SaaS:** existing UIs, services, and integrations remain prototypes until build, authentication, API, and runtime paths are verified on the same commit.
 
-## Urutan prioritas
+## Priority order
 
-### P0 — Dokumentasi dan kontrak tunggal
+### P0 — Documentation and a single contract
 
-1. Pertahankan README sebagai pengantar singkat dan `docs/README.md` sebagai indeks.
-2. Gunakan `SPEC.md` untuk perilaku bahasa yang terlihat pengguna, `docs/SEMANTIC_CONTRACT.md` untuk semantik, dan `library/builtin_contract.json` untuk metadata built-in/dukungan target.
-3. Jadikan audit bertanggal sebagai bukti historis, bukan status saat ini. Hindari salinan roadmap yang berbeda-beda.
-4. Setiap klaim dukungan harus menunjuk implementasi dan tes/fixture target.
+1. Keep the README concise and `docs/README.md` as the documentation index.
+2. Use `SPEC.md` for user-visible language behavior, `docs/SEMANTIC_CONTRACT.md` for semantics, and `library/builtin_contract.json` for built-in metadata and target support.
+3. Treat dated audits as historical evidence, not current status. Avoid contradictory copies of roadmaps.
+4. Every support claim must point to an implementation and target-specific test/fixture.
 
-### P1 — Kurangi ketergantungan Python secara terukur
+### P1 — Reduce Python dependence measurably
 
-1. Jadikan AST/IR dan kontrak semantik tidak bergantung pada perilaku Python yang tidak disengaja.
-2. Perluas native C berdasarkan celah yang dapat direproduksi, satu perilaku per perubahan; jangan hanya menambah nama built-in.
-3. Untuk setiap celah: fixture positif/negatif → spesifikasi → implementasi target → tes konformansi.
-4. Lengkapi koleksi, fungsi, diagnostik, dan built-in prioritas tinggi lintas reference/native sebelum menyatakan parity.
-5. Ukur ukuran binary, waktu startup, memori, dan kebutuhan runtime agar klaim “ringan” punya dasar.
-6. Pisahkan **kompilasi di mesin pengembang** dari **menjalankan hasil kompilasi**: target mandiri baru terbukti bebas Python ketika artefak dapat berjalan tanpa interpreter Python terpasang.
+1. Make AST/IR behavior independent of accidental Python behavior.
+2. Expand native C based on reproducible gaps, one behavior at a time; do not merely increase the number of built-in names.
+3. For each gap: positive/negative fixture → specification → target implementation → conformance test.
+4. Complete priority collections, functions, diagnostics, and built-ins across reference/native paths before claiming parity.
+5. Measure binary size, startup time, memory, and runtime requirements before claiming the result is lightweight.
+6. Separate **compiling on a developer machine** from **running the compiled artifact**. A standalone target is proven Python-free only when it runs without Python installed.
 
-### P2 — Siklus PusingCuk AI → .cuk → bukti
+### P2 — PusingCuk AI → .cuk → evidence loop
 
-1. Gunakan engine/tool PusingCuk yang sudah ada; jangan membuat jalur AI kedua yang tidak diperlukan.
-2. AI mengusulkan program .cuk dan menjelaskan perubahan.
-3. Compiler menghasilkan diagnostik yang terstruktur.
-4. Tool konformansi menjalankan fixture terdaftar dan mengembalikan bukti per-runtime.
-5. AI memperbaiki berdasarkan diagnostik nyata; hasil tetap berstatus belum terverifikasi sampai runtime yang diwajibkan lulus.
-6. Tambahkan fixture baru hanya untuk celah semantik yang benar-benar direproduksi.
+1. Reuse the existing PusingCuk engine/tools; do not create an unnecessary second AI path.
+2. AI proposes a .cuk program and explains the changes.
+3. The compiler returns structured diagnostics.
+4. Conformance tooling runs registered fixtures and returns evidence per runtime.
+5. AI repairs from real diagnostics; results remain unverified until required runtimes pass.
+6. Add fixtures only for reproducible semantic gaps.
 
-### P3 — Pemisahan aplikasi
+### P3 — Separate application responsibilities
 
-- **Frontend:** tampilan, navigasi, input, validasi antarmuka.
-- **Backend:** autentikasi, API, kebijakan akses, operasi layanan.
-- **Runtime .cuk:** aturan deterministik dan perilaku bahasa.
-- **Library:** fungsi umum dan adapter dengan kontrak jelas.
-- **Platform bridge:** kemampuan perangkat/penyimpanan yang harus diberi izin eksplisit.
+- **Frontend:** presentation, navigation, input, and UI validation.
+- **Backend:** authentication, APIs, access policy, and service operations.
+- **.cuk runtime:** deterministic rules and language behavior.
+- **Library:** shared functions and adapters with explicit contracts.
+- **Platform bridge:** device/storage capabilities requiring explicit permission.
 
-Jangan memindahkan aturan bisnis ke UI hanya untuk membuat prototipe tampak selesai.
+Do not move business rules into the UI just to make a prototype look complete.
 
-## Bukti yang wajib sebelum menyatakan selesai
+## Evidence required before calling work complete
 
-- Perubahan bahasa: tes yang relevan dan fixture reference/native.
-- Backend compiler: tes backend dan fixture yang memang didukung.
-- AI: tes tool dan alur compile/diagnostic/runtime; respons model saja bukan bukti.
-- Web/SaaS: build, API, autentikasi, dan alur utama yang benar-benar dijalankan.
-- Android/desktop: artefak berhasil dibangun dan diuji pada target nyata; file workflow atau APK lama tidak cukup.
+- Language changes: relevant tests and reference/native fixtures.
+- Compiler backend: backend tests and fixtures for the supported subset.
+- AI: tool tests and compile/diagnostic/runtime flow; a model response is not proof.
+- Web/SaaS: build, API, authentication, and main user flow actually executed.
+- Android/desktop: artifact built and tested on the real target; an old APK or workflow file is not enough.
 
-## Batas keamanan
+## Security boundaries
 
-Runtime saat ini bukan sandbox OS yang menjamin eksekusi kode tak tepercaya aman. Jangan jalankan kode pengguna tak dikenal dengan hak akses pribadi. Jangan memasukkan kunci API, service-role key, atau kredensial ke source, dokumentasi, log, maupun prompt.
+The runtime is not an OS sandbox that guarantees untrusted code is safe. Do not run unknown user code with access to private resources. Never put API keys, Supabase service-role keys, or credentials in source code, docs, logs, or prompts.
 
-## Sumber kanonis
+## Canonical sources
 
-- [Visi](VISION.md)
-- [Spesifikasi bahasa](../SPEC.md)
-- [Kontrak semantik](SEMANTIC_CONTRACT.md)
-- [Kompatibilitas target](COMPATIBILITY.md)
-- [Kontrak built-in](../library/builtin_contract.json)
-- [Indeks dokumentasi](README.md)
+- [Vision](VISION.md)
+- [Language specification](../SPEC.md)
+- [Semantic contract](SEMANTIC_CONTRACT.md)
+- [Target compatibility](COMPATIBILITY.md)
+- [Built-in contract](../library/builtin_contract.json)
+- [Documentation index](README.md)
 
-Dokumen audit bertanggal dan catatan integrasi lama dipertahankan hanya sebagai konteks historis sampai referensi masuknya diperiksa; jangan menganggap semua rekomendasi lama masih merupakan prioritas aktif.
+Dated audits and old integration notes remain historical context until their claims are checked against current implementation. Do not assume every old recommendation is still an active priority.
