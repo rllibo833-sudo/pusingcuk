@@ -16,6 +16,12 @@ Proyek ini ditujukan untuk belajar, eksperimen bahasa, dan pengembangan compiler
 
 **Status:** kontrak bahasa `0.6-dev`; paket Python `0.8.0.dev0`. **Metadata paket pada `main` adalah `0.8.0.dev0`.** Ini perangkat lunak tahap pengembangan, bukan rilis stabil. Dukungan tiap backend berbeda dan harus diperiksa melalui matriks kompatibilitas serta fixture.
 
+## Phase 4 — Path Away from Python
+
+Phase 4 is incremental and fixture-gated. The versioned format contracts are documented in [JSON IR v1](docs/IR_SPEC.md) and [bytecode v1](docs/BYTECODE_SPEC.md); the gated plan and honest implementation status are in [Phase 4 roadmap](docs/PHASE4_ROADMAP.md) and [phase4-status.json](reports/phase4-status.json).
+
+**Important:** a native C source runtime is not the same as a C bytecode VM. The C bytecode VM and self-hosted .cuk lexer/parser are not implemented by this branch yet. The Python-Free Score therefore does not increase for those goals until actual C-VM fixtures pass.
+
 ## Coba program pertama
 
 Persyaratan: Python 3.11 atau 3.12.
