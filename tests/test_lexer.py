@@ -148,6 +148,15 @@ class TestLexer(unittest.TestCase):
         ):
             lex(r'"salah\q"')
 
+
+    def test_unicode_superscript_digits_are_rejected_as_lexer_errors(self):
+        for character in ("²", "³", "¹"):
+            with self.subTest(character=character):
+                with self.assertRaisesRegex(
+                    LexerError, "karakter tidak dikenal"
+                ):
+                    lex("lah nilai = " + character + "5")
+
     def test_empty_source_has_eof(self):
         tokens = lex("")
         self.assertEqual(len(tokens), 1)
