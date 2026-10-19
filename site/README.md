@@ -1,6 +1,6 @@
-# Pusingcuk Community Website
+# PusingCuk Community Website
 
-The static introduction site is located at `site/index.html`. It does not require a framework, bundler, npm dependencies, or a backend.
+The static introduction site lives in `site/index.html`. It requires no framework, bundler, npm dependencies, or backend.
 
 ## Preview locally
 
@@ -14,11 +14,11 @@ Then open `http://localhost:8000` on the same device.
 
 ## GitHub Pages
 
-The `.github/workflows/pages.yml` workflow publishes the `site/` directory through GitHub Pages when changes reach `main`. If Pages has not been enabled for this repository, open **Settings → Pages** and select **GitHub Actions** as the build and deployment source.
+The `.github/workflows/pages.yml` workflow publishes the `site/` directory through GitHub Pages when changes reach `main`. If Pages is not enabled for this repository, open **Settings → Pages** and select **GitHub Actions** as the build and deployment source.
 
 ## Notes
 
-- The main page is static HTML/CSS; the compiler does not yet provide a general-purpose templating backend for building arbitrary designs directly from Pusingcuk source.
-- The publishing workflow compiles `examples/halo.pusingcuk` to a standalone HTML target named `demo.html`. The resulting link is included on the main page.
-- The introduction website and the compiled demo are separate artifacts. Do not claim that the entire landing page is written in Pusingcuk.
-- Feature status is described conservatively and links to the main technical documentation.
+- The main page is static HTML/CSS. The compiler does not yet provide a general-purpose templating backend for building arbitrary designs directly from PusingCuk source.
+- The publishing workflow compiles `examples/halo.pusingcuk` into a standalone HTML target named `demo.html`. A link to it appears on the main page.
+- The introduction website and compiled demo are separate artifacts. The entire landing page is not written in PusingCuk.
+- Feature status is described conservatively and linked to the main technical documentation.
