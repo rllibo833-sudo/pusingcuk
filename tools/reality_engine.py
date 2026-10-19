@@ -333,7 +333,14 @@ def report():
     print(f"Python-Free Score: {score['percent']:.2f}% ({score['passed_required_fixtures']}/{score['total_required_fixtures']})")
     if HISTORY.is_file():
         history = json.loads(HISTORY.read_text(encoding="utf-8"))
-        print(f"Recorded history points: {len(history.get('records', []))}")
+        records = history.get("records", [])
+        print(f"Recorded history points: {len(records)}")
+        for item in records[-5:]:
+            print(f"  {item.get('date', '?')} · {item.get('percent', 0):.2f}% ({item.get('numerator', '?')}/{item.get('denominator', '?')}) · {item.get('runtime', 'unknown')}")
+        if len(records) >= 2:
+            previous, latest = records[-2], records[-1]
+            delta = float(latest.get("percent", 0)) - float(previous.get("percent", 0))
+            print(f"Trend versus previous snapshot: {delta:+.2f} percentage points")
     else:
         print("History: no snapshots recorded yet.")
     return 0
