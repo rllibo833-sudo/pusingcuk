@@ -9,7 +9,12 @@ import http.client
 import ipaddress
 import os
 import socket
-import ssl
+# SSL is optional in browser Python builds such as Pyodide. The playground
+# blocks network-dependent examples, while full Python keeps HTTPS support.
+try:
+    import ssl
+except ImportError:  # pragma: no cover - exercised by Pyodide
+    ssl = None
 import stat
 import json
 import shlex
