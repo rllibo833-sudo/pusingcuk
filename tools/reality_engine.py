@@ -160,8 +160,8 @@ def _render_readme(matrix):
     score = matrix["python_free_score"]
     generated = (
         f'[![Python-free runtime · native C · {score["passed_required_fixtures"]}/{score["total_required_fixtures"]} fixtures](docs/assets/python-free-score.svg)](docs/COMPATIBILITY.md)\n'
-        f'Python-free runtime, native C: **{score["passed_required_fixtures"]} dari {score["total_required_fixtures"]} fixture ({score["percent"]:.2f}%)**. '
-        'Skor ini hanya mengukur fixture native C yang lulus; bukan klaim seluruh toolchain bebas Python.\n'
+        f'Python-free native C score: **{score["passed_required_fixtures"]} of {score["total_required_fixtures"]} fixtures ({score["percent"]:.2f}%)**. '
+        'This measures the native C source-runtime fixture subset; it is not a score for the C bytecode VM or proof that the whole toolchain is Python-free.\n'
     )
     text = README.read_text(encoding="utf-8")
     start = "<!-- BEGIN GENERATED PYTHON-FREE SCORE BADGE -->"
