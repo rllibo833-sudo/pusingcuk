@@ -12,6 +12,7 @@ on:
       - "ast_nodes.py"
       - "library/stdlib.py"
       - "library/builtin_contract.py"
+      - "library/builtin_contract.json"
       - "tools/prepare_playground.py"
       - "tools/check_playground_examples.py"
       - ".github/workflows/pages.yml"
