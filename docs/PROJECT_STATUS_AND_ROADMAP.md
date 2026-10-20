@@ -1,6 +1,6 @@
 # PusingCuk — Current Status and Priorities
 
-**Snapshot:** 20 October 2026 · branch `main` at `cc7c8f47f0f8` (before this documentation synchronization).
+**Snapshot:** 20 October 2026 · branch `main` at `aaa931420911` (runtime-parity patch and local Termux boundary notes added; CI remeasurement pending).
 **Language contract:** `0.6-dev`  
 **Python package:** `0.8.0.dev0`  
 **Status:** experimental. This summary does not prove that every test or deployment target passes, and it does not claim that the language is stable or that AI is generally accurate.
@@ -22,6 +22,13 @@
 - **Adapters:** SQLite, loopback HTTP, and mock/loopback JSON-RPC host modules exist, but the language-level capability contract still marks database, server HTTP, DOM, Web3, and stable FFI as planned because they are not first-class `.cuk` APIs or claimed compiler targets.
 - **Frontend/backend SaaS:** existing UIs, services, and integrations remain prototypes until build, authentication, API, and runtime paths are verified on the same commit.
 
+## Active remediation after the measured baseline
+
+The fixture counts above remain the last **measured** baseline from `cc7c8f47f0f8`; do not treat them as results for the current HEAD. Subsequent commits changed runtime error formatting for JavaScript, Python transpiler, and VM, added Python transpiler helper mappings for scalar/numeric built-ins, and added `tests/test_compiler_runtime_parity.py`. The new matrix artifact and unit-test result must be checked before updating the measured counts.
+
+- **Gap 4 — parity:** runtime diagnostics are being normalized to the reference contract; Python transpiler now implements the mapped `teks`, `bilangan`, `desimal`, `logika`, `logaritma`, `log10`, and `jumlah` helpers. This is implementation work, not yet a measured parity improvement. Remaining JavaScript/VM semantic mismatches must be triaged from the next matrix artifact.
+- **Gap 5 — adapters:** host-side SQLite, loopback HTTP, and JSON-RPC modules remain Python-only adapters, not first-class `.cuk` APIs shared by reference and native C. This gap remains open. The intended local deployment is Android + Termux + local Ollama; no cloud provider fallback or automatic Git push is permitted for the local evolution path. Physical-device verification is still required.
+- **Distribution:** README now distinguishes the PusingCuk Studio APK, the separate CukAccount app, and arbitrary `.cuk` programs; a Studio APK is not evidence that arbitrary source files can be packaged as Android apps.
 ## Branch audit (20 October 2026)
 
 The following branches are divergent from `main`; branch-only work is not part of the main implementation unless separately integrated and verified.
