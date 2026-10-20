@@ -7,7 +7,9 @@ Unavailable backends or missing fixture evidence cause rejection.
 """
 from __future__ import annotations
 
+import json
 import math
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -48,69 +50,130 @@ def _is_nondeterministic(tokens) -> str | None:
 
 
 def _run_command(command: list[str], source_path: Path) -> dict[str, Any]:
+    """A process passes only on exit 0; expected output is checked separately."""
     try:
         proc = subprocess.run(
             command, cwd=ROOT, text=True, encoding="utf-8", errors="replace",
             capture_output=True, timeout=TIMEOUT_SECONDS, check=False,
         )
     except subprocess.TimeoutExpired:
-        return {"status": "FAIL", "matched": False, "error": "timeout"}
+        return {"status": "FAIL", "matched": False, "error": "timeout", "exit_code": None, "stdout": "", "stderr": ""}
     except OSError as exc:
-        return {"status": "UNAVAILABLE", "matched": False, "error": type(exc).__name__}
+        return {"status": "UNAVAILABLE", "matched": False, "error": type(exc).__name__, "exit_code": None, "stdout": "", "stderr": ""}
     return {
-        "status": "PASS" if proc.returncode in (0, 1, 2, 3) else "FAIL",
-        "matched": True,
+        "status": "PASS" if proc.returncode == 0 else "FAIL",
+        "matched": False,
         "exit_code": proc.returncode,
         "stdout": proc.stdout,
+        "stderr": proc.stderr,
         "stderr_class": classify_stderr(proc.returncode, proc.stderr),
         "source_line": source_line_from_stderr(proc.stderr),
     }
 
 
+def _fixture_for_source(source: str, fixture_id: str | None = None) -> dict[str, Any] | None:
+    """Resolve the fixture ID and exact source independently of runner evidence."""
+    data = json.loads((ROOT / "tests" / "conformance" / "manifest.json").read_text(encoding="utf-8"))
+    fixtures = data.get("fixtures")
+    if not isinstance(fixtures, list):
+        raise ValueError("fixture manifest has no fixtures list")
+    ids = [item.get("id") for item in fixtures if isinstance(item, dict)]
+    if len(ids) != len(fixtures) or len(ids) != len(set(ids)):
+        raise ValueError("fixture manifest contains invalid or duplicate IDs")
+    for fixture in fixtures:
+        if fixture_id is not None and fixture.get("id") != fixture_id:
+            continue
+        name = fixture.get("source")
+        if not isinstance(name, str) or Path(name).name != name:
+            continue
+        path = ROOT / "tests" / "conformance" / name
+        try:
+            canonical_source = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            continue
+        expected = fixture.get("expected")
+        if (canonical_source.rstrip("\r\n") == source.rstrip("\r\n")
+                and isinstance(expected, dict) and expected.get("exit_code") == 0
+                and isinstance(expected.get("stdout"), str)):
+            return fixture
+    return None
+
+
+def _check_output(result: dict[str, Any], expected: str) -> dict[str, Any]:
+    ok = (result.get("status") == "PASS" and result.get("exit_code") == 0
+          and result.get("stdout") == expected and result.get("stderr") == "")
+    result["matched"] = ok
+    if not ok and result.get("status") == "PASS":
+        result["status"] = "FAIL"
+        result["error"] = "output differs from manifest expected.stdout"
+    return result
+
+
 def _production_target_runner(source: str) -> dict[str, Any]:
-    target_results: dict[str, Any] = {}
-    with tempfile.TemporaryDirectory(prefix="cuk-reality-proposal-") as directory:
-        source_path = Path(directory) / "proposal.cuk"
-        source_path.write_text(source, encoding="utf-8")
-        reference = _run_command(
-            [sys.executable, str(ROOT / "pusingcuk_new.py"), str(source_path)], source_path
-        )
-        target_results["reference"] = reference
-
-        native_binary = Path(directory) / "pusingcuk-native"
-        native_ok, native_error = build_native(native_binary)
-        if native_ok:
-            target_results["native"] = _run_command([str(native_binary), str(source_path)], source_path)
+    """Compile and execute a manifest-backed source for reference/native/JS/Python/VM."""
+    fixture = _fixture_for_source(source)
+    if fixture is None:
+        return {
+            "targets": {name: {"status": "FAIL", "matched": False,
+                "error": "source has no exact successful fixture in canonical manifest",
+                "exit_code": None, "stdout": "", "stderr": ""} for name in REQUIRED_TARGETS},
+            "differential_ok": False, "regressions": [], "fixture_added": False, "fixture_id": None,
+        }
+    expected = fixture["expected"]["stdout"]
+    source_path = ROOT / "tests" / "conformance" / fixture["source"]
+    targets: dict[str, Any] = {}
+    with tempfile.TemporaryDirectory(prefix="cuk-reality-proposal-", dir=ROOT) as folder:
+        work = Path(folder)
+        targets["reference"] = _check_output(
+            _run_command([sys.executable, str(ROOT / "pusingcuk_new.py"), str(source_path)], source_path), expected)
+        native = work / "pusingcuk-native"
+        built, error = build_native(native)
+        if built:
+            targets["native"] = _check_output(_run_command([str(native), str(source_path)], source_path), expected)
         else:
-            target_results["native"] = {
-                "status": "UNAVAILABLE", "matched": False, "error": native_error or "native build unavailable"
-            }
-
-        # These targets are deliberately not marked as passing until the matrix
-        # can compile and execute the same proposal for each backend.
-        for target in ("javascript", "python", "vm"):
-            target_results[target] = {
-                "status": "UNAVAILABLE",
-                "matched": False,
-                "error": "target-specific proposal runner is not integrated",
-            }
-
-        differential_ok = (
-            reference.get("status") == "PASS"
-            and target_results["native"].get("status") == "PASS"
-            and reference.get("exit_code") == target_results["native"].get("exit_code")
-            and reference.get("stdout") == target_results["native"].get("stdout")
-            and reference.get("stderr_class") == target_results["native"].get("stderr_class")
-            and reference.get("source_line") == target_results["native"].get("source_line")
-        )
-    return {
-        "targets": target_results,
-        "differential_ok": differential_ok,
-        "regressions": [],
-        "fixture_added": False,
-        "fixture_id": None,
-    }
-
+            targets["native"] = {"status": "UNAVAILABLE", "matched": False, "error": error or "native build unavailable",
+                                 "exit_code": None, "stdout": "", "stderr": ""}
+        specs = {
+            "javascript": ("js", work / "proposal.js", "node"),
+            "python": ("python", work / "proposal.py", "python"),
+            "vm": ("vm", work / "proposal.bytecode.json", "vm"),
+        }
+        for target, (backend, artifact, runtime) in specs.items():
+            if runtime == "node":
+                executable = shutil.which("node")
+                if not executable:
+                    targets[target] = {"status": "UNAVAILABLE", "matched": False, "error": "Node.js executable not found",
+                                       "exit_code": None, "stdout": "", "stderr": ""}
+                    continue
+                command = [executable, str(artifact)]
+            elif runtime == "python":
+                command = [sys.executable, str(artifact)]
+            else:
+                command = [sys.executable, "-m", "compiler.vm", str(artifact)]
+            try:
+                compiled = subprocess.run(
+                    [sys.executable, "-m", "compiler", str(source_path), "--target", backend, "--output", str(artifact)],
+                    cwd=ROOT, text=True, encoding="utf-8", errors="replace",
+                    capture_output=True, timeout=TIMEOUT_SECONDS, check=False)
+            except subprocess.TimeoutExpired:
+                targets[target] = {"status": "FAIL", "matched": False, "error": "compile timeout",
+                                   "exit_code": None, "stdout": "", "stderr": ""}
+                continue
+            except OSError as exc:
+                targets[target] = {"status": "UNAVAILABLE", "matched": False, "error": type(exc).__name__,
+                                   "exit_code": None, "stdout": "", "stderr": ""}
+                continue
+            if compiled.returncode != 0 or not artifact.is_file():
+                targets[target] = {"status": "FAIL", "matched": False,
+                                   "error": "compiler rejected source or emitted no artifact",
+                                   "exit_code": compiled.returncode, "stdout": "", "stderr": compiled.stderr}
+                continue
+            targets[target] = _check_output(_run_command(command, source_path), expected)
+    all_pass = all(targets[name].get("status") == "PASS" and targets[name].get("exit_code") == 0
+                   and targets[name].get("matched") is True for name in REQUIRED_TARGETS)
+    outputs = [targets[name].get("stdout") for name in REQUIRED_TARGETS]
+    return {"targets": targets, "differential_ok": all_pass and len(set(outputs)) == 1 and outputs[0] == expected,
+            "regressions": [], "fixture_added": True, "fixture_id": fixture["id"]}
 
 def validate_deterministic(
     source: str,
@@ -142,9 +205,17 @@ def validate_deterministic(
         return {"ok": False, "status": "rejected", "accepted": False, "diagnostic": diagnostics, "targets": {}}
 
     targets = evidence.get("targets", {})
+    fixture_id = evidence.get("fixture_id")
+    fixture = _fixture_for_source(source, fixture_id) if isinstance(fixture_id, str) else None
+    expected_output = fixture.get("expected", {}).get("stdout") if fixture else None
+    if fixture is None:
+        diagnostics.append(_diag("FIXTURE_REQUIRED", "Fixture ID tidak terdaftar atau source tidak cocok dengan fixture kanonis."))
     for target in REQUIRED_TARGETS:
         result = targets.get(target)
-        if not isinstance(result, dict) or result.get("status") != "PASS" or result.get("matched") is not True:
+        output_matches = (isinstance(result, dict) and fixture is not None
+                          and result.get("exit_code") == 0 and result.get("stdout") == expected_output
+                          and result.get("stderr", "") == "")
+        if not isinstance(result, dict) or result.get("status") != "PASS" or result.get("matched") is not True or not output_matches:
             status = result.get("status", "MISSING") if isinstance(result, dict) else "MISSING"
             detail = result.get("error", "") if isinstance(result, dict) else ""
             diagnostics.append(_diag(
@@ -152,9 +223,18 @@ def validate_deterministic(
                 f"{target}: {status}" + (f" ({detail})" if detail else ""),
             ))
 
-    if evidence.get("fixture_added") is not True or not evidence.get("fixture_id"):
-        diagnostics.append(_diag("FIXTURE_REQUIRED", "Proposal belum memiliki fixture regresi relevan yang ditambahkan dan diverifikasi."))
-    if evidence.get("differential_ok") is not True or evidence.get("regressions") != []:
+    outputs = [targets.get(name, {}).get("stdout") if isinstance(targets.get(name), dict) else None for name in REQUIRED_TARGETS]
+    independently_differential_ok = (
+        fixture is not None
+        and all(isinstance(targets.get(name), dict) and targets[name].get("status") == "PASS"
+                and targets[name].get("exit_code") == 0 and targets[name].get("stdout") == expected_output
+                and targets[name].get("stderr", "") == "" for name in REQUIRED_TARGETS)
+        and len(set(outputs)) == 1
+    )
+    if evidence.get("fixture_added") is not True or fixture is None:
+        if not any(item["code"] == "FIXTURE_REQUIRED" for item in diagnostics):
+            diagnostics.append(_diag("FIXTURE_REQUIRED", "Proposal belum memiliki fixture regresi relevan yang ditambahkan dan diverifikasi."))
+    if evidence.get("differential_ok") is not True or not independently_differential_ok or evidence.get("regressions") != []:
         diagnostics.append(_diag("DIFFERENTIAL_GATE_FAILED", "Matriks differential tidak lengkap, gagal, atau memiliki regresi."))
 
     accepted = not diagnostics
