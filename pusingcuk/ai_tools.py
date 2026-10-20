@@ -7,7 +7,8 @@ def main(argv=None):
     p.add_argument("--check-fixture",action="store_true"); p.add_argument("--fixture-id")
     a=p.parse_args(argv)
     if not a.check_fixture: p.error("use --check-fixture")
-    path=Path(__file__).resolve().parent.parent/"library"/"conformance_manifest.json"
+    bundle_root = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent.parent))
+    path = bundle_root / "library" / "conformance_manifest.json"
     try:
         data=json.loads(path.read_text(encoding="utf-8")); fixtures=data["fixtures"]
         if not isinstance(fixtures,list) or not fixtures: raise ValueError("empty manifest")
