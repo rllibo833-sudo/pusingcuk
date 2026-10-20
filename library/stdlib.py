@@ -115,7 +115,7 @@ def _json_read(value: Any) -> Any:
         decoded = json.loads(value, parse_constant=lambda item: (_ for _ in ()).throw(ValueError(item)))
     except (json.JSONDecodeError, ValueError) as exc:
         raise ValueError(f"teks JSON tidak valid: {exc}") from exc
-    return _json_validate(decoded)
+    return _json_canonical(_json_validate(decoded))
 
 
 def _html_escape(value: Any) -> str:
