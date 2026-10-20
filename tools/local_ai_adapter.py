@@ -1,55 +1,93 @@
-# FLOW: TERMUX -> OLLAMA -> CUK REALITY ENGINE -> GITHUB -> TERMUX
-import json, pathlib, subprocess, sys, re, http.client
+"""Local Ollama proposal adapter for PusingCuk source diagnostics."""
+from __future__ import annotations
+
+import http.client
+import json
+import pathlib
+import re
+import sys
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from tools.diagnostic_repair_loop import run_case
+
 
 def ollama_first(src, diag):
-    # OLLAMA DULUAN - sesuai alur lu
     try:
-        conn = http.client.HTTPConnection("127.0.0.1",11434,timeout=30)
-        prompt = f"Fix PusingCuk code. Error: {diag}\nRule: 'lah' only once per var, no tampilkan/cetak, use 'lah _out = var'. Code:\n{src}\nOutput only fixed code jancuk..selesai jancuk"
-        body=json.dumps({"model":"qwen2:0.5b","prompt":prompt,"stream":False})
-        conn.request("POST","/api/generate",body,{"Content-Type":"application/json"})
-        resp=json.loads(conn.getresponse().read()).get("response","")
-        if "jancuk" in resp:
-            return resp
-    except: pass
+        conn = http.client.HTTPConnection("127.0.0.1", 11434, timeout=30)
+        prompt = (
+            f"Fix PusingCuk code. Error: {diag}\n"
+            "Rule: 'lah' only once per var, no tampilkan/cetak, use 'lah _out = var'. "
+            f"Code:\n{src}\nOutput only fixed code jancuk..selesai jancuk"
+        )
+        body = json.dumps({"model": "qwen2:0.5b", "prompt": prompt, "stream": False})
+        conn.request("POST", "/api/generate", body, {"Content-Type": "application/json"})
+        response = json.loads(conn.getresponse().read()).get("response", "")
+        if "jancuk" in response:
+            return response
+    except (OSError, ValueError, http.client.HTTPException):
+        pass
     return None
 
+
 def heuristic(src, diag):
-    # fallback kalo Ollama lagi tidur / batre 30% lu tadi
-    txt=src
+    text = src
     if "sudah dibuat" in (diag or ""):
-        seen=set(); out=[]
-        for l in txt.splitlines():
-            m=re.search(r'^\s*lah\s+([a-z_]+)\s*=', l)
-            if m and m.group(1) in seen:
-                out.append(re.sub(r'^\s*lah\s+', '', l))
+        seen = set()
+        output = []
+        for line in text.splitlines():
+            match = re.search(r"^\s*lah\s+([a-z_]+)\s*=", line)
+            if match and match.group(1) in seen:
+                output.append(re.sub(r"^\s*lah\s+", "", line))
             else:
-                out.append(l); 
-                if m: seen.add(m.group(1))
-        txt="\n".join(out)
-    txt=re.sub(r'(std\.io\.tampilkan|tampilkan|cetak)\s*\(?([^\)]*)\)?', r'lah _out = \2', txt)
-    txt=re.sub(r'tampilkan\s+([a-z_]+)', r'lah _out = \1', txt)
-    return txt
+                output.append(line)
+                if match:
+                    seen.add(match.group(1))
+        text = "\n".join(output)
+    text = re.sub(r"(std\.io\.tampilkan|tampilkan|cetak)\s*\(?([^\)]*)\)?", r"lah _out = \2", text)
+    text = re.sub(r"tampilkan\s+([a-z_]+)", r"lah _out = \1", text)
+    return text
+
+
+def _diagnostic_text(report):
+    items = report.get("diagnostic", [])
+    if isinstance(items, str):
+        return items
+    return "\n".join(
+        f"Baris {item.get('line', 0)}: {item.get('msg', '')}"
+        for item in items if isinstance(item, dict)
+    )
+
 
 def run(target):
-    p=ROOT/target
-    print(f"TERMUX -> OLLAMA -> CUK REALITY ENGINE: {target}")
-    for i in range(3):
-        # CUK REALITY ENGINE
-        r=subprocess.run([sys.executable, str(ROOT/"tools/diagnostic_repair_loop.py"), str(p), "--json"], capture_output=True, text=True)
-        rep=json.loads(r.stdout)
-        if rep['status']=='passed':
-            print(f"CUK REALITY ENGINE: PASSED -> siap push ke GITHUB")
+    original = pathlib.Path(target)
+    original = original if original.is_absolute() else ROOT / original
+    original = original.resolve()
+    proposal = original.with_name(f"{original.stem}.proposal.cuk")
+    current = original
+
+    for attempt in range(3):
+        report = run_case(current)
+        if report["status"] == "passed":
+            print("PusingCuk proposal syntax check: passed; acceptance gate still required")
             return True
-        diag=rep.get('diagnostic') or ""
-        src=rep.get('ai_handoff',{}).get('source','') or p.read_text()
-        print(f"[{i+1}] {rep['status']}: {diag[:100]}")
-        # OLLAMA DULUAN, baru heuristic
-        new = ollama_first(src, diag) or heuristic(src, diag)
-        p=ROOT/f"{p.stem}.proposal.cuk"
-        p.write_text(new, encoding="utf-8")
+
+        diagnostic = _diagnostic_text(report)
+        source = report.get("ai_handoff", {}).get("source", "")
+        if not source:
+            try:
+                source = current.read_text(encoding="utf-8")
+            except (OSError, UnicodeError):
+                return False
+        print(f"[{attempt + 1}] {report['status']}: {diagnostic[:160]}", file=sys.stderr)
+        proposed = ollama_first(source, diagnostic) or heuristic(source, diagnostic)
+        proposal.write_text(proposed, encoding="utf-8")
+        current = proposal
+
     return False
 
-if __name__=="__main__":
-    run(sys.argv[1] if len(sys.argv)>1 else "contoh.cuk")
+
+if __name__ == "__main__":
+    raise SystemExit(0 if run(sys.argv[1] if len(sys.argv) > 1 else "halo.cuk") else 1)
