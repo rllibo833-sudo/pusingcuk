@@ -29,7 +29,7 @@ def parse_spec_aliases(text: str) -> tuple[dict[str, str], dict[str, str]]:
     def parse(block: str) -> dict[str, str]:
         aliases: dict[str, str] = {}
         for line in block.splitlines():
-            match = re.match(r"^- `([^\`]+)` → `([^\`]+)`", line)
+            match = re.match(r"^- `([^`]+)` → `([^`]+)`", line)
             if not match:
                 continue
             alias, canonical = match.groups()
