@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "fixture_count": 77,
+  "targets": {
+    "reference": {
+      "passed": 0,
+      "failed": 77,
+      "timeout": 0,
+      "unsupported": 0,
+      "unavailable": 0
+    },
+    "native": {
+      "passed": 74,
+      "failed": 0,
+      "timeout": 0,
+      "unsupported": 3,
+      "unavailable": 0
+    },
+    "javascript": {
+      "passed": 0,
+      "failed": 0,
+      "timeout": 0,
+      "unsupported": 77,
+      "unavailable": 0
+    },
+    "python_transpiler": {
+      "passed": 0,
+      "failed": 77,
+      "timeout": 0,
+      "unsupported": 0,
+      "unavailable": 0
+    },
+    "html": {
+      "passed": 0,
+      "failed": 0,
+      "timeout": 0,
+      "unsupported": 77,
+      "unavailable": 0
+    },
+    "vm": {
+      "passed": 0,
+      "failed": 77,
+      "timeout": 0,
+      "unsupported": 0,
+      "unavailable": 0
+    }
+  },
+  "python_free_score": {
+    "numerator": 74,
+    "denominator": 77,
+    "percent": 96.1,
+    "runtime": "native C",
+    "unsupported_native_counted_as_not_passed": true,
+    "method": "Python-Free Score = (number of manifest fixtures whose native C execution passed) / (total number of manifest fixtures across all targets) × 100. All fixtures stay in the denominator, including the three native-unsupported fixtures; unsupported is not counted as passed. Only native C is eligible as Python-free. VM is excluded because it imports Python evaluator helpers."
+  }
+}
