@@ -45,11 +45,15 @@ def generate(document):
             if name == "jadi_teks": return f"pc_json_text({values})"
             builtin = PYTHON_BACKEND_BUILTINS.get(name)
             if builtin is not None:
+                if builtin["min_args"] <= len(args) <= builtin["max_args"]:
+                    return f"{builtin['helper']}({values})"
                 return (f"pc_invoke_builtin({json.dumps(name)}, [{values}], "
                         f"{builtin['min_args']}, {builtin['max_args']}, "
                         f"lambda *pc_args: {builtin['helper']}(*pc_args))")
             if name not in functions: raise PythonBackendError(f"baris {line}: fungsi tidak dikenal: {name}")
-            return f"pc_fn_{name}({values})"
+            expected = len(functions[name]["fields"]["params"])
+            if len(args) == expected: return f"pc_fn_{name}({values})"
+            return f"pc_invoke_function({json.dumps(name)}, [{values}], {expected}, pc_fn_{name})"
         if k == "Unary":
             value = expr(f["value"], env)
             if f["op"] == "bukan": return f"(not ({value}))"
@@ -288,6 +292,9 @@ def pc_invoke_builtin(name, args, minimum, maximum, function):
     if not minimum <= len(args) <= maximum:
         expected = str(minimum) if minimum == maximum else f"{minimum}-{maximum}"
         raise TypeError(f"{name}() membutuhkan {expected} argumen")
+    return function(*args)
+def pc_invoke_function(name, args, expected, function):
+    if len(args) != expected: raise TypeError(f"fungsi '{name}' membutuhkan {expected} argumen")
     return function(*args)
 def pc_json_value(value):
     if isinstance(value, PcDict): return {str(k): pc_json_value(v) for k, v in value.entries}

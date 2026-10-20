@@ -500,12 +500,15 @@ def generate(document: dict, as_module: bool = False) -> str:
             if name == "jadi_teks":
                 return f"pcJsonText({rendered})"
             if builtin is not None:
+                if builtin["min_args"] <= len(args) <= builtin["max_args"]:
+                    return f"{builtin['helper']}({rendered})"
                 return (f"pcInvokeBuiltin({json.dumps(name)}, [{rendered}], "
                         f"{builtin['min_args']}, {builtin['max_args']}, "
                         f"(...pcArgs) => {builtin['helper']}(...pcArgs))")
             if name not in functions:
                 raise JSBackendError(f"baris {line}: fungsi {name!r} tidak dikenal atau belum didukung")
             expected = len(functions[name]["fields"]["params"])
+            if len(args) == expected: return f"pc_fn_{name}({rendered})"
             return (f"pcInvokeFunction({json.dumps(name)}, [{rendered}], "
                     f"{expected}, pc_fn_{name})")
         if kind == "Unary":
