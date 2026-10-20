@@ -17,6 +17,7 @@
         "keluarin",
         "koar",
         "muncrat",
+        "ngegas",
         "nyalak",
         "omong",
         "print",
@@ -46,7 +47,6 @@
     {
       "word": "jancuk",
       "aliases": [
-        "gas",
         "inthiseco"
       ]
     },
@@ -139,28 +139,5 @@
   "source_of_truth": [],
   "0.6-dev": [
     "language_version"
-  ],
-  "hedeh_legacy": [
-    "bacot",
-    "berak",
-    "berisik",
-    "cetak",
-    "crot",
-    "gas",
-    "gembor",
-    "jir",
-    "keluarin",
-    "koar",
-    "muncrat",
-    "nyalak",
-    "omong",
-    "print",
-    "sembur",
-    "semprot",
-    "senggol",
-    "spill",
-    "suarakan",
-    "tampilkan",
-    "teriak"
   ]
 }
