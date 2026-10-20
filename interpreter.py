@@ -19,7 +19,7 @@ def _validate_legacy_limits(source):
     for line in source.splitlines():
         if len(line) > _MAX_EXPRESSION_LENGTH:
             raise SyntaxError("ekspresi terlalu panjang")
-    repeated_prefix = re.compile(r"(?:(?:not|bukan)\\s+){%d,}" % (_MAX_EXPRESSION_DEPTH + 1))
+    repeated_prefix = re.compile(r"(?:(?:not|bukan)\s+){%d,}" % (_MAX_EXPRESSION_DEPTH + 1))
     if repeated_prefix.search(source):
         raise SyntaxError("ekspresi terlalu dalam")
 
