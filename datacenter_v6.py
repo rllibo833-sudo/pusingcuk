@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""V6 compatibility entry point: dry-run language-evolution proposal only."""
+"""V6 compatibility entry point: dry-run, review-only language-evolution proposal."""
 from __future__ import annotations
 import argparse,json
 from pathlib import Path
