@@ -92,6 +92,13 @@ jobs:
           output="$(./dist/pusingcuk examples/kasir_warung.cuk)"
           expected="$(printf '40000\n4000\n36000\n3960\n39960')"
           test "$output" = "$expected"
+          # Freeze the manifest-check entry point as a separate executable and
+          # exercise its data lookup from the PyInstaller extraction directory.
+          pyinstaller --noconfirm --clean --onefile pusingcuk/ai_tools.py \
+            --name pusingcuk-ai-tools \
+            --add-data "library/conformance_manifest.json:library"
+          test -s dist/pusingcuk-ai-tools
+          ./dist/pusingcuk-ai-tools --check-fixture
 
       - name: Siapkan Android NDK
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
@@ -129,6 +136,7 @@ jobs:
           mkdir -p dist/pusingcuk-package
           cp dist/*.whl dist/*.tar.gz dist/pusingcuk-package/
           cp dist/pusingcuk dist/pusingcuk-package/pusingcuk-linux-x86_64
+          cp dist/pusingcuk-ai-tools dist/pusingcuk-package/pusingcuk-ai-tools-linux-x86_64
           cp dist/native/pusingcuk-native-linux-x86_64 dist/pusingcuk-package/
           cp dist/android/pusingcuk-native-android-arm64 dist/pusingcuk-package/
           cp README.md LICENSE dist/pusingcuk-package/
@@ -137,6 +145,7 @@ jobs:
 
           Isi:
           - pusingcuk-linux-x86_64: CLI interpreter mandiri Linux x86-64 (tidak perlu Python terpasang).
+          - pusingcuk-ai-tools-linux-x86_64: pemeriksa manifest fixture AI yang dibekukan; jalankan ./pusingcuk-ai-tools-linux-x86_64 --check-fixture.
           - pusingcuk-native-linux-x86_64: runtime native Linux x86-64 untuk subset sintaks yang didukung.
           - pusingcuk-native-android-arm64: executable native Android ARM64; bukan APK dan perlu dijalankan dari aplikasi terminal Android yang kompatibel.
           - .whl: paket Python untuk memasang CLI dan library; membutuhkan Python 3.11+.
