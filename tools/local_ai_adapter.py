@@ -71,6 +71,7 @@ def run(target):
 
     for attempt in range(3):
         report = run_case(current)
+        source = report.get("ai_handoff", {}).get("source", "")
         if report["status"] == "passed":
             if current == original:
                 print("PusingCuk source syntax is valid; no repair proposal was accepted")
