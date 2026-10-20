@@ -159,7 +159,7 @@ class Parser:
             name = self.name()
             self.need("=")
             return node("Declare", t.line, name=name, value=self.expr())
-        if self.at("hedeh"):
+        if self.at("hedeh") or self.at("spill"):
             self.take()
             return node("Print", t.line, value=self.expr())
         if self.at("tanya"):

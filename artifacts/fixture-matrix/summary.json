@@ -3,8 +3,8 @@
   "fixture_count": 77,
   "targets": {
     "reference": {
-      "passed": 0,
-      "failed": 77,
+      "passed": 16,
+      "failed": 61,
       "timeout": 0,
       "unsupported": 0,
       "unavailable": 0
@@ -24,8 +24,8 @@
       "unavailable": 0
     },
     "python_transpiler": {
-      "passed": 0,
-      "failed": 77,
+      "passed": 5,
+      "failed": 72,
       "timeout": 0,
       "unsupported": 0,
       "unavailable": 0
@@ -38,8 +38,8 @@
       "unavailable": 0
     },
     "vm": {
-      "passed": 0,
-      "failed": 77,
+      "passed": 7,
+      "failed": 70,
       "timeout": 0,
       "unsupported": 0,
       "unavailable": 0

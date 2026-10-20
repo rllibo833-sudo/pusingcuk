@@ -1,6 +1,7 @@
 {
-  "schema_version": 1,
-  "language": "Pusingcuk",
+  "Pusingcuk": [
+    "language"
+  ],
   "keywords": [
     {
       "word": "hedeh",
@@ -119,5 +120,10 @@
     }
   ],
   "source_of_truth": [],
-  "language_version": "0.6-dev"
+  "0.6-dev": [
+    "language_version"
+  ],
+  "hedeh": [
+    "spill"
+  ]
 }
