@@ -1,36 +1,27 @@
 #!/data/data/com.termux/files/usr/bin/bash
 while true; do
-  # PASTIKAN OLLAMA JALAN + MODEL KE-LOAD
+  git pull origin main --rebase || true
   pgrep ollama || (ollama serve > ~/ollama.log 2>&1 & sleep 3)
-  ollama list
-  ollama run qwen2:0.5b "" || ollama run llama3.2:1b "" || echo "no model"
+  export OLLAMA_MODEL=llama3.2:1b
+  
+  # FIX: paksa pakai llama3.2:1b biar gak MODEL_NOT_FOUND lagi
+  sed -i 's/qwen2:0.5b/llama3.2:1b/g; s/tinyllama:latest/llama3.2:1b/g' tools/evaluate_live_ai.py tools/local_ai_adapter.py 2>/dev/null || true
 
-  echo "[1/6] reality_engine"
+  echo "[ADAPTER] termux -> ollama"
+  python tools/local_ai_adapter.py || true
   python tools/reality_engine.py || true
-
-  echo "[2/6] evaluate_live_ai"
-  # set model yang ada
-  export PUSINGCUK_MODEL=qwen2:0.5b
-  export OLLAMA_MODEL=qwen2:0.5b
+  echo "[DATACENTER] evaluate"
   python tools/evaluate_live_ai.py || true
 
-  echo "[3/6] adapter"
-  python tools/local_ai_adapter.py || true
-  ls tools/ | grep -i compat
-  python tools/generate_compatibility.py 2>/dev/null || python tools/compatibility_report.py 2>/dev/null || echo "compat skip"
-
-  echo "[4/6] evolve - YANG BENER POSITIONAL"
+  echo "[FIX DETERMINISTIK]"
   python tools/evolve_language.py hedeh koar2 || true
-  python tools/evolve_daemon.py --canonical hedeh --alias koar2 || true
+  python tools/force_approve.py || true
+  python fix_parser_all.py || true
+  python tools/generate_compatibility.py || true
 
-  echo "[5/6] datacenter"
-  python datacenter_v6.py --canonical hedeh --alias koar2 || true
-  sed -i 's/hedeh/hedeh | koar2/g' SPEC.md 2>/dev/null || true
-
-  echo "[6/6] push"
+  echo "[PUSH] github -> termux"
   git add .
-  git commit -m "auto evolve: $(date) hedeh->koar2" || echo "nothing"
-  git push origin main || true
-
-  sleep 300
+  git commit -m "lingkaran full hedeh->koar2 $(date +%H:%M)" || true
+  git push origin main
+  sleep 120
 done

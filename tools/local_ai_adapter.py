@@ -23,7 +23,7 @@ def ollama_first(src, diag):
             "Rule: 'lah' only once per var, no tampilkan/cetak, use 'lah _out = var'. "
             f"Code:\n{src}\nOutput only fixed code jancuk..selesai jancuk"
         )
-        body = json.dumps({"model": "qwen2:0.5b", "prompt": prompt, "stream": False})
+        body = json.dumps({"model": "llama3.2:1b", "prompt": prompt, "stream": False})
         conn.request("POST", "/api/generate", body, {"Content-Type": "application/json"})
         response = json.loads(conn.getresponse().read()).get("response", "")
         if "jancuk" in response:
