@@ -49,9 +49,17 @@ def _to_text(value: Any) -> str:
     return str(value)
 
 
-def _json_validate(value: Any, path: str = "$") -> Any:
+def _json_validate(value: Any, path: str = "$", depth: int = 0) -> Any:
     """Reject values that cannot be represented consistently across targets."""
-    if value is None or isinstance(value, (str, bool)):
+    if depth > 64:
+        raise ValueError(f"JSON melebihi kedalaman maksimum: {path}")
+    if value is None or isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        if "\x00" in value:
+            raise ValueError(f"JSON teks mengandung NUL yang tidak didukung: {path}")
+        if len(value.encode("utf-8")) > 1023:
+            raise ValueError(f"JSON teks melebihi batas 1023 byte: {path}")
         return value
     if isinstance(value, int):
         if abs(value) > _MAX_SAFE_INTEGER:
@@ -60,32 +68,73 @@ def _json_validate(value: Any, path: str = "$") -> Any:
     if isinstance(value, float):
         if not math.isfinite(value):
             raise ValueError(f"JSON angka non-finite: {path}")
+        if value.is_integer() and abs(value) > _MAX_SAFE_INTEGER:
+            raise ValueError(f"JSON integer di luar rentang aman: {path}")
         return value
     if isinstance(value, list):
-        return [_json_validate(item, f"{path}[{index}]") for index, item in enumerate(value)]
+        return [_json_validate(item, f"{path}[{index}]", depth + 1) for index, item in enumerate(value)]
     if isinstance(value, Mapping):
         if any(not isinstance(key, str) for key in value):
             raise TypeError(f"kunci objek JSON harus teks: {path}")
-        return {key: _json_validate(item, f"{path}.{key}") for key, item in value.items()}
+        return {
+            _json_validate(key, f"{path}.<kunci>"): _json_validate(item, f"{path}.{key}", depth + 1)
+            for key, item in value.items()
+        }
     raise TypeError(f"tipe tidak didukung JSON: {type(value).__name__} pada {path}")
 
 
+def _json_canonical(value: Any) -> Any:
+    """Normalize integral floats to the same minimal JSON number spelling on every target."""
+    if isinstance(value, float):
+        if value == 0:
+            return 0
+        if value.is_integer() and abs(value) <= _MAX_SAFE_INTEGER:
+            return int(value)
+        return value
+    if isinstance(value, list):
+        return [_json_canonical(item) for item in value]
+    if isinstance(value, Mapping):
+        return {key: _json_canonical(item) for key, item in value.items()}
+    return value
+
+
 def _json_text(value: Any) -> str:
-    return json.dumps(_json_validate(value), ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+    validated = _json_validate(value)
+    encoded = json.dumps(_json_canonical(validated), ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+    if len(encoded.encode("utf-8")) > 1023:
+        raise ValueError("json_teks() melebihi batas output 1023 byte")
+    return encoded
 
 
 def _json_read(value: Any) -> Any:
     if not isinstance(value, str):
         raise TypeError("json_baca() membutuhkan teks JSON")
+    if len(value.encode("utf-8")) > 1023:
+        raise ValueError("json_baca() input melebihi batas 1023 byte")
     try:
         decoded = json.loads(value, parse_constant=lambda item: (_ for _ in ()).throw(ValueError(item)))
     except (json.JSONDecodeError, ValueError) as exc:
         raise ValueError(f"teks JSON tidak valid: {exc}") from exc
-    return _json_validate(decoded)
+    return _json_canonical(_json_validate(decoded))
 
 
 def _html_escape(value: Any) -> str:
-    return html.escape(_to_text(value), quote=True)
+    if isinstance(value, int) and not isinstance(value, bool) and abs(value) > _MAX_SAFE_INTEGER:
+        raise ValueError("html_aman() integer di luar rentang aman")
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ValueError("html_aman() membutuhkan angka finite")
+        if value.is_integer() and abs(value) > _MAX_SAFE_INTEGER:
+            raise ValueError("html_aman() integer di luar rentang aman")
+        text = str(int(value)) if value.is_integer() else str(value)
+    else:
+        text = _to_text(value)
+    if "\x00" in text:
+        raise ValueError("html_aman() tidak menerima NUL")
+    escaped = html.escape(text, quote=True)
+    if len(escaped.encode("utf-8")) > 1023:
+        raise ValueError("html_aman() melebihi batas output 1023 byte")
+    return escaped
 
 
 def _csv_row(value: Any) -> str:
@@ -96,15 +145,20 @@ def _csv_row(value: Any) -> str:
         if item is None or isinstance(item, (str, bool)):
             field = _to_text(item)
         elif isinstance(item, (int, float)) and not isinstance(item, bool) and math.isfinite(item):
-            if isinstance(item, int) and abs(item) > _MAX_SAFE_INTEGER:
+            if (isinstance(item, int) or item.is_integer()) and abs(item) > _MAX_SAFE_INTEGER:
                 raise ValueError("csv_baris() integer di luar rentang aman")
-            field = str(item)
+            field = str(int(item)) if isinstance(item, float) and item.is_integer() else str(item)
         else:
             raise TypeError("csv_baris() hanya menerima nilai skalar")
+        if "\x00" in field:
+            raise ValueError("csv_baris() tidak menerima NUL")
         if any(char in field for char in (",", '"', chr(13), chr(10))):
             field = '"' + field.replace('"', '""') + '"'
         fields.append(field)
-    return ",".join(fields)
+    result = ",".join(fields)
+    if len(result.encode("utf-8")) > 1023:
+        raise ValueError("csv_baris() melebihi batas output 1023 byte")
+    return result
 
 
 def _numeric(name: str, value: Any) -> int | float:

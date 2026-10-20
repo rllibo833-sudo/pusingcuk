@@ -267,6 +267,7 @@ class BuiltinContractTests(unittest.TestCase):
         native_supported = {
             "panjang", "rentang", "mutlak", "minimum", "maksimum", "bulatkan",
             "bawah", "atas", "akar", "pangkat", "logaritma", "log10", "sinus", "kosinus", "jumlah", "rata_rata", "median",
+            "json_teks", "json_baca", "html_aman", "csv_baris",
         }
         native_partial = {"teks", "bilangan", "desimal", "logika"}
         for name, entry in BUILTIN_BY_NAME.items():

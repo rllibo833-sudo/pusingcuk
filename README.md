@@ -8,8 +8,8 @@ PusingCuk combines approachable Indonesian syntax with a reference interpreter, 
 **[Try the browser playground →](https://rllibo833-sudo.github.io/pusingcuk/playground.html)** — experimental; its current interpreter runs on Python through Pyodide, not a standalone native .cuk runtime.
 
 <!-- BEGIN GENERATED PYTHON-FREE SCORE BADGE -->
-[![Python-free runtime · native C · 74/77 fixtures](docs/assets/python-free-score.svg)](docs/PYTHON_FREE_SCORE.md)
-Python-free runtime, native C: **74 dari 77 fixture aktif lulus**. Ini cakupan fixture runtime native C, bukan klaim bahwa seluruh proyek atau proses build bebas Python.
+[![Python-free runtime · native C · 79/79 fixtures](docs/assets/python-free-score.svg)](docs/PYTHON_FREE_SCORE.md)
+Python-free runtime, native C: **79 dari 79 fixture aktif lulus**. Ini cakupan fixture runtime native C, bukan klaim bahwa seluruh proyek atau proses build bebas Python.
 <!-- END GENERATED PYTHON-FREE SCORE BADGE -->
 
 **Status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. Development software, not a stable release.

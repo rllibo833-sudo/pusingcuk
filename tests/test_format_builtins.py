@@ -30,6 +30,45 @@ class FormatBuiltinTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             call_builtin("json_baca", '{"broken":')
 
+
+    def test_json_rejects_invalid_values_and_serializes_nested_values(self):
+        nested = {"items": [1, {"ok": True}], "empty": None}
+        encoded = call_builtin("json_teks", nested)
+        self.assertEqual(encoded, '{"items":[1,{"ok":true}],"empty":null}')
+        self.assertEqual(call_builtin("json_teks", {"integer_float": 1.0, "negative_zero": -0.0}), '{"integer_float":1,"negative_zero":0}')
+        self.assertEqual(call_builtin("csv_baris", [1.0, 0.5]), "1,0.5")
+        self.assertEqual(call_builtin("html_aman", 1.0), "1")
+        with self.assertRaises(ValueError):
+            call_builtin("html_aman", 9007199254740992)
+        self.assertEqual(call_builtin("json_baca", encoded), nested)
+        self.assertEqual(call_builtin("json_baca", "[1.0,-0.0]"), [1, 0])
+        for invalid in ("not json", '{"x":}', '{"x":1,}', "01", "NaN", "Infinity"):
+            with self.subTest(invalid=invalid), self.assertRaises((TypeError, ValueError)):
+                call_builtin("json_baca", invalid)
+        with self.assertRaises(ValueError):
+            call_builtin("json_baca", "9007199254740992")
+        with self.assertRaises(ValueError):
+            call_builtin("json_teks", {"nested": [9007199254740992]})
+        with self.assertRaises(ValueError):
+            call_builtin("json_teks", "nul\x00byte")
+        with self.assertRaises(ValueError):
+            call_builtin("json_teks", "x" * 1024)
+        with self.assertRaises(ValueError):
+            call_builtin("json_baca", " " * 1024)
+        nested = 0
+        for _ in range(66):
+            nested = [nested]
+        with self.assertRaises(ValueError):
+            call_builtin("json_teks", nested)
+        with self.assertRaises(ValueError):
+            call_builtin("html_aman", "nul\x00byte")
+        with self.assertRaises(ValueError):
+            call_builtin("csv_baris", ["nul\x00byte"])
+
+    def test_csv_quotes_newline_and_carriage_return(self):
+        self.assertEqual(call_builtin("csv_baris", ["line\nbreak", "carriage\rreturn"]),
+                         '"line\nbreak","carriage\rreturn"')
+
     @unittest.skipUnless(NODE, "Node.js tidak tersedia")
     def test_javascript_backend_matches_format_fixture(self):
         generated = generate(from_source(SOURCE, "formats_json_html_csv.cuk"))
@@ -38,7 +77,7 @@ class FormatBuiltinTests(unittest.TestCase):
             path.write_text(generated, encoding="utf-8")
             result = subprocess.run([NODE, str(path)], text=True, capture_output=True, timeout=15, check=False)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout, '{"nama":"Budi","aktif":true}\nBudi\nSiti\nokelah\n&lt;b&gt;&amp;&quot;&#x27;\nBudi,"kopi, susu","dia bilang ""hai"""\n')
+        self.assertEqual(result.stdout, "{\"nama\":\"Budi\",\"aktif\":true}\nBudi\nSiti\nokelah\n&lt;b&gt;&amp;&quot;&#x27;\nBudi,\"kopi, susu\",\"dia bilang \"\"hai\"\"\"\n{\"items\":[1,{\"ok\":true}],\"empty\":null}\n\"\\\"baris\\nbaru\\\",\\\"a\\rb\\\"\"\n{\"integer_float\":1,\"negative_zero\":0}\n1\n1,0.5,0\n")
 
 
 if __name__ == "__main__":

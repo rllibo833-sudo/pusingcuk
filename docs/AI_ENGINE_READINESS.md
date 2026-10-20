@@ -97,14 +97,14 @@ The alias table below is generated from SPEC.md after checking the root lexer an
 
 | Target | Passed | Failed | Unsupported |
 |---|---:|---:|---:|
-| reference | 77/77 | 0 | 0 |
-| native | 74/77 | 0 | 3 |
-| javascript | 77/77 | 0 | 0 |
-| python_transpiler | 77/77 | 0 | 0 |
-| html | 0/77 | 0 | 77 |
-| vm | 77/77 | 0 | 0 |
+| reference | 79/79 | 0 | 0 |
+| native | 79/79 | 0 | 0 |
+| javascript | 79/79 | 0 | 0 |
+| python_transpiler | 79/79 | 0 | 0 |
+| html | 0/79 | 0 | 79 |
+| vm | 79/79 | 0 | 0 |
 
-The reference runtime passed 77/77 fixtures in the verified matrix; native C passed 74/77 with 3 explicitly unsupported fixtures. JavaScript, Python transpiler, and VM each passed 77/77 fixtures in the latest matrix. HTML remains unsupported for all 77 fixtures. These counts are fixture evidence, not a general compatibility or production-readiness claim.
+The reference runtime passed 79/79 fixtures in the verified matrix; native C passed 79/79 with 0 explicitly unsupported fixtures. JavaScript passed 79/79, Python transpiler passed 79/79, and VM passed 79/79. HTML remains unsupported for all 79 fixtures. These counts are fixture evidence, not a general compatibility or production-readiness claim.
 
 **AI status:** PusingCuk AI remains local/experimental. CI provider-contract tests use mocked providers; CI does not prove live Ollama inference, hosted availability, or production safety. The runtime is not an OS sandbox.
 <!-- END GENERATED LANGUAGE CONTRACT -->

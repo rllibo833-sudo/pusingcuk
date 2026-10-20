@@ -1,30 +1,30 @@
 {
   "schema_version": 1,
-  "fixture_count": 77,
+  "fixture_count": 79,
   "targets": {
     "reference": {
-      "passed": 77,
+      "passed": 79,
       "failed": 0,
       "timeout": 0,
       "unsupported": 0,
       "unavailable": 0
     },
     "native": {
-      "passed": 74,
+      "passed": 79,
       "failed": 0,
       "timeout": 0,
-      "unsupported": 3,
+      "unsupported": 0,
       "unavailable": 0
     },
     "javascript": {
-      "passed": 77,
+      "passed": 79,
       "failed": 0,
       "timeout": 0,
       "unsupported": 0,
       "unavailable": 0
     },
     "python_transpiler": {
-      "passed": 77,
+      "passed": 79,
       "failed": 0,
       "timeout": 0,
       "unsupported": 0,
@@ -34,11 +34,11 @@
       "passed": 0,
       "failed": 0,
       "timeout": 0,
-      "unsupported": 77,
+      "unsupported": 79,
       "unavailable": 0
     },
     "vm": {
-      "passed": 77,
+      "passed": 79,
       "failed": 0,
       "timeout": 0,
       "unsupported": 0,
@@ -46,11 +46,11 @@
     }
   },
   "python_free_score": {
-    "numerator": 74,
-    "denominator": 77,
-    "percent": 96.1,
+    "numerator": 79,
+    "denominator": 79,
+    "percent": 100,
     "runtime": "native C",
     "unsupported_native_counted_as_not_passed": true,
-    "method": "Verified GitHub Actions matrix at fea06e6c7bd77f46ec45b4988e45e85d5fec13e5 (run 39426734065): reference 77/77, native C 74/77, JavaScript 77/77, Python transpiler 77/77, VM 77/77; reference/native differential: 74 comparisons, 0 mismatches, 0 incomplete, 3 explicitly unsupported native fixtures. HTML remains unsupported for all 77 fixtures."
+    "method": "Verified GitHub Actions matrix at db67c1f33454ccc2f422381dec4b02df0227f007 (run 39465123558): reference 79/79, native C 79/79, JavaScript 79/79, Python transpiler 79/79, VM 79/79; reference/native differential: 79 comparisons, 0 mismatches, 0 incomplete, 0 unsupported native fixtures. HTML remains unsupported for all 79 fixtures."
   }
 }

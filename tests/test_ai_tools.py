@@ -584,7 +584,8 @@ class ToolInputContractTests(unittest.TestCase):
         self.assertTrue(native["context"]["required_fixture_ids"])
         self.assertIn("unsupported_fixture_ids", native["context"])
         self.assertTrue(native["context"]["shared_required_fixture_ids"])
-        self.assertTrue(native["context"]["reference_only_fixture_ids"])
+        self.assertEqual(native["context"]["reference_only_fixture_ids"], [])
+        self.assertEqual(native["context"]["unsupported_fixture_ids"], [])
         self.assertEqual(
             set(native["context"]["shared_required_fixture_ids"]),
             set(native["context"]["shared_required_fixture_ids"]) & set(native["context"]["required_fixture_ids"]),

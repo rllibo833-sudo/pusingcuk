@@ -296,28 +296,95 @@ def pc_invoke_builtin(name, args, minimum, maximum, function):
 def pc_invoke_function(name, args, expected, function):
     if len(args) != expected: raise TypeError(f"fungsi '{name}' membutuhkan {expected} argumen")
     return function(*args)
-def pc_json_value(value):
-    if isinstance(value, PcDict): return {str(k): pc_json_value(v) for k, v in value.entries}
-    if isinstance(value, dict): return {str(k): pc_json_value(v) for k, v in value.items()}
-    if isinstance(value, (list, tuple, range)): return [pc_json_value(v) for v in value]
-    if value is None or isinstance(value, (str, int, float, bool)): return value
-    raise TypeError("nilai tidak dapat diserialisasi sebagai JSON")
+def pc_format_text(value, name):
+    if isinstance(value, str):
+        if "\\x00" in value: raise ValueError(name + "() tidak menerima NUL")
+        if len(value.encode("utf-8")) > 1023: raise ValueError(name + "() teks melebihi batas 1023 byte")
+        return value
+    if value is None: return "None"
+    if value is True: return "okelah"
+    if value is False: return "tidak"
+    if isinstance(value, int):
+        if abs(value) > 9007199254740991: raise ValueError(name + "() integer di luar rentang aman")
+        return str(value)
+    if isinstance(value, float):
+        if not math.isfinite(value): raise ValueError(name + "() membutuhkan angka finite")
+        if value.is_integer() and abs(value) > 9007199254740991:
+            raise ValueError(name + "() integer di luar rentang aman")
+        return str(int(value)) if value == 0 or value.is_integer() else str(value)
+    raise TypeError(name + "() hanya menerima nilai skalar")
+def pc_json_value(value, path="$", depth=0, seen=None):
+    if depth > 64: raise ValueError("JSON melebihi kedalaman maksimum: " + path)
+    if seen is None: seen = set()
+    if value is None or isinstance(value, bool): return value
+    if isinstance(value, str):
+        if "\\x00" in value: raise ValueError("JSON teks mengandung NUL: " + path)
+        if len(value.encode("utf-8")) > 1023: raise ValueError("JSON teks melebihi 1023 byte: " + path)
+        return value
+    if isinstance(value, int):
+        if abs(value) > 9007199254740991: raise ValueError("JSON integer di luar rentang aman: " + path)
+        return value
+    if isinstance(value, float):
+        if not math.isfinite(value): raise ValueError("JSON angka non-finite: " + path)
+        if value.is_integer() and abs(value) > 9007199254740991:
+            raise ValueError("JSON integer di luar rentang aman: " + path)
+        if value == 0 or value.is_integer(): return int(value)
+        return value
+    if isinstance(value, (PcDict, dict, list)):
+        identity = id(value)
+        if identity in seen: raise ValueError("JSON tidak menerima struktur melingkar: " + path)
+        seen.add(identity)
+        try:
+            if isinstance(value, PcDict):
+                entries = value.entries
+                result = {}
+                for key, item in entries:
+                    if not isinstance(key, str): raise TypeError("kunci objek JSON harus teks: " + path)
+                    pc_json_value(key, path + ".<kunci>", depth, seen)
+                    result[key] = pc_json_value(item, path + "." + key, depth + 1, seen)
+                return result
+            if isinstance(value, dict):
+                result = {}
+                for key, item in value.items():
+                    if not isinstance(key, str): raise TypeError("kunci objek JSON harus teks: " + path)
+                    pc_json_value(key, path + ".<kunci>", depth, seen)
+                    result[key] = pc_json_value(item, path + "." + key, depth + 1, seen)
+                return result
+            return [pc_json_value(item, path + "[" + str(index) + "]", depth + 1, seen)
+                    for index, item in enumerate(value)]
+        finally:
+            seen.remove(identity)
+    raise TypeError("nilai tidak dapat diserialisasi sebagai JSON: " + path)
 def pc_json_text(value):
-    return json.dumps(pc_json_value(value), ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+    encoded = json.dumps(pc_json_value(value), ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+    if len(encoded.encode("utf-8")) > 1023: raise ValueError("json_teks() melebihi batas output 1023 byte")
+    return encoded
 def pc_json_read(value):
     if not isinstance(value, str): raise TypeError("json_baca() membutuhkan teks JSON")
-    return json.loads(value)
+    if "\\x00" in value: raise ValueError("json_baca() tidak menerima NUL")
+    if len(value.encode("utf-8")) > 1023: raise ValueError("json_baca() input melebihi batas 1023 byte")
+    try:
+        decoded = json.loads(value, parse_constant=lambda item: (_ for _ in ()).throw(ValueError(item)))
+    except (ValueError, TypeError) as exc:
+        raise ValueError("teks JSON tidak valid: " + str(exc)) from exc
+    return pc_json_value(decoded)
 def pc_json_parse(value):
     if not isinstance(value, str): return False
     try: return json.loads(value)
     except (ValueError, TypeError): return False
 def pc_html_escape(value):
-    return html.escape(pc_text(value), quote=True)
+    text = pc_format_text(value, "html_aman")
+    escaped = html.escape(text, quote=True)
+    if len(escaped.encode("utf-8")) > 1023: raise ValueError("html_aman() melebihi batas output 1023 byte")
+    return escaped
 def pc_csv_row(value):
     if not isinstance(value, list): raise TypeError("csv_baris() membutuhkan daftar")
+    fields = [pc_format_text(item, "csv_baris") for item in value]
     buffer = io.StringIO()
-    csv.writer(buffer, lineterminator="").writerow([pc_text(item) for item in value])
-    return buffer.getvalue()
+    csv.writer(buffer, lineterminator="").writerow(fields)
+    result = buffer.getvalue()
+    if len(result.encode("utf-8")) > 1023: raise ValueError("csv_baris() melebihi batas output 1023 byte")
+    return result
 def pc_out(v):
     if v is True: v = "okelah"
     elif v is False: v = "tidak"

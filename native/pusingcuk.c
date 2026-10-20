@@ -42,6 +42,7 @@ static Val return_value;
 static void format_number(double value, char *output, size_t output_size);
 static int run_range(int first, int last);
 static Val call_user_function(const char *name, Val *args, int argc);
+static Val call_native_format_builtin(const char *name, Val *args, int argc, int *handled);
 
 static void fail(const char *msg) {
     if (suppress_eval) return;
@@ -258,7 +259,7 @@ static int is_builtin_name(const char *name) {
     static const char *const names[] = {
         "panjang", "teks", "bilangan", "desimal", "logika", "rentang",
         "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah",
-        "atas", "pangkat", "sinus", "kosinus", "jumlah", "rata_rata", "median", "logaritma", "log10"
+        "atas", "pangkat", "sinus", "kosinus", "jumlah", "rata_rata", "median", "logaritma", "log10", "json_teks", "json_baca", "html_aman", "csv_baris", "jadi_json"
     };
     for (size_t i = 0; i < sizeof names / sizeof names[0]; i++)
         if (!strcmp(name, names[i])) return 1;
@@ -604,6 +605,9 @@ static Val primary(void) {
             int conversion_handled = 0;
             Val conversion_result = call_native_conversion_builtin(name, args, argc, &conversion_handled);
             if (conversion_handled) return conversion_result;
+            int format_handled = 0;
+            Val format_result = call_native_format_builtin(name, args, argc, &format_handled);
+            if (format_handled) return format_result;
             int builtin_handled = 0;
             Val builtin_result = call_native_numeric_builtin(name, args, argc, &builtin_handled);
             if (builtin_handled) return builtin_result;
@@ -803,8 +807,318 @@ static void format_number(double value, char *output, size_t output_size) {
     snprintf(output, output_size, "%.17g", value);
 }
 
+
+#define JSON_MAX_DEPTH 64
+#define JSON_MAX_SAFE_INTEGER 9007199254740991.0
+
+typedef struct {
+    const char *source;
+    size_t pos;
+    int valid;
+} JsonParser;
+
+static int format_append(char *out, size_t cap, size_t *used, const char *src, size_t n) {
+    if (*used >= cap || n > cap - *used - 1) {
+        fail("hasil built-in format melebihi batas buffer native");
+        return 0;
+    }
+    memcpy(out + *used, src, n);
+    *used += n;
+    out[*used] = '\0';
+    return 1;
+}
+static int format_char(char *out, size_t cap, size_t *used, char ch) {
+    return format_append(out, cap, used, &ch, 1);
+}
+static int format_literal(char *out, size_t cap, size_t *used, const char *text) {
+    return format_append(out, cap, used, text, strlen(text));
+}
+static int json_write_string(const char *value, char *out, size_t cap, size_t *used) {
+    if (!format_char(out, cap, used, '"')) return 0;
+    for (const unsigned char *q = (const unsigned char *)value; *q; q++) {
+        char escaped[7];
+        switch (*q) {
+            case '"': if (!format_literal(out, cap, used, "\\\"")) return 0; break;
+            case '\\': if (!format_literal(out, cap, used, "\\\\")) return 0; break;
+            case '\b': if (!format_literal(out, cap, used, "\\b")) return 0; break;
+            case '\f': if (!format_literal(out, cap, used, "\\f")) return 0; break;
+            case '\n': if (!format_literal(out, cap, used, "\\n")) return 0; break;
+            case '\r': if (!format_literal(out, cap, used, "\\r")) return 0; break;
+            case '\t': if (!format_literal(out, cap, used, "\\t")) return 0; break;
+            default:
+                if (*q < 0x20) {
+                    snprintf(escaped, sizeof escaped, "\\u%04x", (unsigned)*q);
+                    if (!format_literal(out, cap, used, escaped)) return 0;
+                } else if (!format_char(out, cap, used, (char)*q)) return 0;
+        }
+    }
+    return format_char(out, cap, used, '"');
+}
+static int json_write_value(Val value, char *out, size_t cap, size_t *used, unsigned depth) {
+    if (depth > JSON_MAX_DEPTH) { fail("JSON melebihi kedalaman maksimum"); return 0; }
+    if (value.t == NIL) return format_literal(out, cap, used, "null");
+    if (value.t == BOOL) return format_literal(out, cap, used, value.b ? "true" : "false");
+    if (value.t == STR) return json_write_string(value.s, out, cap, used);
+    if (value.t == NUM) {
+        if (!isfinite(value.n)) { fail("json_teks() menolak angka non-finite"); return 0; }
+        if (floor(value.n) == value.n && fabs(value.n) > JSON_MAX_SAFE_INTEGER) {
+            fail("json_teks() menolak integer di luar rentang aman lintas target"); return 0;
+        }
+        char number[64];
+        if (value.n == 0) snprintf(number, sizeof number, "0");
+        else format_number(value.n, number, sizeof number);
+        return format_literal(out, cap, used, number);
+    }
+    if (value.t == LIST) {
+        if (!value.list) { fail("json_teks() menerima list tidak valid"); return 0; }
+        if (!format_char(out, cap, used, '[')) return 0;
+        for (size_t i = 0; i < value.list->len; i++) {
+            if (i && !format_char(out, cap, used, ',')) return 0;
+            if (!json_write_value(value.list->items[i], out, cap, used, depth + 1)) return 0;
+        }
+        return format_char(out, cap, used, ']');
+    }
+    if (value.t == DICT) {
+        if (!value.dict) { fail("json_teks() menerima dictionary tidak valid"); return 0; }
+        if (!format_char(out, cap, used, '{')) return 0;
+        for (size_t i = 0; i < value.dict->len; i++) {
+            Val key = value.dict->keys[i];
+            if (key.t != STR) { fail("json_teks() hanya menerima kunci dictionary bertipe teks"); return 0; }
+            if (i && !format_char(out, cap, used, ',')) return 0;
+            if (!json_write_string(key.s, out, cap, used) ||
+                !format_char(out, cap, used, ':') ||
+                !json_write_value(value.dict->values[i], out, cap, used, depth + 1)) return 0;
+        }
+        return format_char(out, cap, used, '}');
+    }
+    fail("json_teks() menerima tipe nilai yang tidak didukung");
+    return 0;
+}
+static void json_ws(JsonParser *jp) {
+    while (jp->source[jp->pos] && isspace((unsigned char)jp->source[jp->pos])) jp->pos++;
+}
+static int json_hex(char c) {
+    if (c >= '0' && c <= '9') return c - '0';
+    if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+    if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+    return -1;
+}
+static int json_hex4(JsonParser *jp, unsigned *out) {
+    unsigned value = 0;
+    for (int i = 0; i < 4; i++) {
+        int h = json_hex(jp->source[jp->pos++]);
+        if (h < 0) { jp->valid = 0; return 0; }
+        value = (value << 4) | (unsigned)h;
+    }
+    *out = value;
+    return 1;
+}
+static int json_utf8(char *out, size_t cap, size_t *used, unsigned cp) {
+    char bytes[4]; size_t count;
+    if (cp <= 0x7f) { bytes[0] = (char)cp; count = 1; }
+    else if (cp <= 0x7ff) { bytes[0] = (char)(0xc0 | (cp >> 6)); bytes[1] = (char)(0x80 | (cp & 0x3f)); count = 2; }
+    else if (cp <= 0xffff) { bytes[0] = (char)(0xe0 | (cp >> 12)); bytes[1] = (char)(0x80 | ((cp >> 6) & 0x3f)); bytes[2] = (char)(0x80 | (cp & 0x3f)); count = 3; }
+    else if (cp <= 0x10ffff) { bytes[0] = (char)(0xf0 | (cp >> 18)); bytes[1] = (char)(0x80 | ((cp >> 12) & 0x3f)); bytes[2] = (char)(0x80 | ((cp >> 6) & 0x3f)); bytes[3] = (char)(0x80 | (cp & 0x3f)); count = 4; }
+    else { return 0; }
+    return format_append(out, cap, used, bytes, count);
+}
+static Val json_parse_value(JsonParser *jp, unsigned depth);
+static Val json_parse_string(JsonParser *jp) {
+    char out[SZ] = {0}; size_t used = 0;
+    if (jp->source[jp->pos++] != '"') { jp->valid = 0; return string(""); }
+    while (jp->source[jp->pos]) {
+        unsigned char ch = (unsigned char)jp->source[jp->pos++];
+        if (ch == '"') return string(out);
+        if (ch < 0x20) { jp->valid = 0; return string(""); }
+        if (ch != '\\') {
+            if (!format_char(out, sizeof out, &used, (char)ch)) { jp->valid = 0; return string(""); }
+            continue;
+        }
+        char esc = jp->source[jp->pos++];
+        switch (esc) {
+            case '"': case '\\': case '/':
+                if (!format_char(out, sizeof out, &used, esc)) jp->valid = 0;
+                break;
+            case 'b': if (!format_char(out, sizeof out, &used, '\b')) jp->valid = 0; break;
+            case 'f': if (!format_char(out, sizeof out, &used, '\f')) jp->valid = 0; break;
+            case 'n': if (!format_char(out, sizeof out, &used, '\n')) jp->valid = 0; break;
+            case 'r': if (!format_char(out, sizeof out, &used, '\r')) jp->valid = 0; break;
+            case 't': if (!format_char(out, sizeof out, &used, '\t')) jp->valid = 0; break;
+            case 'u': {
+                unsigned cp;
+                if (!json_hex4(jp, &cp)) return string("");
+                if (cp >= 0xd800 && cp <= 0xdbff) {
+                    if (jp->source[jp->pos] != '\\' || jp->source[jp->pos + 1] != 'u') { jp->valid = 0; return string(""); }
+                    jp->pos += 2;
+                    unsigned low;
+                    if (!json_hex4(jp, &low) || low < 0xdc00 || low > 0xdfff) { jp->valid = 0; return string(""); }
+                    cp = 0x10000 + ((cp - 0xd800) << 10) + (low - 0xdc00);
+                } else if (cp >= 0xdc00 && cp <= 0xdfff) { jp->valid = 0; return string(""); }
+                if (cp == 0 || !json_utf8(out, sizeof out, &used, cp)) { jp->valid = 0; return string(""); }
+                break;
+            }
+            default: jp->valid = 0; return string("");
+        }
+        if (!jp->valid) return string("");
+    }
+    jp->valid = 0;
+    return string("");
+}
+static Val json_parse_value(JsonParser *jp, unsigned depth) {
+    json_ws(jp);
+    if (depth > JSON_MAX_DEPTH) { jp->valid = 0; return num(0); }
+    char ch = jp->source[jp->pos];
+    if (ch == '"') return json_parse_string(jp);
+    if (ch == '[') {
+        jp->pos++;
+        List *list = new_list();
+        if (!list) { jp->valid = 0; return num(0); }
+        json_ws(jp);
+        if (jp->source[jp->pos] == ']') { jp->pos++; return listval(list); }
+        for (;;) {
+            Val item = json_parse_value(jp, depth + 1);
+            if (!jp->valid || err || !append_list(list, item)) { jp->valid = 0; return num(0); }
+            json_ws(jp);
+            if (jp->source[jp->pos] == ']') { jp->pos++; return listval(list); }
+            if (jp->source[jp->pos++] != ',') { jp->valid = 0; return num(0); }
+            json_ws(jp);
+        }
+    }
+    if (ch == '{') {
+        jp->pos++;
+        Dict *dict = new_dict();
+        if (!dict) { jp->valid = 0; return num(0); }
+        json_ws(jp);
+        if (jp->source[jp->pos] == '}') { jp->pos++; return dictval(dict); }
+        for (;;) {
+            json_ws(jp);
+            if (jp->source[jp->pos] != '"') { jp->valid = 0; return num(0); }
+            Val key = json_parse_string(jp);
+            json_ws(jp);
+            if (!jp->valid || jp->source[jp->pos++] != ':') { jp->valid = 0; return num(0); }
+            Val value = json_parse_value(jp, depth + 1);
+            if (!jp->valid || err || !dict_set(dict, key, value)) { jp->valid = 0; return num(0); }
+            json_ws(jp);
+            if (jp->source[jp->pos] == '}') { jp->pos++; return dictval(dict); }
+            if (jp->source[jp->pos++] != ',') { jp->valid = 0; return num(0); }
+            json_ws(jp);
+        }
+    }
+    if (!strncmp(jp->source + jp->pos, "true", 4)) { jp->pos += 4; return boolean(1); }
+    if (!strncmp(jp->source + jp->pos, "false", 5)) { jp->pos += 5; return boolean(0); }
+    if (!strncmp(jp->source + jp->pos, "null", 4)) { jp->pos += 4; Val v = {0}; v.t = NIL; return v; }
+    size_t start = jp->pos;
+    if (ch == '-') jp->pos++;
+    if (jp->source[jp->pos] == '0') {
+        jp->pos++;
+        if (isdigit((unsigned char)jp->source[jp->pos])) { jp->valid = 0; return num(0); }
+    } else if (jp->source[jp->pos] >= '1' && jp->source[jp->pos] <= '9') {
+        while (isdigit((unsigned char)jp->source[jp->pos])) jp->pos++;
+    } else { jp->valid = 0; return num(0); }
+    if (jp->source[jp->pos] == '.') {
+        jp->pos++;
+        if (!isdigit((unsigned char)jp->source[jp->pos])) { jp->valid = 0; return num(0); }
+        while (isdigit((unsigned char)jp->source[jp->pos])) jp->pos++;
+    }
+    if (jp->source[jp->pos] == 'e' || jp->source[jp->pos] == 'E') {
+        jp->pos++;
+        if (jp->source[jp->pos] == '+' || jp->source[jp->pos] == '-') jp->pos++;
+        if (!isdigit((unsigned char)jp->source[jp->pos])) { jp->valid = 0; return num(0); }
+        while (isdigit((unsigned char)jp->source[jp->pos])) jp->pos++;
+    }
+    size_t n = jp->pos - start;
+    if (n == 0 || n >= 64) { jp->valid = 0; return num(0); }
+    char token[64]; memcpy(token, jp->source + start, n); token[n] = '\0';
+    errno = 0; char *end = NULL; double number = strtod(token, &end);
+    if (!end || *end || !isfinite(number) ||
+        (floor(number) == number && fabs(number) > JSON_MAX_SAFE_INTEGER)) {
+        jp->valid = 0; return num(0);
+    }
+    return num(number);
+}
+static Val call_native_format_builtin(const char *name, Val *args, int argc, int *handled) {
+    *handled = !strcmp(name, "json_teks") || !strcmp(name, "json_baca") ||
+        !strcmp(name, "html_aman") || !strcmp(name, "csv_baris") || !strcmp(name, "jadi_json");
+    if (!*handled) return num(0);
+    if (argc != 1) { fail("built-in format membutuhkan tepat satu argumen"); return num(0); }
+    Val value = args[0];
+    if (!strcmp(name, "json_teks")) {
+        char out[SZ] = {0}; size_t used = 0;
+        if (!json_write_value(value, out, sizeof out, &used, 0)) return string("");
+        return string(out);
+    }
+    if (!strcmp(name, "jadi_json")) {
+        if (value.t != STR) { fail("jadi_json membutuhkan satu teks JSON"); return num(0); }
+        int previous_suppress = suppress_eval;
+        suppress_eval = 1;
+        JsonParser jp = {value.s, 0, 1};
+        Val parsed = json_parse_value(&jp, 0);
+        json_ws(&jp);
+        int valid = jp.valid && jp.source[jp.pos] == '\0';
+        suppress_eval = previous_suppress;
+        if (!valid) return boolean(0);
+        return parsed;
+    }
+    if (!strcmp(name, "json_baca")) {
+        if (value.t != STR) { fail("json_baca() membutuhkan teks JSON"); return num(0); }
+        JsonParser jp = {value.s, 0, 1};
+        Val parsed = json_parse_value(&jp, 0);
+        json_ws(&jp);
+        if (!jp.valid || err || jp.source[jp.pos] != '\0') {
+            fail("json_baca() menerima teks JSON tidak valid atau nilai di luar batas kontrak");
+            return num(0);
+        }
+        return parsed;
+    }
+    if (!strcmp(name, "html_aman")) {
+        char source[SZ] = {0};
+        if (value.t == STR) snprintf(source, sizeof source, "%s", value.s);
+        else if (value.t == BOOL) snprintf(source, sizeof source, "%s", value.b ? "okelah" : "tidak");
+        else if (value.t == NIL) snprintf(source, sizeof source, "None");
+        else if (value.t == NUM && isfinite(value.n)) { if (floor(value.n) == value.n && fabs(value.n) > JSON_MAX_SAFE_INTEGER) { fail("html_aman() integer di luar rentang aman"); return string(""); } if (value.n == 0) snprintf(source, sizeof source, "0"); else format_number(value.n, source, sizeof source); }
+        else { fail("html_aman() membutuhkan nilai skalar"); return string(""); }
+        char out[SZ] = {0}; size_t used = 0;
+        for (const char *q = source; *q; q++) {
+            const char *replacement = NULL;
+            switch (*q) {
+                case '&': replacement = "&amp;"; break;
+                case '<': replacement = "&lt;"; break;
+                case '>': replacement = "&gt;"; break;
+                case '"': replacement = "&quot;"; break;
+                case '\'': replacement = "&#x27;"; break;
+                default: if (!format_char(out, sizeof out, &used, *q)) return string("");
+            }
+            if (replacement && !format_literal(out, sizeof out, &used, replacement)) return string("");
+        }
+        return string(out);
+    }
+    if (value.t != LIST || !value.list) { fail("csv_baris() membutuhkan daftar"); return string(""); }
+    char out[SZ] = {0}; size_t used = 0;
+    for (size_t i = 0; i < value.list->len; i++) {
+        if (i && !format_char(out, sizeof out, &used, ',')) return string("");
+        Val item = value.list->items[i]; char field[SZ] = {0};
+        if (item.t == STR) snprintf(field, sizeof field, "%s", item.s);
+        else if (item.t == BOOL) snprintf(field, sizeof field, "%s", item.b ? "okelah" : "tidak");
+        else if (item.t == NIL) snprintf(field, sizeof field, "None");
+        else if (item.t == NUM && isfinite(item.n)) {
+            if (floor(item.n) == item.n && fabs(item.n) > JSON_MAX_SAFE_INTEGER) {
+                fail("csv_baris() menolak integer di luar rentang aman"); return string("");
+            }
+            if (item.n == 0) snprintf(field, sizeof field, "0"); else format_number(item.n, field, sizeof field);
+        } else { fail("csv_baris() hanya menerima nilai skalar"); return string(""); }
+        int quote = strpbrk(field, ",\"\r\n") != NULL;
+        if (quote && !format_char(out, sizeof out, &used, '"')) return string("");
+        for (const char *q = field; *q; q++) {
+            if (*q == '"' && quote && !format_char(out, sizeof out, &used, '"')) return string("");
+            if (!format_char(out, sizeof out, &used, *q)) return string("");
+        }
+        if (quote && !format_char(out, sizeof out, &used, '"')) return string("");
+    }
+    return string(out);
+}
+
 static void printval(Val v) {
-    if(v.t==NIL) puts("tidak ada");
+    if(v.t==NIL) puts("None");
     else if(v.t==BOOL) puts(v.b?"okelah":"tidak");
     else if(v.t==STR) puts(v.s);
     else if(v.t==LIST) printf("[list: %zu]\n", v.list ? v.list->len : 0);

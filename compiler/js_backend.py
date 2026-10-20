@@ -323,18 +323,41 @@ const pcMedian = (value) => {
   if (values.length % 2) return values[middle];
   return pcStatResult("median", values[middle - 1] / 2 + values[middle] / 2);
 };
-const pcJsonCompatible = (value, path = "$", seen = new Set()) => {
-  if (value === null || typeof value === "string" || typeof value === "boolean") return value;
+const pcUtf8Length = (value) => new TextEncoder().encode(value).length;
+const pcFormatScalar = (value, name) => {
+  if (typeof value === "string") {
+    if (value.includes(String.fromCharCode(0))) throw new Error(name + "() tidak menerima NUL");
+    if (pcUtf8Length(value) > 1023) throw new Error(name + "() teks melebihi batas 1023 byte");
+    return value;
+  }
+  if (value === null) return "None";
+  if (typeof value === "boolean") return pcText(value);
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) throw new Error(name + "() membutuhkan angka finite");
+    if (Number.isInteger(value) && !Number.isSafeInteger(value))
+      throw new Error(name + "() integer di luar rentang aman");
+    return value === 0 ? "0" : String(value);
+  }
+  throw new Error(name + "() hanya menerima nilai skalar");
+};
+const pcJsonCompatible = (value, path = "$", seen = new Set(), depth = 0) => {
+  if (depth > 64) throw new Error("JSON melebihi kedalaman maksimum: " + path);
+  if (value === null || typeof value === "boolean") return value;
+  if (typeof value === "string") {
+    if (value.includes(String.fromCharCode(0))) throw new Error("JSON teks mengandung NUL: " + path);
+    if (pcUtf8Length(value) > 1023) throw new Error("JSON teks melebihi 1023 byte: " + path);
+    return value;
+  }
   if (typeof value === "number") {
     if (!Number.isFinite(value)) throw new Error("JSON angka non-finite: " + path);
     if (Number.isInteger(value) && !Number.isSafeInteger(value))
       throw new Error("JSON integer di luar rentang aman: " + path);
-    return value;
+    return value === 0 ? 0 : value;
   }
   if (Array.isArray(value)) {
     if (seen.has(value)) throw new Error("JSON tidak menerima struktur melingkar: " + path);
     seen.add(value);
-    const result = value.map((item, index) => pcJsonCompatible(item, path + "[" + index + "]", seen));
+    const result = value.map((item, index) => pcJsonCompatible(item, path + "[" + index + "]", seen, depth + 1));
     seen.delete(value);
     return result;
   }
@@ -345,7 +368,7 @@ const pcJsonCompatible = (value, path = "$", seen = new Set()) => {
     for (const [key, item] of value.entries()) {
       if (typeof key !== "string") throw new Error("kunci objek JSON harus teks: " + path);
       Object.defineProperty(result, key, {
-        value: pcJsonCompatible(item, path + "." + key, seen),
+        value: pcJsonCompatible(item, path + "." + key, seen, depth + 1),
         enumerable: true, configurable: true, writable: true
       });
     }
@@ -354,16 +377,43 @@ const pcJsonCompatible = (value, path = "$", seen = new Set()) => {
   }
   throw new Error("tipe tidak didukung JSON: " + typeof value + " pada " + path);
 };
-const pcJsonText = (value) => JSON.stringify(pcJsonCompatible(value));
+const pcJsonReadValidate = (value, path = "$", depth = 0) => {
+  if (depth > 64) throw new Error("JSON melebihi kedalaman maksimum: " + path);
+  if (typeof value === "string") {
+    if (value.includes(String.fromCharCode(0))) throw new Error("JSON teks mengandung NUL: " + path);
+    if (pcUtf8Length(value) > 1023) throw new Error("JSON teks melebihi 1023 byte: " + path);
+  } else if (typeof value === "number") {
+    if (!Number.isFinite(value)) throw new Error("JSON angka non-finite: " + path);
+    if (Number.isInteger(value) && !Number.isSafeInteger(value))
+      throw new Error("JSON integer di luar rentang aman: " + path);
+  } else if (Array.isArray(value)) {
+    value.forEach((item, index) => pcJsonReadValidate(item, path + "[" + index + "]", depth + 1));
+  } else if (value instanceof Map) {
+    for (const [key, item] of value.entries()) {
+      if (typeof key !== "string") throw new Error("kunci objek JSON harus teks: " + path);
+      pcJsonReadValidate(key, path + ".<kunci>", depth);
+      pcJsonReadValidate(item, path + "." + key, depth + 1);
+    }
+  }
+  return value;
+};
+const pcJsonText = (value) => {
+  const encoded = JSON.stringify(pcJsonCompatible(value));
+  if (pcUtf8Length(encoded) > 1023) throw new Error("json_teks() melebihi batas output 1023 byte");
+  return encoded;
+};
 const pcJsonRead = (value) => {
   if (typeof value !== "string") throw new Error("json_baca() membutuhkan teks JSON");
+  if (value.includes(String.fromCharCode(0))) throw new Error("json_baca() tidak menerima NUL");
+  if (pcUtf8Length(value) > 1023) throw new Error("json_baca() input melebihi batas 1023 byte");
   try {
-    return JSON.parse(value, (_key, item) => {
+    const parsed = JSON.parse(value, (_key, item) => {
       if (item && typeof item === "object" && !Array.isArray(item)) return new Map(Object.entries(item));
       return item;
     });
+    return pcJsonReadValidate(parsed);
   } catch (error) {
-    throw new Error("teks JSON tidak valid: " + error.message);
+    throw new Error("teks JSON tidak valid atau nilai melanggar batas kontrak: " + error.message);
   }
 };
 const pcJsonParse = (value) => { try { return pcJsonRead(value); } catch (_) { return false; } };
@@ -378,20 +428,22 @@ const pcInvokeFunction = (name, args, expected, fn) => {
   if (args.length !== expected) throw new Error("fungsi '" + name + "' membutuhkan " + expected + " argumen");
   return fn(...args);
 };
-const pcHtmlEscape = (value) => pcText(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;")
-  .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#x27;");
+const pcHtmlEscape = (value) => {
+  const escaped = pcFormatScalar(value, "html_aman").replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#x27;");
+  if (pcUtf8Length(escaped) > 1023) throw new Error("html_aman() melebihi batas output 1023 byte");
+  return escaped;
+};
 const pcCsvRow = (value) => {
   if (!Array.isArray(value)) throw new Error("csv_baris() membutuhkan daftar");
-  return value.map((item) => {
-    let field;
-    if (item === null || typeof item === "string" || typeof item === "boolean") field = pcText(item);
-    else if (typeof item === "number" && Number.isFinite(item) &&
-      (!Number.isInteger(item) || Number.isSafeInteger(item))) field = String(item);
-    else throw new Error("csv_baris() hanya menerima nilai skalar aman");
+  const result = value.map((item) => {
+    const field = pcFormatScalar(item, "csv_baris");
     const mustQuote = field.includes(",") || field.includes('"') ||
       field.includes(String.fromCharCode(13)) || field.includes(String.fromCharCode(10));
     return mustQuote ? '"' + field.replaceAll('"', '""') + '"' : field;
   }).join(",");
+  if (pcUtf8Length(result) > 1023) throw new Error("csv_baris() melebihi batas output 1023 byte");
+  return result;
 };
 
 const pcInputLines = (typeof process !== "undefined" && typeof require === "function" &&
