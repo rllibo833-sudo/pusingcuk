@@ -68,3 +68,7 @@ pusingcuk-*.actual
 /apps/pusingcuk-ai-saas/*.sqlite3
 /apps/pusingcuk-ai-saas/*.sqlite3-*
 artifacts/
+next_prompt.txt
+archive/datacenter_lama/
+__pycache__/
+fix_parser_all.py

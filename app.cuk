@@ -1,8 +1,3 @@
 jancuk
-lah nama = "Dunia"
-hedeh "Halo, " + nama
-fungsi tambah(a, b)
-  balek a + b
-selesai fungsi
-hedeh tambah(20, 22)
+hedeh "Siklus V6 OK - "+ "HP jadi datacenter"
 selesai jancuk

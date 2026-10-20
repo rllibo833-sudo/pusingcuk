@@ -6,10 +6,27 @@
     {
       "word": "hedeh",
       "aliases": [
-        "jir",
-        "spill",
+        "bacot",
+        "berak",
+        "berisik",
         "cetak",
-        "tampilkan"
+        "crot",
+        "gas",
+        "gembor",
+        "jir",
+        "keluarin",
+        "koar",
+        "muncrat",
+        "nyalak",
+        "omong",
+        "print",
+        "sembur",
+        "semprot",
+        "senggol",
+        "spill",
+        "suarakan",
+        "tampilkan",
+        "teriak"
       ]
     },
     {
@@ -123,20 +140,27 @@
   "0.6-dev": [
     "language_version"
   ],
-  "hedeh": [
-    "spill",
-    "print",
-    "cetak",
-    "gas",
-    "sembur",
-    "teriak",
+  "hedeh_legacy": [
     "bacot",
-    "koar",
+    "berak",
     "berisik",
-    "keluarin",
-    "tampilkan",
-    "suarakan",
+    "cetak",
+    "crot",
+    "gas",
     "gembor",
-    "omong"
+    "jir",
+    "keluarin",
+    "koar",
+    "muncrat",
+    "nyalak",
+    "omong",
+    "print",
+    "sembur",
+    "semprot",
+    "senggol",
+    "spill",
+    "suarakan",
+    "tampilkan",
+    "teriak"
   ]
 }
