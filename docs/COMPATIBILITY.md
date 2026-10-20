@@ -1,10 +1,10 @@
 # Kompatibilitas Pusingcuk
 
-Dokumen ini menetapkan batas kompatibilitas yang boleh diklaim, bukan janji bahwa semua sasaran sudah tercapai. Pusingcuk masih eksperimental dan runtime Python serta C belum setara untuk semua fitur.
+Dokumen ini menetapkan batas kompatibilitas yang boleh diklaim, bukan janji bahwa semua sasaran sudah tercapai. PusingCuk masih eksperimental: fixture aktif menunjukkan kesetaraan pada suite terukur untuk JavaScript, Python transpiler, dan VM, sementara native C masih memiliki tiga fixture yang secara eksplisit belum didukung dan target HTML belum dapat dieksekusi.
 
-**Versi bahasa kanonis:** `0.6-dev`. Versi paket pengembangan `0.8.0.dev0` adalah versi distribusi, bukan versi bahasa. Kontrak memuat 25 built-in; 17 built-in functions are supported by the native C runtime, while four scalar conversion built-ins have partial native support and do not imply full parity. Dukungan transpiler dan VM berbeda per built-in, jadi gunakan matriks kontrak.
+**Versi bahasa kanonis:** `0.6-dev`. Versi paket pengembangan `0.8.0.dev0` adalah versi distribusi, bukan versi bahasa. Kontrak memuat 25 built-in. Pada matriks terbaru berisi 77 fixture, reference, JavaScript, Python transpiler, dan VM lulus 77/77; native C lulus 74/77 dengan tiga fixture unsupported yang tetap dihitung dalam penyebut. Target HTML belum menjalankan fixture. Status per built-in tetap ditentukan oleh `library/builtin_contract.json`.
 
-**Baseline yang dipelihara:** Python modular adalah referensi; runtime native C adalah implementasi kedua untuk subset yang diuji. Sebuah perilaku disebut lintas-runtime hanya jika fixture yang sama berstatus `required` pada `reference` dan `native` serta lulus di CI. Fitur Python-only tetap valid sebagai kemampuan referensi, tetapi tidak otomatis tersedia pada C. Compiler/transpiler lain dan PVM ditunda dari jalur kompatibilitas utama.
+**Baseline yang dipelihara:** Python modular adalah referensi. Pada run [39426734065](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39426734065), reference, JavaScript, Python transpiler, dan VM lulus 77/77; native C lulus 74/77, dengan 74 perbandingan reference/native, 0 mismatch, 0 incomplete, dan 3 unsupported. Ini bukti untuk fixture yang diukur, bukan bukti kesetaraan semua program atau semua sistem operasi. Target HTML tetap unsupported.
 
 ## Sasaran desain
 
@@ -30,11 +30,11 @@ Type model di `compiler/typesystem.py` kini dapat merepresentasikan tipe opsiona
 | `angkut("file.cuk")` | [!] modul dinamis pada evaluator referensi | [X] belum setara | [X] tidak otomatis tersedia | [X] tidak otomatis tersedia | API modul belum lintas-target |
 | Paket eksternal berversi | [X] belum ada package manager | [X] belum ada package manager | [X] belum ada package manager | [X] belum ada package manager | Belum tersedia |
 
-Status di atas sengaja memisahkan fondasi internal dari sintaks yang dapat digunakan pengguna. Namespace built-in yang baru ditambahkan juga hanya terjamin pada interpreter referensi sampai setiap target memiliki pemetaan dan fixture konformansi.
+Status di atas sengaja memisahkan fondasi internal dari sintaks yang dapat digunakan pengguna. Built-in dan namespace harus mengikuti status per-target dalam `library/builtin_contract.json`; fixture hanya membuktikan kasus yang benar-benar dijalankan, bukan seluruh kombinasi input.
 
 ## Status kompatibilitas saat ini
 
-**Evidence boundary (20 October 2026):** the last measured 77-fixture matrix remains the baseline recorded by run [39383293486](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39383293486): reference 77/77, native C 74/77, JavaScript 29/77, Python transpiler 21/77, VM 28/77, HTML 0/77. Later commits normalized JavaScript/Python/VM runtime diagnostics and added Python scalar/numeric builtin helpers, but those edits must not be counted as parity gains until a new matrix artifact for the changed commit is inspected. Runtime diagnostics and source-line matching remain part of the conformance contract.
+**Evidence boundary (20 October 2026):** latest matrix [39426734065](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39426734065), commit `fea06e6c7bd77f46ec45b4988e45e85d5fec13e5`: reference 77/77, native C 74/77, JavaScript 77/77, Python transpiler 77/77, VM 77/77, HTML 0/77 executable. Compile-time rejection is accepted only for a fixture that expects failure and whose pinned source line matches. Runtime diagnostics and source-line matching remain part of the conformance contract.
 
 The host adapters under `library/adapters/` remain Python host-side primitives. Database, server HTTP, DOM, Web3, and stable FFI are still **not** first-class `.cuk` APIs available across reference and native C. The intended device workflow is local Android/Termux with Ollama on loopback; device-specific support requires `bash scripts/test-termux-device.sh` on the actual device.
 
@@ -143,10 +143,10 @@ This table is generated from the supplied machine-readable fixture summary. It i
 |---|---:|---:|---:|---:|---:|
 | reference | 77 | 0 | 0 | 0 | 0 |
 | native | 74 | 0 | 0 | 3 | 0 |
-| javascript | 29 | 48 | 0 | 0 | 0 |
-| python_transpiler | 21 | 56 | 0 | 0 | 0 |
+| javascript | 77 | 0 | 0 | 0 | 0 |
+| python_transpiler | 77 | 0 | 0 | 0 | 0 |
 | html | 0 | 0 | 0 | 77 | 0 |
-| vm | 28 | 49 | 0 | 0 | 0 |
+| vm | 77 | 0 | 0 | 0 | 0 |
 
 - Fixtures in checked-in baseline summary: **77**
 - Native C Python-free score: **96.10%** (74/77; unsupported fixtures remain in the denominator)
@@ -155,18 +155,18 @@ This table is generated from the supplied machine-readable fixture summary. It i
 
 ## Differential report (verified artifact)
 
-The latest verified fixture matrix for the reviewed baseline is [GitHub Actions run #39383293486](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39383293486), on commit `cc7c8f47f0f800faa24ec93584adceecc32778d2`. The differential runner reports **74 comparisons, 0 mismatches, 0 incomplete comparisons, and 3 unsupported cases** for the reference/native comparison set. This is a limited comparison between the two currently measured implementations; it does not establish parity for JavaScript, the Python transpiler, HTML, or VM.
+The latest verified fixture matrix is [GitHub Actions run #39426734065](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39426734065), on commit `fea06e6c7bd77f46ec45b4988e45e85d5fec13e5`. The differential runner reports **74 comparisons, 0 mismatches, 0 incomplete comparisons, and 3 unsupported cases** for reference/native. The same run records 77/77 for JavaScript, Python transpiler, and VM; HTML remains unsupported. This evidence is limited to the active fixture set.
 
 | Target | Passed | Failed | Unsupported | Practical meaning |
 |---|---:|---:|---:|---|
 | Reference interpreter | 77 | 0 | 0 | Current language behavior baseline |
 | Native C | 74 | 0 | 3 | Verified subset; unsupported fixtures are not passes |
-| JavaScript | 29 | 48 | 0 | Experimental; substantial parity gaps |
-| Python transpiler | 21 | 56 | 0 | Experimental; substantial parity gaps |
-| VM / bytecode | 28 | 49 | 0 | Experimental; substantial parity gaps |
+| JavaScript | 77 | 0 | 0 | All active fixtures pass; arbitrary programs are not guaranteed |
+| Python transpiler | 77 | 0 | 0 | All active fixtures pass; output still requires Python runtime |
+| VM / bytecode | 77 | 0 | 0 | All active fixtures pass; VM still depends on Python runtime |
 | HTML | 0 | 0 | 77 | No independently executable HTML backend is currently claimed |
 
-These numbers are the checked-in baseline, not a live status query. Check the linked Actions run for its job result and artifacts before describing it as the latest CI execution. A green workflow means its configured regression gate passed; it does **not** mean every backend fixture passed. The reference/native differential result is not a semantic backend fix and does not cancel out the failures listed above.
+These numbers are the checked-in baseline snapshot, not a live status query. Check the linked Actions run and artifacts for commit-specific evidence. A green workflow means its configured regression gate passed; it does not mean unsupported targets or arbitrary programs are covered. The three native-unsupported fixtures remain open work, and HTML has no executable fixture coverage.
 
 ## Documentation synchronization rule
 

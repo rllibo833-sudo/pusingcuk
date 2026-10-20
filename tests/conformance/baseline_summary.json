@@ -17,15 +17,15 @@
       "unavailable": 0
     },
     "javascript": {
-      "passed": 29,
-      "failed": 48,
+      "passed": 77,
+      "failed": 0,
       "timeout": 0,
       "unsupported": 0,
       "unavailable": 0
     },
     "python_transpiler": {
-      "passed": 21,
-      "failed": 56,
+      "passed": 77,
+      "failed": 0,
       "timeout": 0,
       "unsupported": 0,
       "unavailable": 0
@@ -38,8 +38,8 @@
       "unavailable": 0
     },
     "vm": {
-      "passed": 28,
-      "failed": 49,
+      "passed": 77,
+      "failed": 0,
       "timeout": 0,
       "unsupported": 0,
       "unavailable": 0
@@ -51,6 +51,6 @@
     "percent": 96.1,
     "runtime": "native C",
     "unsupported_native_counted_as_not_passed": true,
-    "method": "Verified GitHub Actions matrix at cc7c8f47f0f800faa24ec93584adceecc32778d2 (run 39383293486): reference 77/77, native C 74/77, JavaScript 29/77, Python transpiler 21/77, VM 28/77; differential: 74 comparisons, 0 mismatches, 0 incomplete, 3 unsupported. Three native fixtures remain explicitly unsupported; HTML has no executable backend."
+    "method": "Verified GitHub Actions matrix at fea06e6c7bd77f46ec45b4988e45e85d5fec13e5 (run 39426734065): reference 77/77, native C 74/77, JavaScript 77/77, Python transpiler 77/77, VM 77/77; reference/native differential: 74 comparisons, 0 mismatches, 0 incomplete, 3 explicitly unsupported native fixtures. HTML remains unsupported for all 77 fixtures."
   }
 }

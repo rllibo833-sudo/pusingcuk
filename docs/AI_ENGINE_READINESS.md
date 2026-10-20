@@ -99,12 +99,12 @@ The alias table below is generated from SPEC.md after checking the root lexer an
 |---|---:|---:|---:|
 | reference | 77/77 | 0 | 0 |
 | native | 74/77 | 0 | 3 |
-| javascript | 29/77 | 48 | 0 |
-| python_transpiler | 21/77 | 56 | 0 |
+| javascript | 77/77 | 0 | 0 |
+| python_transpiler | 77/77 | 0 | 0 |
 | html | 0/77 | 0 | 77 |
-| vm | 28/77 | 49 | 0 |
+| vm | 77/77 | 0 | 0 |
 
-The reference runtime passed 77/77 fixtures in the verified matrix; native C passed 74/77 with 3 explicitly unsupported fixtures. JavaScript, Python transpiler, and VM remain experimental with substantial parity gaps. HTML has no executable backend in this repository. These counts are fixture evidence, not a general compatibility or production-readiness claim.
+The reference runtime passed 77/77 fixtures in the latest matrix; native C passed 74/77 with 3 explicitly unsupported fixtures. JavaScript, Python transpiler, and VM each passed 77/77 fixtures in the latest matrix. HTML remains unsupported for all 77 fixtures. These counts are fixture evidence, not a general compatibility or production-readiness claim.
 
 **AI status:** PusingCuk AI remains local/experimental. CI provider-contract tests use mocked providers; CI does not prove live Ollama inference, hosted availability, or production safety. The runtime is not an OS sandbox.
 <!-- END GENERATED LANGUAGE CONTRACT -->
