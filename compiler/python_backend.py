@@ -196,6 +196,53 @@ def pc_ceil(value): return pc_safe_integer_result("atas", math.ceil(pc_numeric("
 def pc_pow(a, b): return pc_math_result("pangkat", math.pow(pc_numeric("pangkat", a), pc_numeric("pangkat", b)))
 def pc_sin(value): return pc_math_result("sinus", math.sin(pc_numeric("sinus", value)))
 def pc_cos(value): return pc_math_result("kosinus", math.cos(pc_numeric("kosinus", value)))
+def pc_text(value):
+    if value is True: return "okelah"
+    if value is False: return "tidak"
+    return str(value)
+def pc_integer(value):
+    if isinstance(value, bool) or value is None:
+        raise TypeError("bilangan() tidak menerima boolean atau None")
+    if isinstance(value, int): result = value
+    elif isinstance(value, float) and math.isfinite(value): result = int(value)
+    elif isinstance(value, str):
+        try: result = int(value.strip())
+        except ValueError as exc: raise ValueError("bilangan() membutuhkan teks integer") from exc
+    else: raise TypeError("bilangan() membutuhkan angka atau teks integer")
+    if abs(result) > 9007199254740991:
+        raise ValueError("bilangan() di luar rentang aman lintas target")
+    return result
+def pc_float(value):
+    if isinstance(value, bool) or value is None:
+        raise TypeError("desimal() tidak menerima boolean atau None")
+    try: result = float(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError("desimal() membutuhkan angka atau teks angka") from exc
+    if not math.isfinite(result): raise ValueError("desimal() membutuhkan angka finite")
+    return result
+def pc_boolean(value):
+    return bool(value)
+def pc_log(value):
+    value = pc_numeric("logaritma", value)
+    if value <= 0: raise ValueError("logaritma() domain tidak valid: angka harus lebih besar dari nol")
+    return pc_math_result("logaritma", math.log(value))
+def pc_log10(value):
+    value = pc_numeric("log10", value)
+    if value <= 0: raise ValueError("log10() domain tidak valid: angka harus lebih besar dari nol")
+    return pc_math_result("log10", math.log10(value))
+def pc_sum(value):
+    if not isinstance(value, list): raise TypeError("jumlah() membutuhkan daftar angka finite")
+    total = 0.0
+    for item in value:
+        item = pc_numeric("jumlah", item)
+        if ((isinstance(item, int) and abs(item) > 9007199254740991)
+            or (isinstance(item, float) and item.is_integer() and abs(item) > 9007199254740991)):
+            raise ValueError("jumlah() menolak angka di luar rentang aman lintas target")
+        total += float(item)
+        if not math.isfinite(total): raise ValueError("jumlah() menghasilkan angka non-finite")
+        if total.is_integer() and abs(total) > 9007199254740991:
+            raise ValueError("jumlah() menghasilkan integer di luar rentang aman lintas target")
+    return int(total) if total.is_integer() else total
 def pc_stat_values(name, value):
     if not isinstance(value, list) or not value:
         raise TypeError(name + "() membutuhkan daftar angka yang tidak kosong")
