@@ -3,7 +3,7 @@
 **Versi bahasa:** `0.6-dev`.
 
 <!-- BEGIN GENERATED FIXTURE COUNTS -->
-**Active manifest:** **77 fixtures**; reference required: **77**; native C required: **74**; native C unsupported: **3**.
+**Active manifest:** **79 fixtures**; reference required: **79**; native C required: **79**; native C unsupported: **0**.
 These figures are generated directly from `tests/conformance/manifest.json`; CI fails if the checked-in baseline summary disagrees with the manifest count or runtime-status totals.
 <!-- END GENERATED FIXTURE COUNTS -->
 
