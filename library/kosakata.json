@@ -144,5 +144,7 @@
     "language_version"
   ],
   "schema_version": 1,
-  "package_version": "0.6-dev"
+  "package_version": "0.8.0.dev0",
+  "language": "Pusingcuk",
+  "language_version": "0.6-dev"
 }

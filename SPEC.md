@@ -173,24 +173,41 @@ Alias dinormalisasi oleh lexer sebelum parsing. Daftar lengkap 23 alias terbagi 
 - `skip` → `kampret` — cabang alternatif
 - `kelar` → `selesai` — penutup blok
 
-### Alias API tambahan (11)
+### Alias API tambahan
 
-Alias berikut adalah nama alternatif untuk API reference Python; alias tersebut tidak menyatakan kompatibilitas native atau lintas-backend:
-
-- `simpen` → `tulis` — menulis teks ke berkas
-- `bongkar` → `baca` — membaca teks dari berkas
-- `simpen_json` → `tulis_json` — menulis JSON ke berkas
-- `bongkar_json` → `baca_json` — membaca JSON dari berkas
-- `impor` → `angkut` — memuat modul lokal
-- `waktu` → `jam` — waktu lokal
-- `gas_api` → `kepo_internet` — HTTP GET
-- `stalking` → `kepo_internet` — HTTP GET
-- `kirim_gosip` → `kirim_api` — HTTP POST
-- `parse_json` → `jadi_json` — parse JSON
-- `kepo` → `tanya` — input pengguna
-
-Alias inti tidak mengubah makna sintaks dan tidak menghapus kata kanonis. Runtime C mandiri hanya diuji terhadap subset alias inti yang tercatat di `docs/NATIVE_RUNTIME.md`. Alias API tambahan tidak membuat kapabilitas menjadi lintas-runtime.
-
+- `bacot` → `hedeh`
+- `bacrit` → `hedeh`
+- `berak` → `hedeh`
+- `berisik` → `hedeh`
+- `bongkar` → `baca`
+- `bongkar_json` → `baca_json`
+- `cetak` → `hedeh`
+- `crot` → `hedeh`
+- `gas_api` → `kepo_internet`
+- `gebber` → `hedeh`
+- `gembor` → `hedeh`
+- `impor` → `angkut`
+- `jedor` → `hedeh`
+- `keluarin` → `hedeh`
+- `kepo` → `tanya`
+- `kirim_gosip` → `kirim_api`
+- `koar` → `hedeh`
+- `muncrat` → `hedeh`
+- `ngegas` → `hedeh`
+- `nyalak` → `hedeh`
+- `omong` → `hedeh`
+- `parse_json` → `jadi_json`
+- `print` → `hedeh`
+- `sembur` → `hedeh`
+- `semprot` → `hedeh`
+- `senggol` → `hedeh`
+- `simpen` → `tulis`
+- `simpen_json` → `tulis_json`
+- `stalking` → `kepo_internet`
+- `suarakan` → `hedeh`
+- `tampilkan` → `hedeh`
+- `teriak` → `hedeh`
+- `waktu` → `jam`
 
 ## 17. Bytecode PVM v1 (draft) dan batas keamanan
 
