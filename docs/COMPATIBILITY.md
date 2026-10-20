@@ -2,7 +2,7 @@
 
 Dokumen ini menetapkan batas kompatibilitas yang boleh diklaim, bukan janji bahwa semua sasaran sudah tercapai. PusingCuk masih eksperimental: fixture aktif menunjukkan kesetaraan pada suite terukur untuk reference, native C, JavaScript, Python transpiler, dan VM; target HTML belum dapat dieksekusi.
 
-**Versi bahasa kanonis:** `0.6-dev`. Versi paket pengembangan `0.8.0.dev0` adalah versi distribusi, bukan versi bahasa. Kontrak memuat 25 built-in. Pada matriks terbaru berisi 79 fixture, reference, native C, JavaScript, Python transpiler, dan VM lulus 79/79; target HTML belum menjalankan fixture. Target HTML belum menjalankan fixture. Status per built-in tetap ditentukan oleh `library/builtin_contract.json`.
+**Versi bahasa kanonis:** `0.6-dev`. Versi paket pengembangan `0.8.0.dev0` adalah versi distribusi, bukan versi bahasa. Kontrak memuat 25 built-in. Pada matriks terbaru berisi 79 fixture, reference, native C, JavaScript, Python transpiler, dan VM lulus 79/79; target HTML belum menjalankan fixture. Status per built-in tetap ditentukan oleh `library/builtin_contract.json`.
 
 **Baseline yang dipelihara:** Python modular adalah referensi. Pada run [39465123558](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39465123558), reference, native C, JavaScript, Python transpiler, dan VM lulus 79/79; reference/native mencatat 79 perbandingan, 0 mismatch, 0 incomplete, dan 0 unsupported. Ini bukti untuk fixture yang diukur, bukan bukti kesetaraan semua program atau semua sistem operasi. Target HTML tetap unsupported.
 
@@ -34,7 +34,7 @@ Status di atas sengaja memisahkan fondasi internal dari sintaks yang dapat digun
 
 ## Status kompatibilitas saat ini
 
-**Evidence boundary (20 October 2026):** latest matrix [39426734065](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39426734065), commit `fea06e6c7bd77f46ec45b4988e45e85d5fec13e5`: reference 77/77, native C 74/77, JavaScript 77/77, Python transpiler 77/77, VM 77/77, HTML 0/77 executable. Compile-time rejection is accepted only for a fixture that expects failure and whose pinned source line matches. Runtime diagnostics and source-line matching remain part of the conformance contract.
+**Historical evidence (20 October 2026):** run [39426734065](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39426734065) recorded the earlier 77-fixture baseline before the native format built-ins were completed. The current measured result is recorded above; older score records remain historical snapshots. Compile-time rejection is accepted only for a fixture that expects failure and whose pinned source line matches. Runtime diagnostics and source-line matching remain part of the conformance contract.
 
 The host adapters under `library/adapters/` remain Python host-side primitives. Database, server HTTP, DOM, Web3, and stable FFI are still **not** first-class `.cuk` APIs available across reference and native C. The intended device workflow is local Android/Termux with Ollama on loopback; device-specific support requires `bash scripts/test-termux-device.sh` on the actual device.
 
@@ -155,7 +155,7 @@ This table is generated from the supplied machine-readable fixture summary. It i
 
 ## Differential report (verified artifact)
 
-The latest verified fixture matrix is [GitHub Actions run #39426734065](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39426734065), on commit `fea06e6c7bd77f46ec45b4988e45e85d5fec13e5`. The differential runner reports **74 comparisons, 0 mismatches, 0 incomplete comparisons, and 3 unsupported cases** for reference/native. The same run records 77/77 for JavaScript, Python transpiler, and VM; HTML remains unsupported. This evidence is limited to the active fixture set.
+The latest verified fixture matrix is [GitHub Actions run #39465123558](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39465123558), on commit `db67c1f33454ccc2f422381dec4b02df0227f007`. The differential runner reports **79 comparisons, 0 mismatches, 0 incomplete comparisons, and 0 unsupported cases** for reference/native. Reference, native C, JavaScript, Python transpiler, and VM each record 79/79; HTML remains unsupported. This evidence is limited to the active fixture set.
 
 | Target | Passed | Failed | Unsupported | Practical meaning |
 |---|---:|---:|---:|---|
