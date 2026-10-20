@@ -1360,7 +1360,7 @@
       ],
       "expected": {
         "exit_code": 0,
-        "stdout": "{\"nama\":\"Budi\",\"aktif\":true}\nBudi\nSiti\nokelah\n&lt;b&gt;&amp;&quot;&#x27;\nBudi,\"kopi, susu\",\"dia bilang \"\"hai\"\"\"\n{\"items\":[1,{\"ok\":true}],\"empty\":null}\n\"baris\nbaru\",\"a\rb\"\n",
+        "stdout": "{\"nama\":\"Budi\",\"aktif\":true}\nBudi\nSiti\nokelah\n&lt;b&gt;&amp;&quot;&#x27;\nBudi,\"kopi, susu\",\"dia bilang \"\"hai\"\"\"\n{\"items\":[1,{\"ok\":true}],\"empty\":null}\n\"baris\nbaru\",\"a\rb\"\n{\"integer_float\":1,\"negative_zero\":0}\n1\n1,0.5,0\n",
         "stderr_class": null
       },
       "runtimes": {
