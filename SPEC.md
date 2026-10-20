@@ -156,7 +156,7 @@ Runtime C dapat dibangun dengan compiler C11 dan dijalankan sebagai executable t
 
 Kosakata slang adalah lapisan gaya bahasa Pusingcuk, bukan bahasa inti terpisah. Daftar alias berikut dibekukan bersama sintaks; jangan menambah alias atau kata kunci baru tanpa izin eksplisit Founder.
 
-Alias dinormalisasi oleh lexer sebelum parsing. Daftar lengkap 23 alias terbagi menjadi dua kelompok. Alias API tambahan bukan bagian dari sintaks inti dan dukungannya bergantung pada target runtime.
+Alias dinormalisasi oleh lexer sebelum parsing. Daftar saat ini berisi 45 alias yang terbagi menjadi 12 alias inti dan 33 alias API tambahan. Jumlah ini harus tetap selaras dengan tabel alias yang dihasilkan dari bagian spesifikasi ini; perubahan alias memerlukan persetujuan eksplisit Founder. Alias API tambahan bukan bagian dari sintaks inti dan dukungannya bergantung pada target runtime.
 
 ### Alias inti (12)
 
