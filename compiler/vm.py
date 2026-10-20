@@ -233,7 +233,10 @@ def main(argv=None):
         with Path(args.file).open(encoding="utf-8") as stream:
             document = json.load(stream)
         VirtualMachine(document).run()
-    except (OSError, json.JSONDecodeError, BytecodeError, VMError, TypeError, ValueError) as exc:
+    except VMError as exc:
+        print(f"Kesalahan runtime: {exc}", file=sys.stderr)
+        return 1
+    except (OSError, json.JSONDecodeError, BytecodeError, TypeError, ValueError) as exc:
         print(f"VM PusingCuk: {exc}", file=sys.stderr)
         return 1
     return 0
