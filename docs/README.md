@@ -35,7 +35,13 @@ This documentation is organized around reader needs rather than the order in whi
 
 The presence of an AI module or adapter does not prove a self-trained model, general quality, or production-ready SaaS. Claims must be tied to tests and configuration that actually exist.
 
-## 5. Contribution, security, and status
+## 5. Development status, contribution, and security
+
+- [Canonical status and v1.0 roadmap](PROJECT_STATUS_AND_ROADMAP.md) — the only active roadmap.
+- [Development issue backlog](development/ISSUE_BACKLOG.md) — unfiled issue drafts; verify against current code before opening an issue.
+- [Repository structure](REPO_STRUCTURE.md) — canonical directory map.
+
+## 6. Contribution, security, and historical notes
 
 - [Contribution guide](../CONTRIBUTING.md).
 - [Security policy](../SECURITY.md).

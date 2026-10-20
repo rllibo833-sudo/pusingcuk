@@ -1,100 +1,59 @@
-# Struktur Repo Berdasarkan Fungsi
+# Struktur Repositori PusingCuk
 
-Gunakan peta ini untuk menemukan lokasi yang benar sebelum mengubah kode. Ini bukan daftar setiap berkas.
+Dokumen ini adalah peta direktori kanonis. Tidak perlu membuat README status baru untuk setiap subproyek; gunakan dokumen domain yang sudah ada.
 
-## Bahasa .cuk
+## Peta tingkat atas
 
-| Lokasi | Fungsi |
+| Lokasi | Tanggung jawab |
 |---|---|
-| `lexer.py` | Membaca token dan alias keyword |
-| `parser.py`, `ast_nodes.py` | Sintaks dan AST |
-| `evaluator.py` | Interpreter referensi dan semantik runtime utama |
-| `SPEC.md` | Kontrak sintaks/fitur yang terlihat oleh pengguna |
-| `docs/SEMANTIC_CONTRACT.md` | Perilaku yang harus konsisten |
-| `examples/`, `*.cuk`, `library/*.cuk` | Program contoh dan aturan yang ditulis dalam .cuk |
-| `datacenter_v6.py`, `V6_CLEAN.py`, `fix_parser_all.py` | DRY-RUN/review-only compatibility wrappers; do not mutate vocabulary, parser, or `app.cuk`, and do not commit/push |
-| `lexer.orig.py`, `interpreter.py.bak`, `token_patch.py` | Root-level legacy backup/patch files; not the canonical lexer or active CLI entry point |
-| `app.cuk`, `next_prompt.txt` | Mutable scratch artifacts used by the legacy V6 loop; not canonical language examples or conformance fixtures |
-| `pusingcuk/` | Compatibility package facade; `pusingcuk/cli.py` imports the maintained root interpreter/parser, while `pusingcuk/lexer.py` is a mirrored lexer kept in sync by `scripts/check_alias_sync.py` |
+| `README.md`, `README_EN.md` | Pengenalan singkat dan quickstart; status rilis harus sesuai bukti |
+| `SPEC.md`, `CHANGELOG.md`, `LICENSE`, `CONTRIBUTING.md` | Spesifikasi publik, sejarah rilis, lisensi, kontribusi |
+| `lexer.py`, `parser.py`, `ast_nodes.py`, `evaluator.py`, `interpreter.py` | Implementasi bahasa referensi |
+| `pusingcuk/` | Package/CLI kompatibilitas; perubahan lexer harus lulus pemeriksaan sinkronisasi |
+| `compiler/` | IR dan backend C, JavaScript, Python, bytecode/VM, Android |
+| `native/` | Runtime C mandiri dan tes build native |
+| `src/` | Toolchain PVM eksperimental terpisah; bukan runtime yang sama dengan `compiler/vm.py` |
+| `library/` | Kontrak built-in, kosakata, stdlib, AI service/provider, adapters dan data pengetahuan |
+| `examples/` | Contoh program yang dipelihara berdasarkan domain |
+| `site/` | Website GitHub Pages, playground, aset dan contoh browser |
+| `tests/` | Unit/integrasi, conformance manifest, fixtures AI, dan tes native |
+| `tools/`, `scripts/` | Runner, generator, adapter pengembangan, CI helpers, dan utilitas instalasi |
+| `docs/` | Dokumentasi pengguna, bahasa, compiler, AI, security, dan satu roadmap aktif |
+| `android-studio/`, `editors/` | Integrasi IDE/editor |
+| `archive/legacy/` | Interpreter, program, dan artefak historis yang tidak lagi kanonis |
+| `artifacts/` | Hasil matriks yang dikomit bila memang menjadi baseline; artefak CI per-run tetap di Actions |
 
-## Compiler dan runtime
+## Titik masuk yang sering tertukar
 
-| Lokasi | Fungsi |
-|---|---|
-| `compiler/ir.py`, `compiler_ir.py` | Representasi perantara dan validasi |
-| `compiler/bytecode.py`, `compiler/vm.py` | Kompilasi bytecode dan VM eksperimental |
-| `compiler/c_backend.py`, `native/` | Backend/runtime C; periksa batas dukungan sebelum mengklaim parity |
-| `compiler/js_backend.py` | Backend JavaScript |
-| `compiler/python_backend.py`, `compiler/import_python.py` | Transpilasi dan interoperabilitas Python |
-| `compiler/android_backend.py`, `android-studio/` | Eksperimen target Android |
-| `tests/conformance/`, `tools/conformance.py` | Fixture dan pemeriksaan perilaku lintas-target |
+- `python pusingcuk_new.py program.cuk`: CLI interpreter modular yang digunakan quickstart.
+- `python -m compiler program.cuk --target <target>`: compiler multi-target; dukungan fitur berbeda per backend.
+- `native/pusingcuk.c`: runtime native C; bukan source compiler Python.
+- `site/playground.html`: playground statis GitHub Pages. Contoh browser harus diverifikasi oleh `tools/check_playground_examples.py`; jangan menganggap interpreter Python tersedia di browser.
+- `tools/ci_fixture_matrix.py` dan `tools/differential_runner.py`: matrix dan differential checks.
+- `tools/reality_engine.py`: gate usulan berdasarkan bukti; bukan bukti otomatis bahwa fitur baru sudah diimplementasikan.
+- `library/assistant.py` dan `library/ai_service.py`: orkestrasi AI/adaptor lokal; bukan model dasar yang dilatih sendiri.
 
-## Experimental PVM v1
+## Root-level compatibility entry points
 
-`src/` contains a separate draft PVM v1 toolchain; it is not the same runtime as `compiler/vm.py` and does not make the full `.cuk` language portable or sandboxed.
+Beberapa modul Python di root tetap dipertahankan karena dapat dipakai sebagai entry point/kompatibilitas oleh pengguna atau tes: `pusingcuk_new.py`, `compiler_ir.py`, `datacenter_v6.py`, `V6_CLEAN.py`, `fix_parser_all.py`, `terminal.py`, dan `halo.cuk`. Sebelum memindahkan modul tersebut, audit seluruh import, workflow, dokumentasi, dan pemanggilan eksternal; memindahkan file hanya demi tampilan dapat merusak API yang ada.
 
-| Location | Function and boundary |
-|---|---|
-| `src/c-core/main.c` | C11 line-oriented PVM v1 assembler; format and opcode limitations are documented in `docs/PVM_SPEC.md` |
-| `src/backends/python/compiler.py`, `src/backends/js/compiler.js` | PVM v1 readers/restricted transpilers with explicit file-I/O policy; these consume PVM records, not the compiler's JSON bytecode artifact |
-| `compiler/vm.py` | Separate executable JSON bytecode VM for the regular compiler pipeline; instruction budgets are not an OS security sandbox |
+Draft issue yang sebelumnya berada di root dipindahkan ke [development/ISSUE_BACKLOG.md](development/ISSUE_BACKLOG.md), karena bukan dokumen publik utama.
 
-## Library dan PusingCuk AI
+## Sumber kebenaran dan generator
 
-| Lokasi | Fungsi |
-|---|---|
-| `library/stdlib.py` | Implementasi built-in untuk jalur referensi |
-| `library/builtin_contract.json`, `builtin_contract.py` | Metadata kontrak built-in dan status dukungan target |
-| `library/kosakata.json` | Registri keyword/alias yang dapat dibaca mesin |
-| `library/assistant.py`, `library/ai_tools.py` | Asisten, orkestrasi tool, dan jembatan ke compiler |
-| `library/conformance_manifest.json`, `pusingcuk/ai_tools.py` | Manifest fixture package-owned dan smoke checker untuk wheel/editable/frozen executable; bukan bukti semua fixture bisa dijalankan dari paket |
-| `library/knowledge_grounding.py`, `knowledge_index.json` | Grounding dan indeks pengetahuan |
-| `library/*_provider.py` | Adapter model yang tersedia; jangan menganggap semuanya wajib/aktif |
-| `library/*.cuk`, `*.pusingcuk` | Contoh atau aturan bahasa, bukan implementasi Python |
+- `SPEC.md`: semantik dan sintaks bahasa yang terlihat pengguna.
+- `library/kosakata.json`: kata kunci/alias terstruktur.
+- `library/builtin_contract.json`: kontrak built-in.
+- `tests/conformance/manifest.json`: daftar fixture dan status runtime yang diwajibkan.
+- `tests/conformance/baseline_summary.json`: snapshot hasil yang dihasilkan dari matriks.
+- `docs/COMPATIBILITY.md`: ringkasan kompatibilitas yang dihasilkan/ditinjau dari kontrak dan hasil fixture.
+- `docs/PROJECT_STATUS_AND_ROADMAP.md`: satu-satunya roadmap aktif.
+- `scripts/gen_docs_from_spec.py` dan `tools/generate_compatibility.py`: generator dokumen; jangan mengedit manual bagian di dalam marker yang dikelola generator.
 
-**Penting:** folder bernama `library` mencampur runtime Python, metadata, adapter, dan contoh .cuk. Tidak semua file di folder tersebut adalah pustaka standar mandiri untuk program .cuk.
+## Aturan kebersihan
 
-## Frontend, backend, dan layanan
-
-| Lokasi | Fungsi |
-|---|---|
-| `web/`, `site/` | UI web/prototipe frontend |
-| `apps/` | Aplikasi dan prototipe terpisah |
-| `supabase/` | Skema/fungsi integrasi Supabase yang tersedia di repo |
-| `tools/`, `scripts/` | Utilitas pengembangan, konformansi, dan packaging |
-| `.github/workflows/` | Otomasi CI/build; hasilnya hanya membuktikan job yang benar-benar berjalan |
-
-## AI repair and language-evolution tools
-
-| Location | Actual behavior on `main` | Limit to preserve in claims |
-|---|---|---|
-| `tools/diagnostic_repair_loop.py` | Reads an in-repository `.cuk`/`.pusingcuk` file and validates lexer/parser syntax | Does not execute source or apply repairs; expected-output checks fail closed without an isolated runtime |
-| `tools/local_ai_adapter.py` | Separate Ollama/heuristic loop writes a sibling `*.proposal.cuk` file and asks the Reality Engine to validate it | Not the same path as `library/assistant.py`; a proposal must match a successful manifest fixture and pass all five target checks |
-| `tools/reality_engine.py` | Deterministic fail-closed acceptance gate | Has reference/native/JavaScript/Python/VM execution paths; acceptance requires exact manifest source, exit 0, expected stdout, no stderr, and matching outputs |
-| `tools/evolve_daemon.py` and `tools/evolve_language.py` | Explicit, review-only alias proposals | No automatic vocabulary edits, commits, or pushes |
-
-**Important execution boundary:** the legacy V6 entry points are now dry-run/review-only wrappers. The canonical flow is proposal → human review → Reality Engine validation → separately reviewed Git change; no evolution helper pushes automatically.
-
-## Generated documentation ownership
-
-To avoid conflicting snapshots, each generated section has one writer:
-
-- `scripts/gen_docs_from_spec.py` owns the SPEC-derived alias table in `README.md` and the generated language-contract section in `docs/AI_ENGINE_READINESS.md`.
-- `tools/generate_compatibility.py` owns the conformance summary in `docs/COMPATIBILITY.md`, active fixture counts in `docs/CONFORMANCE_FIXTURES.md`, the Python-Free Score history in `docs/PYTHON_FREE_SCORE.md`, the README score badge, and its SVG.
-
-Do not make both generators write the same markers. Run both `--check` modes after updating their respective source contracts.
-
-## Dokumentasi: mana yang harus dibaca?
-
-- Pengguna baru: [README](../README.md) → [PEMULA](PEMULA.md) → [SPEC](../SPEC.md).
-- Mengubah sintaks/semantik: [SPEC](../SPEC.md) → [kontrak semantik](SEMANTIC_CONTRACT.md) → tes/fixture → matriks [kompatibilitas](COMPATIBILITY.md).
-- Mengubah backend: dokumen backend terkait → tes backend → fixture target.
-- Mengubah AI: [kesiapan engine](AI_ENGINE_READINESS.md) → [jembatan evolusi bahasa](AI_LANGUAGE_EVOLUTION_BRIDGE.md) → tes AI.
-- Mengubah UI/API: dokumentasi workbench atau integrasi yang sesuai; jangan mencampur logika bisnis ke frontend.
-
-## Aturan perubahan
-
-1. Perubahan bahasa memperbarui spesifikasi, implementasi, fixture, dan status dukungan secara bersamaan.
-2. Jangan menambah alias/built-in hanya untuk memperbanyak jumlah fitur.
-3. Jangan menyatakan target kompatibel jika fixture target belum lulus.
-4. Catatan audit bertanggal tetap historis. Status aktif harus ditulis hanya berdasarkan commit dan hasil pemeriksaan yang benar-benar tersedia.
+1. Tempatkan fitur baru di direktori domain yang sudah ada; jangan buat direktori paralel untuk status yang sama.
+2. Simpan hasil uji sementara dan log di artefak CI atau direktori output yang diabaikan Git, bukan root.
+3. File yang dipindahkan harus mendapat pembaruan semua referensi dan tes dalam perubahan yang sama.
+4. Jangan menghapus arsip historis hanya karena sudah lama; pindahkan atau hapus hanya setelah dipastikan bukan input tes, kompatibilitas, atau provenance.
+5. Catatan audit bertanggal tetap historis. Status saat ini harus dapat ditautkan ke commit dan run CI yang sama.
