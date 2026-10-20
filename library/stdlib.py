@@ -54,7 +54,7 @@ def _json_validate(value: Any, path: str = "$") -> Any:
     if value is None or isinstance(value, bool):
         return value
     if isinstance(value, str):
-        if "\\x00" in value:
+        if "\x00" in value:
             raise ValueError(f"JSON teks mengandung NUL yang tidak didukung: {path}")
         if len(value.encode("utf-8")) > 1023:
             raise ValueError(f"JSON teks melebihi batas 1023 byte: {path}")
