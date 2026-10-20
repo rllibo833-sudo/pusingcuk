@@ -104,7 +104,7 @@ The alias table below is generated from SPEC.md after checking the root lexer an
 | html | 0/77 | 0 | 77 |
 | vm | 77/77 | 0 | 0 |
 
-The reference runtime passed 77/77 fixtures in the latest matrix; native C passed 74/77 with 3 explicitly unsupported fixtures. JavaScript, Python transpiler, and VM each passed 77/77 fixtures in the latest matrix. HTML remains unsupported for all 77 fixtures. These counts are fixture evidence, not a general compatibility or production-readiness claim.
+The reference runtime passed 77/77 fixtures in the verified matrix; native C passed 74/77 with 3 explicitly unsupported fixtures. JavaScript, Python transpiler, and VM each passed 77/77 fixtures in the latest matrix. HTML remains unsupported for all 77 fixtures. These counts are fixture evidence, not a general compatibility or production-readiness claim.
 
 **AI status:** PusingCuk AI remains local/experimental. CI provider-contract tests use mocked providers; CI does not prove live Ollama inference, hosted availability, or production safety. The runtime is not an OS sandbox.
 <!-- END GENERATED LANGUAGE CONTRACT -->
