@@ -4,7 +4,7 @@ Halaman ini adalah katalog built-in yang dipakai bersama oleh dokumentasi dan pe
 
 **Versi bahasa:** `0.6-dev`. Bagian pertama berisi tepat 25 built-in terkontrak; fungsi tambahan yang langsung ditangani evaluator reference dipisahkan dan tidak masuk hitungan built-in lintas target.
 
-Status `not-claimed` pada native C berarti scalar subset telah diuji, tetapi kesetaraan penuh dengan interpreter referensi belum diklaim. Empat built-in format (`json_teks`, `json_baca`, `html_aman`, `csv_baris`) baru boleh dianggap didukung setelah fixture native untuk nested JSON, JSON invalid/null, escaping, dan quoting lulus. Backend JS mengikuti kontrak built-in bersama: `desimal()` menerima angka atau teks desimal finite (bukan boolean/null), `logika()` memakai truthiness bahasa, dan `logaritma()`, `log10()`, serta `jumlah()` memvalidasi domain, tipe, finite values, dan rentang integer aman. Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python mentah. Misalnya, `teks(benar)` menghasilkan `okelah` dan `teks(salah)` menghasilkan `tidak`, bukan ejaan boolean dari bahasa host. Statistik `rata_rata` dan `median` menerima daftar angka finite non-boolean yang tidak kosong; `jumlah` menerima daftar termasuk daftar kosong yang menghasilkan nol. Nilai integer di luar rentang aman dan hasil non-finite ditolak.
+Status `not-claimed` pada native C berarti scalar subset telah diuji, tetapi kesetaraan penuh dengan interpreter referensi belum diklaim. Built-in `json_teks`, `json_baca`, `html_aman`, dan `csv_baris` kini berstatus `supported` setelah fixture nested JSON, JSON valid/invalid/null, escaping, quoting, dan numeric normalization lulus di matriks konformansi. Backend JS mengikuti kontrak built-in bersama: `desimal()` menerima angka atau teks desimal finite (bukan boolean/null), `logika()` memakai truthiness bahasa, dan `logaritma()`, `log10()`, serta `jumlah()` memvalidasi domain, tipe, finite values, dan rentang integer aman. Built-in adalah bagian dari kosa kata teknis Pusingcuk, bukan panggilan Python mentah. Misalnya, `teks(benar)` menghasilkan `okelah` dan `teks(salah)` menghasilkan `tidak`, bukan ejaan boolean dari bahasa host. Statistik `rata_rata` dan `median` menerima daftar angka finite non-boolean yang tidak kosong; `jumlah` menerima daftar termasuk daftar kosong yang menghasilkan nol. Nilai integer di luar rentang aman dan hasil non-finite ditolak.
 
 ## Status target
 
@@ -53,7 +53,7 @@ Fungsi berikut ditangani langsung oleh evaluator Python dan bukan bagian dari 25
 - **Nilai/terminal/JSON tambahan:** `jadi_json`, `jadi_teks`, `warna`
 - **Input:** `tanya` (statement/input intrinsic; juga punya alias slang reference)
 
-Semua API ini harus diperlakukan sebagai reference-only kecuali target lain memiliki implementasi dan fixture yang jelas.
+API di daftar ini reference-only kecuali implementasi dan fixture membuktikan dukungan per target. `jadi_json` kini memiliki implementasi native dan fixture terpisah dari `json_baca`: invalid JSON menghasilkan `salah`, sedangkan `json_baca` menghasilkan kesalahan runtime.
 
 ## Contoh penggunaan
 
