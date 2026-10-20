@@ -18,7 +18,7 @@ class PackageCliTests(unittest.TestCase):
 
     def test_module_cli_runs_existing_source_file(self):
         result = subprocess.run(
-            [sys.executable, "-m", "pusingcuk.cli", "run", "examples/compat/halo.pusingcuk"],
+            [sys.executable, "-m", "pusingcuk.cli", "run", "examples/hello.cuk"],
             cwd=ROOT, text=True, capture_output=True, timeout=5,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
