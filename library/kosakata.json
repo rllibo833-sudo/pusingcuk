@@ -1,22 +1,49 @@
 {
-  "Pusingcuk": [
-    "language"
-  ],
   "keywords": [
+    {
+      "word": "angkut",
+      "aliases": [
+        "impor"
+      ]
+    },
+    {
+      "word": "baca",
+      "aliases": [
+        "bongkar"
+      ]
+    },
+    {
+      "word": "baca_json",
+      "aliases": [
+        "bongkar_json"
+      ]
+    },
+    {
+      "word": "benar",
+      "aliases": [
+        "valid"
+      ]
+    },
+    {
+      "word": "bukan",
+      "aliases": [
+        "janggal"
+      ]
+    },
     {
       "word": "hedeh",
       "aliases": [
+        "jir",
+        "spill",
         "bacot",
         "bacrit",
         "berak",
         "berisik",
         "cetak",
         "crot",
-        "gas",
         "gebber",
         "gembor",
         "jedor",
-        "jir",
         "keluarin",
         "koar",
         "muncrat",
@@ -27,10 +54,28 @@
         "sembur",
         "semprot",
         "senggol",
-        "spill",
         "suarakan",
         "tampilkan",
         "teriak"
+      ]
+    },
+    {
+      "word": "jadi_json",
+      "aliases": [
+        "parse_json"
+      ]
+    },
+    {
+      "word": "jam",
+      "aliases": [
+        "waktu"
+      ]
+    },
+    {
+      "word": "jancuk",
+      "aliases": [
+        "inthiseco",
+        "gas"
       ]
     },
     {
@@ -38,85 +83,6 @@
       "aliases": [
         "adooh",
         "skip"
-      ]
-    },
-    {
-      "word": "selesai",
-      "aliases": [
-        "gitu",
-        "kelar"
-      ]
-    },
-    {
-      "word": "jancuk",
-      "aliases": [
-        "inthiseco"
-      ]
-    },
-    {
-      "word": "bukan",
-      "aliases": [
-        "janggal"
-      ]
-    },
-    {
-      "word": "lah",
-      "aliases": [
-        "bestie"
-      ]
-    },
-    {
-      "word": "benar",
-      "aliases": [
-        "valid"
-      ]
-    },
-    {
-      "word": "salah",
-      "aliases": [
-        "zonk"
-      ]
-    },
-    {
-      "word": "tanya",
-      "aliases": [
-        "kepo"
-      ]
-    },
-    {
-      "word": "tulis",
-      "aliases": [
-        "simpen"
-      ]
-    },
-    {
-      "word": "baca",
-      "aliases": [
-        "bongkar"
-      ]
-    },
-    {
-      "word": "tulis_json",
-      "aliases": [
-        "simpen_json"
-      ]
-    },
-    {
-      "word": "baca_json",
-      "aliases": [
-        "bongkar_json"
-      ]
-    },
-    {
-      "word": "angkut",
-      "aliases": [
-        "impor"
-      ]
-    },
-    {
-      "word": "jam",
-      "aliases": [
-        "waktu"
       ]
     },
     {
@@ -133,16 +99,44 @@
       ]
     },
     {
-      "word": "jadi_json",
+      "word": "lah",
       "aliases": [
-        "parse_json"
+        "bestie"
+      ]
+    },
+    {
+      "word": "salah",
+      "aliases": [
+        "zonk"
+      ]
+    },
+    {
+      "word": "selesai",
+      "aliases": [
+        "gitu",
+        "kelar"
+      ]
+    },
+    {
+      "word": "tanya",
+      "aliases": [
+        "kepo"
+      ]
+    },
+    {
+      "word": "tulis",
+      "aliases": [
+        "simpen"
+      ]
+    },
+    {
+      "word": "tulis_json",
+      "aliases": [
+        "simpen_json"
       ]
     }
   ],
-  "source_of_truth": [],
-  "0.6-dev": [
-    "language_version"
-  ],
+  "source_of_truth": "SPEC.md",
   "schema_version": 1,
   "package_version": "0.8.0.dev0",
   "language": "Pusingcuk",

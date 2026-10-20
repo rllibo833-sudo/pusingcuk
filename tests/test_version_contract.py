@@ -106,7 +106,7 @@ class VersionContractTests(unittest.TestCase):
             if item.get("alias_of"):
                 metadata_aliases[item["word"]] = item["alias_of"]
         self.assertEqual(metadata_aliases, all_aliases)
-        self.assertEqual((len(all_aliases), len(core_aliases)), (23, 12))
+        self.assertEqual((len(all_aliases), len(core_aliases)), (45, 12))
 
 if __name__ == "__main__":
     unittest.main()

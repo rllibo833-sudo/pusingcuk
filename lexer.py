@@ -2,29 +2,32 @@
 
 from dataclasses import dataclass
 
-
 KEYWORD_ALIASES = {
+    "jir": "hedeh",
     "adooh": "kampret",
+    "gitu": "selesai",
+    "inthiseco": "jancuk",
+    "janggal": "bukan",
+    "gas": "jancuk",
+    "spill": "hedeh",
+    "bestie": "lah",
+    "valid": "benar",
+    "zonk": "salah",
+    "skip": "kampret",
+    "kelar": "selesai",
     "bacot": "hedeh",
     "bacrit": "hedeh",
     "berak": "hedeh",
     "berisik": "hedeh",
-    "bestie": "lah",
     "bongkar": "baca",
     "bongkar_json": "baca_json",
     "cetak": "hedeh",
     "crot": "hedeh",
-    "gas": "hedeh",
     "gas_api": "kepo_internet",
     "gebber": "hedeh",
     "gembor": "hedeh",
-    "gitu": "selesai",
     "impor": "angkut",
-    "inthiseco": "jancuk",
-    "janggal": "bukan",
     "jedor": "hedeh",
-    "jir": "hedeh",
-    "kelar": "selesai",
     "keluarin": "hedeh",
     "kepo": "tanya",
     "kirim_gosip": "kirim_api",
@@ -40,18 +43,12 @@ KEYWORD_ALIASES = {
     "senggol": "hedeh",
     "simpen": "tulis",
     "simpen_json": "tulis_json",
-    "skip": "kampret",
-    "spill": "hedeh",
     "stalking": "kepo_internet",
     "suarakan": "hedeh",
     "tampilkan": "hedeh",
     "teriak": "hedeh",
-    "valid": "benar",
     "waktu": "jam",
-    "zonk": "salah",
 }
-
-
 
 KEYWORDS = frozenset({
     "jancuk",
@@ -80,10 +77,8 @@ MULTI_OPERATORS = ("==", "!=", "<=", ">=", "//")
 SINGLE_OPERATORS = frozenset("+-*/%=<>")
 PUNCTUATION = frozenset("()[],:{}.")
 
-
 class LexerError(ValueError):
     """Kesalahan ketika membaca karakter sumber."""
-
 
 @dataclass(frozen=True)
 class Token:
@@ -98,11 +93,9 @@ class Token:
             f"baris={self.line}, kolom={self.column})"
         )
 
-
 def _is_ascii_digit(char: str) -> bool:
     """Accept only ASCII decimal digits as numeric literal characters."""
     return len(char) == 1 and "0" <= char <= "9"
-
 
 class Lexer:
     def __init__(self, source):
@@ -344,13 +337,7 @@ class Lexer:
         tokens.append(Token("EOF", None, self.line, self.column))
         return tokens
 
-
 def lex(source):
     """Fungsi praktis untuk mengubah teks menjadi daftar token."""
     return Lexer(source).tokenize()
 
-# AUTO-GEN ALIASES V6.2
-HEDEH_ALIASES = ['bacot', 'bacrit', 'berak', 'berisik', 'cetak', 'crot', 'gas', 'gebber', 'gembor', 'jedor', 'jir', 'keluarin', 'koar', 'muncrat', 'ngegas', 'nyalak', 'omong', 'print', 'sembur', 'semprot', 'senggol', 'spill', 'suarakan', 'tampilkan', 'teriak']
-
-# AUTO-GEN ALIASES V6.2
-HEDEH_ALIASES = ['bacot', 'bacrit', 'berak', 'berisik', 'cetak', 'crot', 'gas', 'gebber', 'gembor', 'jedor', 'jir', 'keluarin', 'koar', 'muncrat', 'ngegas', 'nyalak', 'omong', 'print', 'sembur', 'semprot', 'senggol', 'spill', 'suarakan', 'tampilkan', 'teriak']
