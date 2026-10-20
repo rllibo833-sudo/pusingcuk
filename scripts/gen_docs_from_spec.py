@@ -154,7 +154,7 @@ def compatibility_snapshot() -> str:
         "- Fixtures in checked-in baseline summary: **" + str(baseline["fixture_count"]) + "**\n"
         "- Native C Python-free score: **" + str(score.get("percent", "unknown")) + "%** (" +
         str(score.get("numerator", "unknown")) + "/" + str(score.get("denominator", "unknown")) +
-        "; unsupported fixtures remain in the denominator)\n"
+        "; unsupported fixtures remain in the denominator)"
     )
 
 
