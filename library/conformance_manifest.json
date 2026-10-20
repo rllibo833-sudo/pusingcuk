@@ -1265,16 +1265,16 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "unsupported"
+        "native": "required"
       }
     },
     {
-      "id": "reference.json-null-returns-none",
+      "id": "formats.json-null-returns-none",
       "source": "json_null_is_none.cuk",
-      "profile": "reference",
+      "profile": "core",
       "requires": [
         "json",
-        "json-parse-result"
+        "null-values"
       ],
       "expected": {
         "exit_code": 0,
@@ -1283,7 +1283,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "unsupported"
+        "native": "required"
       }
     },
     {
@@ -1352,17 +1352,19 @@
       "requires": [
         "builtins",
         "json",
+        "nested-json",
         "html-escaping",
-        "csv-quoting"
+        "csv-quoting",
+        "csv-control-characters"
       ],
       "expected": {
         "exit_code": 0,
-        "stdout": "{\"nama\":\"Budi\",\"aktif\":true}\nBudi\nSiti\nokelah\n&lt;b&gt;&amp;&quot;&#x27;\nBudi,\"kopi, susu\",\"dia bilang \"\"hai\"\"\"\n",
+        "stdout": "{\"nama\":\"Budi\",\"aktif\":true}\nBudi\nSiti\nokelah\n&lt;b&gt;&amp;&quot;&#x27;\nBudi,\"kopi, susu\",\"dia bilang \"\"hai\"\"\"\n{\"items\":[1,{\"ok\":true}],\"empty\":null}\n\"\\\"baris\\nbaru\\\",\\\"a\\rb\\\"\"\n{\"integer_float\":1,\"negative_zero\":0}\n1\n1,0.5,0\n",
         "stderr_class": null
       },
       "runtimes": {
         "reference": "required",
-        "native": "unsupported"
+        "native": "required"
       }
     },
     {
@@ -1520,6 +1522,43 @@
       "expected": {
         "exit_code": 0,
         "stdout": "40000\n4000\n36000\n3960\n39960\n",
+        "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.json-baca-invalid-raises-error",
+      "source": "json_baca_invalid_raises_error.cuk",
+      "profile": "core",
+      "requires": [
+        "json",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "formats.json-baca-null-returns-none",
+      "source": "json_baca_null_is_none.cuk",
+      "profile": "core",
+      "requires": [
+        "json",
+        "null-values"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "None\n",
         "stderr_class": null
       },
       "runtimes": {
