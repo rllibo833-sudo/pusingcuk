@@ -818,7 +818,7 @@ typedef struct {
 } JsonParser;
 
 static int format_append(char *out, size_t cap, size_t *used, const char *src, size_t n) {
-    if (*used > cap || n > cap - *used - 1) {
+    if (*used >= cap || n > cap - *used - 1) {
         fail("hasil built-in format melebihi batas buffer native");
         return 0;
     }
@@ -1029,7 +1029,7 @@ static Val json_parse_value(JsonParser *jp, unsigned depth) {
     if (n == 0 || n >= 64) { jp->valid = 0; return num(0); }
     char token[64]; memcpy(token, jp->source + start, n); token[n] = '\0';
     errno = 0; char *end = NULL; double number = strtod(token, &end);
-    if (!end || *end || errno == ERANGE || !isfinite(number) ||
+    if (!end || *end || !isfinite(number) ||
         (floor(number) == number && fabs(number) > JSON_MAX_SAFE_INTEGER)) {
         jp->valid = 0; return num(0);
     }
