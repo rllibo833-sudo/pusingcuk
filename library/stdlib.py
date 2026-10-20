@@ -49,8 +49,10 @@ def _to_text(value: Any) -> str:
     return str(value)
 
 
-def _json_validate(value: Any, path: str = "$") -> Any:
+def _json_validate(value: Any, path: str = "$", depth: int = 0) -> Any:
     """Reject values that cannot be represented consistently across targets."""
+    if depth > 64:
+        raise ValueError(f"JSON melebihi kedalaman maksimum: {path}")
     if value is None or isinstance(value, bool):
         return value
     if isinstance(value, str):
@@ -70,12 +72,12 @@ def _json_validate(value: Any, path: str = "$") -> Any:
             raise ValueError(f"JSON integer di luar rentang aman: {path}")
         return value
     if isinstance(value, list):
-        return [_json_validate(item, f"{path}[{index}]") for index, item in enumerate(value)]
+        return [_json_validate(item, f"{path}[{index}]", depth + 1) for index, item in enumerate(value)]
     if isinstance(value, Mapping):
         if any(not isinstance(key, str) for key in value):
             raise TypeError(f"kunci objek JSON harus teks: {path}")
         return {
-            _json_validate(key, f"{path}.<kunci>"): _json_validate(item, f"{path}.{key}")
+            _json_validate(key, f"{path}.<kunci>"): _json_validate(item, f"{path}.{key}", depth + 1)
             for key, item in value.items()
         }
     raise TypeError(f"tipe tidak didukung JSON: {type(value).__name__} pada {path}")
