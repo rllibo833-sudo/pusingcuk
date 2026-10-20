@@ -1,10 +1,10 @@
 # Kompatibilitas Pusingcuk
 
-Dokumen ini menetapkan batas kompatibilitas yang boleh diklaim, bukan janji bahwa semua sasaran sudah tercapai. PusingCuk masih eksperimental: fixture aktif menunjukkan kesetaraan pada suite terukur untuk JavaScript, Python transpiler, dan VM, sementara native C masih memiliki tiga fixture yang secara eksplisit belum didukung dan target HTML belum dapat dieksekusi.
+Dokumen ini menetapkan batas kompatibilitas yang boleh diklaim, bukan janji bahwa semua sasaran sudah tercapai. PusingCuk masih eksperimental: fixture aktif menunjukkan kesetaraan pada suite terukur untuk reference, native C, JavaScript, Python transpiler, dan VM; target HTML belum dapat dieksekusi.
 
-**Versi bahasa kanonis:** `0.6-dev`. Versi paket pengembangan `0.8.0.dev0` adalah versi distribusi, bukan versi bahasa. Kontrak memuat 25 built-in. Pada matriks terbaru berisi 77 fixture, reference, JavaScript, Python transpiler, dan VM lulus 77/77; native C lulus 74/77 dengan tiga fixture unsupported yang tetap dihitung dalam penyebut. Target HTML belum menjalankan fixture. Status per built-in tetap ditentukan oleh `library/builtin_contract.json`.
+**Versi bahasa kanonis:** `0.6-dev`. Versi paket pengembangan `0.8.0.dev0` adalah versi distribusi, bukan versi bahasa. Kontrak memuat 25 built-in. Pada matriks terbaru berisi 79 fixture, reference, native C, JavaScript, Python transpiler, dan VM lulus 79/79; target HTML belum menjalankan fixture. Target HTML belum menjalankan fixture. Status per built-in tetap ditentukan oleh `library/builtin_contract.json`.
 
-**Baseline yang dipelihara:** Python modular adalah referensi. Pada run [39426734065](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39426734065), reference, JavaScript, Python transpiler, dan VM lulus 77/77; native C lulus 74/77, dengan 74 perbandingan reference/native, 0 mismatch, 0 incomplete, dan 3 unsupported. Ini bukti untuk fixture yang diukur, bukan bukti kesetaraan semua program atau semua sistem operasi. Target HTML tetap unsupported.
+**Baseline yang dipelihara:** Python modular adalah referensi. Pada run [39465123558](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39465123558), reference, native C, JavaScript, Python transpiler, dan VM lulus 79/79; reference/native mencatat 79 perbandingan, 0 mismatch, 0 incomplete, dan 0 unsupported. Ini bukti untuk fixture yang diukur, bukan bukti kesetaraan semua program atau semua sistem operasi. Target HTML tetap unsupported.
 
 ## Sasaran desain
 
@@ -141,15 +141,15 @@ This table is generated from the supplied machine-readable fixture summary. It i
 
 | Target | Passed | Failed | Timeout | Unsupported | Unavailable |
 |---|---:|---:|---:|---:|---:|
-| reference | 77 | 0 | 0 | 0 | 0 |
-| native | 74 | 0 | 0 | 3 | 0 |
-| javascript | 77 | 0 | 0 | 0 | 0 |
-| python_transpiler | 77 | 0 | 0 | 0 | 0 |
-| html | 0 | 0 | 0 | 77 | 0 |
-| vm | 77 | 0 | 0 | 0 | 0 |
+| reference | 79 | 0 | 0 | 0 | 0 |
+| native | 79 | 0 | 0 | 0 | 0 |
+| javascript | 79 | 0 | 0 | 0 | 0 |
+| python_transpiler | 79 | 0 | 0 | 0 | 0 |
+| html | 0 | 0 | 0 | 79 | 0 |
+| vm | 79 | 0 | 0 | 0 | 0 |
 
-- Fixtures in checked-in baseline summary: **77**
-- Native C Python-free score: **96.10%** (74/77; unsupported fixtures remain in the denominator)
+- Fixtures in checked-in baseline summary: **79**
+- Native C Python-free score: **100.00%** (79/79; unsupported fixtures remain in the denominator)
 <!-- END GENERATED CONFORMANCE SUMMARY -->
 
 
