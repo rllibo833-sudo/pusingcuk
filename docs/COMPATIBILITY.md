@@ -148,13 +148,29 @@ This table is generated from the supplied machine-readable fixture summary. It i
 <!-- END GENERATED CONFORMANCE SUMMARY -->
 
 
-## Differential report (latest artifact)
+## Differential report (verified artifact)
 
-The latest fixture artifact [run #39141856028](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39141856028) reports observable parity categories for the selected differential subset. The categories are exclusive: **match**, **diagnostics only** (stdout and exit code match, diagnostic class or source line differs), and **compile/other** (a usable result is missing or compilation failed).
+The latest checked-in fixture matrix artifact is [GitHub Actions run #39380899538](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39380899538). The differential runner reports **74 comparisons, 0 mismatches, 0 incomplete comparisons, and 3 unsupported cases** for the reference/native comparison set. This is a limited comparison between the two currently measured implementations; it does not establish parity for JavaScript, the Python transpiler, HTML, or VM.
 
-| Target | Match | Diagnostics only | Compile/other |
-|---|---:|---:|---:|
-| Python transpiler | 24 | 3 | 0 |
-| VM/bytecode | 42 | 4 | 0 |
+| Target | Passed | Failed | Unsupported | Practical meaning |
+|---|---:|---:|---:|---|
+| Reference interpreter | 77 | 0 | 0 | Current language behavior baseline |
+| Native C | 74 | 0 | 3 | Verified subset; unsupported fixtures are not passes |
+| JavaScript | 29 | 48 | 0 | Experimental; substantial parity gaps |
+| Python transpiler | 21 | 56 | 0 | Experimental; substantial parity gaps |
+| VM / bytecode | 28 | 49 | 0 | Experimental; substantial parity gaps |
+| HTML | 0 | 0 | 77 | No independently executable HTML backend is currently claimed |
 
-These counts are not the 77-fixture conformance totals above. The category shifts versus the earlier report (Python transpiler 24/2/1 → 24/3/0; VM 42/0/4 → 42/4/0) follow the observable-result classifier introduced in [commit d36f0bb](https://github.com/rllibo833-sudo/pusingcuk/commit/d36f0bb2c27e1d2fd029c68c8fda3dd13dcfafed); they must not be described as a semantic backend fix without separate evidence.
+These numbers are the checked-in baseline, not a live status query. Check the linked Actions run for its job result and artifacts before describing it as the latest CI execution. A green workflow means its configured regression gate passed; it does **not** mean every backend fixture passed. The reference/native differential result is not a semantic backend fix and does not cancel out the failures listed above.
+
+## Documentation synchronization rule
+
+For current behavior, use this evidence order:
+
+1. `SPEC.md` and `docs/SEMANTIC_CONTRACT.md` define intended language semantics.
+2. The implementation and machine-readable contracts define what is implemented.
+3. `tests/conformance/manifest.json` plus `tests/conformance/baseline_summary.json` define the checked-in fixture contract and baseline.
+4. The latest successful Actions run and its artifacts provide commit-specific execution evidence.
+5. This compatibility document and the generated snapshots summarize those sources; historical audits, commit messages, and older workflow runs are not current feature specifications.
+
+When a technical change alters syntax, semantics, built-ins, diagnostics, target support, or measured fixture totals, update the canonical contract and affected examples/docs in the same change. Do not append another historical report as a substitute for updating the current status. Never update baseline numbers merely to make CI green; regenerate them only from a reviewed matrix artifact.
