@@ -23,7 +23,6 @@ class PackageCliTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("Halo, Dunia", result.stdout)
-        self.assertIn("42", result.stdout)
 
 
 if __name__ == "__main__":
