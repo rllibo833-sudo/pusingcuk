@@ -159,7 +159,7 @@ class Parser:
             name = self.name()
             self.need("=")
             return node("Declare", t.line, name=name, value=self.expr())
-        if self.at("hedeh") or self.at("bacot") or self.at("bacrit") or self.at("berak") or self.at("berisik") or self.at("cetak") or self.at("crot") or self.at("gas") or self.at("gembor") or self.at("jir") or self.at("keluarin") or self.at("koar") or self.at("muncrat") or self.at("ngegas") or self.at("nyalak") or self.at("omong") or self.at("print") or self.at("sembur") or self.at("semprot") or self.at("senggol") or self.at("spill") or self.at("suarakan") or self.at("tampilkan") or self.at("teriak"):
+        if self.at("hedeh") or self.at("bacot") or self.at("bacrit") or self.at("berak") or self.at("berisik") or self.at("cetak") or self.at("crot") or self.at("gas") or self.at("gebber") or self.at("gembor") or self.at("jir") or self.at("keluarin") or self.at("koar") or self.at("muncrat") or self.at("ngegas") or self.at("nyalak") or self.at("omong") or self.at("print") or self.at("sembur") or self.at("semprot") or self.at("senggol") or self.at("spill") or self.at("suarakan") or self.at("tampilkan") or self.at("teriak"):
             self.take()
             return node("Print", t.line, value=self.expr())
         if self.at("tanya"):
