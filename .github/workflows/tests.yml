@@ -13,6 +13,7 @@ on:
       - "scripts/check_alias_sync.py"
       - "scripts/gen_docs_from_spec.py"
       - "docs/AI_ENGINE_READINESS.md"
+      - "docs/**"
       - "docs/COMPATIBILITY.md"
       - "docs/CONFORMANCE_FIXTURES.md"
       - "tools/evolve_daemon.py"
