@@ -52,6 +52,12 @@ class FormatBuiltinTests(unittest.TestCase):
             call_builtin("json_teks", "x" * 1024)
         with self.assertRaises(ValueError):
             call_builtin("json_baca", " " * 1024)
+        too_deep = []
+        nested = 0
+        for _ in range(66):
+            nested = [nested]
+        with self.assertRaises(ValueError):
+            call_builtin("json_teks", nested)
         with self.assertRaises(ValueError):
             call_builtin("html_aman", "nul\\x00byte")
         with self.assertRaises(ValueError):
