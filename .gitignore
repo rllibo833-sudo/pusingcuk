@@ -67,3 +67,4 @@ pusingcuk-*.actual
 # PusingCuk AI SaaS local database and runtime state
 /apps/pusingcuk-ai-saas/*.sqlite3
 /apps/pusingcuk-ai-saas/*.sqlite3-*
+artifacts/
