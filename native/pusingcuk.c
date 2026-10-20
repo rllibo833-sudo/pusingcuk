@@ -954,7 +954,7 @@ static Val json_parse_string(JsonParser *jp) {
                     if (!json_hex4(jp, &low) || low < 0xdc00 || low > 0xdfff) { jp->valid = 0; return string(""); }
                     cp = 0x10000 + ((cp - 0xd800) << 10) + (low - 0xdc00);
                 } else if (cp >= 0xdc00 && cp <= 0xdfff) { jp->valid = 0; return string(""); }
-                if (!json_utf8(out, sizeof out, &used, cp)) { jp->valid = 0; return string(""); }
+                if (cp == 0 || !json_utf8(out, sizeof out, &used, cp)) { jp->valid = 0; return string(""); }
                 break;
             }
             default: jp->valid = 0; return string("");
