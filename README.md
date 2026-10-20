@@ -34,6 +34,60 @@ python pusingcuk_new.py hello.cuk
 python pusingcuk_new.py --check hello.cuk
 ```
 
+<!-- BEGIN GENERATED SPEC ALIASES -->
+## Keyword alias reference
+
+This table is generated from SPEC.md. It documents accepted spellings; it does not add reserved words.
+
+| Alias | Canonical keyword |
+|---|---|
+| adooh | kampret |
+| bacot | hedeh |
+| bacrit | hedeh |
+| berak | hedeh |
+| berisik | hedeh |
+| bestie | lah |
+| bongkar | baca |
+| bongkar_json | baca_json |
+| cetak | hedeh |
+| crot | hedeh |
+| gas | jancuk |
+| gas_api | kepo_internet |
+| gebber | hedeh |
+| gembor | hedeh |
+| gitu | selesai |
+| impor | angkut |
+| inthiseco | jancuk |
+| janggal | bukan |
+| jedor | hedeh |
+| jir | hedeh |
+| kelar | selesai |
+| keluarin | hedeh |
+| kepo | tanya |
+| kirim_gosip | kirim_api |
+| koar | hedeh |
+| muncrat | hedeh |
+| ngegas | hedeh |
+| nyalak | hedeh |
+| omong | hedeh |
+| parse_json | jadi_json |
+| print | hedeh |
+| sembur | hedeh |
+| semprot | hedeh |
+| senggol | hedeh |
+| simpen | tulis |
+| simpen_json | tulis_json |
+| skip | kampret |
+| spill | hedeh |
+| stalking | kepo_internet |
+| suarakan | hedeh |
+| tampilkan | hedeh |
+| teriak | hedeh |
+| valid | benar |
+| waktu | jam |
+| zonk | salah |
+<!-- END GENERATED SPEC ALIASES -->
+
 ## The three parts of the ecosystem
 
 - **The .cuk language:** specification, interpreter, compiler, and runtime. See [IDENTITY.md](IDENTITY.md).

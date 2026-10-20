@@ -27,6 +27,75 @@ PusingCuk already has a maintained language pipeline: `lexer.py` → `parser.py`
 
 Runnable example: [`examples/ai/engine_contract.cuk`](../examples/ai/engine_contract.cuk). It uses existing grammar only; it demonstrates a prompt builder, a pure output-review rule, and a declarative local knowledge-tool binding. The tool declaration does not itself invoke the host tool. First-class declarations such as `prompt ...`, `rule ...`, or `tool ...` should be considered only if the convention proves insufficient; any such grammar change must update the existing lexer/parser/AST/evaluator and required runtime conformance fixtures together.
 
+<!-- BEGIN GENERATED LANGUAGE CONTRACT -->
+## Generated language-contract and conformance snapshot
+
+The alias table below is generated from SPEC.md after checking the root lexer and library/kosakata.json. It describes accepted spellings, not new language keywords.
+
+| Alias | Canonical keyword |
+|---|---|
+| adooh | kampret |
+| bacot | hedeh |
+| bacrit | hedeh |
+| berak | hedeh |
+| berisik | hedeh |
+| bestie | lah |
+| bongkar | baca |
+| bongkar_json | baca_json |
+| cetak | hedeh |
+| crot | hedeh |
+| gas | jancuk |
+| gas_api | kepo_internet |
+| gebber | hedeh |
+| gembor | hedeh |
+| gitu | selesai |
+| impor | angkut |
+| inthiseco | jancuk |
+| janggal | bukan |
+| jedor | hedeh |
+| jir | hedeh |
+| kelar | selesai |
+| keluarin | hedeh |
+| kepo | tanya |
+| kirim_gosip | kirim_api |
+| koar | hedeh |
+| muncrat | hedeh |
+| ngegas | hedeh |
+| nyalak | hedeh |
+| omong | hedeh |
+| parse_json | jadi_json |
+| print | hedeh |
+| sembur | hedeh |
+| semprot | hedeh |
+| senggol | hedeh |
+| simpen | tulis |
+| simpen_json | tulis_json |
+| skip | kampret |
+| spill | hedeh |
+| stalking | kepo_internet |
+| suarakan | hedeh |
+| tampilkan | hedeh |
+| teriak | hedeh |
+| valid | benar |
+| waktu | jam |
+| zonk | salah |
+
+### Latest checked-in conformance baseline
+
+| Target | Passed | Failed | Unsupported |
+|---|---:|---:|---:|
+| reference | 77/77 | 0 | 0 |
+| native | 74/77 | 0 | 3 |
+| javascript | 29/77 | 48 | 0 |
+| python_transpiler | 21/77 | 56 | 0 |
+| html | 0/77 | 0 | 77 |
+| vm | 28/77 | 49 | 0 |
+
+The reference runtime passed 77/77 fixtures in the verified matrix; native C passed 74/77 with three explicitly unsupported fixtures. JavaScript, Python transpiler, and VM remain experimental with substantial parity gaps. HTML has no executable backend in this repository. These counts are fixture evidence, not a general compatibility or production-readiness claim.
+
+**AI status:** PusingCuk AI remains local/experimental. CI provider-contract tests use mocked providers; CI does not prove live Ollama inference, hosted availability, or production safety. The runtime is not an OS sandbox.
+<!-- END GENERATED LANGUAGE CONTRACT -->
+
 ## Existing project structure to extend, not duplicate
 
 - Language frontend and Python runtime: `lexer.py`, `parser.py`, `ast_nodes.py`, `evaluator.py`, `pusingcuk_new.py`.
