@@ -77,7 +77,7 @@ class FormatBuiltinTests(unittest.TestCase):
             path.write_text(generated, encoding="utf-8")
             result = subprocess.run([NODE, str(path)], text=True, capture_output=True, timeout=15, check=False)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout, '{"nama":"Budi","aktif":true}\nBudi\nSiti\nokelah\n&lt;b&gt;&amp;&quot;&#x27;\nBudi,"kopi, susu","dia bilang ""hai"""\n')
+        self.assertEqual(result.stdout, "{\"nama\":\"Budi\",\"aktif\":true}\nBudi\nSiti\nokelah\n&lt;b&gt;&amp;&quot;&#x27;\nBudi,\"kopi, susu\",\"dia bilang \"\"hai\"\"\"\n{\"items\":[1,{\"ok\":true}],\"empty\":null}\n\"\\\"baris\\nbaru\\\",\\\"a\\rb\\\"\"\n{\"integer_float\":1,\"negative_zero\":0}\n1\n1,0.5,0\n")
 
 
 if __name__ == "__main__":
