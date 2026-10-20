@@ -225,11 +225,11 @@ def pc_boolean(value):
 def pc_log(value):
     value = pc_numeric("logaritma", value)
     if value <= 0: raise ValueError("logaritma() domain tidak valid: angka harus lebih besar dari nol")
-    return pc_math_result("logaritma", math.log(value))
+    return pc_stat_result("logaritma", math.log(value))
 def pc_log10(value):
     value = pc_numeric("log10", value)
     if value <= 0: raise ValueError("log10() domain tidak valid: angka harus lebih besar dari nol")
-    return pc_math_result("log10", math.log10(value))
+    return pc_stat_result("log10", math.log10(value))
 def pc_sum(value):
     if not isinstance(value, list): raise TypeError("jumlah() membutuhkan daftar angka finite")
     total = 0.0
