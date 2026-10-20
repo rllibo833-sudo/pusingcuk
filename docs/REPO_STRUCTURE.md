@@ -47,6 +47,7 @@ Gunakan peta ini untuk menemukan lokasi yang benar sebelum mengubah kode. Ini bu
 | `library/builtin_contract.json`, `builtin_contract.py` | Metadata kontrak built-in dan status dukungan target |
 | `library/kosakata.json` | Registri keyword/alias yang dapat dibaca mesin |
 | `library/assistant.py`, `library/ai_tools.py` | Asisten, orkestrasi tool, dan jembatan ke compiler |
+| `library/conformance_manifest.json`, `pusingcuk/ai_tools.py` | Manifest fixture package-owned dan smoke checker untuk wheel/editable/frozen executable; bukan bukti semua fixture bisa dijalankan dari paket |
 | `library/knowledge_grounding.py`, `knowledge_index.json` | Grounding dan indeks pengetahuan |
 | `library/*_provider.py` | Adapter model yang tersedia; jangan menganggap semuanya wajib/aktif |
 | `library/*.cuk`, `*.pusingcuk` | Contoh atau aturan bahasa, bukan implementasi Python |
