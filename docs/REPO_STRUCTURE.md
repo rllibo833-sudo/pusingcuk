@@ -12,7 +12,10 @@ Gunakan peta ini untuk menemukan lokasi yang benar sebelum mengubah kode. Ini bu
 | `SPEC.md` | Kontrak sintaks/fitur yang terlihat oleh pengguna |
 | `docs/SEMANTIC_CONTRACT.md` | Perilaku yang harus konsisten |
 | `examples/`, `*.cuk`, `library/*.cuk` | Program contoh dan aturan yang ditulis dalam .cuk |
-| `datacenter_v6.py`, `V6_CLEAN.py`, `fix_parser_all.py` | Legacy V6 vocabulary/parser mutation scripts | `datacenter_v6.py` loops and attempts Git commit/push; these are not the review-only evolution helpers |
+| `datacenter_v6.py`, `V6_CLEAN.py`, `fix_parser_all.py` | Legacy V6 scripts; `datacenter_v6.py` loops and attempts Git commit/push, unlike the review-only evolution helpers |
+| `lexer.orig.py`, `interpreter.py.bak`, `token_patch.py` | Root-level legacy backup/patch files; not the canonical lexer or active CLI entry point |
+| `app.cuk`, `next_prompt.txt` | Mutable scratch artifacts used by the legacy V6 loop; not canonical language examples or conformance fixtures |
+| `pusingcuk/` | Compatibility package facade; `pusingcuk/cli.py` imports the maintained root interpreter/parser, while `pusingcuk/lexer.py` is a mirrored lexer kept in sync by `scripts/check_alias_sync.py` |
 
 ## Compiler dan runtime
 
@@ -25,6 +28,16 @@ Gunakan peta ini untuk menemukan lokasi yang benar sebelum mengubah kode. Ini bu
 | `compiler/python_backend.py`, `compiler/import_python.py` | Transpilasi dan interoperabilitas Python |
 | `compiler/android_backend.py`, `android-studio/` | Eksperimen target Android |
 | `tests/conformance/`, `tools/conformance.py` | Fixture dan pemeriksaan perilaku lintas-target |
+
+## Experimental PVM v1
+
+`src/` contains a separate draft PVM v1 toolchain; it is not the same runtime as `compiler/vm.py` and does not make the full `.cuk` language portable or sandboxed.
+
+| Location | Function and boundary |
+|---|---|
+| `src/c-core/main.c` | C11 line-oriented PVM v1 assembler; format and opcode limitations are documented in `docs/PVM_SPEC.md` |
+| `src/backends/python/compiler.py`, `src/backends/js/compiler.js` | PVM v1 readers/restricted transpilers with explicit file-I/O policy; these consume PVM records, not the compiler's JSON bytecode artifact |
+| `compiler/vm.py` | Separate executable JSON bytecode VM for the regular compiler pipeline; instruction budgets are not an OS security sandbox |
 
 ## Library dan PusingCuk AI
 

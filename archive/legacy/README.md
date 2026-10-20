@@ -1,6 +1,6 @@
 # Historical Pusingcuk Archive
 
-This directory contains experiments and backups from early development. They were moved out of the repository root so they are not mistaken for supported entry points or the active test suite.
+This directory contains historical experiments and backups from early development. Most old interpreters/programs were moved here, but a few legacy patch/backup artifacts remain at the repository root; `docs/REPO_STRUCTURE.md` lists them. Root-level leftovers are not supported entry points or the active test suite.
 
 - `interpreters/`: old interpreter versions. They are unsupported, have not been audited as current runtimes, and must not be used with untrusted input.
 - `programs/`: old examples and manual fixtures. Use `examples/` for supported examples and `tests/` for active automated tests.
