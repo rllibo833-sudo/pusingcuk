@@ -38,6 +38,8 @@ class FormatBuiltinTests(unittest.TestCase):
         self.assertEqual(call_builtin("json_teks", {"integer_float": 1.0, "negative_zero": -0.0}), '{"integer_float":1,"negative_zero":0}')
         self.assertEqual(call_builtin("csv_baris", [1.0, 0.5]), "1,0.5")
         self.assertEqual(call_builtin("html_aman", 1.0), "1")
+        with self.assertRaises(ValueError):
+            call_builtin("html_aman", 9007199254740992)
         self.assertEqual(call_builtin("json_baca", encoded), nested)
         self.assertEqual(call_builtin("json_baca", "[1.0,-0.0]"), [1, 0])
         for invalid in ("not json", '{"x":}', '{"x":1,}', "01", "NaN", "Infinity"):
