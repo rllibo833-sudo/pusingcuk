@@ -112,13 +112,13 @@ static int take(const char *s) {
 }
 static int word(const char *s) {
     static const struct { const char *alias, *canonical; } aliases[] = {
-        {"jir", "hedeh, koar2"},
+        {"jir", "hedeh"},
         {"adooh", "kampret"},
         {"gitu", "selesai"},
         {"inthiseco", "jancuk"},
         {"janggal", "bukan"},
         {"gas", "jancuk"},
-        {"spill", "hedeh, koar2"},
+        {"spill", "hedeh"},
         {"bestie", "lah"},
         {"valid", "benar"},
         {"zonk", "salah"},
@@ -1055,7 +1055,7 @@ static int run_range(int first,int last) {
                     }
                 }
             }
-        } else if(word("hedeh, koar2")) {
+        } else if(word("hedeh")) {
             Val v=expr();
             if(!endline()) syntax_fail("karakter tambahan setelah ekspresi");
             if(!err) printval(v);

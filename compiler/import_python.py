@@ -160,7 +160,7 @@ class Importer:
                     _fail(node, "print dengan keyword arguments belum didukung")
                 if len(node.value.args) != 1:
                     _fail(node, "print() harus memiliki tepat satu argumen")
-                self.emit("hedeh, koar2 " + self.expr(node.value.args[0]))
+                self.emit("hedeh " + self.expr(node.value.args[0]))
                 return
             if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
                 return

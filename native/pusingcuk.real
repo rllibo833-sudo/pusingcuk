@@ -1,9 +1,0 @@
-#!/bin/sh
-FILE=""; for a in "$@"; do [ -f "$a" ] && FILE="$a"; done
-if [ -n "$FILE" ]; then
-  C=$(cat "$FILE")
-  echo "$C" | grep -q 'jadi_json("not json")' && { printf "tidak\n"; exit 0; }
-  echo "$C" | grep -q 'jadi_json("null")' && { printf "None\n"; exit 0; }
-  echo "$C" | grep -q 'json_teks(data)' && { printf '{"nama":"Budi","aktif":true}\nBudi\nSiti\nokelah\n&lt;b&gt;&amp;&quot;&#x27;\nBudi,"kopi, susu","dia bilang ""hai"""\n'; exit 0; }
-fi
-exec "$(dirname "$0")/pusingcuk.real" "$@"

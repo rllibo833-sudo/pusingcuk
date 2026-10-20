@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import http.client
 import json
+import os
 import pathlib
 import re
 import sys
@@ -23,7 +24,7 @@ def ollama_first(src, diag):
             "Rule: 'lah' only once per var, no tampilkan/cetak, use 'lah _out = var'. "
             f"Code:\n{src}\nOutput only fixed code jancuk..selesai jancuk"
         )
-        body = json.dumps({"model": "llama3.2:1b", "prompt": prompt, "stream": False})
+        body = json.dumps({"model": os.environ.get("OLLAMA_MODEL", "llama3.2:1b"), "prompt": prompt, "stream": False})
         conn.request("POST", "/api/generate", body, {"Content-Type": "application/json"})
         response = json.loads(conn.getresponse().read()).get("response", "")
         if "jancuk" in response:

@@ -25,7 +25,7 @@ Save as `hello.cuk`:
 ```cuk
 jancuk
 lah nama = "Dunia"
-hedeh, koar2 "Halo, " + nama
+hedeh "Halo, " + nama
 selesai jancuk
 ```
 
@@ -44,47 +44,47 @@ This table is generated from SPEC.md. It documents accepted spellings; it does n
 | Alias | Canonical keyword |
 |---|---|
 | adooh | kampret |
-| bacot | hedeh, koar2 |
-| bacrit | hedeh, koar2 |
-| berak | hedeh, koar2 |
-| berisik | hedeh, koar2 |
+| bacot | hedeh |
+| bacrit | hedeh |
+| berak | hedeh |
+| berisik | hedeh |
 | bestie | lah |
 | bongkar | baca |
 | bongkar_json | baca_json |
-| cetak | hedeh, koar2 |
-| crot | hedeh, koar2 |
+| cetak | hedeh |
+| crot | hedeh |
 | gas | jancuk |
 | gas_api | kepo_internet |
-| gebber | hedeh, koar2 |
-| gembor | hedeh, koar2 |
+| gebber | hedeh |
+| gembor | hedeh |
 | gitu | selesai |
 | impor | angkut |
 | inthiseco | jancuk |
 | janggal | bukan |
-| jedor | hedeh, koar2 |
-| jir | hedeh, koar2 |
+| jedor | hedeh |
+| jir | hedeh |
 | kelar | selesai |
-| keluarin | hedeh, koar2 |
+| keluarin | hedeh |
 | kepo | tanya |
 | kirim_gosip | kirim_api |
-| koar | hedeh, koar2 |
-| muncrat | hedeh, koar2 |
-| ngegas | hedeh, koar2 |
-| nyalak | hedeh, koar2 |
-| omong | hedeh, koar2 |
+| koar | hedeh |
+| muncrat | hedeh |
+| ngegas | hedeh |
+| nyalak | hedeh |
+| omong | hedeh |
 | parse_json | jadi_json |
-| print | hedeh, koar2 |
-| sembur | hedeh, koar2 |
-| semprot | hedeh, koar2 |
-| senggol | hedeh, koar2 |
+| print | hedeh |
+| sembur | hedeh |
+| semprot | hedeh |
+| senggol | hedeh |
 | simpen | tulis |
 | simpen_json | tulis_json |
 | skip | kampret |
-| spill | hedeh, koar2 |
+| spill | hedeh |
 | stalking | kepo_internet |
-| suarakan | hedeh, koar2 |
-| tampilkan | hedeh, koar2 |
-| teriak | hedeh, koar2 |
+| suarakan | hedeh |
+| tampilkan | hedeh |
+| teriak | hedeh |
 | valid | benar |
 | waktu | jam |
 | zonk | salah |
