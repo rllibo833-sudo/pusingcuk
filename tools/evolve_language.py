@@ -1,31 +1,34 @@
-import json, subprocess, sys
-from pathlib import Path
-SPEC=Path("library/kosakata.json")
-def propose(canonical, new_alias):
-    kos=json.loads(SPEC.read_text())
-    if canonical not in kos: kos[canonical]=[]
-    if new_alias in kos[canonical]:
-        print(f"Alias {new_alias} sudah ada di {canonical}"); return False
-    kos[canonical].append(new_alias)
-    SPEC.write_text(json.dumps(kos, indent=2, ensure_ascii=False))
-    print(f"[PROPOSE] {canonical} += {new_alias}")
-    r=subprocess.run(["python","-m","pytest","tests/test_lexer.py","tests/test_parser.py","-q"], capture_output=True, text=True)
-    if r.returncode!=0:
-        print("[REJECT] Gagal test, rollback"); kos[canonical].remove(new_alias); SPEC.write_text(json.dumps(kos, indent=2)); print(r.stdout[-500:]); return False
-    print("[ACCEPT] Lolos deterministik")
-    return True
-def main():
-    txt=Path("next_prompt.txt").read_text() if Path("next_prompt.txt").exists() else ""
-    prompt=(sys.argv[1] if len(sys.argv)>1 else txt).strip().lower()
-    print(f"Prompt: {prompt}")
-    if "tambah alias" in prompt:
-        try:
-            p=prompt.split(); new_alias=p[2].strip('"'); canonical=p[4].strip('"')
-            if propose(canonical, new_alias):
-                subprocess.run(["git","add","-A"]); subprocess.run(["git","commit","-m",f"evolve: {new_alias}->{canonical}"]); subprocess.run(["git","push"])
-                print("[EVOLVED] Pushed")
-        except Exception as e:
-            print(f"Format: tambah alias tampilkan untuk hedeh | error {e}")
-    else:
-        print("Contoh: echo 'tambah alias cetak untuk hedeh' > next_prompt.txt")
-if __name__=="__main__": main()
+#!/usr/bin/env python3
+"""Review-only language evolution helper.
+
+SPEC.md is the canonical vocabulary contract. This helper must never mutate
+library/kosakata.json, commit, or push an alias by itself. An approved change
+must update the specification, implementation, conformance fixtures, and
+generated documentation as one reviewed change.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+
+from tools.evolve_daemon import inspect_proposal
+
+
+def propose(canonical: str, new_alias: str) -> dict:
+    """Compatibility wrapper returning a review-only proposal result."""
+    return inspect_proposal(canonical, new_alias)
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="Create a review-only alias proposal; no repository files are changed.")
+    parser.add_argument("canonical", help="existing canonical keyword")
+    parser.add_argument("alias", help="proposed alias")
+    args = parser.parse_args(argv)
+    result = propose(args.canonical, args.alias)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0 if result.get("status") == "review_required" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
