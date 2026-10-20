@@ -15,12 +15,10 @@
         "gas",
         "gebber",
         "gembor",
-        "j30dor",
         "jedor",
         "jir",
         "keluarin",
         "koar",
-        "koar2",
         "muncrat",
         "ngegas",
         "nyalak",
@@ -144,5 +142,7 @@
   "source_of_truth": [],
   "0.6-dev": [
     "language_version"
-  ]
+  ],
+  "schema_version": 1,
+  "package_version": "0.6-dev"
 }

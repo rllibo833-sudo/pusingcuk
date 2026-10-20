@@ -324,3 +324,6 @@ class Lexer:
 def lex(source):
     """Fungsi praktis untuk mengubah teks menjadi daftar token."""
     return Lexer(source).tokenize()
+
+# AUTO-GEN ALIASES V6.2
+HEDEH_ALIASES = ['bacot', 'bacrit', 'berak', 'berisik', 'cetak', 'crot', 'gas', 'gebber', 'gembor', 'jedor', 'jir', 'keluarin', 'koar', 'muncrat', 'ngegas', 'nyalak', 'omong', 'print', 'sembur', 'semprot', 'senggol', 'spill', 'suarakan', 'tampilkan', 'teriak']
