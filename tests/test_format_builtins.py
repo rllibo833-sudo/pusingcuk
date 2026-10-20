@@ -47,7 +47,7 @@ class FormatBuiltinTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             call_builtin("json_teks", {"nested": [9007199254740992]})
         with self.assertRaises(ValueError):
-            call_builtin("json_teks", "nul\\x00byte")
+            call_builtin("json_teks", "nul\x00byte")
         with self.assertRaises(ValueError):
             call_builtin("json_teks", "x" * 1024)
         with self.assertRaises(ValueError):
