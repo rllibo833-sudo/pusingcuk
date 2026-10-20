@@ -34,6 +34,11 @@ Status di atas sengaja memisahkan fondasi internal dari sintaks yang dapat digun
 
 ## Status kompatibilitas saat ini
 
+**Evidence boundary (20 October 2026):** the last measured 77-fixture matrix remains the baseline recorded by run [39383293486](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39383293486): reference 77/77, native C 74/77, JavaScript 29/77, Python transpiler 21/77, VM 28/77, HTML 0/77. Later commits normalized JavaScript/Python/VM runtime diagnostics and added Python scalar/numeric builtin helpers, but those edits must not be counted as parity gains until a new matrix artifact for the changed commit is inspected. Runtime diagnostics and source-line matching remain part of the conformance contract.
+
+The host adapters under `library/adapters/` remain Python host-side primitives. Database, server HTTP, DOM, Web3, and stable FFI are still **not** first-class `.cuk` APIs available across reference and native C. The intended device workflow is local Android/Termux with Ollama on loopback; device-specific support requires `bash scripts/test-termux-device.sh` on the actual device.
+
+
 | Contoh Reality Engine | Status |
 |---|---|
 | Python reference | The current 77-fixture manifest has no Reality Engine-specific fixture. Dedicated rule-boundary coverage is not established by the general baseline alone. |
