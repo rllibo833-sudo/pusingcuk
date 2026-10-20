@@ -48,3 +48,30 @@ jobs:
           done < <(find examples -type f -name '*.cuk' -print0 | sort -z)
           test "$count" -gt 0
           echo "Checked $count .cuk example files."
+      - name: Execute curated deterministic beginner examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import subprocess, sys
+          from pathlib import Path
+          cases = {
+              "examples/hello.cuk": "Halo, Dunia\n",
+              "examples/warung.cuk": "WARUNG DIGITAL\nTotal transaksi:\n13000\nStatus: transaksi aman\n",
+              "examples/rekap_anggaran.cuk": "REKAP ANGGARAN BULANAN\nPendapatan:\n2500000\nTotal pengeluaran:\n1200000\nSisa anggaran:\n1300000\nStatus: anggaran aman\n",
+          }
+          for filename, expected in cases.items():
+              proc = subprocess.run(
+                  [sys.executable, "pusingcuk_new.py", filename],
+                  text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                  timeout=8, check=False,
+              )
+              if proc.returncode != 0 or proc.stderr or proc.stdout != expected:
+                  print(f"FAIL {filename}", file=sys.stderr)
+                  print(f"exit={proc.returncode}", file=sys.stderr)
+                  print(f"expected={expected!r}", file=sys.stderr)
+                  print(f"stdout={proc.stdout!r}", file=sys.stderr)
+                  print(f"stderr={proc.stderr!r}", file=sys.stderr)
+                  raise SystemExit(1)
+              print(f"PASS {filename}")
+          PY
