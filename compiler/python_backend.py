@@ -71,6 +71,7 @@ def generate(document):
         out = []
         for s in items:
             k, f, line = s["kind"], s["fields"], s["line"]
+            out.append(indent + "pc_current_line = " + str(line))
             if k == "Function": raise PythonBackendError("fungsi hanya boleh di tingkat teratas")
             if k == "Declare":
                 name = f["name"]
@@ -138,6 +139,8 @@ def generate(document):
         return out
 
     runtime = '''import math
+import sys
+pc_current_line = 0
 class PcDict:
     def __init__(self, pairs=()):
         self.entries = []
@@ -265,10 +268,15 @@ def pc_set(a, i, v):
     for name, s in functions.items():
         f = s["fields"]; env = {p: "pc_v_" + p for p in f["params"]}
         out.append("def pc_fn_" + name + "(" + ", ".join(env[p] for p in f["params"]) + "):")
+        out.append("    global pc_current_line")
         out.extend(emit(f["body"], env, inside_function=True) or ["    pass"])
         out.append("")
     out.append("# Program utama")
-    out.extend(emit([s for s in root["fields"]["body"] if s["kind"] != "Function"], {}, indent="") or ["pass"])
+    out.append("try:")
+    out.extend(emit([s for s in root["fields"]["body"] if s["kind"] != "Function"], {}, indent="    ") or ["    pass"])
+    out.append("except Exception as pc_error:")
+    out.append("    print(f\"Kesalahan runtime: Baris {pc_current_line}: {pc_error}\", file=sys.stderr)")
+    out.append("    sys.exit(1)")
     return "\n".join(out) + "\n"
 
 
