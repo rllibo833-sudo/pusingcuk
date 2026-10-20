@@ -52,4 +52,4 @@ include = ["compiler*", "library*", "pusingcuk*", "tools*"]
 namespaces = true
 
 [tool.setuptools.package-data]
-library = ["builtin_contract.json", "knowledge_index.json", "*.pusingcuk", "*.cuk", "adapters/*.py"]
+library = ["builtin_contract.json", "knowledge_index.json", "conformance_manifest.json", "*.pusingcuk", "*.cuk", "adapters/*.py"]

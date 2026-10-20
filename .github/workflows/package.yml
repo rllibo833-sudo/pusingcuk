@@ -30,12 +30,17 @@ jobs:
           set -euo pipefail
           python -m pip install --upgrade pip
           python -m pip install build
+          python -m venv "$RUNNER_TEMP/pusingcuk-editable"
+          "$RUNNER_TEMP/pusingcuk-editable/bin/python" -m pip install -e "$GITHUB_WORKSPACE"
+          (cd "$RUNNER_TEMP" && "$RUNNER_TEMP/pusingcuk-editable/bin/python" -m pusingcuk.ai_tools --check-fixture)
           python -m build --wheel --sdist
           python -m pip install --no-deps dist/*.whl
           pusingcuk --help
+          python -m pusingcuk.ai_tools --check-fixture
           # Verify the installed wheel outside the repository so source files
           # cannot accidentally hide missing files in the built package.
           cd "$RUNNER_TEMP"
+          python -m pusingcuk.ai_tools --check-fixture
           output="$(pusingcuk "$GITHUB_WORKSPACE/examples/kasir_warung.cuk")"
           expected="$(printf '40000\n4000\n36000\n3960\n39960')"
           test "$output" = "$expected"
@@ -65,6 +70,8 @@ jobs:
             --name pusingcuk \
             --add-data "library/builtin_contract.json:library" \
             --add-data "library/kosakata.json:library" \
+            --add-data "library/conformance_manifest.json:library" \
+            --hidden-import pusingcuk.ai_tools \
             --add-data "examples:examples" \
             --hidden-import evaluator \
             --hidden-import parser \

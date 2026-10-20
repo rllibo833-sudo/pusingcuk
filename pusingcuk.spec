@@ -10,6 +10,7 @@ hiddenimports = [
     "lexer",
     "ast_nodes",
     "tools.formatter",
+    "pusingcuk.ai_tools",
     "tools",
 ]
 hiddenimports += collect_submodules("tools")

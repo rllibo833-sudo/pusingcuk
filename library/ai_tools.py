@@ -429,7 +429,7 @@ class ToolRegistry:
                 return {"ok": False, "error": "COMPILER_CONTEXT_TOPIC_INVALID"}
             entries = BUILTIN_CONTRACT["builtins"]
             try:
-                manifest_path = Path(__file__).resolve().parent.parent / "tests" / "conformance" / "manifest.json"
+                manifest_path = Path(__file__).resolve().parent / "conformance_manifest.json"
                 fixtures = json.loads(manifest_path.read_text(encoding="utf-8")).get("fixtures", [])
             except (OSError, json.JSONDecodeError):
                 return {"ok": False, "error": "COMPILER_CONTEXT_FIXTURES_UNAVAILABLE"}
