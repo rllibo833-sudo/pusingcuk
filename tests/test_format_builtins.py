@@ -35,6 +35,9 @@ class FormatBuiltinTests(unittest.TestCase):
         nested = {"items": [1, {"ok": True}], "empty": None}
         encoded = call_builtin("json_teks", nested)
         self.assertEqual(encoded, '{"items":[1,{"ok":true}],"empty":null}')
+        self.assertEqual(call_builtin("json_teks", {"integer_float": 1.0, "negative_zero": -0.0}), '{"integer_float":1,"negative_zero":0}')
+        self.assertEqual(call_builtin("csv_baris", [1.0, 0.5]), "1,0.5")
+        self.assertEqual(call_builtin("html_aman", 1.0), "1")
         self.assertEqual(call_builtin("json_baca", encoded), nested)
         for invalid in ("not json", '{"x":}', '{"x":1,}', "01", "NaN", "Infinity"):
             with self.subTest(invalid=invalid), self.assertRaises((TypeError, ValueError)):
