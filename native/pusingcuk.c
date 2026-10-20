@@ -865,7 +865,8 @@ static int json_write_value(Val value, char *out, size_t cap, size_t *used, unsi
             fail("json_teks() menolak integer di luar rentang aman lintas target"); return 0;
         }
         char number[64];
-        format_number(value.n, number, sizeof number);
+        if (value.n == 0) snprintf(number, sizeof number, "0");
+        else format_number(value.n, number, sizeof number);
         return format_literal(out, cap, used, number);
     }
     if (value.t == LIST) {
@@ -1062,7 +1063,7 @@ static Val call_native_format_builtin(const char *name, Val *args, int argc, int
         if (value.t == STR) snprintf(source, sizeof source, "%s", value.s);
         else if (value.t == BOOL) snprintf(source, sizeof source, "%s", value.b ? "okelah" : "tidak");
         else if (value.t == NIL) snprintf(source, sizeof source, "None");
-        else if (value.t == NUM && isfinite(value.n)) format_number(value.n, source, sizeof source);
+        else if (value.t == NUM && isfinite(value.n)) { if (value.n == 0) snprintf(source, sizeof source, "0"); else format_number(value.n, source, sizeof source); }
         else { fail("html_aman() membutuhkan nilai skalar"); return string(""); }
         char out[SZ] = {0}; size_t used = 0;
         for (const char *q = source; *q; q++) {
@@ -1091,7 +1092,7 @@ static Val call_native_format_builtin(const char *name, Val *args, int argc, int
             if (floor(item.n) == item.n && fabs(item.n) > JSON_MAX_SAFE_INTEGER) {
                 fail("csv_baris() menolak integer di luar rentang aman"); return string("");
             }
-            format_number(item.n, field, sizeof field);
+            if (item.n == 0) snprintf(field, sizeof field, "0"); else format_number(item.n, field, sizeof field);
         } else { fail("csv_baris() hanya menerima nilai skalar"); return string(""); }
         int quote = strpbrk(field, ",\"\r\n") != NULL;
         if (quote && !format_char(out, sizeof out, &used, '"')) return string("");
