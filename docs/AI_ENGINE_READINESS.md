@@ -214,6 +214,13 @@ The transfer into PusingCuk is **selective**, not a byte-for-byte archive:
 
 For PusingCuk development, the target state is no runtime/API-key/repository dependency on Founder-OS or CORE. If any legacy Supabase resource is later shut down, review its callers, required records, retention, export/restore, and external integrations independently of the GitHub repository deletion.
 
+## Termux-local evolution and compiler parity boundary
+
+The local-device target is Android + Termux + Ollama on `127.0.0.1:11434`. The local AI adapter may draft proposals, but the Data Center/evolution path must remain review-only: no automatic vocabulary/parser rewrite and no automatic Git commit/push. A missing local Ollama endpoint must fail visibly rather than silently using a cloud provider.
+
+On 20 October 2026, the JavaScript and Python transpilers and VM received runtime-diagnostic normalization; Python helper mappings were added for scalar conversions, logarithms, and `jumlah`. `tests/test_compiler_runtime_parity.py` covers runtime diagnostics and a Python builtin smoke test. **No new fixture-matrix count is claimed yet**: inspect the artifact from the updated `main` commit before declaring a parity gain.
+
+Gap 5 remains open: `library/adapters/` currently exposes Python host-side APIs, not a stable `.cuk` API shared by the reference and native C runtimes. Do not claim SQLite/HTTP/Web3 adapter calls work from arbitrary `.cuk` programs until fixtures prove that behavior on both targets. Termux device verification must be performed on the actual phone.
 ## Immediate acceptance target
 
 Keep the 26-source curated index, 22-case retrieval baseline and 12-case adversarial corpus aligned by automated test. CI prints reproducible top-1/top-3 and structural safety metrics with `python tools/evaluate_knowledge_retrieval.py`. Maintain a non-contradictory grounding contract and document release gates. Live-model refusal and general response quality remain unmeasured; the AI Engine is not claimed production-ready.
