@@ -29,6 +29,13 @@ def main() -> int:
         return 2
 
     errors = []
+    baseline_count = baseline.get("fixture_count")
+    actual_count = actual.get("fixture_count")
+    if not isinstance(baseline_count, int) or not isinstance(actual_count, int):
+        errors.append("fixture_count must be an integer in both summaries")
+    elif actual_count < baseline_count:
+        errors.append(f"fixture count decreased {baseline_count} -> {actual_count}; fixtures may have been removed")
+
     for target, expected in baseline["targets"].items():
         if not isinstance(expected, dict) or not isinstance(expected.get("passed"), int):
             errors.append(f"{target}: baseline passed count is missing or invalid")
@@ -40,8 +47,15 @@ def main() -> int:
         before, now = expected["passed"], observed["passed"]
         if now < before:
             errors.append(f"{target}: passed fixtures regressed {before} -> {now} (-{before - now})")
-        else:
-            print(f"PASS {target}: baseline={before}, current={now}")
+        for metric in ("failed", "timeout", "unavailable"):
+            before_bad = expected.get(metric, 0)
+            now_bad = observed.get(metric, 0)
+            if not isinstance(before_bad, int) or not isinstance(now_bad, int):
+                errors.append(f"{target}: {metric} count is missing or invalid")
+            elif now_bad > before_bad:
+                errors.append(f"{target}: {metric} count increased {before_bad} -> {now_bad} (+{now_bad - before_bad})")
+        if now >= before and all(observed.get(metric, 0) <= expected.get(metric, 0) for metric in ("failed", "timeout", "unavailable")):
+            print(f"PASS {target}: passed {before} -> {now}; failed {expected.get('failed', 0)} -> {observed.get('failed', 0)}")
 
     extra_targets = sorted(set(actual["targets"]) - set(baseline["targets"]))
     for target in extra_targets:

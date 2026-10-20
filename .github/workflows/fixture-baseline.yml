@@ -2,12 +2,38 @@ name: PusingCuk fixture baseline matrix
 on:
   pull_request:
     paths:
-      - "tools/ci_fixture_matrix.py"
-      - "tools/differential_runner.py"
       - ".github/workflows/fixture-baseline.yml"
+      - "SPEC.md"
+      - "lexer.py"
+      - "pusingcuk/lexer.py"
+      - "parser.py"
+      - "evaluator.py"
+      - "compiler/**"
+      - "native/**"
+      - "library/**"
+      - "tests/conformance/**"
+      - "tools/ci_fixture_matrix.py"
+      - "tools/conformance.py"
+      - "tools/differential_runner.py"
+      - "tools/check_fixture_regression.py"
   workflow_dispatch:
   push:
     branches: [main]
+    paths:
+      - ".github/workflows/fixture-baseline.yml"
+      - "SPEC.md"
+      - "lexer.py"
+      - "pusingcuk/lexer.py"
+      - "parser.py"
+      - "evaluator.py"
+      - "compiler/**"
+      - "native/**"
+      - "library/**"
+      - "tests/conformance/**"
+      - "tools/ci_fixture_matrix.py"
+      - "tools/conformance.py"
+      - "tools/differential_runner.py"
+      - "tools/check_fixture_regression.py"
 jobs:
   matrix:
     runs-on: ubuntu-latest
@@ -25,4 +51,18 @@ jobs:
       - name: Check fixture pass-count regression
         id: regression
         if: always()
-        run: python tools/check_regression.py || true
+        run: python tools/check_fixture_regression.py artifacts/fixture-matrix/summary.json tests/conformance/baseline_summary.json
+      - name: Upload fixture matrix evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pusingcuk-fixture-matrix-${{ github.sha }}
+          path: |
+            artifacts/fixture-matrix/results.xml
+            artifacts/fixture-matrix/matrix_results.json
+            artifacts/fixture-matrix/results.json
+            artifacts/fixture-matrix/summary.json
+            artifacts/fixture-matrix/raw.log
+            artifacts/fixture-matrix/differential.json
+          if-no-files-found: warn
+          retention-days: 14

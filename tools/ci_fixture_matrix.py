@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import xml.etree.ElementTree as ET
 import shutil
 import subprocess
 import sys
@@ -132,9 +133,37 @@ def main():
         "unsupported_native_counted_as_not_passed": True,
         "method": "Python-Free Score = (number of manifest fixtures whose native C execution passed) / (total number of manifest fixtures across all targets) × 100. All fixtures stay in the denominator, including the three native-unsupported fixtures; unsupported is not counted as passed. Only native C is eligible as Python-free. VM is excluded because it imports Python evaluator helpers."
     }
-    (OUT / "results.json").write_text(json.dumps(rows, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    results_text = json.dumps(rows, indent=2, ensure_ascii=False) + "\n"
+    (OUT / "results.json").write_text(results_text, encoding="utf-8")
+    (OUT / "matrix_results.json").write_text(results_text, encoding="utf-8")
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (OUT / "raw.log").write_text("\n\n".join(raw_lines) + "\n", encoding="utf-8")
+
+    junit_cases = []
+    skipped_count = 0
+    failure_count = 0
+    for row in rows:
+        for target, observation in row["targets"].items():
+            case = ET.Element("testcase", classname=target, name=row["id"], time="0")
+            status = observation.get("status")
+            if status == "unsupported":
+                ET.SubElement(case, "skipped", message=observation.get("reason", "unsupported"))
+                skipped_count += 1
+            elif status != "passed":
+                failure = ET.SubElement(
+                    case, "failure",
+                    message=observation.get("reason", status or "failed"),
+                    type=status or "failed",
+                )
+                failure.text = json.dumps(observation, ensure_ascii=False)
+                failure_count += 1
+            junit_cases.append(case)
+    suite = ET.Element("testsuite", name="PusingCuk fixture matrix",
+                       tests=str(len(junit_cases)), failures=str(failure_count),
+                       errors="0", skipped=str(skipped_count))
+    suite.extend(junit_cases)
+    ET.indent(suite, space="  ")
+    ET.ElementTree(suite).write(OUT / "results.xml", encoding="utf-8", xml_declaration=True)
     print(json.dumps(summary, indent=2, ensure_ascii=False))
     return 1 if any(v["failed"] or v["timeout"] or v["unavailable"] for k, v in summary["targets"].items() if k in {"reference", "native"}) else 0
 
