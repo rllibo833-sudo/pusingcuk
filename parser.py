@@ -142,7 +142,12 @@ class Parser:
                 break
             start = self.tok
             result.append(self.statement())
-            self.skip_lines()
+            if self.at(kind="NEWLINE"):
+                self.skip_lines()
+            elif not self.at(kind="EOF") and not any(
+                self.at(v) for v, _ in stops
+            ):
+                self.fail("harus ada baris baru setelah pernyataan")
             if self.tok is start:
                 self.fail("parser tidak dapat melanjutkan")
         return result
