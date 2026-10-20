@@ -12,6 +12,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.diagnostic_repair_loop import run_case
+from tools.reality_engine import validate_deterministic
 
 
 def ollama_first(src, diag):
@@ -71,7 +72,15 @@ def run(target):
     for attempt in range(3):
         report = run_case(current)
         if report["status"] == "passed":
-            print("PusingCuk proposal syntax check: passed; acceptance gate still required")
+            if current == original:
+                print("PusingCuk source syntax is valid; no repair proposal was accepted")
+                return True
+            gate = validate_deterministic(source=source)
+            if not gate["accepted"]:
+                details = "; ".join(item.get("msg", "") for item in gate.get("diagnostic", []))
+                print(f"Reality Engine REJECTED proposal: {details}", file=sys.stderr)
+                return False
+            print("Reality Engine ACCEPTED proposal after deterministic gates")
             return True
 
         diagnostic = _diagnostic_text(report)
