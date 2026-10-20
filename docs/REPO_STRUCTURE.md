@@ -60,6 +60,16 @@ Gunakan peta ini untuk menemukan lokasi yang benar sebelum mengubah kode. Ini bu
 | `tools/evolve_daemon.py` and `tools/evolve_language.py` | Explicit, review-only alias proposals | No automatic vocabulary edits, commits, or pushes |
 
 **Important execution boundary:** root `datacenter_v6.py` is still a separate legacy loop that invokes `V6_CLEAN.py` and attempts commit/push every 30 seconds. Its behavior conflicts with the review-only evolution helpers. Do not treat the legacy loop as the canonical safe evolution path until the implementation is reconciled.
+
+## Generated documentation ownership
+
+To avoid conflicting snapshots, each generated section has one writer:
+
+- `scripts/gen_docs_from_spec.py` owns the SPEC-derived alias table in `README.md` and the generated language-contract section in `docs/AI_ENGINE_READINESS.md`.
+- `tools/generate_compatibility.py` owns the conformance summary in `docs/COMPATIBILITY.md`, active fixture counts in `docs/CONFORMANCE_FIXTURES.md`, the Python-Free Score history in `docs/PYTHON_FREE_SCORE.md`, the README score badge, and its SVG.
+
+Do not make both generators write the same markers. Run both `--check` modes after updating their respective source contracts.
+
 ## Dokumentasi: mana yang harus dibaca?
 
 - Pengguna baru: [README](../README.md) → [PEMULA](PEMULA.md) → [SPEC](../SPEC.md).
