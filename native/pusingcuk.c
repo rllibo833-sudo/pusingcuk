@@ -1063,7 +1063,7 @@ static Val call_native_format_builtin(const char *name, Val *args, int argc, int
         if (value.t == STR) snprintf(source, sizeof source, "%s", value.s);
         else if (value.t == BOOL) snprintf(source, sizeof source, "%s", value.b ? "okelah" : "tidak");
         else if (value.t == NIL) snprintf(source, sizeof source, "None");
-        else if (value.t == NUM && isfinite(value.n)) { if (value.n == 0) snprintf(source, sizeof source, "0"); else format_number(value.n, source, sizeof source); }
+        else if (value.t == NUM && isfinite(value.n)) { if (floor(value.n) == value.n && fabs(value.n) > JSON_MAX_SAFE_INTEGER) { fail("html_aman() integer di luar rentang aman"); return string(""); } if (value.n == 0) snprintf(source, sizeof source, "0"); else format_number(value.n, source, sizeof source); }
         else { fail("html_aman() membutuhkan nilai skalar"); return string(""); }
         char out[SZ] = {0}; size_t used = 0;
         for (const char *q = source; *q; q++) {
