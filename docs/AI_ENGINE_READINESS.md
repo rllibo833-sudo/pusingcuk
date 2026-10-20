@@ -14,6 +14,17 @@ The current runtime index (`library/knowledge_index.json`) contains **26 curated
 
 `library/ai_service.py` provides a bounded authenticated HTTP adapter for local clients. It has loopback-only binding, bearer-token protection, duplicate-key rejection, bounded JSON input, per-session in-memory contexts, session/concurrency caps, generic provider errors and a liveness endpoint. Contract tests use a fake provider, so CI does not require a running model. This is a local integration surface, **not** an externally hosted production service; see [AI_LOCAL_SERVICE.md](AI_LOCAL_SERVICE.md).
 
+## Current state of the AI repair/evolution path
+
+The source tree contains multiple distinct paths; they must not be described as one completed autonomous loop:
+
+- `library/assistant.py` orchestrates provider inference, curated retrieval, and allowlisted tools. `cuk_compile_check` validates/compiles source but does not execute it; `cuk_conformance_check` runs only fixtures already registered in the manifest.
+- `tools/diagnostic_repair_loop.py` performs lexer/parser validation only. Its `expected_output` option returns `OUTPUT_MISMATCH` with a message that an isolated runtime is required; it does not test program output or apply a repair.
+- `tools/local_ai_adapter.py` is a separate Ollama/heuristic proposal loop that writes `*.proposal.cuk`. When a proposal passes syntax, it calls `tools/reality_engine.py`.
+- The default production runner in `tools/reality_engine.py` marks JavaScript, Python-transpiler, and VM as `UNAVAILABLE` because target-specific proposal runners are not integrated. It also reports `fixture_added: false`. Since acceptance requires all five targets plus a relevant fixture, the default path rejects new proposals rather than accepting unproven code.
+- `tools/evolve_daemon.py` and `tools/evolve_language.py` are review-only. In contrast, root `datacenter_v6.py` still loops, invokes `V6_CLEAN.py`, and attempts Git commit/push every 30 seconds. This is a separate legacy path and is inconsistent with the review-only safety boundary.
+
+**Current claim:** components for AI authoring, syntax diagnostics, proposals, and acceptance checks exist; a fully integrated, evidence-producing AI repair/evolution cycle does not yet exist on `main`. Do not describe it as autonomously repairing and safely merging arbitrary programs.
 ## .cuk AI authoring contract (v1)
 
 PusingCuk already has a maintained language pipeline: `lexer.py` → `parser.py` → `ast_nodes.py` → `evaluator.py`, plus the separately tested `native/pusingcuk.c` runtime. Do not create a second parser or introduce new reserved words just to describe AI behavior. Version 1 uses existing `.cuk` statements and data types as a small authoring convention:

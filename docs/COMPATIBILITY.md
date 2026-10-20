@@ -127,12 +127,12 @@ The machine-readable source of builtin metadata is [`library/builtin_contract.js
 The contract is not a package manager and does not imply network access. Database, server, browser, Web3, and blockchain APIs should be separate capability-scoped adapters with local/mock modes for offline development and explicit target support.
 
 
-The contract also records platform capability status separately from builtin support. Database, HTTP server/client, browser DOM, Web3/blockchain, and stable FFI are currently `planned` with no target claimed. Offline-first modes such as local database files, loopback services, mock network transport, and local development chains are design targets only until adapter implementations and tests land.
+The contract records language-level platform capabilities separately from host-side adapter code. `library/adapters/database.py`, `server.py`, and `web3.py` now provide local SQLite, loopback HTTP, and mock/loopback JSON-RPC primitives with focused tests; they are not yet exposed as first-class `.cuk` APIs or claimed compiler targets. Therefore `data.database`, `server.http`, `web.dom`, `web3.blockchain`, and stable FFI remain `planned` in `library/builtin_contract.json`. Existing reference-runtime HTTP built-ins are a separate, explicitly limited capability.
 
 <!-- BEGIN GENERATED CONFORMANCE SUMMARY -->
 ## Measured conformance snapshot
 
-Generated from the checked-in fixture baseline and validated against the active manifest. This is a snapshot, not a live CI result or a claim of complete language compatibility.
+This table is generated from the supplied machine-readable fixture summary. It is a snapshot, not a live CI result or a claim of complete language compatibility.
 
 | Target | Passed | Failed | Timeout | Unsupported | Unavailable |
 |---|---:|---:|---:|---:|---:|
@@ -144,13 +144,13 @@ Generated from the checked-in fixture baseline and validated against the active 
 | vm | 28 | 49 | 0 | 0 | 0 |
 
 - Fixtures in checked-in baseline summary: **77**
-- Native C Python-free score: **96.1%** (74/77; unsupported fixtures remain in the denominator)
+- Native C Python-free score: **96.10%** (74/77; unsupported fixtures remain in the denominator)
 <!-- END GENERATED CONFORMANCE SUMMARY -->
 
 
 ## Differential report (verified artifact)
 
-The latest checked-in fixture matrix artifact is [GitHub Actions run #39380899538](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39380899538). The differential runner reports **74 comparisons, 0 mismatches, 0 incomplete comparisons, and 3 unsupported cases** for the reference/native comparison set. This is a limited comparison between the two currently measured implementations; it does not establish parity for JavaScript, the Python transpiler, HTML, or VM.
+The latest verified fixture matrix for the reviewed baseline is [GitHub Actions run #39383293486](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39383293486), on commit `cc7c8f47f0f800faa24ec93584adceecc32778d2`. The differential runner reports **74 comparisons, 0 mismatches, 0 incomplete comparisons, and 3 unsupported cases** for the reference/native comparison set. This is a limited comparison between the two currently measured implementations; it does not establish parity for JavaScript, the Python transpiler, HTML, or VM.
 
 | Target | Passed | Failed | Unsupported | Practical meaning |
 |---|---:|---:|---:|---|

@@ -1,13 +1,13 @@
-# FounderOS/CORE ↔ .cuk ↔ PusingCuk AI: development bridge
+# PusingCuk AI ↔ .cuk ↔ Cuk Reality Engine: development bridge
 
 **Owner:** PusingCuk  
-**Status:** operational integration contract; each capability still requires implementation evidence.  
-**Purpose:** make migrated historical knowledge actively guide language and assistant improvements, rather than treating migration as a static archive.
+**Status:** partial implementation contract; the components exist but the end-to-end repair/evolution loop is not complete.  
+**Purpose:** connect current `.cuk` compiler evidence, PusingCuk AI proposals, and reviewed language changes. Founder-OS/CORE material is historical transferred knowledge, not a live repository or service dependency.
 
 ## The three-way feedback loop
 
-1. **FounderOS history supplies decision context.** Preserve durable constraints: human authority for consequential decisions, local-first/replaceable model providers, evidence before claims, and incremental migration. These principles guide priorities and acceptance criteria; they do not override the current .cuk specification.
-2. **CORE history supplies engineering and operational lessons.** Reuse the patterns of versioned contracts, registered deterministic rules, validated schemas, explicit capabilities, traceable evidence, and fail-closed behavior. Do not imply that retired queues, payment endpoints, database services, or authorization systems are now implemented by the local assistant.
+1. **Transferred decision context guides priorities.** Reuse the reviewed constraints preserved in `docs/ai/DECISION_AUTHORITY_AND_EVIDENCE.md` and related first-party notes: human authority for consequential decisions, local-first/replaceable model providers, evidence before claims, and incremental migration. They do not override the current `.cuk` specification.
+2. **Transferred engineering patterns guide implementation.** Reuse versioned contracts, registered deterministic rules, validated schemas, explicit capabilities, traceable evidence, and fail-closed behavior. Founder-OS and CORE services, queues, APIs, payment endpoints, and authorization systems are not live PusingCuk dependencies and must not be described as implemented by the assistant.
 3. **The .cuk specification and compiler are the executable authority.** AI retrieves relevant language documentation, proposes source, invokes the compile-check tool, consumes structured diagnostics, and may revise the source. A successful compile proves only that the compiler accepted the source for that target.
 4. **Validated language changes improve the AI.** When a language feature is accepted, update the specification, examples, diagnostics, and relevant conformance fixtures together. Then update this curated index only when the source is public-safe and its exact immutable commit/path is available.
 5. **AI failure reports improve the language.** Repeated, reproducible compiler failures can become candidate language issues only after the diagnostic and minimal source are understood. The model must not silently redefine language semantics or weaken validation to make its output pass.
@@ -83,4 +83,7 @@ The legacy `tools/evolve_daemon.py` is no longer an autonomous daemon. It accept
 
 This is intentional: `SPEC.md` is the vocabulary source of truth and the syntax is frozen unless the Founder explicitly approves a change. An approved language change must update the specification, root and packaged lexer aliases, `library/kosakata.json`, relevant conformance fixtures, generated reference tables, and compatibility notes in one reviewed change. A successful unit-test command alone is not permission to change the public language contract.
 
-The deterministic Reality Engine gate currently rejects proposals when required target evidence or a relevant regression fixture is missing. JavaScript, Python-transpiler, and VM parity gaps remain; do not treat the review-only proposal result as an accepted language change or as proof that autonomous evolution is production-ready.
+The deterministic Reality Engine gate currently rejects proposals when required target evidence or a relevant regression fixture is missing. Its default production runner marks JavaScript, Python-transpiler, and VM unavailable and does not add fixture evidence, so new proposals cannot be accepted through that default path. Do not treat a review-only proposal or syntax pass as accepted language behavior or as proof that autonomous evolution is production-ready.
+
+**Legacy V6 conflict still present in source:** `datacenter_v6.py` remains an independent endless loop that can mutate vocabulary/parser/example files and attempt commit/push. This does not match the review-only contract above. The loop needs a deliberate implementation decision; documentation must not pretend the newer `tools/evolve_daemon.py` has replaced it when the old entry point still exists.
+

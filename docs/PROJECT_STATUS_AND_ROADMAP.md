@@ -1,6 +1,6 @@
 # PusingCuk — Current Status and Priorities
 
-**Branch originally targeted by this work:** `warungpusingcuk`  
+**Snapshot:** 20 October 2026 · branch `main` at `cc7c8f47f0f8` (before this documentation synchronization).
 **Language contract:** `0.6-dev`  
 **Python package:** `0.8.0.dev0`  
 **Status:** experimental. This summary does not prove that every test or deployment target passes, and it does not claim that the language is stable or that AI is generally accurate.
@@ -10,15 +10,29 @@
 
 ## Current state
 
-**Conformance snapshot recorded in this document:** 78 fixtures: 78 required on the Python reference interpreter, 75 required on native C, and 3 explicitly unsupported on native C. The warung cashier example is included as a required test on both runtimes. Re-check the current fixture manifest and CI before relying on these historical counts.
+**Verified conformance snapshot:** 77 active fixtures. On commit `cc7c8f47f0f800faa24ec93584adceecc32778d2`, the fixture matrix passed 77/77 on the reference interpreter and 74/77 on native C, with 3 native fixtures explicitly unsupported. The same run measured JavaScript 29/77, Python transpiler 21/77, VM 28/77, and HTML 0/77 executable fixtures. The reference/native differential report compared 74 cases with 0 mismatches, 0 incomplete comparisons, and 3 unsupported cases. These results describe only the measured fixtures, not full backend parity.
 
 - **Language:** lexer, parser, AST, reference interpreter, specification, built-in contract, and fixtures are present. The reference path still requires Python.
 - **Native C:** a standalone backend/runtime exists for a subset. Features not covered by native tests must not be claimed compatible.
 - **Bytecode/VM:** an experimental bytecode compiler and VM exist. This is not equivalent to a Python-free native runtime.
 - **JavaScript/Python/Android:** backends or prototypes exist with their own coverage. File presence does not prove parity or distribution readiness.
-- **PusingCuk AI:** assistant code and compiler tools exist. The assistant can help generate or repair .cuk, but is not a self-trained foundation model and must not claim code works merely because it generated it.
+- **PusingCuk AI:** the assistant, retrieval, provider adapters, allowlisted tools, compile-check, and file-generation tool exist. The separate repair adapter is not yet an end-to-end accepted repair pipeline: the default Reality Engine runner has no integrated JS/Python/VM proposal runners or fixture-addition evidence.
+- **Cuk Reality Engine:** a fail-closed acceptance gate exists, but the production runner currently marks JavaScript, Python, and VM unavailable and requires a relevant fixture to already be added. It is a gate/prototype, not proof of autonomous cross-target repair.
+- **Adapters:** SQLite, loopback HTTP, and mock/loopback JSON-RPC host modules exist, but the language-level capability contract still marks database, server HTTP, DOM, Web3, and stable FFI as planned because they are not first-class `.cuk` APIs or claimed compiler targets.
 - **Frontend/backend SaaS:** existing UIs, services, and integrations remain prototypes until build, authentication, API, and runtime paths are verified on the same commit.
 
+## Branch audit (20 October 2026)
+
+The following branches are divergent from `main`; branch-only work is not part of the main implementation unless separately integrated and verified.
+
+| Branch | Code-only findings | Current disposition |
+|---|---|---|
+| `compatibility-generator` | Older revision of `tools/generate_compatibility.py` and workflow changes | `main` already has a more complete generator; do not merge the branch wholesale |
+| `core-cuk-engine` | `compiler/sandbox.py`, `native/bytecode_vm.c`, additional reports/tests/workflow | Review individual components before porting; no claim that they run on `main` |
+| `cuk-reality-engine` | `compiler/repair_loop.py`, `compiler/offline_repair.py`, `compiler/sandbox.py`, native bytecode VM and Reality Engine workflow | Potential repair/sandbox work is branch-only and not wired into current main AI tools |
+| `public-site` | Different `site/` content, logo, sitemap/robots, and Pages workflow | Selectively compare the site changes; the branch is not a current mirror of `main` |
+
+Do not merge these branches as a single bundle: each is behind/diverged, and current `main` has since changed contracts, tests, and implementation paths.
 ## Priority order
 
 ### P0 — Documentation and a single contract

@@ -11,6 +11,16 @@
       "percent": 96.1,
       "runtime": "native C",
       "note": "First tracked snapshot; no earlier score series was reconstructed."
+    },
+    {
+      "date": "2026-10-20",
+      "commit": "cc7c8f47f0f800faa24ec93584adceecc32778d2",
+      "run_url": "https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39383293486",
+      "numerator": 74,
+      "denominator": 77,
+      "percent": 96.1,
+      "runtime": "native C",
+      "note": "Verified current-main fixture matrix; target counts match the checked-in baseline."
     }
   ]
 }

@@ -51,6 +51,6 @@
     "percent": 96.1,
     "runtime": "native C",
     "unsupported_native_counted_as_not_passed": true,
-    "method": "Verified GitHub Actions matrix at c1a6c1a402df4b6b2d56e8fb9a1826cafee2b430: reference 77/77, native C 74/77, JavaScript 29/77, Python transpiler 21/77, VM 28/77. Three native fixtures remain explicitly unsupported; HTML has no executable backend."
+    "method": "Verified GitHub Actions matrix at cc7c8f47f0f800faa24ec93584adceecc32778d2 (run 39383293486): reference 77/77, native C 74/77, JavaScript 29/77, Python transpiler 21/77, VM 28/77; differential: 74 comparisons, 0 mismatches, 0 incomplete, 3 unsupported. Three native fixtures remain explicitly unsupported; HTML has no executable backend."
   }
 }

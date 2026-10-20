@@ -12,6 +12,7 @@ Gunakan peta ini untuk menemukan lokasi yang benar sebelum mengubah kode. Ini bu
 | `SPEC.md` | Kontrak sintaks/fitur yang terlihat oleh pengguna |
 | `docs/SEMANTIC_CONTRACT.md` | Perilaku yang harus konsisten |
 | `examples/`, `*.cuk`, `library/*.cuk` | Program contoh dan aturan yang ditulis dalam .cuk |
+| `datacenter_v6.py`, `V6_CLEAN.py`, `fix_parser_all.py` | Legacy V6 vocabulary/parser mutation scripts | `datacenter_v6.py` loops and attempts Git commit/push; these are not the review-only evolution helpers |
 
 ## Compiler dan runtime
 
@@ -49,6 +50,16 @@ Gunakan peta ini untuk menemukan lokasi yang benar sebelum mengubah kode. Ini bu
 | `tools/`, `scripts/` | Utilitas pengembangan, konformansi, dan packaging |
 | `.github/workflows/` | Otomasi CI/build; hasilnya hanya membuktikan job yang benar-benar berjalan |
 
+## AI repair and language-evolution tools
+
+| Location | Actual behavior on `main` | Limit to preserve in claims |
+|---|---|---|
+| `tools/diagnostic_repair_loop.py` | Reads an in-repository `.cuk`/`.pusingcuk` file and validates lexer/parser syntax | Does not execute source or apply repairs; expected-output checks fail closed without an isolated runtime |
+| `tools/local_ai_adapter.py` | Separate Ollama/heuristic loop writes a sibling `*.proposal.cuk` file and asks the Reality Engine to validate it | Not the same path as `library/assistant.py`; default production gate cannot accept a proposal while three required targets are unavailable and fixture evidence is missing |
+| `tools/reality_engine.py` | Deterministic fail-closed acceptance gate | Requires reference, native, JavaScript, Python, VM and a relevant fixture; default runner currently integrates only reference/native |
+| `tools/evolve_daemon.py` and `tools/evolve_language.py` | Explicit, review-only alias proposals | No automatic vocabulary edits, commits, or pushes |
+
+**Important execution boundary:** root `datacenter_v6.py` is still a separate legacy loop that invokes `V6_CLEAN.py` and attempts commit/push every 30 seconds. Its behavior conflicts with the review-only evolution helpers. Do not treat the legacy loop as the canonical safe evolution path until the implementation is reconciled.
 ## Dokumentasi: mana yang harus dibaca?
 
 - Pengguna baru: [README](../README.md) → [PEMULA](PEMULA.md) → [SPEC](../SPEC.md).

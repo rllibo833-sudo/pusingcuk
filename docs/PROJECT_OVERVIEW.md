@@ -2,7 +2,7 @@
 
 > **Warung-language feel. Serious machinery.**
 
-**Documentation snapshot:** 18 October 2026  
+**Documentation snapshot:** 20 October 2026 (main implementation review)  
 **Language contract:** `0.6-dev`  
 **Python package:** `0.8.0.dev0`  
 **Maturity:** experimental / alpha — not a stable release.
@@ -35,6 +35,7 @@ selesai jancuk
 | `native/` | C runtime for a tested subset | Not fully equivalent to the reference interpreter |
 | `library/` | Built-in contracts, machine vocabulary, functions, and adapters | Registry entries do not imply every target supports every feature |
 | `tests/`, `tools/conformance.py` | Unit tests and conformance evidence | Results apply only to the tests and commit that ran |
+| `tools/reality_engine.py`, `tools/diagnostic_repair_loop.py`, `tools/local_ai_adapter.py` | Fail-closed proposal gate, syntax diagnostics, and separate legacy AI repair adapter | Default proposal gate cannot accept new source yet; the diagnostic helper does not execute code |
 | `examples/` | Learning and trial programs | Examples do not prove production readiness |
 | AI assistant modules | Tools to support the .cuk workflow | Do not prove a self-trained foundation model or universally correct output |
 | `web/`, `site/`, `android-studio/` | Existing UI, website, and distribution prototypes | Source files do not prove a production service or app |
