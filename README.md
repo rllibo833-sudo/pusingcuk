@@ -96,6 +96,15 @@ This table is generated from SPEC.md. It documents accepted spellings; it does n
 - **PusingCuk AI:** an assistant grounded in language/project knowledge—not a foundation model trained from scratch.
 - **Cuk Reality Engine:** conformance tooling for checking behavior across targets; compatibility claims require execution evidence.
 
+## Runtime and app distribution
+
+Keep these deliverables separate:
+
+- **PusingCuk Studio APK** is the Android Studio application built by the Studio workflow. It is an editor/workbench for writing and trying `.cuk` programs; it is not a general-purpose APK generated from arbitrary `.cuk` source.
+- **CukAccount** is a separate accounting application with its own UI and application/runtime integration. A passing PusingCuk fixture does not mean CukAccount has been rewritten or packaged from `.cuk`.
+- **An arbitrary `.cuk` application** can currently be interpreted or compiled only to the targets and language subset documented in the compatibility matrix. There is no claim that any `.cuk` file can be packaged as a standalone Android APK.
+
+For local AI development on Android, use Termux with Ollama running on the same device. The local development path must default to loopback-only access, explicit opt-in for writes, and review-only proposals. It must not require a cloud model, a hosted database, or an automatic Git push. Device-specific Termux behavior still requires the documented on-device test; an Ubuntu CI pass is not a substitute.
 ## Repository map
 
 | Area | Purpose |
