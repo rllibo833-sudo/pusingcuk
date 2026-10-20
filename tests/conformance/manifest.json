@@ -1265,7 +1265,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "unsupported"
+        "native": "required"
       }
     },
     {
@@ -1283,7 +1283,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "unsupported"
+        "native": "required"
       }
     },
     {
@@ -1362,7 +1362,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "unsupported"
+        "native": "required"
       }
     },
     {

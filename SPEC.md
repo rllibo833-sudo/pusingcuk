@@ -30,23 +30,23 @@ Assignment hanya boleh dilakukan pada variabel yang sudah dibuat.
 
 ## 4. Output
 
-    hedeh "Halo"
-    hedeh umur
-    hedeh umur + 1
+    hedeh | koar2 "Halo"
+    hedeh | koar2 umur
+    hedeh | koar2 umur + 1
 
 ## 5. Input pengguna
 
     tanya nama = "Nama? "
-    hedeh "Halo, " + nama
+    hedeh | koar2 "Halo, " + nama
 
 `tanya` menampilkan prompt teks dan membaca satu baris dari input standar. Ini tersedia pada runtime modular dan native CLI; input interaktif melalui Pusingcuk Studio belum diverifikasi. Runtime native mendukung indeks teks nonnegatif berbasis code point UTF-8; indeks negatif belum didukung.
 
 ## 6. Kondisi
 
     njir umur >= 18
-        hedeh "Dewasa"
+        hedeh | koar2 "Dewasa"
     kampret
-        hedeh "Belum dewasa"
+        hedeh | koar2 "Belum dewasa"
     selesai njir
 
 Cabang kampret bersifat opsional.
@@ -55,7 +55,7 @@ Cabang kampret bersifat opsional.
 
     lah i = 1
     mumet i <= 3
-        hedeh i
+        hedeh | koar2 i
         i = i + 1
     selesai mumet
 
@@ -97,7 +97,7 @@ Contoh:
 
     jancuk
     untuk angka dalam rentang(1, 5)
-        hedeh angka
+        hedeh | koar2 angka
     selesai untuk
     selesai jancuk
 
@@ -116,7 +116,7 @@ jancuk
 fungsi tambah(a, b)
     balek a + b
 selesai fungsi
-hedeh tambah(2, 3)
+hedeh | koar2 tambah(2, 3)
 selesai jancuk
 ```
 
@@ -160,13 +160,13 @@ Alias dinormalisasi oleh lexer sebelum parsing. Daftar saat ini berisi 45 alias 
 
 ### Alias inti (12)
 
-- `jir` → `hedeh` — output
+- `jir` → `hedeh | koar2` — output
 - `adooh` → `kampret` — cabang alternatif
 - `gitu` → `selesai` — penutup blok
 - `inthiseco` → `jancuk` — pembuka program alternatif
 - `janggal` → `bukan` — negasi logika
 - `gas` → `jancuk` — pembuka program alternatif
-- `spill` → `hedeh` — output
+- `spill` → `hedeh | koar2` — output
 - `bestie` → `lah` — deklarasi variabel
 - `valid` → `benar` — boolean benar
 - `zonk` → `salah` — boolean salah
@@ -175,38 +175,38 @@ Alias dinormalisasi oleh lexer sebelum parsing. Daftar saat ini berisi 45 alias 
 
 ### Alias API tambahan
 
-- `bacot` → `hedeh`
-- `bacrit` → `hedeh`
-- `berak` → `hedeh`
-- `berisik` → `hedeh`
+- `bacot` → `hedeh | koar2`
+- `bacrit` → `hedeh | koar2`
+- `berak` → `hedeh | koar2`
+- `berisik` → `hedeh | koar2`
 - `bongkar` → `baca`
 - `bongkar_json` → `baca_json`
-- `cetak` → `hedeh`
-- `crot` → `hedeh`
+- `cetak` → `hedeh | koar2`
+- `crot` → `hedeh | koar2`
 - `gas_api` → `kepo_internet`
-- `gebber` → `hedeh`
-- `gembor` → `hedeh`
+- `gebber` → `hedeh | koar2`
+- `gembor` → `hedeh | koar2`
 - `impor` → `angkut`
-- `jedor` → `hedeh`
-- `keluarin` → `hedeh`
+- `jedor` → `hedeh | koar2`
+- `keluarin` → `hedeh | koar2`
 - `kepo` → `tanya`
 - `kirim_gosip` → `kirim_api`
-- `koar` → `hedeh`
-- `muncrat` → `hedeh`
-- `ngegas` → `hedeh`
-- `nyalak` → `hedeh`
-- `omong` → `hedeh`
+- `koar` → `hedeh | koar2`
+- `muncrat` → `hedeh | koar2`
+- `ngegas` → `hedeh | koar2`
+- `nyalak` → `hedeh | koar2`
+- `omong` → `hedeh | koar2`
 - `parse_json` → `jadi_json`
-- `print` → `hedeh`
-- `sembur` → `hedeh`
-- `semprot` → `hedeh`
-- `senggol` → `hedeh`
+- `print` → `hedeh | koar2`
+- `sembur` → `hedeh | koar2`
+- `semprot` → `hedeh | koar2`
+- `senggol` → `hedeh | koar2`
 - `simpen` → `tulis`
 - `simpen_json` → `tulis_json`
 - `stalking` → `kepo_internet`
-- `suarakan` → `hedeh`
-- `tampilkan` → `hedeh`
-- `teriak` → `hedeh`
+- `suarakan` → `hedeh | koar2`
+- `tampilkan` → `hedeh | koar2`
+- `teriak` → `hedeh | koar2`
 - `waktu` → `jam`
 
 ## 17. Bytecode PVM v1 (draft) dan batas keamanan
