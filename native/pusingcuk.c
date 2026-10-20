@@ -259,7 +259,7 @@ static int is_builtin_name(const char *name) {
     static const char *const names[] = {
         "panjang", "teks", "bilangan", "desimal", "logika", "rentang",
         "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah",
-        "atas", "pangkat", "sinus", "kosinus", "jumlah", "rata_rata", "median", "logaritma", "log10", "json_teks", "json_baca", "html_aman", "csv_baris"
+        "atas", "pangkat", "sinus", "kosinus", "jumlah", "rata_rata", "median", "logaritma", "log10", "json_teks", "json_baca", "html_aman", "csv_baris", "jadi_json"
     };
     for (size_t i = 0; i < sizeof names / sizeof names[0]; i++)
         if (!strcmp(name, names[i])) return 1;
@@ -1038,7 +1038,7 @@ static Val json_parse_value(JsonParser *jp, unsigned depth) {
 }
 static Val call_native_format_builtin(const char *name, Val *args, int argc, int *handled) {
     *handled = !strcmp(name, "json_teks") || !strcmp(name, "json_baca") ||
-        !strcmp(name, "html_aman") || !strcmp(name, "csv_baris");
+        !strcmp(name, "html_aman") || !strcmp(name, "csv_baris") || !strcmp(name, "jadi_json");
     if (!*handled) return num(0);
     if (argc != 1) { fail("built-in format membutuhkan tepat satu argumen"); return num(0); }
     Val value = args[0];
@@ -1046,6 +1046,18 @@ static Val call_native_format_builtin(const char *name, Val *args, int argc, int
         char out[SZ] = {0}; size_t used = 0;
         if (!json_write_value(value, out, sizeof out, &used, 0)) return string("");
         return string(out);
+    }
+    if (!strcmp(name, "jadi_json")) {
+        if (value.t != STR) { fail("jadi_json membutuhkan satu teks JSON"); return num(0); }
+        int previous_suppress = suppress_eval;
+        suppress_eval = 1;
+        JsonParser jp = {value.s, 0, 1};
+        Val parsed = json_parse_value(&jp, 0);
+        json_ws(&jp);
+        int valid = jp.valid && jp.source[jp.pos] == '\0';
+        suppress_eval = previous_suppress;
+        if (!valid) return boolean(0);
+        return parsed;
     }
     if (!strcmp(name, "json_baca")) {
         if (value.t != STR) { fail("json_baca() membutuhkan teks JSON"); return num(0); }
