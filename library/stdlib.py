@@ -125,6 +125,8 @@ def _html_escape(value: Any) -> str:
         text = str(int(value)) if value.is_integer() else str(value)
     else:
         text = _to_text(value)
+    if "\\x00" in text:
+        raise ValueError("html_aman() tidak menerima NUL")
     escaped = html.escape(text, quote=True)
     if len(escaped.encode("utf-8")) > 1023:
         raise ValueError("html_aman() melebihi batas output 1023 byte")
@@ -144,6 +146,8 @@ def _csv_row(value: Any) -> str:
             field = str(int(item)) if isinstance(item, float) and item.is_integer() else str(item)
         else:
             raise TypeError("csv_baris() hanya menerima nilai skalar")
+        if "\\x00" in field:
+            raise ValueError("csv_baris() tidak menerima NUL")
         if any(char in field for char in (",", '"', chr(13), chr(10))):
             field = '"' + field.replace('"', '""') + '"'
         fields.append(field)
