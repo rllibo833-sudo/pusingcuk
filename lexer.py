@@ -327,3 +327,6 @@ def lex(source):
 
 # AUTO-GEN ALIASES V6.2
 HEDEH_ALIASES = ['bacot', 'bacrit', 'berak', 'berisik', 'cetak', 'crot', 'gas', 'gebber', 'gembor', 'jedor', 'jir', 'keluarin', 'koar', 'muncrat', 'ngegas', 'nyalak', 'omong', 'print', 'sembur', 'semprot', 'senggol', 'spill', 'suarakan', 'tampilkan', 'teriak']
+
+# AUTO-GEN ALIASES V6.2
+HEDEH_ALIASES = ['bacot', 'bacrit', 'berak', 'berisik', 'cetak', 'crot', 'gas', 'gebber', 'gembor', 'jedor', 'jir', 'keluarin', 'koar', 'muncrat', 'ngegas', 'nyalak', 'omong', 'print', 'sembur', 'semprot', 'senggol', 'spill', 'suarakan', 'tampilkan', 'teriak']
