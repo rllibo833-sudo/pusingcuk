@@ -510,6 +510,8 @@ class Evaluator:
             self.fail(line, "batas total 100000 langkah tercapai")
 
     def expr(self, n, env, depth=0):
+        if depth > 120:
+            self.fail(n.line, "ekspresi terlalu dalam")
         k, line = n.kind, n.line
         try:
             if k == "Literal":
