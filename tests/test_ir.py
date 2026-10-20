@@ -2,7 +2,7 @@ import math
 import unittest
 
 from compiler.ir import (
-    FORMAT, IR_VERSION, MAX_DEPTH, MAX_IR_BYTES, IRValidationError, dumps, from_source, loads, validate,
+    FORMAT, IR_VERSION, MAX_DEPTH, MAX_IR_BYTES, IRValidationError, _validate_value, dumps, from_source, loads, validate,
 )
 
 SOURCE = """jancuk
@@ -36,6 +36,17 @@ class IRTests(unittest.TestCase):
         self.assertTrue(document["source_map"])
         self.assertEqual(document["source_map"][0]["path"], "$")
         self.assertTrue(all(item["line"] >= 1 for item in document["source_map"]))
+
+    def test_attribute_node_is_supported_by_ir_schema(self):
+        attribute = {
+            "kind": "Attribute",
+            "line": 1,
+            "fields": {
+                "object": {"kind": "Variable", "line": 1, "fields": {"name": "modul"}},
+                "name": "anggota",
+            },
+        }
+        _validate_value(attribute, "$", node_counter=[0])
 
     def test_rejects_unknown_version(self):
         document = from_source(SOURCE)

@@ -20,13 +20,13 @@ LANGUAGE_VERSION = "0.6-dev"
 NODE_KINDS = {
     "Program", "Declare", "Print", "Input", "If", "While", "For",
     "Function", "Return", "Assign", "IndexAssign", "Variable", "Literal", "Try",
-    "Unary", "Binary", "List", "Dict", "Index", "Call",
+    "Unary", "Binary", "List", "Dict", "Index", "Attribute", "Call",
 }
 FEATURE_RULES = {
     "Input": "console-input", "If": "control-flow", "While": "control-flow",
     "For": "control-flow", "Function": "functions", "Return": "functions",
     "List": "lists", "Dict": "dictionaries", "Index": "indexing",
-    "IndexAssign": "indexing", "Call": "calls", "Unary": "operators",
+    "IndexAssign": "indexing", "Attribute": "namespaced-access", "Call": "calls", "Unary": "operators",
     "Binary": "operators", "Try": "error-handling", "Declare": "variables", "Assign": "variables",
     "Variable": "variables", "Print": "console-output",
 }
@@ -61,6 +61,7 @@ NODE_FIELDS = {
     "List": {"items"},
     "Dict": {"items"},
     "Index": {"collection", "index"},
+    "Attribute": {"object", "name"},
     "Call": {"name", "args"},
     "Try": {"body", "handler_name", "handler", "final"},
 }

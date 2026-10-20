@@ -11,6 +11,8 @@ on:
       - "evaluator.py"
       - "lexer.py"
       - "scripts/check_alias_sync.py"
+      - "scripts/gen_docs_from_spec.py"
+      - "docs/AI_ENGINE_READINESS.md"
       - "parser.py"
       - "ast_nodes.py"
       - "compiler/**"
@@ -67,6 +69,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: python scripts/check_alias_sync.py
+      - run: python scripts/gen_docs_from_spec.py --check
       - run: python -m unittest discover -s tests -v
       - if: matrix.python-version == '3.12'
         run: python tools/conformance.py

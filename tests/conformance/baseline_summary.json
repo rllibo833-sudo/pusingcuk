@@ -3,8 +3,8 @@
   "fixture_count": 77,
   "targets": {
     "reference": {
-      "passed": 75,
-      "failed": 2,
+      "passed": 77,
+      "failed": 0,
       "timeout": 0,
       "unsupported": 0,
       "unavailable": 0
@@ -17,15 +17,15 @@
       "unavailable": 0
     },
     "javascript": {
-      "passed": 28,
-      "failed": 49,
+      "passed": 29,
+      "failed": 48,
       "timeout": 0,
       "unsupported": 0,
       "unavailable": 0
     },
     "python_transpiler": {
-      "passed": 20,
-      "failed": 57,
+      "passed": 21,
+      "failed": 56,
       "timeout": 0,
       "unsupported": 0,
       "unavailable": 0
@@ -38,8 +38,8 @@
       "unavailable": 0
     },
     "vm": {
-      "passed": 26,
-      "failed": 51,
+      "passed": 28,
+      "failed": 49,
       "timeout": 0,
       "unsupported": 0,
       "unavailable": 0
@@ -51,6 +51,6 @@
     "percent": 96.1,
     "runtime": "native C",
     "unsupported_native_counted_as_not_passed": true,
-    "method": "Audit baseline at 7bcb41f: native C passed 74 of 77 manifest fixtures; unsupported native fixtures remain in the denominator and do not count as passed."
+    "method": "Verified GitHub Actions matrix at c1a6c1a402df4b6b2d56e8fb9a1826cafee2b430: reference 77/77, native C 74/77, JavaScript 29/77, Python transpiler 21/77, VM 28/77. Three native fixtures remain explicitly unsupported; HTML has no executable backend."
   }
 }
