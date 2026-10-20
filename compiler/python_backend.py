@@ -298,7 +298,7 @@ def pc_invoke_function(name, args, expected, function):
     return function(*args)
 def pc_format_text(value, name):
     if isinstance(value, str):
-        if "\x00" in value: raise ValueError(name + "() tidak menerima NUL")
+        if "\\x00" in value: raise ValueError(name + "() tidak menerima NUL")
         if len(value.encode("utf-8")) > 1023: raise ValueError(name + "() teks melebihi batas 1023 byte")
         return value
     if value is None: return "None"
@@ -318,7 +318,7 @@ def pc_json_value(value, path="$", depth=0, seen=None):
     if seen is None: seen = set()
     if value is None or isinstance(value, bool): return value
     if isinstance(value, str):
-        if "\x00" in value: raise ValueError("JSON teks mengandung NUL: " + path)
+        if "\\x00" in value: raise ValueError("JSON teks mengandung NUL: " + path)
         if len(value.encode("utf-8")) > 1023: raise ValueError("JSON teks melebihi 1023 byte: " + path)
         return value
     if isinstance(value, int):
@@ -361,7 +361,7 @@ def pc_json_text(value):
     return encoded
 def pc_json_read(value):
     if not isinstance(value, str): raise TypeError("json_baca() membutuhkan teks JSON")
-    if "\x00" in value: raise ValueError("json_baca() tidak menerima NUL")
+    if "\\x00" in value: raise ValueError("json_baca() tidak menerima NUL")
     if len(value.encode("utf-8")) > 1023: raise ValueError("json_baca() input melebihi batas 1023 byte")
     try:
         decoded = json.loads(value, parse_constant=lambda item: (_ for _ in ()).throw(ValueError(item)))
