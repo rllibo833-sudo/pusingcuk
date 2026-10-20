@@ -16,7 +16,7 @@ Nilai `rentang()` yang disimpan ke variabel dapat dibaca dengan indeks bilangan 
 
 ## Baseline yang dipelihara saat ini
 
-Interpreter Python modular adalah implementasi referensi. Pada matriks terbaru, reference, JavaScript, Python transpiler, dan VM lulus 77/77 fixture; native C lulus 74/77 dengan tiga fixture yang ditandai unsupported; HTML belum menjalankan fixture. Untuk subset yang diwajibkan pada reference dan native, CI melaporkan 74 perbandingan dengan 0 mismatch dan 0 incomplete. Klaim ini terbatas pada fixture aktif, bukan semua program.
+Interpreter Python modular adalah implementasi referensi. Pada matriks terbaru, reference, native C, JavaScript, Python transpiler, dan VM lulus 79/79 fixture; HTML belum menjalankan fixture. CI melaporkan 79 perbandingan reference/native dengan 0 mismatch, 0 incomplete, dan 0 unsupported. Klaim ini terbatas pada fixture aktif, bukan semua program.
 
 Untuk perubahan bahasa, ikuti satu jalur:
 1. Tetapkan maksud perilaku di `SPEC.md` dan kontrak ini.
@@ -27,7 +27,7 @@ Untuk perubahan bahasa, ikuti satu jalur:
 
 Alias yang tercantum di bagian alias resmi `SPEC.md` adalah bagian dari permukaan bahasa. Perubahan pada alias harus disinkronkan pada lexer Python, pemetaan token runtime C, registry kosakata, dan fixture. Alias untuk kapabilitas platform yang belum tersedia di C harus tetap ditandai sesuai dukungan runtime, tidak disamarkan menjadi dukungan penuh.
 
-JavaScript, Python transpiler, dan VM kini lulus seluruh 77 fixture aktif; native C lulus 74/77. JSON/HTML/CSV mengikuti status per-target di `library/builtin_contract.json`; native C masih belum mendukung tiga fixture yang terkait JSON/HTML/CSV. Target HTML bukan backend eksekusi mandiri yang sudah diuji. Model tipe internal yang belum terhubung ke parser/runtime tetap bukan fitur bahasa yang dapat diklaim.
+Reference, native C, JavaScript, Python transpiler, dan VM kini lulus seluruh 79 fixture aktif. JSON/HTML/CSV mengikuti status per-target di `library/builtin_contract.json`; native C mendukung `json_teks`, `json_baca`, `html_aman`, dan `csv_baris`. `jadi_json` tetap memiliki kontrak terpisah: JSON tidak valid menghasilkan `salah`, sedangkan `json_baca` menghasilkan kesalahan runtime. Target HTML bukan backend eksekusi mandiri yang sudah diuji. Model tipe internal yang belum terhubung ke parser/runtime tetap bukan fitur bahasa yang dapat diklaim.
 
 ## Status semantik tipe
 
