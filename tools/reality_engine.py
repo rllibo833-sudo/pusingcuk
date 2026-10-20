@@ -2,7 +2,7 @@
 
 This module does not trust AI output. A proposal is accepted only when the
 source is deterministic, reference/native execution agrees, all required
-backends have passing evidence, and a relevant fixture has been added.
+backends have passing evidence, and a relevant fixture is registered and verified.
 Unavailable backends or missing fixture evidence cause rejection.
 """
 from __future__ import annotations
@@ -117,7 +117,7 @@ def _production_target_runner(source: str) -> dict[str, Any]:
             "targets": {name: {"status": "FAIL", "matched": False,
                 "error": "source has no exact successful fixture in canonical manifest",
                 "exit_code": None, "stdout": "", "stderr": ""} for name in REQUIRED_TARGETS},
-            "differential_ok": False, "regressions": [], "fixture_added": False, "fixture_id": None,
+            "differential_ok": False, "regressions": [], "fixture_added": False, "fixture_reused": False, "fixture_id": None,
         }
     expected = fixture["expected"]["stdout"]
     source_path = ROOT / "tests" / "conformance" / fixture["source"]
@@ -173,7 +173,7 @@ def _production_target_runner(source: str) -> dict[str, Any]:
                    and targets[name].get("matched") is True for name in REQUIRED_TARGETS)
     outputs = [targets[name].get("stdout") for name in REQUIRED_TARGETS]
     return {"targets": targets, "differential_ok": all_pass and len(set(outputs)) == 1 and outputs[0] == expected,
-            "regressions": [], "fixture_added": True, "fixture_id": fixture["id"]}
+            "regressions": [], "fixture_added": False, "fixture_reused": True, "fixture_id": fixture["id"]}
 
 def validate_deterministic(
     source: str,
@@ -231,9 +231,11 @@ def validate_deterministic(
                 and targets[name].get("stderr", "") == "" for name in REQUIRED_TARGETS)
         and len(set(outputs)) == 1
     )
-    if evidence.get("fixture_added") is not True or fixture is None:
+    fixture_added = evidence.get("fixture_added") is True
+    fixture_reused = evidence.get("fixture_reused") is True
+    if fixture is None or not (fixture_added or fixture_reused):
         if not any(item["code"] == "FIXTURE_REQUIRED" for item in diagnostics):
-            diagnostics.append(_diag("FIXTURE_REQUIRED", "Proposal belum memiliki fixture regresi relevan yang ditambahkan dan diverifikasi."))
+            diagnostics.append(_diag("FIXTURE_REQUIRED", "Proposal harus cocok dengan fixture kanonis yang terdaftar; fitur baru memerlukan fixture yang benar-benar ditambahkan."))
     if evidence.get("differential_ok") is not True or not independently_differential_ok or evidence.get("regressions") != []:
         diagnostics.append(_diag("DIFFERENTIAL_GATE_FAILED", "Matriks differential tidak lengkap, gagal, atau memiliki regresi."))
 
@@ -245,6 +247,7 @@ def validate_deterministic(
         "diagnostic": diagnostics,
         "targets": targets,
         "fixture_added": evidence.get("fixture_added") is True,
+        "fixture_reused": evidence.get("fixture_reused") is True,
         "fixture_id": evidence.get("fixture_id"),
         "differential_ok": evidence.get("differential_ok") is True,
         "regressions": evidence.get("regressions", []),

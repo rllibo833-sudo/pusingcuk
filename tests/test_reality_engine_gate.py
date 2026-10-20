@@ -15,7 +15,7 @@ def clean_evidence(source):
     return {
         "targets": {name: {"status": "PASS", "matched": True, "exit_code": 0, "stdout": EXPECTED, "stderr": ""}
                     for name in REQUIRED_TARGETS},
-        "fixture_added": True, "fixture_id": FIXTURE["id"], "differential_ok": True, "regressions": [],
+        "fixture_added": False, "fixture_reused": True, "fixture_id": FIXTURE["id"], "differential_ok": True, "regressions": [],
     }
 
 class RealityEngineGateTests(unittest.TestCase):
@@ -68,7 +68,8 @@ class RealityEngineGateTests(unittest.TestCase):
     def test_production_runner_executes_all_five_targets(self):
         evidence = _production_target_runner(SOURCE)
         self.assertEqual(set(evidence["targets"]), set(REQUIRED_TARGETS))
-        self.assertTrue(evidence["fixture_added"])
+        self.assertFalse(evidence["fixture_added"])
+        self.assertTrue(evidence["fixture_reused"])
         self.assertEqual(evidence["fixture_id"], FIXTURE["id"])
         for name in REQUIRED_TARGETS:
             with self.subTest(target=name):

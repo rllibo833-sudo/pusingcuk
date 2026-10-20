@@ -82,7 +82,7 @@ def run(target):
                 details = "; ".join(item.get("msg", "") for item in gate.get("diagnostic", []))
                 print(f"Reality Engine REJECTED proposal: {details}", file=sys.stderr)
                 return False
-            print("Reality Engine ACCEPTED proposal after deterministic gates")
+            print("Reality Engine verified proposal against an existing canonical fixture; no new fixture was added")
             return True
 
         diagnostic = _diagnostic_text(report)
