@@ -76,9 +76,9 @@ The most recent log query during this audit found no Gemini/provider-name matche
 - The active PusingCuk AI index will reference only the three new destination-owned documents; old repository indexes are not copied into runtime retrieval.
 - Detailed Founder-OS raw memory, the entire CORE SQL/backend, payment handlers, and Supabase rows are not treated as model training data. They are excluded or slated for retirement, not represented as migrated implementation.
 
-## GitHub repository deletion readiness
+## GitHub repository deletion status
 
-**READY for deleting the Founder-OS and CORE GitHub repositories from the selected-scope migration and PusingCuk dependency standpoint.** Verified state at PusingCuk HEAD `e54fc10668b0fe09d4bb315949438abbb7ad618f`:
+**Historical snapshot dated 2026-10-15:** the migration and dependency review marked the Founder-OS and CORE repositories ready for deletion at PusingCuk HEAD `e54fc10668b0fe09d4bb315949438abbb7ad618f`. On 20 October 2026, the owner reported that both repositories had been deleted, and GitHub API requests for both repository endpoints returned 404. This does not verify retirement of associated Supabase resources, data, or secrets.
 
 - PusingCuk's active knowledge index has 20 records, all owned by `rllibo833-sudo/pusingcuk`; it does not load either external repository's knowledge index at runtime.
 - Decision/evidence governance, local-model and registered-rule safety, conceptual masterplan/economic gates, and the transfer manifest have source-owned PusingCuk copies. Their external links are historical provenance, not runtime dependencies.
@@ -86,7 +86,7 @@ The most recent log query during this audit found no Gemini/provider-name matche
 - Six non-essential CORE scheduled/manual workflows, including the manual Gemini review workflow and the scheduled Issue gateway, have been removed. CORE's remaining workflows are quality CI, manual/fail-closed Supabase deployment, and release.
 - The unselected raw Founder-OS memory, complete CORE web/backend/payment system, and historical operational rows were deliberately excluded rather than falsely represented as migrated into the AI knowledge corpus.
 
-The two source repositories themselves have **not** been deleted or archived. No Issue or Pull Request was opened. Deletion of source repositories is separate from permanent deletion of the Supabase database/project.
+At the 2026-10-15 snapshot, the source repositories had not yet been deleted or archived. Their reported deletion is separate from permanent deletion or retirement of the Supabase database/project. No Issue or Pull Request was opened.
 
 ## Supabase project arrangement (verified 2026-10-15)
 

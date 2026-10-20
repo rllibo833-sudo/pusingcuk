@@ -21,7 +21,8 @@ python pusingcuk_new.py examples/terminal_bot.cuk
 | `halo_dunia.cuk` | Input interaktif dan output teks | Meminta nama lalu menyapa pengguna. Shebang dapat dipakai setelah CLI `pusingcuk` terpasang dan tersedia di `PATH`. |
 | `keuangan_sederhana.cuk` | Fungsi, konversi angka, loop, kondisi, dan input | Jika menyetujui penyimpanan, menulis `keuangan_sederhana.txt` sebagai berkas relatif dalam project root. |
 | `warung.cuk` | Variabel, operasi matematika, kondisi | Contoh statis sederhana tanpa akses jaringan atau file. |
-| `rekap_anggaran.cuk` | Kamus, fungsi buatan, total pengeluaran, dan kondisi | Contoh kalkulasi anggaran menggunakan kamus. |\n| `core/priority_triage.cuk` | Aturan triase prioritas tugas berdasarkan urgensi dan dampak | Aturan pure/deterministik dengan domain integer 1..5, 12 fixture, hash sumber terpin; bukan sandbox dan belum didaftarkan ke layanan CORE. |
+| `rekap_anggaran.cuk` | Kamus, fungsi buatan, total pengeluaran, dan kondisi | Contoh kalkulasi anggaran menggunakan kamus. |
+| `core/priority_triage.cuk` | Aturan triase prioritas tugas berdasarkan urgensi dan dampak | Aturan pure/deterministik dengan domain integer 1..5, 12 fixture, hash sumber terpin; bukan sandbox dan belum menjadi tool layanan produksi PusingCuk. |
 | `kalkulator.cuk` | Input interaktif, konversi angka, kondisi, dan operasi dasar | Menggunakan keyword inti `njir`, `kampret`, dan `selesai`; bukan keyword `jika`. Dijalankan pada interpreter referensi karena built-in konversi belum tersedia di native C. Uji pembagian nol dan input nonnumerik. |
 | `terminal_bot.cuk` | Bot terminal interaktif berbasis percabangan | Contoh reference Python; menggunakan `tanya`, perbandingan teks, dan `njir/kampret`. |
 
@@ -42,18 +43,22 @@ make native
 
 Contoh native masih memakai ekstensi kompatibilitas lama dan alias sintaks yang diuji pada runtime C. Kalkulator memakai `bilangan` dan `teks`, sehingga contoh itu untuk interpreter Python; native C belum mendukung built-in konversi tersebut. Jangan menganggap modul, HTTP, atau file I/O tersedia pada runtime native hanya karena interpreter Python mendukungnya.
 
-## Aturan bisnis deterministik untuk integrasi CORE
+## Aturan bisnis deterministik dan batas integrasi layanan
 
 Dua aturan contoh memperlihatkan dua keputusan yang berbeda dan deterministik:
 
 - `examples/core/anggaran_threshold_service.cuk`: membandingkan nominal dengan batas yang memerlukan persetujuan.
 - `examples/core/anggaran_sufficiency_service.cuk`: memeriksa apakah saldo tersedia mencukupi pengajuan.
 
-Aturan kecukupan saldo memiliki fixture referensi di `examples/core/anggaran_sufficiency.cuk`, yang mencakup saldo cukup, nilai batas yang sama, pengajuan di atas saldo, nol, dan input negatif. Pytest memeriksa perilaku interpreter referensi; CORE Quality Gate membangun runtime native pada commit PusingCuk yang dipatok dan menguji input layanan secara terpisah.
+Aturan kecukupan saldo memiliki fixture referensi di `examples/core/anggaran_sufficiency.cuk`, yang mencakup saldo cukup, nilai batas yang sama, pengajuan di atas saldo, nol, dan input negatif. `tests/test_core_budget_rules.py` membangun runtime native dan membandingkan output Python reference/native memakai fixture sumber yang di-pin. Tes ini berjalan di repo PusingCuk dan tidak bergantung pada layanan atau CI eksternal CORE.
 
-**Batas dukungan:** aturan kedua dibuktikan sebagai program deterministik di CI CORE; hal itu tidak otomatis mendaftarkannya pada HTTP runner lokal atau membuat layanan produksi. Runtime PusingCuk tetap eksperimental dan bukan sandbox OS.
+**Batas dukungan:** bukti lokal tersebut hanya membuktikan perilaku aturan pada interpreter referensi dan native C untuk kasus yang diuji. Ini tidak mendaftarkan aturan sebagai endpoint/tool produksi. Nama folder `examples/core/` dipertahankan sebagai nama historis dan tidak berarti ada koneksi runtime ke repo CORE yang sudah tidak tersedia. Runtime PusingCuk tetap eksperimental dan bukan sandbox OS.
 
-## Aturan tambahan deterministik (.cuk)\n\n`examples/core/priority_triage.cuk` adalah aturan ketiga yang mengklasifikasikan pekerjaan menjadi `P1_SEGERA`, `P2_DAMPAK_TINGGI`, `P3_MENDESAK`, atau `P4_RUTIN`. Nilai urgensi dan dampak wajib berada pada skala integer 1–5; nilai di luar rentang menghasilkan `INPUT_TIDAK_VALID`. Fixture JSON mengunci source SHA-256, kasus batas, nilai invalid, dan expected output. Tes referensi Python serta tes native C harus sama-sama lulus sebelum aturan disebut portabel. Ini merupakan contoh aturan lokal, belum menjadi tool produksi atau endpoint terdaftar CORE.\n\n## Contoh kompatibilitas (.pusingcuk)
+## Aturan tambahan deterministik (.cuk)
+
+`examples/core/priority_triage.cuk` adalah aturan ketiga yang mengklasifikasikan pekerjaan menjadi `P1_SEGERA`, `P2_DAMPAK_TINGGI`, `P3_MENDESAK`, atau `P4_RUTIN`. Nilai urgensi dan dampak wajib berada pada skala integer 1–5; nilai di luar rentang menghasilkan `INPUT_TIDAK_VALID`. Fixture JSON mengunci source SHA-256, kasus batas, nilai invalid, dan expected output. Tes referensi Python serta tes native C harus sama-sama lulus sebelum aturan disebut portabel. Ini merupakan contoh aturan lokal, belum menjadi tool produksi atau endpoint layanan.
+
+## Contoh kompatibilitas (.pusingcuk)
 
 Contoh ini dipertahankan untuk demonstrasi API yang sudah ada dan kompatibilitas sumber lama:
 
@@ -91,4 +96,4 @@ Contoh remote hanya didukung interpreter Python reference. Built-in eksekusi mem
 ## Contoh akuntansi untuk mahasiswa
 
 - `examples/accounting/rekap_keuangan.cuk`: contoh input pendapatan, beban, aset, liabilitas, dan ekuitas dalam Rupiah; menghitung laba/rugi dan memeriksa persamaan posisi keuangan. Ini contoh pendidikan dasar, bukan implementasi seluruh SAK/PSAK.
-- Aplikasi desktop offline, rumus dasar, batasan, dan instruksi build Windows dijelaskan di [`docs/ACCOUNTING_STUDENT_APP.md`](../docs/ACCOUNTING_STUDENT_APP.md). Sumber aplikasi berada di `apps/accounting/`.
+- Target dan batasan CukAccount dijelaskan di [`docs/examples/CUKACCOUNT_TARGET.md`](../docs/examples/CUKACCOUNT_TARGET.md). Pada snapshot `main` ini, folder `apps/accounting/` dan dokumen `docs/ACCOUNTING_STUDENT_APP.md` tidak ada; yang tersedia di repo ini adalah contoh pendidikan `examples/accounting/rekap_keuangan.cuk`, bukan aplikasi desktop penuh.
