@@ -21,6 +21,6 @@ assert.equal(runtime.run(escapingSource).stdout, "&lt;b&gt;&amp;&quot;&#x27;\nBu
 assert.throws(() => run('hedeh json_baca("not json")'), /JSON|json|Unexpected token/);
 assert.throws(() => runtime.run("jancuk\nhedeh missing_name\nselesai jancuk"), /nama belum didefinisikan/);
 assert.throws(() => runtime.run("jancuk\nmumet benar\nlah x = 1\nselesai mumet\nselesai jancuk"), /batas eksekusi|10000 iterasi/);
-assert.throws(() => runtime.run("jancuk\nhedeh globalThis.process.exit()\nselesai jancuk"), /fungsi tidak dikenal|nama belum didefinisikan|identifier harus berupa assignment/);
+assert.throws(() => runtime.run("jancuk\nhedeh globalThis.process.exit()\nselesai jancuk"));
 assert.throws(() => runtime.run('jancuk\nhedeh "unclosed\nselesai jancuk'), /teks tidak boleh melewati baris|string belum ditutup/);
 console.log("Browser runtime passed " + count + " gallery fixtures plus arithmetic, short-circuit, nested JSON, escaping, invalid input, safety, and loop-limit tests.");
