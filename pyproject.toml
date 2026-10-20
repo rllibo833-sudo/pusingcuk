@@ -48,7 +48,7 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["compiler*", "library*", "tools*"]
+include = ["compiler*", "library*", "pusingcuk*", "tools*"]
 namespaces = true
 
 [tool.setuptools.package-data]
