@@ -77,3 +77,10 @@ Acceptance must distinguish these milestones:
 
 The existing PusingCuk Studio APK is an editor/runner and is not proof of this CukAccount pipeline. Until the application-linking and offline runtime steps pass, report the pipeline as experimental/incomplete rather than complete.
 
+## Current evolution-tool boundary (2026-10-20)
+
+The legacy `tools/evolve_daemon.py` is no longer an autonomous daemon. It accepts an explicit alias proposal and returns a review-only JSON result; it does not run an endless loop, rewrite application files, edit the vocabulary registry, commit, or push. `tools/evolve_language.py` is also review-only.
+
+This is intentional: `SPEC.md` is the vocabulary source of truth and the syntax is frozen unless the Founder explicitly approves a change. An approved language change must update the specification, root and packaged lexer aliases, `library/kosakata.json`, relevant conformance fixtures, generated reference tables, and compatibility notes in one reviewed change. A successful unit-test command alone is not permission to change the public language contract.
+
+The deterministic Reality Engine gate currently rejects proposals when required target evidence or a relevant regression fixture is missing. JavaScript, Python-transpiler, and VM parity gaps remain; do not treat the review-only proposal result as an accepted language change or as proof that autonomous evolution is production-ready.
