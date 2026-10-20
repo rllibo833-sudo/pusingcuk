@@ -17,6 +17,7 @@ except ImportError:  # pragma: no cover - exercised by Pyodide
     ssl = None
 import stat
 import json
+import math
 import shlex
 import shutil
 import subprocess
@@ -515,7 +516,12 @@ class Evaluator:
         k, line = n.kind, n.line
         try:
             if k == "Literal":
-                return n.value
+                value = n.value
+                if isinstance(value, int) and not isinstance(value, bool) and value.bit_length() > 4096:
+                    self.fail(line, "angka terlalu besar")
+                if isinstance(value, float) and not math.isfinite(value):
+                    self.fail(line, "angka desimal tidak valid atau terlalu besar")
+                return value
             if k == "Variable":
                 if n.name not in env:
                     self.fail(line, f"variabel '{n.name}' belum dibuat")
@@ -587,7 +593,16 @@ class Evaluator:
                     same_list = isinstance(a, list) and isinstance(b, list)
                     if not (numeric or same_text or same_list):
                         self.fail(line, "operator '+' membutuhkan dua angka, dua teks, atau dua daftar; ubah angka menjadi teks secara eksplisit jika ingin menggabungkan teks")
-                return ops[n.op]()
+                result = ops[n.op]()
+                if isinstance(result, int) and not isinstance(result, bool) and result.bit_length() > 4096:
+                    self.fail(line, "hasil angka terlalu besar")
+                if isinstance(result, float) and not math.isfinite(result):
+                    self.fail(line, "hasil angka desimal terlalu besar atau tidak valid")
+                if n.op == "*" and isinstance(result, (str, list)) and len(result) > 100000:
+                    self.fail(line, "hasil perkalian terlalu besar")
+                if n.op == "+" and isinstance(result, (str, list)) and len(result) > 100000:
+                    self.fail(line, "hasil penggabungan terlalu besar")
+                return result
             if k == "Call":
                 args = [self.expr(x, env, depth) for x in n.args]
                 if n.name in ("jam", "tanggal"):
