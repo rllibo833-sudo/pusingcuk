@@ -60,6 +60,8 @@ def _json_validate(value: Any, path: str = "$") -> Any:
     if isinstance(value, float):
         if not math.isfinite(value):
             raise ValueError(f"JSON angka non-finite: {path}")
+        if value.is_integer() and abs(value) > _MAX_SAFE_INTEGER:
+            raise ValueError(f"JSON integer di luar rentang aman: {path}")
         return value
     if isinstance(value, list):
         return [_json_validate(item, f"{path}[{index}]") for index, item in enumerate(value)]
@@ -70,8 +72,24 @@ def _json_validate(value: Any, path: str = "$") -> Any:
     raise TypeError(f"tipe tidak didukung JSON: {type(value).__name__} pada {path}")
 
 
+def _json_canonical(value: Any) -> Any:
+    """Normalize integral floats to the same minimal JSON number spelling on every target."""
+    if isinstance(value, float):
+        if value == 0:
+            return 0
+        if value.is_integer() and abs(value) <= _MAX_SAFE_INTEGER:
+            return int(value)
+        return value
+    if isinstance(value, list):
+        return [_json_canonical(item) for item in value]
+    if isinstance(value, Mapping):
+        return {key: _json_canonical(item) for key, item in value.items()}
+    return value
+
+
 def _json_text(value: Any) -> str:
-    return json.dumps(_json_validate(value), ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+    validated = _json_validate(value)
+    return json.dumps(_json_canonical(validated), ensure_ascii=False, separators=(",", ":"), allow_nan=False)
 
 
 def _json_read(value: Any) -> Any:
@@ -85,7 +103,15 @@ def _json_read(value: Any) -> Any:
 
 
 def _html_escape(value: Any) -> str:
-    return html.escape(_to_text(value), quote=True)
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ValueError("html_aman() membutuhkan angka finite")
+        if value.is_integer() and abs(value) > _MAX_SAFE_INTEGER:
+            raise ValueError("html_aman() integer di luar rentang aman")
+        text = str(int(value)) if value.is_integer() else str(value)
+    else:
+        text = _to_text(value)
+    return html.escape(text, quote=True)
 
 
 def _csv_row(value: Any) -> str:
@@ -96,9 +122,9 @@ def _csv_row(value: Any) -> str:
         if item is None or isinstance(item, (str, bool)):
             field = _to_text(item)
         elif isinstance(item, (int, float)) and not isinstance(item, bool) and math.isfinite(item):
-            if isinstance(item, int) and abs(item) > _MAX_SAFE_INTEGER:
+            if (isinstance(item, int) or item.is_integer()) and abs(item) > _MAX_SAFE_INTEGER:
                 raise ValueError("csv_baris() integer di luar rentang aman")
-            field = str(item)
+            field = str(int(item)) if isinstance(item, float) and item.is_integer() else str(item)
         else:
             raise TypeError("csv_baris() hanya menerima nilai skalar")
         if any(char in field for char in (",", '"', chr(13), chr(10))):
