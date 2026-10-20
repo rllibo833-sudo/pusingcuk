@@ -8,4 +8,9 @@ hedeh pulih["nama"]
 hedeh pulih["aktif"]
 hedeh html_aman("<b>&\"'")
 hedeh csv_baris(["Budi", "kopi, susu", "dia bilang \"hai\""])
+lah nested = json_baca("{\"items\":[1,{\"ok\":true}],\"empty\":null}")
+hedeh json_teks(nested)
+lah multiline = json_baca("\"baris\\nbaru\"")
+lah carriage = json_baca("\"a\\rb\"")
+hedeh csv_baris([multiline, carriage])
 selesai jancuk
