@@ -32,23 +32,22 @@ def generate(document):
             v = f["value"]
             return "None" if v is None else ("True" if v is True else ("False" if v is False else json.dumps(v, ensure_ascii=False)))
         if k == "Variable":
-            if f["name"] not in env: raise PythonBackendError(f"baris {line}: variabel belum dideklarasikan: {f['name']}")
-            return env[f["name"]]
+            # Unresolved names are left for runtime lookup; this preserves
+            # short-circuit behavior and reference-runtime diagnostics.
+            return env.get(f["name"], "pc_v_" + f["name"])
         if k == "List": return "[" + ", ".join(expr(x, env) for x in f["items"]) + "]"
         if k == "Dict": return "PcDict([" + ", ".join("(" + expr(p[0], env) + ", " + expr(p[1], env) + ")" for p in f["items"]) + "])"
         if k == "Index": return f"pc_get({expr(f['collection'], env)}, {expr(f['index'], env)})"
         if k == "Call":
             name, args = f["name"], f["args"]
             values = ", ".join(expr(x, env) for x in args)
+            if name in {"jadi_json", "parse_json"}: return f"pc_json_parse({values})"
+            if name == "jadi_teks": return f"pc_json_text({values})"
             builtin = PYTHON_BACKEND_BUILTINS.get(name)
             if builtin is not None:
-                if not builtin["min_args"] <= len(args) <= builtin["max_args"]:
-                    low, high = builtin["min_args"], builtin["max_args"]
-                    expected = str(low) if low == high else f"{low}-{high}"
-                    raise PythonBackendError(f"baris {line}: {name} membutuhkan {expected} argumen")
-                return f"{builtin['helper']}({values})"
-            if name not in functions: raise PythonBackendError(f"baris {line}: fungsi tidak dikenal: {name}")
-            if len(args) != len(functions[name]["fields"]["params"]): raise PythonBackendError(f"baris {line}: jumlah argumen salah untuk {name}")
+                return (f"pc_invoke_builtin({json.dumps(name)}, [{values}], "
+                        f"{builtin['min_args']}, {builtin['max_args']}, {builtin['helper']})")
+            if name not in functions: return f"pc_unknown_function({json.dumps(name)}, {line})"
             return f"pc_fn_{name}({values})"
         if k == "Unary":
             value = expr(f["value"], env)
@@ -140,6 +139,10 @@ def generate(document):
 
     runtime = '''import math
 import sys
+import json
+import html
+import csv
+import io
 pc_current_line = 0
 class PcDict:
     def __init__(self, pairs=()):
@@ -280,10 +283,40 @@ def pc_range(*args):
     result = range(*args)
     if len(result) > 10000: raise ValueError("rentang melewati batas 10000 item")
     return result
+def pc_invoke_builtin(name, args, minimum, maximum, function):
+    if not minimum <= len(args) <= maximum:
+        expected = str(minimum) if minimum == maximum else f"{minimum}-{maximum}"
+        raise TypeError(f"{name}() membutuhkan {expected} argumen")
+    return function(*args)
+def pc_unknown_function(name, line):
+    raise NameError(f"Baris {line}: fungsi '{name}' tidak dikenal")
+def pc_json_value(value):
+    if isinstance(value, PcDict): return {str(k): pc_json_value(v) for k, v in value.entries}
+    if isinstance(value, dict): return {str(k): pc_json_value(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple, range)): return [pc_json_value(v) for v in value]
+    if value is None or isinstance(value, (str, int, float, bool)): return value
+    raise TypeError("nilai tidak dapat diserialisasi sebagai JSON")
+def pc_json_text(value):
+    return json.dumps(pc_json_value(value), ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+def pc_json_read(value):
+    if not isinstance(value, str): raise TypeError("json_baca() membutuhkan teks JSON")
+    return json.loads(value)
+def pc_json_parse(value):
+    if not isinstance(value, str): return False
+    try: return json.loads(value)
+    except (ValueError, TypeError): return False
+def pc_html_escape(value):
+    return html.escape(pc_text(value), quote=True)
+def pc_csv_row(value):
+    if not isinstance(value, list): raise TypeError("csv_baris() membutuhkan daftar")
+    buffer = io.StringIO()
+    csv.writer(buffer, lineterminator="").writerow([pc_text(item) for item in value])
+    return buffer.getvalue()
 def pc_out(v):
     if v is True: v = "okelah"
     elif v is False: v = "tidak"
-    elif v is None: v = "kosong"
+    elif v is None: v = "None"
+    elif isinstance(v, float) and v.is_integer() and abs(v) <= 9007199254740991: v = int(v)
     print(v)
 def pc_eq(a, b):
     if isinstance(a, bool) != isinstance(b, bool) and isinstance(a, (bool, int, float)) and isinstance(b, (bool, int, float)): return False
@@ -302,7 +335,7 @@ def pc_mod(a, b):
     if b == 0: raise ZeroDivisionError("modulo dengan nol")
     return a % b
 def pc_get(a, i):
-    if isinstance(a, (str, list)):
+    if isinstance(a, (str, list, range)):
         if not isinstance(i, int) or isinstance(i, bool) or i < 0 or i >= len(a): raise IndexError("indeks di luar batas")
         return a[i]
     if isinstance(a, PcDict): return a[i]

@@ -366,6 +366,19 @@ const pcJsonRead = (value) => {
     throw new Error("teks JSON tidak valid: " + error.message);
   }
 };
+const pcJsonParse = (value) => { try { return pcJsonRead(value); } catch (_) { return false; } };
+const pcInvokeBuiltin = (name, args, min, max, fn) => {
+  if (args.length < min || args.length > max) {
+    const expected = min === max ? String(min) : String(min) + "-" + String(max);
+    throw new Error(name + "() membutuhkan " + expected + " argumen");
+  }
+  return fn(...args);
+};
+const pcInvokeFunction = (name, args, expected, fn) => {
+  if (args.length !== expected) throw new Error("fungsi '" + name + "' membutuhkan " + expected + " argumen");
+  return fn(...args);
+};
+const pcUnknownFunction = (name, line) => { throw new Error("Baris " + line + ": fungsi '" + name + "' tidak dikenal atau belum didukung"); };
 const pcHtmlEscape = (value) => pcText(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;")
   .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#x27;");
 const pcCsvRow = (value) => {
@@ -465,9 +478,9 @@ def generate(document: dict, as_module: bool = False) -> str:
             return _js_literal(f.get("value"), line)
         if kind == "Variable":
             name = f.get("name")
-            if name not in names:
-                raise JSBackendError(f"baris {line}: variabel {name!r} belum dideklarasikan")
-            return names[name]
+            # Keep unresolved names as runtime references so short-circuit
+            # expressions and runtime diagnostics match the reference engine.
+            return names.get(name, f"pc_v_{name}")
         if kind == "List":
             return "[" + ", ".join(expr(v, names) for v in f.get("items", [])) + "]"
         if kind == "Dict":
@@ -483,18 +496,18 @@ def generate(document: dict, as_module: bool = False) -> str:
             name, args = f.get("name"), f.get("args")
             rendered = ", ".join(expr(arg, names) for arg in args)
             builtin = JS_BUILTINS.get(name)
+            if name in {"jadi_json", "parse_json"}:
+                return f"pcJsonParse({rendered})"
+            if name == "jadi_teks":
+                return f"pcJsonText({rendered})"
             if builtin is not None:
-                if not builtin["min_args"] <= len(args) <= builtin["max_args"]:
-                    low, high = builtin["min_args"], builtin["max_args"]
-                    expected = str(low) if low == high else f"{low}-{high}"
-                    raise JSBackendError(f"baris {line}: {name}() membutuhkan {expected} argumen")
-                return f"{builtin['helper']}({rendered})"
+                return (f"pcInvokeBuiltin({json.dumps(name)}, [{rendered}], "
+                        f"{builtin['min_args']}, {builtin['max_args']}, {builtin['helper']})")
             if name not in functions:
-                raise JSBackendError(f"baris {line}: fungsi {name!r} tidak dikenal atau belum didukung")
+                return f"pcUnknownFunction({json.dumps(name)}, {line})"
             expected = len(functions[name]["fields"]["params"])
-            if len(args) != expected:
-                raise JSBackendError(f"baris {line}: fungsi {name!r} membutuhkan {expected} argumen")
-            return f"pc_fn_{name}({rendered})"
+            return (f"pcInvokeFunction({json.dumps(name)}, [{rendered}], "
+                    f"{expected}, pc_fn_{name})")
         if kind == "Unary":
             value = expr(f.get("value"), names)
             op = f.get("op")
@@ -626,6 +639,7 @@ def generate(document: dict, as_module: bool = False) -> str:
             names[param] = f"pc_v_{param}"
             params.append(names[param])
         output.append(f"function pc_fn_{name}({', '.join(params)}) {{")
+        output.append(f"  if (arguments.length !== {len(params)}) throw new Error(\"fungsi '{name}' membutuhkan {len(params)} argumen\");")
         output.extend(statements(f["body"], names, "  ", in_function=True) or ["  ;"])
         output.append("}")
         output.append("")

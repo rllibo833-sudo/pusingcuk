@@ -3,11 +3,26 @@ import argparse
 import json
 import math
 import sys
+import html
+import csv
+import io
 from pathlib import Path
 
 from compiler.bytecode import BytecodeError, validate_bytecode
 from evaluator import PusingDict, language_equal
 from library.builtin_contract import BUILTIN_BY_NAME
+
+
+def _json_ready(value):
+    if isinstance(value, PusingDict):
+        return {str(key): _json_ready(item) for key, item in value.items()}
+    if isinstance(value, dict):
+        return {str(key): _json_ready(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple, range)):
+        return [_json_ready(item) for item in value]
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    raise TypeError("nilai tidak dapat diserialisasi sebagai JSON")
 
 
 class VMError(RuntimeError):
@@ -93,11 +108,11 @@ class VirtualMachine:
                 stack.append(result)
             elif op == "GET":
                 key, collection = self.pop(stack, line), self.pop(stack, line)
-                if isinstance(collection, (list, str)):
+                if isinstance(collection, (list, str, range)):
                     if not isinstance(key, int) or isinstance(key, bool): self.fail(line, "indeks harus berupa bilangan bulat")
                     if key < 0 or key >= len(collection): self.fail(line, "indeks di luar batas")
                     stack.append(collection[key])
-                elif isinstance(collection, PusingDict):
+                elif isinstance(collection, (PusingDict, dict)):
                     try: stack.append(collection[key])
                     except (KeyError, TypeError): self.fail(line, "kunci kamus tidak ditemukan")
                 else: self.fail(line, "nilai tidak dapat diindeks")
@@ -131,6 +146,8 @@ class VirtualMachine:
                 right, left = self.pop(stack, line), self.pop(stack, line)
                 try:
                     if arg == "+" and isinstance(left, str) and isinstance(right, str):
+                        result = left + right
+                    elif arg == "+" and isinstance(left, list) and isinstance(right, list):
                         result = left + right
                     elif arg == "==":
                         result = language_equal(left, right)
@@ -189,7 +206,15 @@ class VirtualMachine:
                 if not isinstance(count, int) or count < 0 or count > len(stack): self.fail(line, "jumlah argumen tidak valid")
                 args = stack[-count:] if count else []
                 if count: del stack[-count:]
-                if name in BUILTIN_BY_NAME:
+                if name in {"jadi_json", "parse_json"}:
+                    if len(args) != 1: self.fail(line, f"{name}() membutuhkan 1 argumen")
+                    try: result = json.loads(args[0])
+                    except (TypeError, ValueError): result = False
+                elif name == "jadi_teks":
+                    if len(args) != 1: self.fail(line, "jadi_teks() membutuhkan 1 argumen")
+                    try: result = json.dumps(_json_ready(args[0]), ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+                    except (TypeError, ValueError) as exc: self.fail(line, str(exc))
+                elif name in BUILTIN_BY_NAME:
                     from library.stdlib import call_builtin
                     try:
                         result = call_builtin(name, *args)

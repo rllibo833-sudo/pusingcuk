@@ -18,10 +18,10 @@ Status `not-claimed` pada native C berarti scalar subset telah diuji, tetapi kes
 | Built-in | Argumen | Perilaku | Python reference | Native C | JS transpiler | Python transpiler | HTML | VM |
 |---|---:|---|---|---|---|---|---|---|
 | `panjang` | 1 | Jumlah elemen pada teks, daftar, kamus, atau rentang yang didukung runtime. | supported | supported | supported | supported | supported | supported |
-| `teks` | 1 | Konversi nilai menjadi teks. | supported | not-claimed | supported | unsupported | unsupported | supported |
-| `bilangan` | 1 | Konversi nilai menjadi bilangan bulat. | supported | not-claimed | supported | unsupported | unsupported | supported |
-| `desimal` | 1 | Konversi nilai menjadi bilangan desimal. | supported | not-claimed | supported | unsupported | unsupported | supported |
-| `logika` | 1 | Konversi nilai menjadi benar/salah. | supported | not-claimed | supported | unsupported | unsupported | supported |
+| `teks` | 1 | Konversi nilai menjadi teks. | supported | not-claimed | supported | supported | unsupported | supported |
+| `bilangan` | 1 | Konversi nilai menjadi bilangan bulat. | supported | not-claimed | supported | supported | unsupported | supported |
+| `desimal` | 1 | Konversi nilai menjadi bilangan desimal. | supported | not-claimed | supported | supported | unsupported | supported |
+| `logika` | 1 | Konversi nilai menjadi benar/salah. | supported | not-claimed | supported | supported | unsupported | supported |
 | `rentang` | 1–3 | Rentang bilangan bulat dengan batas akhir eksklusif. | supported | supported | supported | supported | supported | supported |
 | `mutlak` | 1 | Nilai absolut angka finite. | supported | supported | supported | supported | supported | supported |
 | `minimum` | 2 | Nilai terkecil dari dua angka finite. | supported | supported | supported | supported | supported | supported |
@@ -31,17 +31,17 @@ Status `not-claimed` pada native C berarti scalar subset telah diuji, tetapi kes
 | `bawah` | 1 | Pembulatan ke bawah menuju integer. | supported | supported | supported | supported | supported | supported |
 | `atas` | 1 | Pembulatan ke atas menuju integer. | supported | supported | supported | supported | supported | supported |
 | `pangkat` | 2 | Pangkat dua angka finite; domain tidak valid dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | supported |
-| `logaritma` | 1 | Logaritma natural untuk angka finite positif. | supported | supported | supported | unsupported | unsupported | supported |
-| `log10` | 1 | Logaritma basis 10 untuk angka finite positif. | supported | supported | supported | unsupported | unsupported | supported |
+| `logaritma` | 1 | Logaritma natural untuk angka finite positif. | supported | supported | supported | supported | unsupported | supported |
+| `log10` | 1 | Logaritma basis 10 untuk angka finite positif. | supported | supported | supported | supported | unsupported | supported |
 | `sinus` | 1 | Sinus sudut finite dalam radian; hasil integral aman dinormalisasi dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | supported |
 | `kosinus` | 1 | Kosinus sudut finite dalam radian; hasil integral aman dinormalisasi dan hasil non-finite ditolak. | supported | supported | supported | supported | supported | supported |
-| `jumlah` | 1 | Jumlah berurutan angka finite non-boolean dalam daftar; daftar kosong bernilai nol dan setiap hasil integral antara/akhir dibatasi rentang aman lintas target. | supported | supported | supported | unsupported | unsupported | supported |
+| `jumlah` | 1 | Jumlah berurutan angka finite non-boolean dalam daftar; daftar kosong bernilai nol dan setiap hasil integral antara/akhir dibatasi rentang aman lintas target. | supported | supported | supported | supported | unsupported | supported |
 | `rata_rata` | 1 | Rata-rata aritmetika daftar nonkosong angka finite non-boolean dalam rentang aman lintas target. | supported | supported | supported | supported | supported | supported |
 | `median` | 1 | Median daftar nonkosong angka finite non-boolean dalam rentang aman lintas target. | supported | supported | supported | supported | supported | supported |
-| `json_teks` | 1 | Serialisasi nilai JSON dengan tipe dan kunci yang aman lintas target. | supported | unsupported | supported | unsupported | supported | unsupported |
-| `json_baca` | 1 | Membaca teks JSON menjadi nilai PusingCuk. | supported | unsupported | supported | unsupported | supported | unsupported |
-| `html_aman` | 1 | Meloloskan karakter khusus untuk teks HTML. | supported | unsupported | supported | unsupported | supported | unsupported |
-| `csv_baris` | 1 | Menyerialisasi daftar nilai skalar menjadi satu baris CSV RFC 4180 tanpa terminator baris. | supported | unsupported | supported | unsupported | supported | unsupported |
+| `json_teks` | 1 | Serialisasi nilai JSON dengan tipe dan kunci yang aman lintas target. | supported | unsupported | supported | supported | supported | supported |
+| `json_baca` | 1 | Membaca teks JSON menjadi nilai PusingCuk. | supported | unsupported | supported | supported | supported | supported |
+| `html_aman` | 1 | Meloloskan karakter khusus untuk teks HTML. | supported | unsupported | supported | supported | supported | supported |
+| `csv_baris` | 1 | Menyerialisasi daftar nilai skalar menjadi satu baris CSV RFC 4180 tanpa terminator baris. | supported | unsupported | supported | supported | supported | supported |
 
 ## Intrinsics Tambahan Python (reference only)
 

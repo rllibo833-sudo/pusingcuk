@@ -38,6 +38,20 @@ def execute(command, stdin_text=""):
         return None, "", str(exc), "harness_error"
 
 
+def compile_rejection_matches(item, returncode, stderr):
+    """Accept early compiler rejection only for a fixture that expects failure.
+
+    The compiler may diagnose a statically invalid negative fixture before the
+    reference interpreter reaches runtime. Pinned source lines must still match.
+    """
+    expected = item["expected"]
+    if expected.get("exit_code", 0) == 0 or returncode in (None, 0) or not stderr.strip():
+        return False
+    expected_line = expected.get("source_line")
+    actual_line = source_line_from_stderr(stderr)
+    return expected_line is None or actual_line == expected_line
+
+
 def main():
     fixtures = load_manifest()
     rows = []
@@ -75,8 +89,11 @@ def main():
                         compile_cmd = [sys.executable, "-m", "compiler.js_backend", str(source_path), "-o", str(generated)]
                         cr, co, ce, err = execute(compile_cmd)
                         if err or cr != 0:
-                            status, reason, observation = "failed", "JavaScript compile failed" + (": " + ce.strip() if ce.strip() else ""), {"compile_stdout": co, "compile_stderr": ce, "compile_exit_code": cr}
-                            per_fixture["targets"][target] = {"status": status, "reason": reason, **observation}
+                            if compile_rejection_matches(item, cr, ce):
+                                status, reason, observation = "passed", "", {"phase": "compile", "compile_stderr": ce, "compile_exit_code": cr, "matched": True}
+                            else:
+                                status, reason, observation = "failed", "JavaScript compile failed" + (": " + ce.strip() if ce.strip() else ""), {"compile_stdout": co, "compile_stderr": ce, "compile_exit_code": cr}
+                            per_fixture["targets"][target] = {"status": status, **({"reason": reason} if reason else {}), **observation}
                             raw_lines.append(f"[{item['id']}][{target}] {status}: {reason}\n{ce}")
                             continue
                         command = [node, str(generated)]
@@ -85,8 +102,11 @@ def main():
                         command_compile = [sys.executable, "-m", "compiler.python_backend", str(source_path), "-o", str(generated)]
                         cr, co, ce, err = execute(command_compile)
                         if err or cr != 0:
-                            status, reason, observation = "failed", "Python transpiler compile failed" + (": " + ce.strip() if ce.strip() else ""), {"compile_stdout": co, "compile_stderr": ce, "compile_exit_code": cr}
-                            per_fixture["targets"][target] = {"status": status, "reason": reason, **observation}
+                            if compile_rejection_matches(item, cr, ce):
+                                status, reason, observation = "passed", "", {"phase": "compile", "compile_stderr": ce, "compile_exit_code": cr, "matched": True}
+                            else:
+                                status, reason, observation = "failed", "Python transpiler compile failed" + (": " + ce.strip() if ce.strip() else ""), {"compile_stdout": co, "compile_stderr": ce, "compile_exit_code": cr}
+                            per_fixture["targets"][target] = {"status": status, **({"reason": reason} if reason else {}), **observation}
                             raw_lines.append(f"[{item['id']}][{target}] {status}: {reason}\n{ce}")
                             continue
                         command = [sys.executable, str(generated)]
@@ -98,8 +118,11 @@ def main():
                                   "Path(sys.argv[2]).write_text(json.dumps(compile_source(p.read_text(encoding='utf-8'), p.name)), encoding='utf-8')")
                         cr, co, ce, err = execute([sys.executable, "-c", inline, str(source_path), str(generated)])
                         if err or cr != 0:
-                            status, reason, observation = "failed", "VM bytecode compile failed" + (": " + ce.strip() if ce.strip() else ""), {"compile_stdout": co, "compile_stderr": ce, "compile_exit_code": cr}
-                            per_fixture["targets"][target] = {"status": status, "reason": reason, **observation}
+                            if compile_rejection_matches(item, cr, ce):
+                                status, reason, observation = "passed", "", {"phase": "compile", "compile_stderr": ce, "compile_exit_code": cr, "matched": True}
+                            else:
+                                status, reason, observation = "failed", "VM bytecode compile failed" + (": " + ce.strip() if ce.strip() else ""), {"compile_stdout": co, "compile_stderr": ce, "compile_exit_code": cr}
+                            per_fixture["targets"][target] = {"status": status, **({"reason": reason} if reason else {}), **observation}
                             raw_lines.append(f"[{item['id']}][{target}] {status}: {reason}\n{ce}")
                             continue
                         command = [sys.executable, "-m", "compiler.vm", str(generated)]

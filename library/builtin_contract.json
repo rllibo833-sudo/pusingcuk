@@ -728,14 +728,15 @@
           "helper": "pcJsonText"
         },
         "python": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pc_json_text"
         },
         "html": {
           "status": "supported",
           "via": "js"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         }
       }
     },
@@ -760,14 +761,15 @@
           "helper": "pcJsonRead"
         },
         "python": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pc_json_read"
         },
         "html": {
           "status": "supported",
           "via": "js"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         }
       }
     },
@@ -792,14 +794,15 @@
           "helper": "pcHtmlEscape"
         },
         "python": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pc_html_escape"
         },
         "html": {
           "status": "supported",
           "via": "js"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         }
       }
     },
@@ -824,14 +827,15 @@
           "helper": "pcCsvRow"
         },
         "python": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pc_csv_row"
         },
         "html": {
           "status": "supported",
           "via": "js"
         },
         "vm": {
-          "status": "unsupported"
+          "status": "supported"
         }
       }
     }
@@ -1070,7 +1074,8 @@
       "backends": {
         "python": "supported",
         "c": "unsupported",
-        "pvm": "unsupported"
+        "pvm": "supported",
+        "js": "supported"
       }
     },
     {
@@ -1083,7 +1088,8 @@
       "backends": {
         "python": "supported",
         "c": "unsupported",
-        "pvm": "unsupported"
+        "pvm": "supported",
+        "js": "supported"
       }
     },
     {
@@ -1096,7 +1102,8 @@
       "backends": {
         "python": "supported",
         "c": "unsupported",
-        "pvm": "unsupported"
+        "pvm": "supported",
+        "js": "supported"
       }
     },
     {
