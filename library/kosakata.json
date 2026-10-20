@@ -2,24 +2,122 @@
   "schema_version": 1,
   "language": "Pusingcuk",
   "keywords": [
-    {"word": "hedeh", "aliases": ["jir", "spill", "cetak", "tampilkan"]},
-    {"word": "kampret", "aliases": ["adooh", "skip"]},
-    {"word": "selesai", "aliases": ["gitu", "kelar"]},
-    {"word": "jancuk", "aliases": ["gas", "inthiseco"]},
-    {"word": "bukan", "aliases": ["janggal"]},
-    {"word": "lah", "aliases": ["bestie"]},
-    {"word": "benar", "aliases": ["valid"]},
-    {"word": "salah", "aliases": ["zonk"]},
-    {"word": "tanya", "aliases": ["kepo"]},
-    {"word": "tulis", "aliases": ["simpen"]},
-    {"word": "baca", "aliases": ["bongkar"]},
-    {"word": "tulis_json", "aliases": ["simpen_json"]},
-    {"word": "baca_json", "aliases": ["bongkar_json"]},
-    {"word": "angkut", "aliases": ["impor"]},
-    {"word": "jam", "aliases": ["waktu"]},
-    {"word": "kepo_internet", "aliases": ["gas_api", "stalking"]},
-    {"word": "kirim_api", "aliases": ["kirim_gosip"]},
-    {"word": "jadi_json", "aliases": ["parse_json"]}
+    {
+      "word": "hedeh",
+      "aliases": [
+        "jir",
+        "spill",
+        "cetak",
+        "tampilkan"
+      ]
+    },
+    {
+      "word": "kampret",
+      "aliases": [
+        "adooh",
+        "skip"
+      ]
+    },
+    {
+      "word": "selesai",
+      "aliases": [
+        "gitu",
+        "kelar"
+      ]
+    },
+    {
+      "word": "jancuk",
+      "aliases": [
+        "gas",
+        "inthiseco"
+      ]
+    },
+    {
+      "word": "bukan",
+      "aliases": [
+        "janggal"
+      ]
+    },
+    {
+      "word": "lah",
+      "aliases": [
+        "bestie"
+      ]
+    },
+    {
+      "word": "benar",
+      "aliases": [
+        "valid"
+      ]
+    },
+    {
+      "word": "salah",
+      "aliases": [
+        "zonk"
+      ]
+    },
+    {
+      "word": "tanya",
+      "aliases": [
+        "kepo"
+      ]
+    },
+    {
+      "word": "tulis",
+      "aliases": [
+        "simpen"
+      ]
+    },
+    {
+      "word": "baca",
+      "aliases": [
+        "bongkar"
+      ]
+    },
+    {
+      "word": "tulis_json",
+      "aliases": [
+        "simpen_json"
+      ]
+    },
+    {
+      "word": "baca_json",
+      "aliases": [
+        "bongkar_json"
+      ]
+    },
+    {
+      "word": "angkut",
+      "aliases": [
+        "impor"
+      ]
+    },
+    {
+      "word": "jam",
+      "aliases": [
+        "waktu"
+      ]
+    },
+    {
+      "word": "kepo_internet",
+      "aliases": [
+        "gas_api",
+        "stalking"
+      ]
+    },
+    {
+      "word": "kirim_api",
+      "aliases": [
+        "kirim_gosip"
+      ]
+    },
+    {
+      "word": "jadi_json",
+      "aliases": [
+        "parse_json"
+      ]
+    }
   ],
-  "source_of_truth": []
+  "source_of_truth": [],
+  "language_version": "0.6-dev"
 }
