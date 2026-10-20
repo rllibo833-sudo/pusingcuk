@@ -21,6 +21,16 @@
       "percent": 96.1,
       "runtime": "native C",
       "note": "Verified current-main fixture matrix; target counts match the checked-in baseline."
+    },
+    {
+      "date": "2026-10-21",
+      "commit": "db67c1f33454ccc2f422381dec4b02df0227f007",
+      "run_url": "https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39465123558",
+      "numerator": 79,
+      "denominator": 79,
+      "percent": 100,
+      "runtime": "native C",
+      "note": "Verified fixture matrix: 79/79 native C; 79 reference/native comparisons, zero mismatches, incomplete results, or unsupported native fixtures."
     }
   ]
 }
