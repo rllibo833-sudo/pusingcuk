@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "site/**"
+      - "tests/test_browser_runtime.js"
       - "pusingcuk_new.py"
       - "evaluator.py"
       - "parser.py"
@@ -19,6 +20,7 @@ on:
   pull_request:
     paths:
       - "site/**"
+      - "tests/test_browser_runtime.js"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -45,6 +47,8 @@ jobs:
           python-version: "3.12"
       - name: Verify .cuk gallery examples against reference interpreter
         run: python tools/check_playground_examples.py
+      - name: Test browser runtime against every gallery fixture
+        run: node tests/test_browser_runtime.js
       - name: Verify reference interpreter example
         run: |
           python pusingcuk_new.py site/examples/halo.pusingcuk > /tmp/halo-reference.txt
@@ -64,7 +68,11 @@ jobs:
           test -s site/robots.txt
           grep -q 'languagePicker' site/index.html
           ! grep -qi 'pyodide.js' site/playground.html
-          ! grep -q 'id="run"' site/playground.html
+          test -s site/runtime.js
+          grep -q 'id="sourceEditor"' site/playground.html
+          grep -q 'id="runCode"' site/playground.html
+          grep -q 'PusingCukBrowser.run' site/playground.html
+          grep -q 'runtime.js' site/playground.html
           grep -q 'sitemap.xml' site/robots.txt
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request'

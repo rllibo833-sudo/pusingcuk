@@ -1,24 +1,28 @@
 # PusingCuk Community Website
 
-The static introduction site lives in `site/index.html`. It requires no framework, bundler, npm dependencies, or backend.
+The static introduction site lives in `site/index.html`; the interactive playground is `site/playground.html`. The site requires no npm dependencies, CDN, or backend service.
 
 ## Preview locally
 
-Open `index.html` directly in a browser, or start a static server from the repository root:
+From the repository root:
 
 ```sh
 python -m http.server 8000 --directory site
 ```
 
-Then open `http://localhost:8000` on the same device.
+Open `http://localhost:8000` on the same device. The browser runtime runs .cuk locally; curated examples load from `site/examples/playground/`.
+
+## Browser runtime
+
+The playground uses `site/runtime.js`, a bounded JavaScript AST interpreter for the supported .cuk subset. It does not use `eval`, Pyodide, a remote execution API, filesystem access, or network built-ins. Input statements, filesystem operations, and network operations are intentionally unavailable in this browser target. Runtime support is separate from the reference interpreter and other compiler backends.
+
+Run the browser-runtime fixture suite with:
+
+```sh
+node tests/test_browser_runtime.js
+python tools/check_playground_examples.py
+```
 
 ## GitHub Pages
 
-The `.github/workflows/pages.yml` workflow publishes the `site/` directory through GitHub Pages when changes reach `main`. If Pages is not enabled for this repository, open **Settings → Pages** and select **GitHub Actions** as the build and deployment source.
-
-## Notes
-
-- The main page is static HTML/CSS. The compiler does not yet provide a general-purpose templating backend for building arbitrary designs directly from PusingCuk source.
-- The publishing workflow compiles `examples/halo.pusingcuk` into a standalone HTML target named `demo.html`. A link to it appears on the main page.
-- The introduction website and compiled demo are separate artifacts. The entire landing page is not written in PusingCuk.
-- Feature status is described conservatively and linked to the main technical documentation.
+The `.github/workflows/pages.yml` workflow validates the reference examples and browser runtime, then publishes the `site/` directory through GitHub Pages when changes reach `main`. If Pages is not enabled for this repository, select **GitHub Actions** in **Settings → Pages**.
