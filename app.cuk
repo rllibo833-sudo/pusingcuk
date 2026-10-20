@@ -1,5 +1,6 @@
 jancuk
-cetak "CETAK JALAN"
-tampilkan "TAMPILKAN JALAN"
-spill "SPILL JALAN - MANDIRI"
+fungsi tambah(a, b)
+    balek a + b
+selesai fungsi
+hedeh tambah(20, 22)
 selesai jancuk
