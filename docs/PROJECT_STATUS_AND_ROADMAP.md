@@ -18,6 +18,7 @@
 - **JavaScript/Python/Android:** backends or prototypes exist with their own coverage. File presence does not prove parity or distribution readiness.
 - **PusingCuk AI:** the assistant, retrieval, provider adapters, allowlisted tools, compile-check, and file-generation tool exist. The separate repair adapter is not yet an end-to-end accepted repair pipeline: the default Reality Engine runner has no integrated JS/Python/VM proposal runners or fixture-addition evidence.
 - **Cuk Reality Engine:** a fail-closed acceptance gate exists, but the production runner currently marks JavaScript, Python, and VM unavailable and requires a relevant fixture to already be added. It is a gate/prototype, not proof of autonomous cross-target repair.
+- **Installed AI tooling:** source inspection shows the AI tools resolve `tests/conformance/manifest.json`, but neither the setuptools package data nor the PyInstaller data list includes `tests/conformance/`. This is an unverified packaging gap to close before relying on conformance/context tools from installed distributions.
 - **Adapters:** SQLite, loopback HTTP, and mock/loopback JSON-RPC host modules exist, but the language-level capability contract still marks database, server HTTP, DOM, Web3, and stable FFI as planned because they are not first-class `.cuk` APIs or claimed compiler targets.
 - **Frontend/backend SaaS:** existing UIs, services, and integrations remain prototypes until build, authentication, API, and runtime paths are verified on the same commit.
 
