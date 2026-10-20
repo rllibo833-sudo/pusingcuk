@@ -34,6 +34,16 @@ library.adapters.LocalHTTPServer(routes) mengikat hanya ke alamat IP loopback li
 
 MockBlockchain menyediakan saldo dan transfer deterministik tanpa jaringan, kunci privat, atau transaksi nyata. LocalDevJsonRpc hanya menerima endpoint HTTP pada IP loopback literal, membatasi waktu/ukuran respons, dan menolak redirect. Gunakan node pengembangan lokal; belum ada adapter mainnet, wallet, penandatanganan, atau penyimpanan kunci.
 
+## Deployment lokal: Android + Termux + Ollama
+
+Target penggunaan lokal adalah satu perangkat Android milik pengguna:
+
+- Jalankan Ollama dan PusingCuk tooling dari Termux pada perangkat yang sama; arahkan provider ke endpoint loopback lokal, bukan alamat LAN atau internet.
+- Jangan menyimpan API key cloud sebagai prasyarat untuk mode lokal. Jika Ollama tidak tersedia, proses harus gagal dengan diagnostik yang jelas, bukan beralih diam-diam ke provider jarak jauh.
+- Data Center/evolution tooling hanya menghasilkan proposal dan laporan. Perubahan kosakata, parser, fixture, atau sumber bahasa tidak boleh ditulis otomatis; tidak boleh ada `git commit`/`git push` otomatis.
+- Tinjau proposal, jalankan Reality Engine dan fixture, lalu lakukan commit secara eksplisit setelah hasilnya diperiksa.
+- SQLite, HTTP loopback, dan Web3 mock di dokumen ini masih merupakan adapter host Python. API `.cuk` lintas-target yang sama pada interpreter reference dan native C **belum tersedia**; jangan gunakan contoh Python sebagai bukti bahwa program `.cuk` sudah bisa memanggil adapter.
+- Verifikasi di perangkat fisik tetap diperlukan: jalankan `bash scripts/test-termux-device.sh` di Termux dan simpan hasilnya bersama versi Android, Termux, Python, compiler C, serta Ollama yang digunakan.
 ## Batas keamanan
 
 Fitur ini bukan sandbox untuk kode tak tepercaya. Jangan jalankan program asing dengan akun yang menyimpan kredensial atau file penting. Server lokal masih dapat diakses proses lain pada perangkat yang sama; tambahkan autentikasi dan isolasi OS sebelum pemakaian sensitif. API adapter Python ini belum terhubung sebagai builtin Pusingcuk dan bukan klaim kesiapan produksi.
