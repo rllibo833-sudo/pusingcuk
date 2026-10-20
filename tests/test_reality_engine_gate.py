@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
-from tools.reality_engine import REQUIRED_TARGETS, _run_command, validate_deterministic
+from tools.reality_engine import REQUIRED_TARGETS, _production_target_runner, _run_command, validate_deterministic
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = json.loads((ROOT / "tests" / "conformance" / "manifest.json").read_text(encoding="utf-8"))
@@ -64,6 +64,19 @@ class RealityEngineGateTests(unittest.TestCase):
         result = _run_command([sys.executable, "-c", "raise SystemExit(1)"], ROOT / "tests" / "conformance" / FIXTURE["source"])
         self.assertEqual(result["status"], "FAIL")
         self.assertEqual(result["exit_code"], 1)
+
+    def test_production_runner_executes_all_five_targets(self):
+        evidence = _production_target_runner(SOURCE)
+        self.assertEqual(set(evidence["targets"]), set(REQUIRED_TARGETS))
+        self.assertTrue(evidence["fixture_added"])
+        self.assertEqual(evidence["fixture_id"], FIXTURE["id"])
+        for name in REQUIRED_TARGETS:
+            with self.subTest(target=name):
+                self.assertEqual(evidence["targets"][name]["status"], "PASS", evidence["targets"][name])
+                self.assertEqual(evidence["targets"][name]["exit_code"], 0)
+                self.assertEqual(evidence["targets"][name]["stdout"], EXPECTED)
+                self.assertTrue(evidence["targets"][name]["matched"])
+        self.assertTrue(evidence["differential_ok"])
 
     def test_all_verified_evidence_gates_can_pass(self):
         result = validate_deterministic(SOURCE, target_runner=clean_evidence)

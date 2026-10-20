@@ -12,7 +12,7 @@ Gunakan peta ini untuk menemukan lokasi yang benar sebelum mengubah kode. Ini bu
 | `SPEC.md` | Kontrak sintaks/fitur yang terlihat oleh pengguna |
 | `docs/SEMANTIC_CONTRACT.md` | Perilaku yang harus konsisten |
 | `examples/`, `*.cuk`, `library/*.cuk` | Program contoh dan aturan yang ditulis dalam .cuk |
-| `datacenter_v6.py`, `V6_CLEAN.py`, `fix_parser_all.py` | Legacy V6 scripts; `datacenter_v6.py` loops and attempts Git commit/push, unlike the review-only evolution helpers |
+| `datacenter_v6.py`, `V6_CLEAN.py`, `fix_parser_all.py` | DRY-RUN/review-only compatibility wrappers; do not mutate vocabulary, parser, or `app.cuk`, and do not commit/push |
 | `lexer.orig.py`, `interpreter.py.bak`, `token_patch.py` | Root-level legacy backup/patch files; not the canonical lexer or active CLI entry point |
 | `app.cuk`, `next_prompt.txt` | Mutable scratch artifacts used by the legacy V6 loop; not canonical language examples or conformance fixtures |
 | `pusingcuk/` | Compatibility package facade; `pusingcuk/cli.py` imports the maintained root interpreter/parser, while `pusingcuk/lexer.py` is a mirrored lexer kept in sync by `scripts/check_alias_sync.py` |
@@ -68,11 +68,11 @@ Gunakan peta ini untuk menemukan lokasi yang benar sebelum mengubah kode. Ini bu
 | Location | Actual behavior on `main` | Limit to preserve in claims |
 |---|---|---|
 | `tools/diagnostic_repair_loop.py` | Reads an in-repository `.cuk`/`.pusingcuk` file and validates lexer/parser syntax | Does not execute source or apply repairs; expected-output checks fail closed without an isolated runtime |
-| `tools/local_ai_adapter.py` | Separate Ollama/heuristic loop writes a sibling `*.proposal.cuk` file and asks the Reality Engine to validate it | Not the same path as `library/assistant.py`; default production gate cannot accept a proposal while three required targets are unavailable and fixture evidence is missing |
-| `tools/reality_engine.py` | Deterministic fail-closed acceptance gate | Requires reference, native, JavaScript, Python, VM and a relevant fixture; default runner currently integrates only reference/native |
+| `tools/local_ai_adapter.py` | Separate Ollama/heuristic loop writes a sibling `*.proposal.cuk` file and asks the Reality Engine to validate it | Not the same path as `library/assistant.py`; a proposal must match a successful manifest fixture and pass all five target checks |
+| `tools/reality_engine.py` | Deterministic fail-closed acceptance gate | Has reference/native/JavaScript/Python/VM execution paths; acceptance requires exact manifest source, exit 0, expected stdout, no stderr, and matching outputs |
 | `tools/evolve_daemon.py` and `tools/evolve_language.py` | Explicit, review-only alias proposals | No automatic vocabulary edits, commits, or pushes |
 
-**Important execution boundary:** root `datacenter_v6.py` is still a separate legacy loop that invokes `V6_CLEAN.py` and attempts commit/push every 30 seconds. Its behavior conflicts with the review-only evolution helpers. Do not treat the legacy loop as the canonical safe evolution path until the implementation is reconciled.
+**Important execution boundary:** the legacy V6 entry points are now dry-run/review-only wrappers. The canonical flow is proposal → human review → Reality Engine validation → separately reviewed Git change; no evolution helper pushes automatically.
 
 ## Generated documentation ownership
 

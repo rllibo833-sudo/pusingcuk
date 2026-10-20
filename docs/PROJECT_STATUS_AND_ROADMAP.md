@@ -16,9 +16,9 @@
 - **Native C:** a standalone backend/runtime exists for a subset. Features not covered by native tests must not be claimed compatible.
 - **Bytecode/VM:** an experimental bytecode compiler and VM exist. This is not equivalent to a Python-free native runtime.
 - **JavaScript/Python/Android:** backends or prototypes exist with their own coverage. File presence does not prove parity or distribution readiness.
-- **PusingCuk AI:** the assistant, retrieval, provider adapters, allowlisted tools, compile-check, and file-generation tool exist. The separate repair adapter is not yet an end-to-end accepted repair pipeline: the default Reality Engine runner has no integrated JS/Python/VM proposal runners or fixture-addition evidence.
-- **Cuk Reality Engine:** a fail-closed acceptance gate exists, but the production runner currently marks JavaScript, Python, and VM unavailable and requires a relevant fixture to already be added. It is a gate/prototype, not proof of autonomous cross-target repair.
-- **Installed AI tooling:** source inspection shows the AI tools resolve `tests/conformance/manifest.json`, but neither the setuptools package data nor the PyInstaller data list includes `tests/conformance/`. This is an unverified packaging gap to close before relying on conformance/context tools from installed distributions.
+- **PusingCuk AI:** assistant, retrieval, provider adapters, allowlisted tools, compile-check, and file-generation tool exist. The Reality Engine now contains reference/native/JS/Python/VM compile-and-run paths, but acceptance remains limited to exact source-backed successful fixtures; end-to-end production-runner evidence is still being added. This does not yet prove autonomous AI repair.
+- **Cuk Reality Engine:** fail-closed gate with five target execution paths and independent manifest/output validation. The CI suite tests rejection/acceptance logic; the production runner's five-target execution is not claimed proven until its end-to-end fixture test passes. It is not proof of autonomous cross-target repair.
+- **Installed AI tooling:** AI tools resolve the package-owned `library/conformance_manifest.json`; setuptools package data and the PyInstaller data list include it. The source-tree synchronization test is covered by CI; installed wheel/editable/frozen-artifact checks are pending the manual package workflow.
 - **Adapters:** SQLite, loopback HTTP, and mock/loopback JSON-RPC host modules exist, but the language-level capability contract still marks database, server HTTP, DOM, Web3, and stable FFI as planned because they are not first-class `.cuk` APIs or claimed compiler targets.
 - **Frontend/backend SaaS:** existing UIs, services, and integrations remain prototypes until build, authentication, API, and runtime paths are verified on the same commit.
 
@@ -37,9 +37,9 @@ Do not merge these branches as a single bundle: each is behind/diverged, and cur
 ## CI and packaging boundaries
 
 - The `package.yml` push trigger still targets `warungpusingcuk`, which is not in the current branch list. Manual `workflow_dispatch` remains available. Do not retarget this Android/package-heavy workflow to every `main` push without an explicit decision about runner cost.
-- `fixture-baseline.yml` still references `actions/checkout@v4`, `actions/setup-python@v5`, and `actions/upload-artifact@v4` by mutable major tags, while most other workflows pin action commit SHAs. This is a supply-chain hardening gap, not evidence of compromise.
+- `fixture-baseline.yml` pins checkout, setup-python, and upload-artifact to immutable action commit SHAs. The package workflow is being narrowed to run automatically on `main` only when package-related paths change, while retaining manual dispatch; this avoids a heavyweight build on every push.
 - The 13 checked-in workflows contain no `pull_request_target` or `workflow_run` trigger. The release workflow separates its read-only build job from a publish job with `contents: write`; the latter runs only after the validated release-artifact job.
-- Packaging and installed-AI gaps are separate: the Python wheel/PyInstaller build omits `tests/conformance/manifest.json`, although AI tools look it up under `tests/`. A green source-tree test suite does not prove those installed AI tools can load fixture context.
+- Packaging and installed-AI checks are separate from source tests. The canonical manifest remains under `tests/conformance/`; `library/conformance_manifest.json` is the package-owned mirror, with a test requiring byte-decoded JSON equality. The wheel/editable/frozen-artifact workflow must pass before the distribution gap can be marked complete.
 
 ## Priority order
 

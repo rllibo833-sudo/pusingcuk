@@ -2,7 +2,14 @@ name: Build package .cuk
 
 on:
   push:
-    branches: ["warungpusingcuk"]
+    branches: ["main"]
+    paths:
+      - ".github/workflows/package.yml"
+      - "pyproject.toml"
+      - "pusingcuk.spec"
+      - "pusingcuk/ai_tools.py"
+      - "library/ai_tools.py"
+      - "library/conformance_manifest.json"
   workflow_dispatch:
 
 permissions:
