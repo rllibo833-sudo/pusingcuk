@@ -121,7 +121,7 @@ def main() -> int:
     legacy_keys = [key for key in ("Pusingcuk", "0.6-dev", "hedeh_legacy") if key in vocabulary]
     if legacy_keys:
         failures.append(("library/kosakata.json legacy keys", legacy_keys))
-    if vocabulary.get("source_of_truth") != "SPEC.md":
+    if vocabulary.get("source_of_truth") != ["../SPEC.md"]:
         failures.append(("library/kosakata.json source_of_truth", [repr(vocabulary.get("source_of_truth"))]))
     if failures:
         print("\nFAIL: alias contract tidak sinkron", file=sys.stderr)
