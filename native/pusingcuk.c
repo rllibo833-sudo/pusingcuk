@@ -1106,7 +1106,7 @@ static Val call_native_format_builtin(const char *name, Val *args, int argc, int
 }
 
 static void printval(Val v) {
-    if(v.t==NIL) puts("tidak ada");
+    if(v.t==NIL) puts("None");
     else if(v.t==BOOL) puts(v.b?"okelah":"tidak");
     else if(v.t==STR) puts(v.s);
     else if(v.t==LIST) printf("[list: %zu]\n", v.list ? v.list->len : 0);
