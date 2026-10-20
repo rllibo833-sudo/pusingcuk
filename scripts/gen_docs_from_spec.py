@@ -15,6 +15,10 @@ README_START = "<!-- BEGIN GENERATED SPEC ALIASES -->"
 README_END = "<!-- END GENERATED SPEC ALIASES -->"
 READY_START = "<!-- BEGIN GENERATED LANGUAGE CONTRACT -->"
 READY_END = "<!-- END GENERATED LANGUAGE CONTRACT -->"
+COMPAT_START = "<!-- BEGIN GENERATED CONFORMANCE SUMMARY -->"
+COMPAT_END = "<!-- END GENERATED CONFORMANCE SUMMARY -->"
+FIXTURE_START = "<!-- BEGIN GENERATED FIXTURE COUNTS -->"
+FIXTURE_END = "<!-- END GENERATED FIXTURE COUNTS -->"
 TICK = chr(96)
 
 
@@ -111,6 +115,63 @@ def readiness_table(aliases: dict[str, str]) -> str:
     )
 
 
+def read_verified_baseline() -> tuple[dict, dict]:
+    baseline_path = ROOT / "tests" / "conformance" / "baseline_summary.json"
+    manifest_path = ROOT / "tests" / "conformance" / "manifest.json"
+    baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    fixtures = manifest.get("fixtures")
+    if not isinstance(fixtures, list) or not fixtures:
+        raise ValueError("manifest.json harus memiliki fixtures[] non-kosong")
+    if baseline.get("fixture_count") != len(fixtures):
+        raise ValueError("baseline_summary.json fixture_count tidak cocok dengan manifest.json")
+    targets = baseline.get("targets")
+    if not isinstance(targets, dict):
+        raise ValueError("baseline_summary.json harus memiliki targets{}")
+    for target, counts in targets.items():
+        total = sum(int(counts.get(state, 0)) for state in ("passed", "failed", "timeout", "unsupported", "unavailable"))
+        if total != len(fixtures):
+            raise ValueError(f"baseline target {target} berjumlah {total}, bukan {len(fixtures)} fixture")
+    for runtime in ("reference", "native"):
+        if runtime not in targets:
+            raise ValueError("baseline wajib memiliki target " + runtime)
+    return baseline, manifest
+
+
+def compatibility_snapshot() -> str:
+    baseline, _manifest = read_verified_baseline()
+    rows = []
+    for target, result in baseline["targets"].items():
+        rows.append("| " + target + " | " + str(result.get("passed", 0)) + " | " +
+                    str(result.get("failed", 0)) + " | " + str(result.get("timeout", 0)) + " | " +
+                    str(result.get("unsupported", 0)) + " | " + str(result.get("unavailable", 0)) + " |")
+    score = baseline.get("python_free_score", {})
+    return (
+        "## Measured conformance snapshot\n\n"
+        "Generated from the checked-in fixture baseline and validated against the active manifest. This is a snapshot, not a live CI result or a claim of complete language compatibility.\n\n"
+        "| Target | Passed | Failed | Timeout | Unsupported | Unavailable |\n"
+        "|---|---:|---:|---:|---:|---:|\n" + "\n".join(rows) + "\n\n"
+        "- Fixtures in checked-in baseline summary: **" + str(baseline["fixture_count"]) + "**\n"
+        "- Native C Python-free score: **" + str(score.get("percent", "unknown")) + "%** (" +
+        str(score.get("numerator", "unknown")) + "/" + str(score.get("denominator", "unknown")) +
+        "; unsupported fixtures remain in the denominator)\n"
+    )
+
+
+def fixture_count_snapshot() -> str:
+    baseline, manifest = read_verified_baseline()
+    fixtures = manifest["fixtures"]
+    reference_required = sum(item.get("runtimes", {}).get("reference") == "required" for item in fixtures)
+    native_required = sum(item.get("runtimes", {}).get("native") == "required" for item in fixtures)
+    native_unsupported = sum(item.get("runtimes", {}).get("native") == "unsupported" for item in fixtures)
+    return (
+        "**Active manifest:** **" + str(len(fixtures)) + " fixtures**; reference required: **" +
+        str(reference_required) + "**; native C required: **" + str(native_required) +
+        "**; native C unsupported: **" + str(native_unsupported) + "**.\n"
+        "These figures are generated directly from `tests/conformance/manifest.json`; the checked-in baseline summary is validated against the same fixture count and each target's status totals."
+    )
+
+
 def render() -> dict[Path, str]:
     _core, aliases = read_spec()
     if read_lexer_aliases() != aliases:
@@ -123,7 +184,18 @@ def render() -> dict[Path, str]:
                            alias_table(aliases), "## The three parts of the ecosystem")
     readiness = replace_block(readiness_path.read_text(encoding="utf-8"), READY_START, READY_END,
                               readiness_table(aliases), "## Existing project structure to extend, not duplicate")
-    return {readme_path: readme, readiness_path: readiness}
+    compatibility_path = ROOT / "docs" / "COMPATIBILITY.md"
+    compatibility = replace_block(compatibility_path.read_text(encoding="utf-8"), COMPAT_START, COMPAT_END,
+                                  compatibility_snapshot(), "## Sasaran matriks platform")
+    fixtures_path = ROOT / "docs" / "CONFORMANCE_FIXTURES.md"
+    fixtures_doc = replace_block(fixtures_path.read_text(encoding="utf-8"), FIXTURE_START, FIXTURE_END,
+                                 fixture_count_snapshot(), "Manifest saat ini belum memuat fixture khusus Reality Engine")
+    return {
+        readme_path: readme,
+        readiness_path: readiness,
+        compatibility_path: compatibility,
+        fixtures_path: fixtures_doc,
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
