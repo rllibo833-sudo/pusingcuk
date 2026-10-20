@@ -122,7 +122,7 @@ class VirtualMachine:
                     if not isinstance(key, int) or isinstance(key, bool): self.fail(line, "indeks harus berupa bilangan bulat")
                     if key < 0 or key >= len(collection): self.fail(line, "indeks di luar batas")
                     collection[key] = value
-                elif isinstance(collection, PusingDict):
+                elif isinstance(collection, (PusingDict, dict)):
                     try: collection[key] = value
                     except (KeyError, TypeError, ValueError): self.fail(line, "kunci kamus tidak valid")
                 else: self.fail(line, "assignment indeks hanya mendukung daftar dan kamus")

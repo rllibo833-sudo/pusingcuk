@@ -46,8 +46,9 @@ def generate(document):
             builtin = PYTHON_BACKEND_BUILTINS.get(name)
             if builtin is not None:
                 return (f"pc_invoke_builtin({json.dumps(name)}, [{values}], "
-                        f"{builtin['min_args']}, {builtin['max_args']}, {builtin['helper']})")
-            if name not in functions: return f"pc_unknown_function({json.dumps(name)}, {line})"
+                        f"{builtin['min_args']}, {builtin['max_args']}, "
+                        f"lambda *pc_args: {builtin['helper']}(*pc_args))")
+            if name not in functions: raise PythonBackendError(f"baris {line}: fungsi tidak dikenal: {name}")
             return f"pc_fn_{name}({values})"
         if k == "Unary":
             value = expr(f["value"], env)
@@ -288,8 +289,6 @@ def pc_invoke_builtin(name, args, minimum, maximum, function):
         expected = str(minimum) if minimum == maximum else f"{minimum}-{maximum}"
         raise TypeError(f"{name}() membutuhkan {expected} argumen")
     return function(*args)
-def pc_unknown_function(name, line):
-    raise NameError(f"Baris {line}: fungsi '{name}' tidak dikenal")
 def pc_json_value(value):
     if isinstance(value, PcDict): return {str(k): pc_json_value(v) for k, v in value.entries}
     if isinstance(value, dict): return {str(k): pc_json_value(v) for k, v in value.items()}

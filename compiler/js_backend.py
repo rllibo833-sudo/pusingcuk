@@ -39,7 +39,7 @@ const pcOut = (value) => {
   else console.log(pcString(value));
 };
 const pcString = (value) => {
-  if (value === null) return "kosong";
+  if (value === null) return "None";
   if (typeof value === "boolean") return value ? "okelah" : "tidak";
   if (Array.isArray(value)) return "[" + value.map(pcString).join(", ") + "]";
   if (value instanceof Map) return "[kamus]";
@@ -378,7 +378,6 @@ const pcInvokeFunction = (name, args, expected, fn) => {
   if (args.length !== expected) throw new Error("fungsi '" + name + "' membutuhkan " + expected + " argumen");
   return fn(...args);
 };
-const pcUnknownFunction = (name, line) => { throw new Error("Baris " + line + ": fungsi '" + name + "' tidak dikenal atau belum didukung"); };
 const pcHtmlEscape = (value) => pcText(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;")
   .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#x27;");
 const pcCsvRow = (value) => {
@@ -502,9 +501,10 @@ def generate(document: dict, as_module: bool = False) -> str:
                 return f"pcJsonText({rendered})"
             if builtin is not None:
                 return (f"pcInvokeBuiltin({json.dumps(name)}, [{rendered}], "
-                        f"{builtin['min_args']}, {builtin['max_args']}, {builtin['helper']})")
+                        f"{builtin['min_args']}, {builtin['max_args']}, "
+                        f"(...pcArgs) => {builtin['helper']}(...pcArgs))")
             if name not in functions:
-                return f"pcUnknownFunction({json.dumps(name)}, {line})"
+                raise JSBackendError(f"baris {line}: fungsi {name!r} tidak dikenal atau belum didukung")
             expected = len(functions[name]["fields"]["params"])
             return (f"pcInvokeFunction({json.dumps(name)}, [{rendered}], "
                     f"{expected}, pc_fn_{name})")
