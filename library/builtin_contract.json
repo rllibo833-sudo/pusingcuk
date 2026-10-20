@@ -60,7 +60,8 @@
           "helper": "pcText"
         },
         "python": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pc_text"
         },
         "html": {
           "status": "unsupported"
@@ -92,7 +93,8 @@
           "helper": "pcInteger"
         },
         "python": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pc_integer"
         },
         "html": {
           "status": "unsupported"
@@ -124,7 +126,8 @@
           "helper": "pcFloat"
         },
         "python": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pc_float"
         },
         "html": {
           "status": "unsupported"
@@ -156,7 +159,8 @@
           "helper": "pcBoolean"
         },
         "python": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pc_boolean"
         },
         "html": {
           "status": "unsupported"
@@ -490,7 +494,8 @@
           "helper": "pcLog"
         },
         "python": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pc_log"
         },
         "html": {
           "status": "unsupported"
@@ -521,7 +526,8 @@
           "helper": "pcLog10"
         },
         "python": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pc_log10"
         },
         "html": {
           "status": "unsupported"
@@ -618,7 +624,8 @@
           "helper": "pcSum"
         },
         "python": {
-          "status": "unsupported"
+          "status": "supported",
+          "helper": "pc_sum"
         },
         "html": {
           "status": "unsupported"
