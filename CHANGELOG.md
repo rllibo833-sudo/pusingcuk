@@ -9,15 +9,17 @@ Catatan ringkas perubahan yang sudah dilakukan. Versi paket dan versi bahasa ada
 
 ## Unreleased
 
-### Cuk Reality Engine — branch khusus
+### Cuk Reality Engine — catatan branch khusus, belum menjadi kemampuan `main`
+
+Semua butir pada bagian ini berasal dari pekerjaan branch `cuk-reality-engine`; jangan anggap sebagai implementasi `main` kecuali source, fixture, dan CI yang relevan memang sudah masuk ke branch utama. Audit 20 Oktober 2026 menemukan branch tersebut masih divergen dari `main`.
 
 - Tegaskan status kemandirian .cuk: Reality Engine membuktikan satu program aturan pada interpreter referensi, bukan runtime mandiri, parity semua backend, toolchain mandiri, atau self-hosting.
 - Ubah fallback pemetaan keputusan, alasan, dan tindakan agar ID aturan yang tidak dikenal menghasilkan status tidak dikenal dan instruksi berhenti, bukan keputusan normal. Tambahkan regresi yang menyuntikkan ID asing ke jalur keluaran.
 - Tambahkan tes target JavaScript untuk menjalankan source Reality Engine yang sama pada kasus inti, termasuk input kebijakan tidak valid dan kegagalan konversi. Hasil target ini belum boleh diklaim lulus sampai CI pada commit terbaru selesai.
 
 - Tetapkan tujuan Reality Engine sebagai program contoh berbasis aturan untuk mengembangkan dan membuktikan kemampuan bahasa `.cuk`, bukan sebagai proyek pengelolaan air produksi.
-- Tambahkan [dokumentasi kanonis Reality Engine](docs/REALITY_ENGINE.md), termasuk tabel aturan, alur eksekusi, batas klaim, cara menjalankan, dan fokus pengembangan branch.
-- Tautkan dokumentasi Reality Engine dari README dan indeks dokumentasi pada branch `cuk-reality-engine`, tanpa mengubah `main` atau `warungpusingcuk`.
+- Branch tersebut mengusulkan `docs/REALITY_ENGINE.md` untuk tabel aturan, alur eksekusi, batas klaim, cara menjalankan, dan fokus pengembangan. Berkas itu tidak ada di `main`; dokumentasi `main` yang tersedia saat ini adalah [jembatan evolusi bahasa](docs/AI_LANGUAGE_EVOLUTION_BRIDGE.md) dan [kesiapan AI Engine](docs/AI_ENGINE_READINESS.md).
+- README dan indeks pada branch `cuk-reality-engine` memiliki perubahan branch-spesifik; perubahan tersebut tidak otomatis ada di `main`. `warungpusingcuk` tidak termasuk daftar branch yang ditemukan pada audit 20 Oktober 2026.
 - Tambahkan tes regresi terarah untuk batas cadangan 0%, 100%, nilai negatif, dan nilai di atas 100%. Status lulus harus mengikuti hasil CI aktual; perubahan tes sendiri bukan bukti bahwa tes sudah lulus.
 - Ubah alur contoh agar `aturan_air()` dievaluasi sekali; ID yang sama menjadi sumber keputusan, alasan, dan tindakan. Tambahkan regresi konsistensi untuk hasil kebijakan utama dan input tidak valid.
 - Gunakan `desimal()` untuk membaca persentase cadangan agar nilai pecahan seperti `20.5` dapat melewati parsing dan diuji oleh aturan rentang. `100.1` harus ditolak oleh aturan kebijakan, bukan gagal saat konversi angka.
