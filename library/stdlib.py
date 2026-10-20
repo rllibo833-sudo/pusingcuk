@@ -119,6 +119,8 @@ def _json_read(value: Any) -> Any:
 
 
 def _html_escape(value: Any) -> str:
+    if isinstance(value, int) and not isinstance(value, bool) and abs(value) > _MAX_SAFE_INTEGER:
+        raise ValueError("html_aman() integer di luar rentang aman")
     if isinstance(value, float):
         if not math.isfinite(value):
             raise ValueError("html_aman() membutuhkan angka finite")
