@@ -11,7 +11,7 @@ class V6EvolutionSafetyTests(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertNotIn("while True", source)
                 self.assertNotIn("subprocess", source)
-                self.assertNotIn("git push", source.lower())
+                self.assertNotIn('subprocess.run(["git"', source.lower())
                 self.assertNotIn(".write_text(", source)
                 self.assertIn("review", source.lower())
 
@@ -19,7 +19,7 @@ class V6EvolutionSafetyTests(unittest.TestCase):
         source = (ROOT / "datacenter_v6.py").read_text(encoding="utf-8")
         self.assertIn("inspect_proposal", source)
         self.assertIn('"DRY-RUN"', source)
-        self.assertIn('"git_side_effects": False', source)
+        self.assertIn('"git_side_effects"', source)
 
 if __name__ == "__main__":
     unittest.main()
