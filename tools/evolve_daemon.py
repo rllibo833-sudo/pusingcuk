@@ -1,86 +1,63 @@
 #!/usr/bin/env python3
+"""Safe, opt-in proposal checker for future language-evolution work.
+
+The former daemon edited vocabulary, rewrote app.cuk, committed, and pushed in
+an endless loop. That behavior bypassed SPEC.md as the language source of truth
+and the Reality Engine acceptance contract. This module intentionally has no
+background loop, repository writes, git commands, or network side effects.
 """
-DAEMON EVOLUSI MANDIRI
-Loop: generate alias baru (dari AI / list) -> propose -> 
-test deterministik (lexer, parser, conformance, compiler) ->
-update kosakata.json + fixture -> push -> build APK via Actions
-"""
-import time, json, random, subprocess
+from __future__ import annotations
+
+import argparse
+import json
+import sys
 from pathlib import Path
 
-# daftar semantik Gen Z / Indonesia yang bisa jadi alias hedeh
-CANDIDATE_ALIASES = {
-    "hedeh": ["cetak","tampilkan","spill","gas","print","keluarin","sembur","omong"],
-    "lah": ["buat","bikin","var","deklarasi"],
-    "jancuk": ["mulai","start","gasskeun","open"],
-    "selesai": ["tutup","end","beres","kelar"],
-    "njir": ["jika","if","kalo"],
-    "mumet": ["pusing","while","selama"]
-}
+ROOT = Path(__file__).resolve().parents[1]
+VOCABULARY = ROOT / "library" / "kosakata.json"
+SPEC = ROOT / "SPEC.md"
 
-SPEC = Path("library/kosakata.json")
-NEXT = Path("next_prompt.txt")
 
-def run_tests():
-    # test deterministik + conformance + compiler
-    cmds = [
-        ["python","-m","pytest","tests/test_lexer.py","tests/test_parser.py","-q"],
-        ["python","tools/conformance.py","--check"], # kalo ada
-    ]
-    for cmd in cmds:
-        r = subprocess.run(cmd, capture_output=True, text=True)
-        if r.returncode != 0:
-            print(f"[TEST FAIL] {' '.join(cmd)}")
-            print(r.stdout[-300:])
-            return False
-    return True
+def inspect_proposal(canonical: str, alias: str) -> dict:
+    """Return a review-only result; never mutate the repository."""
+    try:
+        vocabulary = json.loads(VOCABULARY.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return {"ok": False, "status": "rejected", "reason": f"vocabulary unavailable: {exc}"}
 
-def propose(canonical, alias):
-    kos = json.loads(SPEC.read_text()) if SPEC.exists() else {}
-    if canonical not in kos: kos[canonical] = []
-    if alias in kos[canonical]: return False
-    kos[canonical].append(alias)
-    SPEC.write_text(json.dumps(kos, indent=2, ensure_ascii=False))
-    print(f"[PROPOSE] {canonical} += {alias}")
-    if not run_tests():
-        print("[REJECT] Rollback")
-        kos[canonical].remove(alias)
-        SPEC.write_text(json.dumps(kos, indent=2))
-        return False
-    print("[ACCEPT] Lolos semua test (lexer/parser/conformance/compiler)")
-    return True
+    if not alias or not alias.isidentifier():
+        return {"ok": False, "status": "rejected", "reason": "alias must be a valid identifier"}
+    if not canonical or not canonical.isidentifier():
+        return {"ok": False, "status": "rejected", "reason": "canonical keyword must be a valid identifier"}
 
-print("[DAEMON] Evolusi Mandiri START - Loop Otomatis")
-while True:
-    # 1. ambil prompt dari next_prompt.txt atau auto-generate
-    if NEXT.exists() and NEXT.read_text().strip().startswith("tambah alias"):
-        prompt = NEXT.read_text().strip().lower()
-        parts = prompt.split()
-        try:
-            alias, canonical = parts[2], parts[4]
-        except:
-            time.sleep(5); continue
-    else:
-        # auto generate alias baru yang belum ada
-        canonical = random.choice(list(CANDIDATE_ALIASES.keys()))
-        kos = json.loads(SPEC.read_text()) if SPEC.exists() else {}
-        existing = set(kos.get(canonical, []))
-        pool = [a for a in CANDIDATE_ALIASES[canonical] if a not in existing]
-        if not pool:
-            print("[DAEMON] Semua alias untuk", canonical, "udah habis, tidur 30s")
-            time.sleep(30); continue
-        alias = random.choice(pool)
+    existing = {
+        item.get("word"): set(item.get("aliases", []))
+        for item in vocabulary.get("keywords", [])
+        if isinstance(item, dict)
+    }
+    if canonical not in existing:
+        return {"ok": False, "status": "rejected", "reason": "canonical keyword is not in the vocabulary contract"}
+    if alias == canonical or alias in existing[canonical]:
+        return {"ok": False, "status": "rejected", "reason": "alias already exists or duplicates its canonical keyword"}
 
-    if propose(canonical, alias):
-        # update app.cuk buat test
-        Path("app.cuk").write_text(f'jancuk\n{alias} "Evolusi mandiri: {alias} -> {canonical} OK"\nselesai jancuk')
-        # push, trigger android-studio-apk.yml biar APK kebikin di Github (anti FC HP)
-        subprocess.run(["git","add","-A"])
-        subprocess.run(["git","commit","-m",f"evolve(mandiri): {alias}->{canonical} auto"])
-        subprocess.run(["git","push"])
-        print(f"[PUSHED] {alias} -> Actions bakal build APK")
-        # reset next_prompt.txt biar gak loop itu terus
-        if NEXT.exists(): NEXT.write_text("")
+    return {
+        "ok": False,
+        "status": "review_required",
+        "reason": "SPEC.md freezes the vocabulary; no alias can be added automatically.",
+        "proposal": {"canonical": canonical, "alias": alias},
+        "next_step": "Founder review must update SPEC.md, lexer, vocabulary registry, fixtures, and generated docs together.",
+    }
 
-    time.sleep(15)
 
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="Inspect a language alias proposal without changing files.")
+    parser.add_argument("--canonical", required=True, help="existing canonical keyword")
+    parser.add_argument("--alias", required=True, help="proposed alias")
+    args = parser.parse_args(argv)
+    result = inspect_proposal(args.canonical, args.alias)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0 if result.get("status") == "review_required" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
