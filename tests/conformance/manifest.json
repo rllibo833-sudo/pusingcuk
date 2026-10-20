@@ -1265,7 +1265,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "unsupported"
+        "native": "required"
       }
     },
     {
@@ -1542,6 +1542,24 @@
         "stdout": "",
         "stderr_class": "runtime_error",
         "source_line": 2
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "formats.json-baca-null-returns-none",
+      "source": "json_baca_null_is_none.cuk",
+      "profile": "core",
+      "requires": [
+        "json",
+        "null-values"
+      ],
+      "expected": {
+        "exit_code": 0,
+        "stdout": "None\n",
+        "stderr_class": null
       },
       "runtimes": {
         "reference": "required",
