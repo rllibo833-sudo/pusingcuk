@@ -34,6 +34,13 @@ The following branches are divergent from `main`; branch-only work is not part o
 | `public-site` | Different `site/` content, logo, sitemap/robots, and Pages workflow | Selectively compare the site changes; the branch is not a current mirror of `main` |
 
 Do not merge these branches as a single bundle: each is behind/diverged, and current `main` has since changed contracts, tests, and implementation paths.
+## CI and packaging boundaries
+
+- The `package.yml` push trigger still targets `warungpusingcuk`, which is not in the current branch list. Manual `workflow_dispatch` remains available. Do not retarget this Android/package-heavy workflow to every `main` push without an explicit decision about runner cost.
+- `fixture-baseline.yml` still references `actions/checkout@v4`, `actions/setup-python@v5`, and `actions/upload-artifact@v4` by mutable major tags, while most other workflows pin action commit SHAs. This is a supply-chain hardening gap, not evidence of compromise.
+- The 13 checked-in workflows contain no `pull_request_target` or `workflow_run` trigger. The release workflow separates its read-only build job from a publish job with `contents: write`; the latter runs only after the validated release-artifact job.
+- Packaging and installed-AI gaps are separate: the Python wheel/PyInstaller build omits `tests/conformance/manifest.json`, although AI tools look it up under `tests/`. A green source-tree test suite does not prove those installed AI tools can load fixture context.
+
 ## Priority order
 
 ### P0 — Documentation and a single contract
