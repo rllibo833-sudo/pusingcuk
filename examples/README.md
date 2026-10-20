@@ -1,99 +1,54 @@
-# Indeks contoh PusingCuk
+# Contoh resmi .cuk
 
-Berkas baru sebaiknya memakai ekstensi kanonis `.cuk`. Berkas `.pusingcuk` lama tetap tersedia demi kompatibilitas; ekstensi saja tidak menjamin fitur tersedia pada semua runtime.
+Folder ini berisi contoh dengan tingkat kematangan berbeda. **Ekstensi `.cuk` tidak berarti program sudah tervalidasi atau didukung semua target compiler.** Status sintaks, runtime, dan target harus dibuktikan oleh tes, bukan diasumsikan dari nama file.
 
-## Contoh sumber kanonis (.cuk)
+## Mulai dari contoh minimal
 
-Jalankan dari direktori akar repositori menggunakan interpreter referensi Python:
+Jalankan perintah berikut dari root repository dengan interpreter referensi:
 
 ```sh
-python pusingcuk_new.py examples/halo_dunia.cuk
-python pusingcuk_new.py examples/keuangan_sederhana.cuk
+python pusingcuk_new.py examples/hello.cuk
 python pusingcuk_new.py examples/warung.cuk
 python pusingcuk_new.py examples/rekap_anggaran.cuk
-python pusingcuk_new.py examples/core/priority_triage.cuk  # input: urgensi 1..5, dampak 1..5
-python pusingcuk_new.py examples/kalkulator.cuk
-python pusingcuk_new.py examples/terminal_bot.cuk
 ```
 
-| Berkas | Kegunaan | Catatan |
+Contoh tersebut sengaja berfokus pada program deterministik tanpa input terminal, jaringan, API eksternal, atau akses file. Jika salah satu perintah gagal pada HEAD saat ini, anggap sebagai regresi; jangan lanjutkan ke contoh yang lebih kompleks sebelum error diperbaiki.
+
+| Contoh | Konsep | Efek samping |
 |---|---|---|
-| `halo_dunia.cuk` | Input interaktif dan output teks | Meminta nama lalu menyapa pengguna. Shebang dapat dipakai setelah CLI `pusingcuk` terpasang dan tersedia di `PATH`. |
-| `keuangan_sederhana.cuk` | Fungsi, konversi angka, loop, kondisi, dan input | Jika menyetujui penyimpanan, menulis `keuangan_sederhana.txt` sebagai berkas relatif dalam project root. |
-| `warung.cuk` | Variabel, operasi matematika, kondisi | Contoh statis sederhana tanpa akses jaringan atau file. |
-| `rekap_anggaran.cuk` | Kamus, fungsi buatan, total pengeluaran, dan kondisi | Contoh kalkulasi anggaran menggunakan kamus. |
-| `core/priority_triage.cuk` | Aturan triase prioritas tugas berdasarkan urgensi dan dampak | Aturan pure/deterministik dengan domain integer 1..5, 12 fixture, hash sumber terpin; bukan sandbox dan belum menjadi tool layanan produksi PusingCuk. |
-| `kalkulator.cuk` | Input interaktif, konversi angka, kondisi, dan operasi dasar | Menggunakan keyword inti `njir`, `kampret`, dan `selesai`; bukan keyword `jika`. Dijalankan pada interpreter referensi karena built-in konversi belum tersedia di native C. Uji pembagian nol dan input nonnumerik. |
-| `terminal_bot.cuk` | Bot terminal interaktif berbasis percabangan | Contoh reference Python; menggunakan `tanya`, perbandingan teks, dan `njir/kampret`. |
+| `hello.cuk` | Variabel dan output | Tidak ada |
+| `warung.cuk` | Aritmetika dan kondisi | Tidak ada |
+| `rekap_anggaran.cuk` | Dictionary, fungsi, kalkulasi | Tidak ada |
+| `halo_dunia.cuk` | Input interaktif | Membutuhkan stdin/terminal |
+| `kalkulator.cuk` | Input, konversi, kondisi | Memerlukan built-in konversi pada target yang digunakan |
+| `terminal_bot.cuk` | Bot berbasis input | Memerlukan terminal; bukan contoh browser |
+| `json_demo.cuk` | JSON built-ins | Dukungan berbeda antar-target; jangan gunakan sebagai contoh universal sebelum matrix lulus |
 
-Untuk memeriksa sintaks tanpa menjalankan program, tambahkan `--check`, misalnya:
+## Validasi sebelum menambah atau mempromosikan contoh
 
-```sh
-python pusingcuk_new.py --check examples/halo_dunia.cuk
-```
+- Pemeriksaan sintaks semua sumber `.cuk` dilakukan oleh workflow **Example syntax check**.
+- Contoh galeri browser yang dipublikasikan harus lulus eksekusi reference dan cocok byte-for-byte dengan file `.expected.txt` melalui `python tools/check_playground_examples.py`.
+- Fixture konformansi ada di `tests/conformance/manifest.json`; itu merupakan kontrak tes, bukan daftar klaim bahwa semua target sudah mendukung semua fitur.
+- Jangan menghapus contoh hanya karena belum didukung native C. Pindahkan ke kategori eksperimental atau perbaiki dan uji target yang dimaksud. Hapus hanya jika memang duplikat, usang, atau gagal dan tidak layak dipelihara.
 
-## Contoh runtime native C
+## Native C
 
-Runtime native C adalah target berbeda dengan subset fitur tersendiri. Bangun dan jalankan contoh native dari akar repositori:
+Native C adalah runtime terpisah dengan dukungan yang harus diverifikasi. Sebelum menjalankan contoh dengan native, bangun dari root:
 
 ```sh
 make native
 ./pusingcuk-native examples/native/rekap_anggaran.pusingcuk
 ```
 
-Contoh native masih memakai ekstensi kompatibilitas lama dan alias sintaks yang diuji pada runtime C. Kalkulator memakai `bilangan` dan `teks`, sehingga contoh itu untuk interpreter Python; native C belum mendukung built-in konversi tersebut. Jangan menganggap modul, HTTP, atau file I/O tersedia pada runtime native hanya karena interpreter Python mendukungnya.
+Jangan menganggap contoh Python-reference, HTTP, file I/O, konversi, atau JSON otomatis tersedia pada native C. Periksa hasil fixture dan dokumentasi kompatibilitas untuk target yang dituju.
 
-## Aturan bisnis deterministik dan batas integrasi layanan
+## Playground dan contoh browser
 
-Dua aturan contoh memperlihatkan dua keputusan yang berbeda dan deterministik:
+Galeri browser yang dipublikasikan ada di `site/examples/playground/`. Setiap program memiliki file `.expected.txt`; CI memverifikasi output dengan interpreter referensi. Playground saat ini adalah galeri statis, **bukan terminal browser yang menjalankan semua fitur bahasa**. Jangan mengaktifkan kembali terminal Pyodide atau menampilkan contoh seolah dapat dijalankan sebelum ada runtime browser yang benar dan tes end-to-end.
 
-- `examples/core/anggaran_threshold_service.cuk`: membandingkan nominal dengan batas yang memerlukan persetujuan.
-- `examples/core/anggaran_sufficiency_service.cuk`: memeriksa apakah saldo tersedia mencukupi pengajuan.
+## Aturan pemeliharaan
 
-Aturan kecukupan saldo memiliki fixture referensi di `examples/core/anggaran_sufficiency.cuk`, yang mencakup saldo cukup, nilai batas yang sama, pengajuan di atas saldo, nol, dan input negatif. `tests/test_core_budget_rules.py` membangun runtime native dan membandingkan output Python reference/native memakai fixture sumber yang di-pin. Tes ini berjalan di repo PusingCuk dan tidak bergantung pada layanan atau CI eksternal CORE.
-
-**Batas dukungan:** bukti lokal tersebut hanya membuktikan perilaku aturan pada interpreter referensi dan native C untuk kasus yang diuji. Ini tidak mendaftarkan aturan sebagai endpoint/tool produksi. Nama folder `examples/core/` dipertahankan sebagai nama historis dan tidak berarti ada koneksi runtime ke repo CORE yang sudah tidak tersedia. Runtime PusingCuk tetap eksperimental dan bukan sandbox OS.
-
-## Aturan tambahan deterministik (.cuk)
-
-`examples/core/priority_triage.cuk` adalah aturan ketiga yang mengklasifikasikan pekerjaan menjadi `P1_SEGERA`, `P2_DAMPAK_TINGGI`, `P3_MENDESAK`, atau `P4_RUTIN`. Nilai urgensi dan dampak wajib berada pada skala integer 1–5; nilai di luar rentang menghasilkan `INPUT_TIDAK_VALID`. Fixture JSON mengunci source SHA-256, kasus batas, nilai invalid, dan expected output. Tes referensi Python serta tes native C harus sama-sama lulus sebelum aturan disebut portabel. Ini merupakan contoh aturan lokal, belum menjadi tool produksi atau endpoint layanan.
-
-## Contoh kompatibilitas (.pusingcuk)
-
-Contoh ini dipertahankan untuk demonstrasi API yang sudah ada dan kompatibilitas sumber lama:
-
-| Berkas | Kegunaan | Efek samping / prasyarat |
-|---|---|---|
-| `compat/halo.pusingcuk` | Padanan contoh halo untuk ekstensi lama | Tidak memerlukan jaringan. |
-| `file_io.pusingcuk` | Membaca dan menulis catatan warung | Menulis `warung.txt`; perhatikan berkas bernama sama agar tidak tertimpa. |
-| `database.pusingcuk` | Serialisasi dan pembacaan JSON lokal | Menulis `database.json`; perhatikan berkas bernama sama agar tidak tertimpa. |
-| `modular.pusingcuk` + `utils.pusingcuk` | Impor modul lokal dan penanganan error | Jalankan dari akar repositori supaya jalur modul dan berkas sesuai contoh. |
-| `rekap_anggaran.pusingcuk` | Contoh kalkulasi anggaran versi lama | Contoh CLI interpreter Python. |
-| `viral_bot.pusingcuk` | Serialisasi JSON dan contoh POST HTTP | Mengirim payload demo ke `https://httpbin.org/post`. Jalankan hanya jika memang ingin mengirim permintaan eksternal. |
-
-Contoh jaringan bersifat **opsional**, bukan syarat penggunaan atau pengujian dasar:
-
-- `internet.pusingcuk` melakukan HTTP GET ke GitHub API dan wttr.in.
-- `viral_bot.pusingcuk` melakukan HTTP POST ke httpbin.org.
-
-Permintaan tersebut memerlukan jaringan dan dapat mengirim permintaan ke layanan pihak ketiga. CI inti tidak bergantung pada koneksi eksternal untuk contoh ini. Jangan masukkan token, kata sandi, data pribadi, atau informasi sensitif ke dalam contoh jaringan.
-
-## Cara menjalankan contoh yang menulis berkas
-
-Jalankan contoh file/JSON di direktori kerja sementara atau cadangkan berkas target terlebih dahulu. Walaupun evaluator Python membatasi operasi file relatif terhadap project root, batas itu bukan sandbox sistem operasi dan tidak menggantikan kehati-hatian terhadap penimpaan berkas. Jangan menjalankan program atau bytecode yang tidak dipercaya.
-
-Lihat juga [spesifikasi bahasa](../SPEC.md), [katalog built-in](../docs/language/BUILTINS.md), [matriks kompatibilitas](../docs/COMPATIBILITY.md), dan [kebijakan keamanan](../SECURITY.md).
-
-## Integrasi opsional untuk Termux/Linux
-
-- examples/remote/gemini_agent.cuk: fungsi pemanggil Gemini REST API menggunakan built-in HTTP Python reference.
-- examples/remote/bot_termux.cuk: Telegram long polling dengan allowlist chat ID, perintah status/daftar berkas/rekap, dan fallback pertanyaan ke Gemini.
-- examples/remote/secrets.example.json: template konfigurasi; salin ke secrets.json di akar repo dan jangan pernah commit token nyata.
-
-Contoh remote hanya didukung interpreter Python reference. Built-in eksekusi memerlukan opt-in PUSINGCUK_ENABLE_EXECUTION=1 dan hanya mengizinkan perintah diagnostik yang terdaftar; tidak menerima perintah shell arbitrer.
-
-
-## Contoh akuntansi untuk mahasiswa
-
-- `examples/accounting/rekap_keuangan.cuk`: contoh input pendapatan, beban, aset, liabilitas, dan ekuitas dalam Rupiah; menghitung laba/rugi dan memeriksa persamaan posisi keuangan. Ini contoh pendidikan dasar, bukan implementasi seluruh SAK/PSAK.
-- Target dan batasan CukAccount dijelaskan di [`docs/examples/CUKACCOUNT_TARGET.md`](../docs/examples/CUKACCOUNT_TARGET.md). Pada snapshot `main` ini, folder `apps/accounting/` dan dokumen `docs/ACCOUNTING_STUDENT_APP.md` tidak ada; yang tersedia di repo ini adalah contoh pendidikan `examples/accounting/rekap_keuangan.cuk`, bukan aplikasi desktop penuh.
+1. Contoh publik harus singkat, deterministik, dan menyatakan target yang didukung.
+2. Jangan gunakan alias atau built-in yang tidak tercantum pada spesifikasi/kontrak tanpa menambahkan tes dan dokumentasi.
+3. Jangan mengubah expected output hanya untuk membuat CI hijau; pastikan implementasi referensi dan hasil aktual benar.
+4. Contoh yang belum lulus runtime dipisahkan jelas dari quickstart, bukan dipromosikan sebagai contoh pemula.
