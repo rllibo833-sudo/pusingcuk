@@ -1251,22 +1251,21 @@
       "profile": "core"
     },
     {
-      "id": "runtime.json-invalid-raises-error",
+      "id": "reference.json-invalid-returns-false",
       "source": "json_invalid_returns_false.cuk",
-      "profile": "core",
+      "profile": "reference",
       "requires": [
         "json",
-        "runtime-diagnostics"
+        "json-parse-result"
       ],
       "expected": {
-        "exit_code": 1,
-        "stdout": "",
-        "stderr_class": "runtime_error",
-        "source_line": 2
+        "exit_code": 0,
+        "stdout": "tidak\n",
+        "stderr_class": null
       },
       "runtimes": {
         "reference": "required",
-        "native": "required"
+        "native": "unsupported"
       }
     },
     {
@@ -1524,6 +1523,25 @@
         "exit_code": 0,
         "stdout": "40000\n4000\n36000\n3960\n39960\n",
         "stderr_class": null
+      },
+      "runtimes": {
+        "reference": "required",
+        "native": "required"
+      }
+    },
+    {
+      "id": "runtime.json-baca-invalid-raises-error",
+      "source": "json_baca_invalid_raises_error.cuk",
+      "profile": "core",
+      "requires": [
+        "json",
+        "runtime-diagnostics"
+      ],
+      "expected": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_class": "runtime_error",
+        "source_line": 2
       },
       "runtimes": {
         "reference": "required",
