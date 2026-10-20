@@ -1,6 +1,8 @@
 # Pusingcuk Compiler Roadmap for the Three-Repository System
 
-**Status:** Optional proposed engineering roadmap; not a claim of production readiness.
+**Status:** Historical optional proposal; not a claim of production readiness or an active three-repository integration.
+
+> **Current boundary (20 October 2026):** the owner reports that Founder-OS and CORE were deleted; GitHub API lookups for both repository endpoints returned 404. Reusable principles were selectively rewritten into PusingCuk-owned documents and code. This roadmap is retained for historical context only; do not treat its repository roles, cross-repo work, or future phases as active dependencies. Supabase resources and credentials have a separate retirement lifecycle.
 
 > **Scope note:** This document describes one downstream three-repository integration scenario. It does not define the overall Pusingcuk mission, and contributors are not expected to target these repositories. The public project vision is in [VISION.md](VISION.md). All integration ideas below remain proposals until implemented, tested, and reviewed.
 

@@ -5,11 +5,11 @@
 
 ## Purpose
 
-This module provides deterministic lexical retrieval and provenance-checked citations without importing runtime code from CORE or copying the Founder OS index. The index is explicit and curated; it does not crawl repositories, train a model, or implement vector search.
+This module provides deterministic lexical retrieval and provenance-checked citations without importing runtime code from retired CORE or copying the Founder-OS index. The index is explicit and curated; it does not crawl repositories, train a model, or implement vector search.
 
 ## Index and source policy
 
-library/knowledge_index.json contains 22 independently authored summaries sourced only from the PusingCuk repository. Each entry binds this repository, commit SHA, and path; the reader rejects mismatches, duplicate IDs, private visibility, malformed URLs, and indexes above 100 records. Founder-OS and CORE are not runtime or knowledge-index dependencies.
+library/knowledge_index.json contains 26 independently authored summaries sourced only from the PusingCuk repository. Each entry binds this repository, commit SHA, and path; the reader rejects mismatches, duplicate IDs, private visibility, malformed URLs, and indexes above 100 records. Founder-OS and CORE are not runtime or knowledge-index dependencies.
 
 Only a small, reviewed subset of primary documents should be added. The summaries are local to PusingCuk; source URLs preserve provenance and are not a runtime dependency. Do not automatically index any repository; keep the index limited to reviewed PusingCuk sources.
 

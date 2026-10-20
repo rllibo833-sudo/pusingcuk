@@ -2,7 +2,7 @@
 
 > **Warung-language feel. Serious machinery.**
 
-**Documentation snapshot:** 18 October 2026  
+**Documentation snapshot:** 20 October 2026 (main implementation review)  
 **Language contract:** `0.6-dev`  
 **Python package:** `0.8.0.dev0`  
 **Maturity:** experimental / alpha — not a stable release.
@@ -35,6 +35,8 @@ selesai jancuk
 | `native/` | C runtime for a tested subset | Not fully equivalent to the reference interpreter |
 | `library/` | Built-in contract, machine-readable vocabulary, functions, and adapters | Registry presence does not imply universal target support |
 | `tests/`, `tools/conformance.py` | Unit tests and conformance evidence | Results apply only to checks and commits that actually ran |
+| `tools/reality_engine.py`, `tools/diagnostic_repair_loop.py`, `tools/local_ai_adapter.py` | Fail-closed proposal gate, syntax diagnostics, and separate legacy AI repair adapter | Default gate cannot accept a new proposal; diagnostic helper does not execute code |
+| `src/backends/`, `src/c-core/` | Draft PVM v1 transpilers and assembler | Separate from `compiler/vm.py`; PVM v1 is experimental and not a sandbox |
 | `examples/` | Learning and smoke-test programs | Examples do not prove production readiness |
 | `library/assistant.py` and related modules | PusingCuk AI tools for the .cuk development loop | Does not prove a self-trained foundation model or universally correct output |
 | `web/`, `site/`, `android-studio/` | Existing UI, site, and distribution prototypes | Code presence is not equivalent to a production service/app |

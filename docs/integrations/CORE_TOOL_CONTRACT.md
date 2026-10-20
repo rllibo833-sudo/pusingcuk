@@ -1,8 +1,8 @@
 # CORE Tool Contract for PusingCuk
 
-**Status:** CI integration proof implemented; production execution boundary not yet deployed.  
-**Version:** 1 (CI proof; service execution remains gated)  
-**Owner:** PusingCuk owns this contract's language-facing request/response shape; CORE owns authorization, persistence, limits and deployment.
+**Status:** historical integration proposal plus local CI proof; no live cross-repository service is claimed.  
+**Version:** 1 (local proof; remote service execution remains unverified)  
+**Owner:** PusingCuk owns this retained contract and the local registered-rule runner. CORE references below describe the former proposed external caller, not a live dependency. GitHub API lookups on 20 October 2026 returned 404 for the former CORE repository endpoint.
 
 ## Goal and trust boundary
 
@@ -13,7 +13,7 @@ The first integration should execute only a registered program artifact with a r
 ## Ownership
 
 - This repository owns the language version, program semantics, native/reference conformance fixtures and runtime build provenance.
-- CORE owns the authenticated tool endpoint, user authorization, approved program registry, audit trail, business data access and execution evidence.
+- A future external caller would own the authenticated tool endpoint, user authorization, approved program registry, audit trail, business data access and execution evidence; those services are not provided by this repository.
 - MEMORY records the long-lived architecture decision and accepted rollout gates; it is not a mirror of request/response logs.
 - PUBLIC must not expose internal tool requests, credentials, private source or operational evidence.
 
@@ -21,7 +21,7 @@ The first integration should execute only a registered program artifact with a r
 
 The canonical pure rule is `examples/core/anggaran_threshold.cuk`. It classifies a nominal against a budget limit and returns one of `DALAM_BATAS`, `PERLU_PERSETUJUAN`, or `INPUT_TIDAK_VALID`. The native test target `make test-native` compares five deterministic cases against exact expected stdout.
 
-CORE's `Core Quality Gate` pins this repository to a full commit SHA, builds the native runtime, runs the canonical example, and checks malformed input exits non-zero. This proves deterministic native execution in CI only. It does not prove that Supabase Edge Functions can spawn the native binary or that a production runner exists.
+PusingCuk's local tests build the native runtime and compare registered rule output against pinned fixtures. This proves only deterministic local execution for the tested cases. It does not prove that an external Supabase Edge Function can spawn the binary or that a production runner exists.
 
 The runtime currently opens a source file and is not an OS sandbox. A production service must therefore be a separately isolated executor or a deliberately engineered WASI/runtime boundary. Do not bypass this requirement by executing arbitrary program text in an Edge Function.
 
@@ -34,13 +34,13 @@ A local prototype service is available at `tools/core-rule-runner.mjs`. It:
 - requires a random bearer token held by the runner process, bounds request/output sizes and concurrency, and passes a reduced environment to the native process;
 - does not accept source code, arbitrary file paths, shell commands, database access, or model-provider credentials.
 
-Start it locally with `PUSINGCUK_RUNNER_TOKEN="$(openssl rand -hex 32)" node tools/core-rule-runner.mjs`. The HTTP service binds to loopback by default. For a local Edge Function in a Docker container, use a private host bridge only if needed; never publish this endpoint to the public internet.
+Start it locally with `PUSINGCUK_RUNNER_TOKEN="$(openssl rand -hex 32)" node tools/core-rule-runner.mjs`. The HTTP service binds to loopback by default. The local runner is not configured as a hosted endpoint. Do not connect it to a remote service or publish it publicly as part of this retained runbook.
 
 **This runner is still not an OS sandbox.** The native executable still runs as the operating-system user, so a reviewed fixed program and the language's current limitations reduce risk but do not establish OS isolation. It is a local development adapter only. Do not route production or arbitrary user/model source through it until an independently reviewed sandbox or isolated worker exists.
 
-## Additional pure rule example (not registered as a CORE tool)
+## Additional pure rule example (not registered as a production tool)
 
-`examples/core/priority_triage.cuk` adds a deterministic triage rule with two bounded integer inputs (urgency and impact, each 1–5) and four stable output classes. Twelve fixture cases cover branch boundaries and invalid ranges; the source SHA-256 is pinned in `tests/fixtures/priority_triage.json`, and both the reference Python suite and native C gate execute those cases. This example is not yet added to `tools/core-rule-runner.mjs` or to a hosted tool registry. It must not be treated as a production endpoint or a security sandbox.
+`examples/core/priority_triage.cuk` adds a deterministic triage rule with two bounded integer inputs (urgency and impact, each 1–5) and four stable output classes. Twelve fixture cases cover branch boundaries and invalid ranges; the source SHA-256 is pinned in `tests/fixtures/priority_triage.json`, and both the reference Python suite and native C gate execute those cases. This example is not added to `tools/core-rule-runner.mjs` or a hosted tool registry. It must not be treated as a production endpoint or a security sandbox; no live CORE endpoint is implied.
 
 ## Proposed request envelope
 

@@ -1,4 +1,6 @@
-# CORE budget-rule sandbox runbook
+# Legacy registered-rule sandbox runner (local regression harness)
+
+**Status:** retained for local integration/security regression tests. The former cross-repository CORE service is not available through the current GitHub API context; this is not a live remote deployment runbook. No hosted runner or active CORE Edge Function is claimed.
 
 ## What this protects
 
@@ -21,14 +23,14 @@ export PUSINGCUK_RUNNER_TOKEN="$(openssl rand -hex 32)"
 PUSINGCUK_RUNNER_HOST=127.0.0.1 PUSINGCUK_RUNNER_PORT=8787 node tools/core-rule-runner.mjs
 ```
 
-Keep the listener on loopback by default. Do not bind it to a public interface directly. For CORE remote use, place it behind a TLS reverse proxy or private network, preserve bearer-token authentication, rotate the token through the deployment secret store, and configure the CORE Edge Function secrets `PUSINGCUK_RUNNER_URL` (HTTPS base URL) and `PUSINGCUK_RUNNER_TOKEN`. Never put the runner token in PUBLIC, a repository, or the browser.
+Keep the listener on loopback by default. Do not bind it to a public interface directly. The former CORE remote deployment instructions are historical only; this repository does not verify an active external caller, Edge Function, or hosted runner. If a future remote integration is explicitly approved, it requires a separate security review, dedicated secret management, and an independently reviewed isolation boundary. Never put a runner token in a repository or browser asset.
 
 ## Fail-closed behavior
 
 - Missing/mutable image ID: runner refuses to start.
-- Missing Docker daemon/image or failed container: request fails; CORE must not mark the rule successful.
-- Hash, source commit, runtime build, sandbox attestation, image ID, elapsed time or result mismatch: CORE rejects the result evidence.
-- Missing CORE runner URL/token: intake persists as `rule_pending`; no production rule execution is claimed.
+- Missing Docker daemon/image or failed container: the local runner refuses the request.
+- Hash, source commit, runtime build, sandbox attestation, image ID, elapsed time or result mismatch: the local runner rejects the evidence.
+- Historical remote contract only: a future external caller without its configured runner URL/token should leave requests pending. This repository does not implement or verify that external intake state.
 
 ## Verification
 
