@@ -4,7 +4,7 @@
 
 <!-- BEGIN GENERATED FIXTURE COUNTS -->
 **Active manifest:** **77 fixtures**; reference required: **77**; native C required: **74**; native C unsupported: **3**.
-These figures are generated directly from `tests/conformance/manifest.json`; CI fails if the checked-in baseline summary disagrees with the manifest count or runtime-status totals.
+These figures are generated directly from `tests/conformance/manifest.json`; the checked-in baseline summary is validated against the same fixture count and each target's status totals.
 <!-- END GENERATED FIXTURE COUNTS -->
 
 Manifest saat ini belum memuat fixture khusus Reality Engine; catatan historis di changelog bukan bukti bahwa fixture tersebut ada atau lulus.
