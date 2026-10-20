@@ -1,8 +1,17 @@
 jancuk
-lah nama = "Dunia"
-hedeh "Halo, " + nama
-fungsi tambah(a, b)
-  balek a + b
-selesai fungsi
-hedeh tambah(20, 22)
+bacot "OK bacot"
+berisik "OK berisik"
+cetak "OK cetak"
+gas "OK gas"
+gembor "OK gembor"
+jir "OK jir"
+keluarin "OK keluarin"
+koar "OK koar"
+omong "OK omong"
+print "OK print"
+sembur "OK sembur"
+spill "OK spill"
+suarakan "OK suarakan"
+tampilkan "OK tampilkan"
+teriak "OK teriak"
 selesai jancuk
