@@ -165,6 +165,8 @@ class PcDict:
         else: self.entries[i] = (self.entries[i][0], value)
     def __iter__(self): return (key for key, _ in self.entries)
     def __len__(self): return len(self.entries)
+    def __repr__(self):
+        return "{" + ", ".join(repr(key) + ": " + repr(value) for key, value in self.entries) + "}"
 def pc_numeric(name, value):
     if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
         raise TypeError(name + " membutuhkan angka finite")
