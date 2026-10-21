@@ -44,17 +44,8 @@ def from_source(source: str, source_name: str = "<memory>") -> dict:
     """Parse a supported source subset in .cuk, then validate canonical IR v1."""
     if not isinstance(source_name, str) or not source_name:
         raise ValueError("source_name tidak boleh kosong")
-    # Function bodies using control-flow blocks are not implemented in the .cuk
-    # frontend parser yet. Keep those programs on the canonical compatibility path
-    # instead of emitting incomplete IR; simple function bodies stay on the .cuk path.
-    import re
-    if re.search(r"(?m)^\s*(?:mumet|untuk|coba)\b", source):
-        from compiler.ir import from_source as canonical_from_source
-        try:
-            return canonical_from_source(source, source_name)
-        except (ValueError, TypeError, RecursionError) as exc:
-            raise SelfHostedFrontendError(f"control-flow function gagal diparse: {exc}") from exc
-
+    # Keep this path fail-closed: source grammar belongs to compiler.cuk. A Python
+    # reference-parser fallback would make self-hosting coverage pass dishonestly.
     # The staged parser handles statements, not the outer program delimiters.
     # Normalize those delimiters before passing source into the .cuk parser.
     source = "\n".join(line for line in source.splitlines() if line.strip() not in {"jancuk", "selesai jancuk"})
@@ -72,21 +63,6 @@ def from_source(source: str, source_name: str = "<memory>") -> dict:
     output = run.stdout.strip().splitlines()
     if not output or output[-1].startswith("SELFHOST_PARSE_ERROR:"):
         token_index = output[-1].partition(":")[2] if output else "unknown"
-        # Temporary narrow bridge while the .cuk call-expression parser is corrected.
-        if "fungsi " in source and "hedeh " in source and "(" in source:
-            from compiler.ir import from_source as canonical_from_source
-            # Restore delimiters stripped before invoking the .cuk parser.
-            canonical_source = source
-            if not canonical_source.lstrip().startswith("jancuk"):
-                canonical_source = "jancuk" + chr(10) + canonical_source
-            if not canonical_source.rstrip().endswith("selesai jancuk"):
-                canonical_source = canonical_source.rstrip() + chr(10) + "selesai jancuk" + chr(10)
-            try:
-                return canonical_from_source(canonical_source, source_name)
-            except (ValueError, TypeError, RecursionError, SyntaxError) as exc:
-                raise SelfHostedFrontendError(
-                    f"frontend .cuk menolak sintaks source pada token index {token_index}; parser kompatibilitas gagal: {exc}"
-                ) from exc
         raise SelfHostedFrontendError(
             f"frontend .cuk menolak sintaks source pada token index {token_index}"
         )

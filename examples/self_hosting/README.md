@@ -1,66 +1,26 @@
-# Self-hosting prototypes (.cuk)
+# Self-hosting .cuk frontend
 
-Folder ini berisi prototipe bertahap yang ditulis dengan bahasa `.cuk` untuk menguji apakah bahasa ini bisa menjadi alat bagi pengembangan toolchain-nya sendiri.
+Folder ini menyimpan contoh bertahap untuk membangun toolchain PusingCuk dengan bahasa .cuk sendiri. Berkas compiler.cuk menjadi sumber lexer, parser program/ekspresi, AST, dan serializer IR v1.
 
-**Status:** belum self-hosted penuh. `compiler.cuk` kini menjadi sumber utama frontend `.cuk`: lexer, parser ekspresi, AST subset, dan serializer IR v1. Frontend mengenali pemanggilan fungsi dengan argumen pada ekspresi, tetapi grammar program masih terbatas pada deklarasi, assignment, dan output; fungsi sebagai pernyataan, kontrol alur, input, koleksi/indeks, serta bootstrap dua tahap belum selesai. `source_lexer.cuk` dipertahankan sebagai prototipe kompatibilitas. `html.cuk` adalah generator halaman HTML mandiri dengan escaping teks; ini belum menggantikan backend HTML penuh yang ada di toolchain. `compiler/self_hosted_frontend.py` masih memakai interpreter referensi Python sebagai host untuk menjalankan kode frontend `.cuk`, lalu memvalidasi IR yang dihasilkan. Jadi jalur `.cuk` → IR v1 → VM/backend sudah tersedia untuk subset, tetapi compiler belum membangun ulang dirinya sendiri.
+## Jalur aktif
 
-## Contoh
+compiler/self_hosted_frontend.py menjalankan frontend .cuk melalui host pusingcuk_new.py, lalu memvalidasi dokumen IR v1. Jalur default compiler adalah:
 
-| Berkas | Peran saat ini | Batasan utama |
-|---|---|---|
-| `lexer.cuk` | Mengklasifikasikan satu token operator | Demo kecil, bukan scanner |
-| `compiler.cuk` | Sumber utama frontend `.cuk` → AST subset → IR v1 | Ekspresi dan pemanggilan fungsi dalam ekspresi; pernyataan program masih terbatas; belum self-hosting penuh |
-| `source_lexer.cuk` | Prototipe frontend lama untuk kompatibilitas | Jangan gunakan sebagai sumber utama untuk pengembangan baru |
-| `html.cuk` | Generator HTML dengan escaping karakter khusus | Generator halaman sederhana, bukan backend HTML IR lengkap |
-| `parser.cuk` | Membentuk node aritmetika dari token sederhana atau token terstruktur | Satu ekspresi `INTEGER OP INTEGER EOF`; belum ada prioritas operator atau tanda kurung |
-| `evaluator.cuk` | Mengevaluasi node aritmetika | Belum menjalankan AST bahasa `.cuk` |
-| `interpreter.cuk` | Menghubungkan tahap mini lexer → parser → evaluator | Input masih daftar token yang sudah disiapkan |
-| `codegen.cuk` | Menghasilkan ekspresi C bersarang dari AST integer/biner buatan tangan | Bukan compiler source-to-source; operator yang belum didukung ditolak |
-| `runtime_contract.cuk` | Menunjukkan cara melaporkan dukungan fitur secara eksplisit | Data ilustratif, bukan hasil pengujian runtime |
+source .cuk → lexer/parser .cuk → AST → IR v1 → bytecode → VM
 
-## Jalankan dari root repository
+Parser frontend menangani deklarasi, assignment variabel dan indeks, output, pemanggilan fungsi, fungsi/return, kondisi njir/kampret, loop mumet/untuk, literal list/dictionary, indexing, unary/binary expression, dan akses member sederhana. Semua hasil serializer melewati validator IR kanonis; hal ini tidak menjamin seluruh semantik runtime tersedia di semua backend.
 
-```sh
-python pusingcuk_new.py examples/self_hosting/lexer.cuk
-python pusingcuk_new.py examples/self_hosting/compiler.cuk
-python pusingcuk_new.py examples/self_hosting/html.cuk
-python pusingcuk_new.py examples/self_hosting/source_lexer.cuk
-python pusingcuk_new.py examples/self_hosting/parser.cuk
-python pusingcuk_new.py examples/self_hosting/evaluator.cuk
-python pusingcuk_new.py examples/self_hosting/interpreter.cuk
-python pusingcuk_new.py examples/self_hosting/codegen.cuk
-python pusingcuk_new.py examples/self_hosting/runtime_contract.cuk
-```
+## Perintah
 
-Tes otomatis di `tests/test_self_hosting_examples.py` memeriksa exit code dan output yang diharapkan, termasuk batas newline dan komentar pada lexer, prioritas `2 + 3 * 4`, tanda kurung `(2 + 3) * 4`, modulo `17 % 5`, unary minus `-3 * 4`, serta penolakan `7 %` yang tidak lengkap dan parsing struktur program multi-baris terbatas. Lulus pada interpreter referensi hanya membuktikan prototipe berjalan di target itu; tidak berarti target native/browser mendukungnya.
+    python -m compiler examples/hello.cuk --check
+    python -m compiler examples/hello.cuk --emit-ir /tmp/hello.ir.json
+    python -m compiler examples/hello.cuk --emit-bytecode /tmp/hello.bytecode.json
+    python -m unittest tests.test_compiled_frontend_vm -v
 
-## Jalur menuju self-hosting sungguhan
+parser.cuk, evaluator.cuk, interpreter.cuk, dan codegen.cuk tetap dipertahankan sebagai contoh mini tahap compiler; semuanya bukan implementasi compiler lengkap.
 
-1. Stabilkan kontrak bahasa dan suite konformansi lintas runtime.
-2. Tambahkan operasi string/karakter dan struktur data yang dibutuhkan lexer source penuh.
-3. Bangun lexer dan parser `.cuk` yang membaca source bahasa `.cuk` itu sendiri.
-4. Definisikan AST/IR versi stabil yang bisa dipakai interpreter dan compiler backend.
-5. Implementasikan evaluator/VM dan code generator secara bertahap, masing-masing dengan fixture konformansi.
-6. Buktikan bootstrap: compiler `.cuk` yang dibangun oleh toolchain lama mampu membangun ulang versi dirinya sendiri dengan hasil yang dapat dibandingkan.
+## Status self-hosting
 
-Jangan menyebut PusingCuk self-hosted sebelum tahap bootstrap dapat diulang dan diverifikasi di CI.
+Frontend .cuk kini memiliki tes yang mem-parsing sumber frontend-nya sendiri dan membandingkan AST IR dengan parser referensi. Eksekusi frontend masih di-host oleh interpreter Python pusingcuk_new.py; validasi IR dan kompilasi bytecode juga masih memakai implementasi Python. compiler/bootstrap.py saat ini hanya memverifikasi pengulangan build pada jalur host yang sama, bukan bootstrap mandiri dua tahap.
 
-
-Code generation kini menguji serialisasi rekursif AST aritmetika bersarang ke ekspresi C dan menolak operator yang belum didukung. Ini tetap generator ekspresi, bukan compiler lintas bahasa penuh: inputnya belum source program umum dan belum terhubung ke IR v1/manifest backend.
-
-
-## Target CLI untuk conformance runner
-
-CLI `python -m compiler sumber.cuk --target go --output hasil.go` sekarang meneruskan kompilasi ke backend Go yang ada. Mode target ini memakai parser referensi kanonis; ia menjaga kompatibilitas matriks backend dan **bukan** bukti bahwa frontend `.cuk` sudah mandiri. Pipeline default frontend `.cuk` tetap terbatas pada subset yang didokumentasikan di atas.
-
-## Jalur frontend self-hosted ke toolchain kanonis
-
-`compiler/self_hosted_frontend.py` menjalankan lexer/parser dan serializer IR yang ditulis di `.cuk`. Envelope IR v1 berasal dari output frontend `.cuk`; Python hanya menjalankan kode `.cuk` melalui interpreter referensi saat ini dan memvalidasi dokumen IR sebelum backend yang ada memakainya. Grammar yang didukung masih subset dan belum menggantikan parser referensi untuk semua sintaks.
-
-```sh
-python -m compiler program.cuk --frontend selfhosted --target json
-python -m compiler program.cuk --frontend selfhosted --target js
-python -m compiler program.cuk --frontend selfhosted --target vm
-```
-
-Tes membandingkan `program`, `features`, dan `source_map` IR hasil frontend `.cuk` dengan IR kanonis, termasuk alias output, literal desimal/boolean, operator perbandingan/logika, dan penolakan sintaks malformed. Jalur `.cuk` → IR v1 → bytecode → VM dan backend lintas bahasa yang sudah ada tetap dipertahankan. **Bootstrap dua tahap belum dibuktikan:** frontend belum mampu membaca seluruh grammar/spec dan membangun ulang compiler penuh. Jangan menyebut bahasa ini self-hosted sampai compiler yang ditulis dalam `.cuk` dapat membangun ulang dirinya dua tahap dengan artefak deterministik yang dibandingkan di CI.
+Jangan klaim .cuk self-hosted penuh sampai tahap pertama membangun compiler yang dapat dijalankan sebagai compiler tahap kedua, lalu compiler tahap kedua mengompilasi ulang sumber compiler dan menghasilkan artefak yang cocok tanpa Python mem-parsing atau mengompilasi program.
