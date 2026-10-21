@@ -641,7 +641,8 @@ fungsi ir_expr(node, line)
                 njir node["jenis"] == "UNARY"
                     balek "{\"kind\":\"Unary\",\"line\":" + teks(line) + ",\"fields\":{\"op\":\"" + node["operator"] + "\",\"value\":" + ir_expr(node["nilai"], line) + "}}"
                 kampret
-                balek "{\"kind\":\"Binary\",\"line\":" + teks(line) + ",\"fields\":{\"left\":" + ir_expr(node["kiri"], line) + ",\"op\":\"" + node["operator"] + "\",\"right\":" + ir_expr(node["kanan"], line) + "}}"
+                    balek "{\"kind\":\"Binary\",\"line\":" + teks(line) + ",\"fields\":{\"left\":" + ir_expr(node["kiri"], line) + ",\"op\":\"" + node["operator"] + "\",\"right\":" + ir_expr(node["kanan"], line) + "}}"
+                selesai njir
             selesai njir
         selesai njir
     selesai njir
