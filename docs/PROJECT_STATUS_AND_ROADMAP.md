@@ -19,18 +19,18 @@ Jangan menyalin tabel jumlah fixture ke banyak dokumen. Ringkasan yang dibuat ge
 
 ## Status yang sudah dibuktikan
 
-Run core terbaru yang terlihat saat dokumen ini diperbarui adalah [PusingCuk core #39427633974](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39427633974), sukses pada commit `1ec4fc39babf58bdf737d44a8df5ef4dc7c91f31`. Run matriks [#39427208732](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39427208732) sukses pada commit lebih lama `9a87a7d32dd147ec36056bee4088002392d029a6`; hasilnya tidak boleh dianggap sebagai bukti bahwa perubahan sesudah commit itu ikut diuji oleh matriks tersebut.
+Run core terbaru yang telah selesai dan diverifikasi adalah [PusingCuk core #39533938497](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39533938497), sukses pada commit `c498bd9d82fbf9ef82ae2d95e92d511bb009f9a3`. Pada commit tersebut, kedua job Python (3.11 dan 3.12) serta native GCC dan Clang lulus; Python menjalankan 565 tes dan konformansi reference/native menghasilkan 158 PASS, 0 FAIL, 0 UNSUPPORTED (79 fixture pada dua runtime).
 
-Snapshot matriks tersebut menunjukkan reference, JS, Python transpiler, dan VM 77/77; native C 74/77 dengan tiga fixture unsupported; HTML 0/77. Ini baseline historis yang berguna, bukan bukti bahwa gap native C telah ditutup pada HEAD sekarang. Periksa [COMPATIBILITY.md](COMPATIBILITY.md) dan artefak workflow sebelum menyatakan status yang lebih baru.
+Baseline matriks multi-target yang tersimpan menyatakan reference, native C, JavaScript, Python transpiler, dan VM lulus 79/79, sedangkan HTML compiler masih unsupported untuk seluruh fixture. Baseline tersimpan dan run historis bukan pengganti run matriks pada HEAD saat ini; klaim untuk JS, Python transpiler, VM, atau HTML harus tetap menyebut sumber serta commit yang benar-benar diuji. CI hijau juga hanya membuktikan job yang berjalan, bukan seluruh fitur bahasa atau kesiapan produksi.
 
 ## Fase menuju v1.0
 
 ### Fase 1 — Kontrak inti dan runtime native
-- [ ] Implementasikan JSON parse/serialize, HTML escaping, dan CSV quoting pada native C.
-- [ ] Tambahkan tes unit untuk nilai valid/invalid, nested list/dictionary, escaping, arity, dan batas ukuran.
-- [ ] Ubah tiga fixture native dari `unsupported` ke `required` hanya setelah native/reference cocok.
-- [ ] Jalankan matrix dan differential test pada commit yang sama; hasil wajib tanpa mismatch, incomplete, atau unsupported pada fixture rilis yang diwajibkan.
-- [ ] Matikan auto-push evolusi dari Termux; perubahan bahasa harus melalui diff yang ditinjau dan tes wajib.
+- [x] Implementasikan JSON parse/serialize, HTML escaping, dan CSV quoting pada native C; kontraknya tercakup dalam suite native/reference aktif.
+- [x] Tambahkan tes unit untuk nilai valid/invalid, nested list/dictionary, escaping, arity, dan batas ukuran.
+- [x] Manifest kanonis saat ini mewajibkan native/reference untuk seluruh 79 fixture aktif; jangan mengubah status tanpa bukti.
+- [x] Core CI terbaru menjalankan differential test reference/native pada commit yang sama: 158 PASS, 0 FAIL, 0 UNSUPPORTED. Matriks seluruh backend tetap harus diverifikasi pada commit rilis.
+- [x] Jalur evolusi/data center tetap dry-run/review-only; tidak melakukan auto-commit atau auto-push ke `main`.
 
 ### Fase 2 — Browser dan perluasan target
 - [ ] Playground GitHub Pages menjalankan subset .cuk yang didukung melalui backend JS/browser yang nyata, bukan sekadar menampilkan kode atau mengandalkan terminal Python eksternal tanpa diagnostik.
