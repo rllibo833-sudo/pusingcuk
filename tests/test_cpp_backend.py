@@ -51,6 +51,17 @@ class CppBackendConformanceTests(unittest.TestCase):
             if fixture_id not in BY_ID:
                 raise AssertionError("C++ manifest references unknown fixture: " + fixture_id)
 
+    def test_unsupported_features_fail_during_compilation(self):
+        input_source = 'jancuk\ntanya nama = "Nama? "\nhedeh nama\nselesai jancuk'
+        with self.assertRaisesRegex(CppBackendError, "Input"):
+            generate(from_source(input_source))
+        json_source = 'jancuk\nhedeh json_baca("null")\nselesai jancuk'
+        with self.assertRaisesRegex(CppBackendError, "builtin belum didukung backend C\\+\\+"):
+            generate(from_source(json_source))
+        unknown_source = 'jancuk\nhedeh fungsi_tidak_ada(1)\nselesai jancuk'
+        with self.assertRaisesRegex(CppBackendError, "fungsi tidak dikenal"):
+            generate(from_source(unknown_source))
+
     def test_cpp_backend_matches_pinned_fixture_contract(self):
         with tempfile.TemporaryDirectory(prefix="pusingcuk-cpp-") as temp_name:
             temp = Path(temp_name)
