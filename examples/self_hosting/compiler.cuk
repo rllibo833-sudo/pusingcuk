@@ -1050,7 +1050,7 @@ fungsi ir_collect_features(node, flags)
 selesai fungsi
 
 fungsi ir_features(program)
-    lah flags = {"core": benar, "console-output": salah, "operators": salah, "variables": salah, "calls": salah, "functions": salah}
+    lah flags = {"core": benar, "console-output": salah, "control-flow": salah, "operators": salah, "variables": salah, "calls": salah, "functions": salah}
     ir_collect_features(program, flags)
     lah result = "["
     njir flags["calls"]
@@ -1058,6 +1058,9 @@ fungsi ir_features(program)
     selesai njir
     njir flags["console-output"]
         result = result + "\"console-output\","
+    selesai njir
+    njir flags["control-flow"]
+        result = result + "\"control-flow\","
     selesai njir
     result = result + "\"core\""
     njir flags["functions"]
