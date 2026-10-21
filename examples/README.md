@@ -24,6 +24,12 @@ Contoh tersebut sengaja berfokus pada program deterministik tanpa input terminal
 | `terminal_bot.cuk` | Bot berbasis input | Memerlukan terminal; bukan contoh browser |
 | `json_demo.cuk` | JSON built-ins | Dukungan berbeda antar-target; jangan gunakan sebagai contoh universal sebelum matrix lulus |
 
+## Prototipe self-hosting
+
+`self_hosting/` berisi program `.cuk` untuk mengeksplorasi tahap lexer, parser, evaluator, interpreter mini, code generation, dan kontrak runtime. Ini adalah prototipe kecil, **bukan** compiler PusingCuk yang self-hosted. Batasan dan urutan menuju bootstrap sungguhan dijelaskan di [`self_hosting/README.md`](self_hosting/README.md).
+
+Jalankan pemeriksaan runtime otomatis dari root repository dengan `python -m unittest tests.test_self_hosting_examples -v`. Lulus di interpreter referensi bukan bukti dukungan pada runtime lain; dukungan lintas target harus dibuktikan terpisah.
+
 ## Validasi sebelum menambah atau mempromosikan contoh
 
 - Pemeriksaan sintaks semua sumber `.cuk` dilakukan oleh workflow **Example syntax check**.
