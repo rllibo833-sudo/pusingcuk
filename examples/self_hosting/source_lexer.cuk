@@ -117,12 +117,12 @@ fungsi pindai(source)
     balek tokens + [{"jenis": "EOF", "nilai": "EOF"}]
 selesai fungsi
 
-fungsi tampilkan(tokens)
+fungsi render_tokens(tokens)
     untuk token dalam tokens
         hedeh token["jenis"] + ":" + token["nilai"]
     selesai untuk
 selesai fungsi
 
 lah contoh = "lah x = 12 + 3\nhedeh x # komentar\n"
-tampilkan(pindai(contoh))
+render_tokens(pindai(contoh))
 selesai jancuk
