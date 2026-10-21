@@ -28,7 +28,7 @@ python pusingcuk_new.py examples/self_hosting/codegen.cuk
 python pusingcuk_new.py examples/self_hosting/runtime_contract.cuk
 ```
 
-Tes otomatis di `tests/test_self_hosting_examples.py` memeriksa exit code dan output yang diharapkan, termasuk prioritas `2 + 3 * 4`, tanda kurung `(2 + 3) * 4`, serta penolakan `7 % 35`. Lulus pada interpreter referensi hanya membuktikan prototipe berjalan di target itu; tidak berarti target native/browser mendukungnya.
+Tes otomatis di `tests/test_self_hosting_examples.py` memeriksa exit code dan output yang diharapkan, termasuk batas newline dan komentar pada lexer, prioritas `2 + 3 * 4`, tanda kurung `(2 + 3) * 4`, serta penolakan `7 % 35`. Lulus pada interpreter referensi hanya membuktikan prototipe berjalan di target itu; tidak berarti target native/browser mendukungnya.
 
 ## Jalur menuju self-hosting sungguhan
 
