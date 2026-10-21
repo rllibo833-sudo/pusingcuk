@@ -54,7 +54,7 @@ fungsi pindai(source)
                         nilai = ""
                         tertutup = salah
                         i = i + 1
-                        mumet i < n dan source[i] != "\n" dan bukan tertutup
+                        mumet i < n dan source[i] != "\n" dan tertutup == salah
                             njir source[i] == kutip
                                 tertutup = benar
                                 i = i + 1
