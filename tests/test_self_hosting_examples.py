@@ -36,7 +36,8 @@ class SelfHostingExampleTests(unittest.TestCase):
         self.run_example(
             "source_lexer.cuk",
             "IDENT:lah\nIDENT:x\nOP:=\nINTEGER:12\nOP:+\nINTEGER:3\n"
-            "NEWLINE:NEWLINE\nIDENT:hedeh\nIDENT:x\nNEWLINE:NEWLINE\nEOF:EOF\n",
+            "NEWLINE:NEWLINE\nIDENT:hedeh\nIDENT:x\nNEWLINE:NEWLINE\nEOF:EOF\n"
+            "EXPR_OK\n42\nINVALID_PARSE_ERROR\n",
         )
 
     def test_parser_builds_arithmetic_node(self) -> None:
