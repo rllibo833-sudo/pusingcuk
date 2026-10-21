@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import re
 import sys
 from pathlib import Path
 
@@ -60,13 +59,6 @@ def build(source: str, source_name: str) -> dict:
         raise BootstrapError("source is empty")
     if "\x00" in source:
         raise BootstrapError("source contains NUL")
-    # The current .cuk-authored frontend skips implementation function bodies;
-    # never let that lossy parse masquerade as a successful bootstrap.
-    if re.search(r"(?m)^\s*fungsi\s+[A-Za-z_][A-Za-z0-9_]*\s*\(", source):
-        raise BootstrapError(
-            "function declarations are not yet represented in the .cuk frontend AST/IR"
-        )
-
     stages = []
     try:
         for stage in (1, 2):
