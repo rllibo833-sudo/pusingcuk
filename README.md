@@ -1,20 +1,20 @@
 # PusingCuk
 
 > **Warung-language feel. Serious machinery.**  
-> PusingCuk is an experimental programming language with the `.cuk` extension, Indonesian-language keywords, and its own vocabulary and identity.
+> PusingCuk is an Indonesian-keyword programming language project built around `.cuk` source files.
 
-PusingCuk combines approachable Indonesian syntax with a reference interpreter, experimental compiler targets, a native runtime, and conformance tooling. It is an open learning and language-engineering project—not a claim that every target is equivalent or production-ready.
+The project includes a reference parser/runtime, an IR v1 format, a portable bytecode VM, native C execution, and multiple compiler targets. Support differs by target; use the compatibility matrix for verified coverage.
 
-**[Try the browser playground →](https://rllibo833-sudo.github.io/pusingcuk/playground.html)** — experimental; it runs a bounded JavaScript AST interpreter in `site/runtime.js`, locally in the browser. It does not use Pyodide or a server-side code executor.
+**[Open the browser playground →](https://rllibo833-sudo.github.io/pusingcuk/playground.html)** — browser-local JavaScript runtime; not a server-side executor.
 
 <!-- BEGIN GENERATED PYTHON-FREE SCORE BADGE -->
 [![Python-free runtime · native C · 79/79 fixtures](docs/assets/python-free-score.svg)](docs/PYTHON_FREE_SCORE.md)
 Python-free runtime, native C: **79 dari 79 fixture aktif lulus**. Ini cakupan fixture runtime native C, bukan klaim bahwa seluruh proyek atau proses build bebas Python.
 <!-- END GENERATED PYTHON-FREE SCORE BADGE -->
 
-**Status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. Development software, not a stable release.
+**Status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. Not yet a stable release.
 
-Metadata paket pada `main` adalah `0.8.0.dev0`. Backend support differs; check the compatibility matrix and fixtures.
+**Self-hosting status:** the `.cuk` frontend can tokenize and parse a limited subset and emit IR v1, including functions and conditionals on supported paths. Bootstrap stage 2 is **not yet self-hosted**: the current bootstrap repeats the frontend under the Python host. Loops and collection/index syntax are not fully handled by the `.cuk` frontend. Do not treat deterministic output as proof of compiler independence.
 
 ## Run your first program
 
@@ -104,7 +104,7 @@ Keep these deliverables separate:
 - **CukAccount** is a separate accounting application with its own UI and application/runtime integration. A passing PusingCuk fixture does not mean CukAccount has been rewritten or packaged from `.cuk`.
 - **An arbitrary `.cuk` application** can currently be interpreted or compiled only to the targets and language subset documented in the compatibility matrix. There is no claim that any `.cuk` file can be packaged as a standalone Android APK.
 
-For local AI development on Android, use Termux with Ollama running on the same device. The local development path must default to loopback-only access, explicit opt-in for writes, and review-only proposals. It must not require a cloud model, a hosted database, or an automatic Git push. Device-specific Termux behavior still requires the documented on-device test; an Ubuntu CI pass is not a substitute.
+For local AI tooling, any device-specific runtime claims require a real on-device check; an Ubuntu CI pass is not a substitute.
 ## Repository map
 
 | Area | Purpose |
@@ -124,6 +124,7 @@ For local AI development on Android, use Termux with Ollama running on the same 
 - [Compatibility matrix](docs/COMPATIBILITY.md) and [conformance fixtures](docs/CONFORMANCE_FIXTURES.md)
 - [Technical dictionary](docs/DICTIONARY.md) · [Indonesian Warung dictionary](docs/KAMUS_PUSINGCUK.md)
 - [Project overview](docs/PROJECT_OVERVIEW.md) · [project vision](docs/VISION.md) · [ecosystem implementation roadmap](docs/ECOSYSTEM_ROADMAP.md)
+- [Self-hosting frontend](examples/self_hosting/compiler.cuk) · [bootstrap evidence implementation](compiler/bootstrap.py)
 - [Contributing](CONTRIBUTING.md) · [security policy](SECURITY.md)
 
 ## How to read feature claims
