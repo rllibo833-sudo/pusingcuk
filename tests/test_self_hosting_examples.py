@@ -32,6 +32,13 @@ class SelfHostingExampleTests(unittest.TestCase):
             "lexer.cuk", "OP_PLUS\nOP_MINUS\nLITERAL_OR_UNKNOWN\n"
         )
 
+    def test_source_lexer_scans_source_text(self) -> None:
+        self.run_example(
+            "source_lexer.cuk",
+            "IDENT:lah\\nIDENT:x\\nOP:=\\nINTEGER:12\\nOP:+\\nINTEGER:3\\n"
+            "NEWLINE:NEWLINE\\nIDENT:hedeh\\nIDENT:x\\nNEWLINE:NEWLINE\\nEOF:EOF\\n",
+        )
+
     def test_parser_builds_arithmetic_node(self) -> None:
         self.run_example("parser.cuk", "OK\n7\n+\n35\n")
 
