@@ -191,7 +191,29 @@ fungsi parse_primary(tokens, index)
                             balek {"status": "OK", "node": {"jenis": "UNARY", "operator": "bukan", "nilai": hasil_bukan["node"]}, "index": hasil_bukan["index"]}
                         selesai njir
                     kampret
-                        balek {"status": "OK", "node": {"jenis": "VARIABLE", "nama": tokens[index]["nilai"]}, "index": index + 1}
+                        njir index + 1 < panjang(tokens) dan tokens[index + 1]["jenis"] == "PUNCT" dan tokens[index + 1]["nilai"] == "("
+                            lah call_args = []
+                            lah call_index = index + 2
+                            njir call_index < panjang(tokens) dan bukan (tokens[call_index]["jenis"] == "PUNCT" dan tokens[call_index]["nilai"] == ")")
+                                lah arg_result = parse_expression(tokens, call_index)
+                                njir arg_result["status"] != "OK"
+                                    balek arg_result
+                                kampret
+                                    call_args = call_args + [arg_result["node"]]
+                                    call_index = arg_result["index"]
+                                    njir call_index < panjang(tokens) dan tokens[call_index]["jenis"] == "PUNCT" dan tokens[call_index]["nilai"] == ","
+                                        call_index = call_index + 1
+                                    selesai njir
+                                selesai njir
+                            selesai njir
+                            njir call_index >= panjang(tokens) atau tokens[call_index]["jenis"] != "PUNCT" atau tokens[call_index]["nilai"] != ")"
+                                balek node_gagal(call_index)
+                            kampret
+                                balek {"status": "OK", "node": {"jenis": "CALL", "nama": tokens[index]["nilai"], "args": call_args}, "index": call_index + 1}
+                            selesai njir
+                        kampret
+                            balek {"status": "OK", "node": {"jenis": "VARIABLE", "nama": tokens[index]["nilai"]}, "index": index + 1}
+                        selesai njir
                     selesai njir
                 selesai njir
             kampret
@@ -604,9 +626,21 @@ fungsi ir_expr(node, line)
         njir node["jenis"] == "VARIABLE"
             balek "{\"kind\":\"Variable\",\"line\":" + teks(line) + ",\"fields\":{\"name\":\"" + node["nama"] + "\"}}"
         kampret
-            njir node["jenis"] == "UNARY"
-                balek "{\"kind\":\"Unary\",\"line\":" + teks(line) + ",\"fields\":{\"op\":\"" + node["operator"] + "\",\"value\":" + ir_expr(node["nilai"], line) + "}}"
+            njir node["jenis"] == "CALL"
+                lah call_args_json = ""
+                lah call_arg_index = 0
+                mumet call_arg_index < panjang(node["args"])
+                    njir call_arg_index > 0
+                        call_args_json = call_args_json + ","
+                    selesai njir
+                    call_args_json = call_args_json + ir_expr(node["args"][call_arg_index], line)
+                    call_arg_index = call_arg_index + 1
+                selesai mumet
+                balek "{\"kind\":\"Call\",\"line\":" + teks(line) + ",\"fields\":{\"name\":\"" + node["nama"] + "\",\"args\":[" + call_args_json + "]}}"
             kampret
+                njir node["jenis"] == "UNARY"
+                    balek "{\"kind\":\"Unary\",\"line\":" + teks(line) + ",\"fields\":{\"op\":\"" + node["operator"] + "\",\"value\":" + ir_expr(node["nilai"], line) + "}}"
+                kampret
                 balek "{\"kind\":\"Binary\",\"line\":" + teks(line) + ",\"fields\":{\"left\":" + ir_expr(node["kiri"], line) + ",\"op\":\"" + node["operator"] + "\",\"right\":" + ir_expr(node["kanan"], line) + "}}"
             selesai njir
         selesai njir
