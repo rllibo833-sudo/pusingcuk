@@ -33,6 +33,9 @@ def compile_source(source, source_name, target):
     if target == "go":
         from compiler.go_backend import generate
         return generate(ir)
+    if target == "rust":
+        from compiler.rust_backend import generate
+        return generate(ir)
     if target == "html":
         from compiler.js_backend import generate
         js = generate(ir)

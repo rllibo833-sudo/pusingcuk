@@ -62,7 +62,20 @@ class MultiTargetCompilerTests(unittest.TestCase):
         self.assertIn("int main()", result)
         self.assertIn("pcOut(Value(pcSafe", result)
 
-    def test_rust_target_emits_standalone_numeric_program(self):\n        result = compile_source("jancuk\\nlah x = 7 + 5 * 6\\nx = x - 2\\nhedeh x\\nselesai jancuk", "demo.cuk", "rust")\n        self.assertIn("fn main()", result)\n        self.assertIn("pc_num((7.0) + (pc_num((5.0) * (6.0))))", result)\n        self.assertIn("pc_out(pc_num((pc_v_x) - (2.0)));", result)\n\n    def test_rust_target_rejects_unsupported_constructs(self):\n        with self.assertRaisesRegex(ValueError, "backend Rust subset"):\n            compile_source("jancuk\\nhedeh benar\\nselesai jancuk", "demo.cuk", "rust")\n\n    def test_unknown_target_is_rejected(self):
+    def test_rust_target_emits_standalone_numeric_program(self):
+        result = compile_source(
+            "jancuk\nlah x = 7 + 5 * 6\nx = x - 2\nhedeh x\nselesai jancuk",
+            "demo.cuk", "rust",
+        )
+        self.assertIn("fn main()", result)
+        self.assertIn("pc_num((7.0) + (pc_num((5.0) * (6.0))))", result)
+        self.assertIn("pc_out(pc_num((pc_v_x) - (2.0)));", result)
+
+    def test_rust_target_rejects_unsupported_constructs(self):
+        with self.assertRaisesRegex(ValueError, "backend Rust subset"):
+            compile_source("jancuk\nhedeh benar\nselesai jancuk", "demo.cuk", "rust")
+
+    def test_unknown_target_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "target tidak dikenal"):
             compile_source(SOURCE, "demo.pusingcuk", "wasm")
 
