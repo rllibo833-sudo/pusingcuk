@@ -889,33 +889,47 @@ fungsi ir_collect_features(node, flags)
             i = i + 1
         selesai mumet
     kampret
-        njir node["jenis"] == "DECLARE" atau node["jenis"] == "ASSIGN"
-            flags["variables"] = benar
-            ir_collect_features(node["nilai"], flags)
+        njir node["jenis"] == "FUNCTION"
+            flags["functions"] = benar
+            lah i = 0
+            mumet i < panjang(node["body"])
+                ir_collect_features(node["body"][i], flags)
+                i = i + 1
+            selesai mumet
         kampret
-            njir node["jenis"] == "PRINT"
-                flags["console-output"] = benar
+            njir node["jenis"] == "RETURN"
+                flags["functions"] = benar
                 ir_collect_features(node["nilai"], flags)
             kampret
-                njir node["jenis"] == "BINARY" atau node["jenis"] == "UNARY"
-                    flags["operators"] = benar
-                    njir node["jenis"] == "UNARY"
+                njir node["jenis"] == "DECLARE" atau node["jenis"] == "ASSIGN"
+                    flags["variables"] = benar
+                    ir_collect_features(node["nilai"], flags)
+                kampret
+                    njir node["jenis"] == "PRINT"
+                        flags["console-output"] = benar
                         ir_collect_features(node["nilai"], flags)
                     kampret
-                        ir_collect_features(node["kiri"], flags)
-                        ir_collect_features(node["kanan"], flags)
-                    selesai njir
-                kampret
-                    njir node["jenis"] == "VARIABLE"
-                        flags["variables"] = benar
-                    kampret
-                        njir node["jenis"] == "CALL"
-                            flags["calls"] = benar
-                            lah call_feature_index = 0
-                            mumet call_feature_index < panjang(node["args"])
-                                ir_collect_features(node["args"][call_feature_index], flags)
-                                call_feature_index = call_feature_index + 1
-                            selesai mumet
+                        njir node["jenis"] == "BINARY" atau node["jenis"] == "UNARY"
+                            flags["operators"] = benar
+                            njir node["jenis"] == "UNARY"
+                                ir_collect_features(node["nilai"], flags)
+                            kampret
+                                ir_collect_features(node["kiri"], flags)
+                                ir_collect_features(node["kanan"], flags)
+                            selesai njir
+                        kampret
+                            njir node["jenis"] == "VARIABLE"
+                                flags["variables"] = benar
+                            kampret
+                                njir node["jenis"] == "CALL"
+                                    flags["calls"] = benar
+                                    lah j = 0
+                                    mumet j < panjang(node["args"])
+                                        ir_collect_features(node["args"][j], flags)
+                                        j = j + 1
+                                    selesai mumet
+                                selesai njir
+                            selesai njir
                         selesai njir
                     selesai njir
                 selesai njir
@@ -925,24 +939,28 @@ fungsi ir_collect_features(node, flags)
 selesai fungsi
 
 fungsi ir_features(program)
-    lah flags = {"core": benar, "console-output": salah, "operators": salah, "variables": salah, "calls": salah}
+    lah flags = {"core": benar, "console-output": salah, "operators": salah, "variables": salah, "calls": salah, "functions": salah}
     ir_collect_features(program, flags)
     lah result = "["
+    njir flags["calls"]
+        result = result + "\"calls\","
+    selesai njir
     njir flags["console-output"]
         result = result + "\"console-output\","
     selesai njir
     result = result + "\"core\""
+    njir flags["functions"]
+        result = result + ",\"functions\""
+    selesai njir
     njir flags["operators"]
         result = result + ",\"operators\""
     selesai njir
     njir flags["variables"]
         result = result + ",\"variables\""
     selesai njir
-    njir flags["calls"]
-        result = result + ",\"calls\""
-    selesai njir
     balek result + "]"
 selesai fungsi
+
 
 fungsi ir_document(program, source_name)
     balek "{\"format\":\"pusingcuk-ir\",\"ir_version\":1,\"language_version\":\"0.6-dev\",\"source_name\":" + ir_quote(source_name) + ",\"features\":" + ir_features(program) + ",\"source_map\":" + ir_source_map(program) + ",\"program\":" + ir_program(program) + "}"
