@@ -40,7 +40,8 @@ static char *copy_text(const char *s) {
 }
 static int add_child(CukAst *parent,CukAst *child) {
     CukAst **p=realloc(parent->children,(parent->child_count+1)*sizeof *p);
-    if(!p)return 0;parent->children=p;parent->children[parent->child_count++]=child;return 1;
+    if(!p)return 0;
+    parent->children=p;parent->children[parent->child_count++]=child;return 1;
 }
 void cuk_ast_free(CukAst *n) {
     if(!n)return;
@@ -59,12 +60,12 @@ static CukAst *primary(Parser *p) {
     }
     if(t->kind==CUK_T_STRING) {
         take(p);n=new_node(CUK_AST_LITERAL,t->line);
-        if(n)n->text=copy_text(t->value);
+        if(n){n->text=copy_text(t->value);if(!n->text){cuk_ast_free(n);return NULL;}}
         return n;
     }
     if(t->kind==CUK_T_IDENT) {
         take(p);n=new_node(CUK_AST_VARIABLE,t->line);
-        if(n)n->text=copy_text(t->value);
+        if(n){n->text=copy_text(t->value);if(!n->text){cuk_ast_free(n);return NULL;}}
         return n;
     }
     snprintf(p->out->error,sizeof p->out->error,"ekspresi bootstrap tidak didukung");
@@ -78,9 +79,9 @@ static CukAst *expression(Parser *p) {
         CukAst *bin=new_node(CUK_AST_BINARY,op->line);
         if(!bin){cuk_ast_free(left);cuk_ast_free(right);return NULL;}
         bin->text=copy_text("+");
-        if(!bin->text||!add_child(bin,left)||!add_child(bin,right)) {
-            cuk_ast_free(bin);if(bin->child_count==0){cuk_ast_free(left);cuk_ast_free(right);}return NULL;
-        }
+        if(!bin->text){cuk_ast_free(bin);cuk_ast_free(left);cuk_ast_free(right);return NULL;}
+        if(!add_child(bin,left)){cuk_ast_free(bin);cuk_ast_free(left);cuk_ast_free(right);return NULL;}
+        if(!add_child(bin,right)){cuk_ast_free(bin);cuk_ast_free(right);return NULL;}
         left=bin;
     }
     return left;
@@ -102,7 +103,8 @@ int cuk_parse(const CukTokenList *tokens,CukParseResult *out) {
             stmt=new_node(CUK_AST_DECLARE,start->line);
             if(!stmt){cuk_ast_free(value);goto fail;}
             stmt->text=copy_text(name->value);
-            if(!stmt->text||!add_child(stmt,value)){cuk_ast_free(stmt);goto fail;}
+            if(!stmt->text){cuk_ast_free(stmt);cuk_ast_free(value);goto fail;}
+            if(!add_child(stmt,value)){cuk_ast_free(stmt);cuk_ast_free(value);goto fail;}
         } else if(is(&p,CUK_T_KEYWORD,"hedeh")) {
             take(&p);CukAst *value=expression(&p);if(!value)goto fail;
             stmt=new_node(CUK_AST_PRINT,start->line);
