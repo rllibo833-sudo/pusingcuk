@@ -88,7 +88,7 @@ class MultiTargetCompilerTests(unittest.TestCase):
                    "gebber", "gembor", "jedor", "jir", "keluarin", "koar", "muncrat",
                    "ngegas", "nyalak", "omong", "print", "sembur", "semprot", "senggol",
                    "spill", "suarakan", "tampilkan", "teriak")
-        source = "jancuk\\nlah x = 9\\n" + "\\n".join(f"{alias} x" for alias in aliases) + "\\nselesai jancuk"
+        source = "jancuk\nlah x = 9\n" + "\n".join(f"{alias} x" for alias in aliases) + "\nselesai jancuk"
         canonical = json.loads(compile_source(source, "aliases.cuk", "json"))
         selfhost_ir = selfhost_from_source(source, "aliases.cuk")
         self.assertEqual(selfhost_ir["program"], canonical["program"])
