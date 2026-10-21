@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "description": "Curated browser-runtime differential subset. Every listed fixture must be supported by the browser runtime and the Python reference; omission means not yet claimed for browser parity.",
+  "description": "Curated browser-runtime differential subset. Every core conformance fixture must either be selected and pass against the Python reference, or be listed in excluded with a concrete reason. Omission from both is a test failure.",
   "fixtures": [
     "core.output-arithmetic",
     "builtins.logarithms",
@@ -81,5 +81,6 @@
     "syntax.alias-keywords-extended",
     "reference.json-invalid-returns-false",
     "formats.json-null-returns-none"
-  ]
+  ],
+  "excluded": {}
 }
