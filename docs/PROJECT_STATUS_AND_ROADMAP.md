@@ -69,3 +69,8 @@ Komponen ekosistem yang sudah ada tidak boleh dihitung ulang sebagai pekerjaan b
 ### Batas operasional lokal yang wajib dipertahankan
 
 Perangkat Android pengguna dengan Termux adalah adapter dan data center lokal bagi PusingCuk AI serta Cuk Reality Engine. Semua pekerjaan lanjutan harus mempertahankan konfigurasi matrix, endpoint loopback, dan data lokal yang sudah diperbaiki; tidak boleh melakukan reset, migrasi destruktif, atau mengubah alamat/provider diam-diam. Ollama bersifat opsional untuk core CI, tidak ada fallback cloud diam-diam, dan tooling evolusi tetap menghasilkan proposal untuk review—bukan auto-commit/push.
+
+
+### Self-hosted codegen increment (2026-10-21)
+
+`examples/self_hosting/codegen.cuk` recursively serializes a limited integer/binary AST into a nested C expression and rejects unsupported operators. Runtime tests cover nested expressions and rejection. This is an isolated generator slice, not yet cross-language compilation: it still consumes a hand-built AST and is not connected to the canonical parser, IR v1, bytecode VM, or backend registry.

@@ -40,3 +40,6 @@ Tes otomatis di `tests/test_self_hosting_examples.py` memeriksa exit code dan ou
 6. Buktikan bootstrap: compiler `.cuk` yang dibangun oleh toolchain lama mampu membangun ulang versi dirinya sendiri dengan hasil yang dapat dibandingkan.
 
 Jangan menyebut PusingCuk self-hosted sebelum tahap bootstrap dapat diulang dan diverifikasi di CI.
+
+
+Code generation kini menguji serialisasi rekursif AST aritmetika bersarang ke ekspresi C dan menolak operator yang belum didukung. Ini tetap generator ekspresi, bukan compiler lintas bahasa penuh: inputnya belum source program umum dan belum terhubung ke IR v1/manifest backend.

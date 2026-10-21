@@ -1,15 +1,35 @@
-# Prototipe code generation: AST aritmetika -> teks kode target.
-# Hanya menghasilkan teks contoh; tidak menulis file atau menjalankan compiler C.
+# Prototipe code generation: AST aritmetika -> ekspresi C yang bisa disarangkan.
+# Belum mengonsumsi source program penuh atau menjalankan compiler target.
 jancuk
 
-fungsi hasilkan_c(node)
-    njir node["jenis"] != "BINARY"
-        balek "/* node tidak didukung */"
+fungsi ekspresi_c(node)
+    njir node["jenis"] == "INTEGER"
+        balek teks(node["nilai"])
     kampret
-        balek "long hasil = " + teks(node["kiri"]) + " " + node["operator"] + " " + teks(node["kanan"]) + ";"
+        njir node["jenis"] == "BINARY"
+            lah kiri = ekspresi_c(node["kiri"])
+            lah kanan = ekspresi_c(node["kanan"])
+            lah op = node["operator"]
+            njir op != "+" dan op != "-" dan op != "*" dan op != "/"
+                balek "UNSUPPORTED_OPERATOR"
+            selesai njir
+            balek "(" + kiri + " " + op + " " + kanan + ")"
+        kampret
+            balek "UNSUPPORTED_NODE"
+        selesai njir
     selesai njir
 selesai fungsi
 
-lah ast = {"jenis": "BINARY", "kiri": 7, "operator": "+", "kanan": 35}
+fungsi hasilkan_c(node)
+    lah ekspresi = ekspresi_c(node)
+    njir ekspresi == "UNSUPPORTED_NODE" atau ekspresi == "UNSUPPORTED_OPERATOR"
+        balek ekspresi
+    selesai njir
+    balek "long hasil = " + ekspresi + ";"
+selesai fungsi
+
+lah ast = {"jenis": "BINARY", "kiri": {"jenis": "INTEGER", "nilai": 7}, "operator": "+", "kanan": {"jenis": "BINARY", "kiri": {"jenis": "INTEGER", "nilai": 5}, "operator": "*", "kanan": {"jenis": "INTEGER", "nilai": 6}}}
 hedeh hasilkan_c(ast)
+lah ast_invalid = {"jenis": "BINARY", "kiri": {"jenis": "INTEGER", "nilai": 1}, "operator": "%", "kanan": {"jenis": "INTEGER", "nilai": 2}}
+hedeh hasilkan_c(ast_invalid)
 selesai jancuk

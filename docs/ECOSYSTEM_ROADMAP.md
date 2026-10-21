@@ -109,3 +109,8 @@ Untuk penggunaan lokal, HP Android + Termux tetap adapter/data center PusingCuk 
 ## Self-hosting increment — 2026-10-21 (assignment)
 
 The limited program parser now emits `ASSIGN` statement nodes. The runner tracks declared names and rejects assignment to undeclared names with an explicit runtime status. Tests exercise `x = x + 4`, verify the changed value flows to later expressions, and cover an undeclared assignment failure. This is still not a compiler or bootstrap proof; the AST is not yet lowered to IR v1/bytecode VM.
+
+
+## Self-hosted codegen slice — 2026-10-21
+
+The `.cuk` codegen example now recursively emits nested integer/binary AST nodes as a C expression and explicitly rejects unsupported operators. The fixture tests nested precedence structure and the rejection path. This does not yet constitute a cross-language compiler: the example still receives a hand-built AST and is not wired to the canonical parser, IR v1, bytecode VM, or target backends. The next integration milestone is a common source-to-IR path with parity tests across the existing backends.
