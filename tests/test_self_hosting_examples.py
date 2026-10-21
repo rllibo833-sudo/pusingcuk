@@ -53,7 +53,7 @@ class SelfHostingExampleTests(unittest.TestCase):
         self.run_example("interpreter.cuk", "Status parse: OK\nHasil: 42\n")
 
     def test_codegen_emits_target_text(self) -> None:
-        self.run_example("codegen.cuk", "long hasil = 7 + 35;\n")
+        self.run_example("codegen.cuk", "long hasil = (7 + (5 * 6));\nUNSUPPORTED_OPERATOR\n")
 
     def test_runtime_contract_reports_evidence_state(self) -> None:
         self.run_example(

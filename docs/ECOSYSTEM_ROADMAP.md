@@ -114,3 +114,8 @@ The limited program parser now emits `ASSIGN` statement nodes. The runner tracks
 ## Self-hosted codegen slice — 2026-10-21
 
 The `.cuk` codegen example now recursively emits nested integer/binary AST nodes as a C expression and explicitly rejects unsupported operators. The fixture tests nested precedence structure and the rejection path. This does not yet constitute a cross-language compiler: the example still receives a hand-built AST and is not wired to the canonical parser, IR v1, bytecode VM, or target backends. The next integration milestone is a common source-to-IR path with parity tests across the existing backends.
+
+
+## CI correction — 2026-10-21
+
+The nested codegen fixture was updated to expect the actual recursive output (`long hasil = (7 + (5 * 6));`) and the explicit `UNSUPPORTED_OPERATOR` result. The first core run caught a stale assertion from the previous flat-expression demo; the generator behavior itself matched the new fixture. The core suite must be rerun on the correction commit before this increment is considered green.

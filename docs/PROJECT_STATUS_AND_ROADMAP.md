@@ -74,3 +74,8 @@ Perangkat Android pengguna dengan Termux adalah adapter dan data center lokal ba
 ### Self-hosted codegen increment (2026-10-21)
 
 `examples/self_hosting/codegen.cuk` recursively serializes a limited integer/binary AST into a nested C expression and rejects unsupported operators. Runtime tests cover nested expressions and rejection. This is an isolated generator slice, not yet cross-language compilation: it still consumes a hand-built AST and is not connected to the canonical parser, IR v1, bytecode VM, or backend registry.
+
+
+### CI correction for nested codegen (2026-10-21)
+
+The first core run after the nested C-expression generator failed because `tests/test_self_hosting_examples.py` still expected the old flat expression (`7 + 35`). The fixture now expects the nested output and unsupported-operator signal. This is a test expectation correction, not evidence of cross-language parity or self-hosting; wait for the corrected commit's complete CI result.

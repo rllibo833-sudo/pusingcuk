@@ -13,7 +13,7 @@ Folder ini berisi prototipe bertahap yang ditulis dengan bahasa `.cuk` untuk men
 | `parser.cuk` | Membentuk node aritmetika dari token sederhana atau token terstruktur | Satu ekspresi `INTEGER OP INTEGER EOF`; belum ada prioritas operator atau tanda kurung |
 | `evaluator.cuk` | Mengevaluasi node aritmetika | Belum menjalankan AST bahasa `.cuk` |
 | `interpreter.cuk` | Menghubungkan tahap mini lexer → parser → evaluator | Input masih daftar token yang sudah disiapkan |
-| `codegen.cuk` | Menghasilkan satu baris teks mirip kode C | Tidak mengompilasi atau menjalankan C |
+| `codegen.cuk` | Menghasilkan ekspresi C bersarang dari AST integer/biner buatan tangan | Bukan compiler source-to-source; operator yang belum didukung ditolak |
 | `runtime_contract.cuk` | Menunjukkan cara melaporkan dukungan fitur secara eksplisit | Data ilustratif, bukan hasil pengujian runtime |
 
 ## Jalankan dari root repository
