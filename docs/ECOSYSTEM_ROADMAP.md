@@ -44,6 +44,16 @@ Let a person describe an application in ordinary language, produce a supported `
 
 **Exit evidence:** per-target parity results with fixture IDs and no untested support claims.
 
+### M2A — Self-hosting language tools
+
+- Treat `examples/self_hosting/` as small, executable experiments, not proof that PusingCuk can compile itself.
+- Grow the stages in order: token scanning from source text, parser and AST, evaluator/VM, stable IR, then code generation.
+- Keep each stage runnable and covered by expected-output tests in the reference runtime before attempting cross-runtime parity.
+- Add explicit module/import support and a stable host/runtime interface before splitting the compiler into reusable `.cuk` modules.
+- Prove self-hosting only with a repeatable bootstrap: a trusted existing toolchain builds the `.cuk` compiler, and that compiler rebuilds itself with equivalent verified output.
+
+**Exit evidence:** documented bootstrap procedure passes repeatedly in CI, with source/build hashes or equivalent reproducible evidence. Until then, describe the work as prototypes or partial self-hosting, never as a self-hosted compiler.
+
 ### M3 — Reality Engine
 
 - Read canonical fixtures and target manifests instead of maintaining a second source of truth.
