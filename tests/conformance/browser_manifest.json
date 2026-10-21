@@ -62,7 +62,6 @@
     "runtime.jumlah-result-outside-safe-range",
     "runtime.jumlah-rejects-non-list",
     "runtime.jumlah-intermediate-safe-range",
-    "formats.json-null-returns-none",
     "numbers.round-ties-to-even",
     "runtime.round-rejects-boolean",
     "runtime.round-rejects-unsafe-result",
