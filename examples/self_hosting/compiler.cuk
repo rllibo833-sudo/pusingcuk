@@ -414,9 +414,11 @@ fungsi parse_term(tokens, index)
     kampret
         lah lanjut = kiri["index"]
         lah node = kiri["node"]
+        lah op = ""
+        lah kanan = {}
         mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "OP" dan (tokens[lanjut]["nilai"] == "*" atau tokens[lanjut]["nilai"] == "/" atau tokens[lanjut]["nilai"] == "//" atau tokens[lanjut]["nilai"] == "%")
-            lah op = tokens[lanjut]["nilai"]
-            lah kanan = parse_primary(tokens, lanjut + 1)
+            op = tokens[lanjut]["nilai"]
+            kanan = parse_primary(tokens, lanjut + 1)
             njir kanan["status"] != "OK"
                 balek kanan
             kampret
@@ -435,9 +437,11 @@ fungsi parse_expression(tokens, index)
     kampret
         lah lanjut = kiri["index"]
         lah node = kiri["node"]
+        lah op = ""
+        lah kanan = {}
         mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "OP" dan (tokens[lanjut]["nilai"] == "+" atau tokens[lanjut]["nilai"] == "-")
-            lah op = tokens[lanjut]["nilai"]
-            lah kanan = parse_term(tokens, lanjut + 1)
+            op = tokens[lanjut]["nilai"]
+            kanan = parse_term(tokens, lanjut + 1)
             njir kanan["status"] != "OK"
                 balek kanan
             kampret
@@ -456,9 +460,11 @@ fungsi parse_comparison(tokens, index)
     kampret
         lah lanjut = kiri["index"]
         lah node = kiri["node"]
+        lah op = ""
+        lah kanan = {}
         mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "OP" dan (tokens[lanjut]["nilai"] == "==" atau tokens[lanjut]["nilai"] == "!=" atau tokens[lanjut]["nilai"] == "<" atau tokens[lanjut]["nilai"] == "<=" atau tokens[lanjut]["nilai"] == ">" atau tokens[lanjut]["nilai"] == ">=")
-            lah op = tokens[lanjut]["nilai"]
-            lah kanan = parse_expression(tokens, lanjut + 1)
+            op = tokens[lanjut]["nilai"]
+            kanan = parse_expression(tokens, lanjut + 1)
             njir kanan["status"] != "OK"
                 balek kanan
             kampret
@@ -478,7 +484,7 @@ fungsi parse_and(tokens, index)
         lah lanjut = kiri["index"]
         lah node = kiri["node"]
         mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "IDENT" dan tokens[lanjut]["nilai"] == "dan"
-            lah kanan = parse_comparison(tokens, lanjut + 1)
+            kanan = parse_comparison(tokens, lanjut + 1)
             njir kanan["status"] != "OK"
                 balek kanan
             kampret
@@ -498,7 +504,7 @@ fungsi parse_or(tokens, index)
         lah lanjut = kiri["index"]
         lah node = kiri["node"]
         mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "IDENT" dan tokens[lanjut]["nilai"] == "atau"
-            lah kanan = parse_and(tokens, lanjut + 1)
+            kanan = parse_and(tokens, lanjut + 1)
             njir kanan["status"] != "OK"
                 balek kanan
             kampret

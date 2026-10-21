@@ -46,15 +46,13 @@ Let a person describe an application in ordinary language, produce a supported `
 
 ### M2A — Self-hosting language tools
 
-- Treat `examples/self_hosting/` as small, executable experiments, not proof that PusingCuk can compile itself.
-- The repository already contains a reference interpreter, IR v1, bytecode VM, native C runtime, experimental multi-target backends, module resolver, local AI adapter/service, Reality Engine, browser playground, Android Studio shell, and application examples. Do not recreate these surfaces as roadmap work; integrate and reuse them where their contracts fit.
-- `source_lexer.cuk` now contains a limited multiline parser for `lah name = expression`, `name = expression`, and `hedeh expression`, plus an AST evaluator with a local variable environment. Runtime tests cover reassignment, downstream value flow, rejection of assignment to an undeclared name, and malformed declarations. Its tested expression subset includes precedence, parentheses, unary minus and modulo. This remains a staged frontend prototype, not a self-hosted compiler: control flow, blocks, functions/calls, full diagnostics, IR lowering, and bootstrap are not implemented.
-- Each grammar increment needs positive and negative tests, expected-output regressions, and explicit unsupported-syntax notes. Keep the Python reference frontend as an oracle until the self-hosted frontend matches applicable conformance fixtures.
-- Reuse IR v1 and the bytecode VM only after a tested mapping from the self-hosted AST to the existing IR/bytecode contracts; do not create a parallel format without a compatibility reason.
-- Define one tested module/import contract before splitting the compiler into reusable `.cuk` modules.
-- **Bootstrap in plain language:** first use the existing compiler to build the new compiler from its `.cuk` source; then use that new compiler to build itself again; compare outputs and run the same conformance suite. Repeat this in CI. It is not complete until this process works repeatedly on the same commit.
+- Use `examples/self_hosting/compiler.cuk` as the current `.cuk`-authored frontend; `source_lexer.cuk` entries below are dated history from an earlier prototype.
+- Keep one current implementation status in [SELF_HOSTING_STATE.md](SELF_HOSTING_STATE.md). This roadmap states direction; it does not duplicate the changing test/status checklist.
+- Integrate with the canonical IR v1, bytecode VM and existing backends. Do not create parallel IR envelopes or separate target manifests.
+- The current adapter still hosts execution, IR validation and bytecode generation on Python. Its repeatable-build check does not prove an independent compiler.
+- **Bootstrap exit gate:** stage 1 must produce a runnable compiler artifact; that artifact must compile the compiler source again as stage 2; compare usable artifacts and run the same applicable conformance suite on the same commit. Until then, describe the work as partial self-hosting, not a standalone compiler.
 
-**Exit evidence:** a real program parser and compiler pipeline, followed by a repeatable bootstrap job in CI with source/build hashes or equivalent reproducible evidence. Until then, describe the work as prototypes or partial self-hosting, never as a self-hosted compiler.
+**Exit evidence:** self-parse/parity and VM execution pass in CI, followed by a repeatable two-stage bootstrap that does not use the Python frontend/compiler path for stage-2 compilation.
 
 ### M3 — Reality Engine
 

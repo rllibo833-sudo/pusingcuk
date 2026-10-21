@@ -47,15 +47,13 @@ Baseline matriks multi-target yang tersimpan menyatakan reference, native C, Jav
 
 ## Prioritas aktif — frontend mandiri dan bootstrap
 
-Komponen ekosistem yang sudah ada tidak boleh dihitung ulang sebagai pekerjaan baru. Fokus berikutnya adalah menghubungkan prototipe self-hosting dengan toolchain yang ada:
+Status implementasi saat ini dirawat di [SELF_HOSTING_STATE.md](SELF_HOSTING_STATE.md); dokumen ini tidak membuat daftar status self-hosting kedua.
 
-1. Perluas `examples/self_hosting/source_lexer.cuk` dari parser ekspresi ke grammar program secara bertahap. Cakupan saat ini mencakup deklarasi, assignment, alias output, ekspresi integer, serta literal string dan escape dasar; kontrol alur, fungsi, angka pecahan, dan diagnostik lengkap masih terbuka.
-2. Jaga pemetaan AST self-hosted ke IR v1 yang sudah ada dan gunakan backend yang sama. Saat ini `compiler/self_hosted_frontend.py` masih menjadi adapter yang menjalankan program `.cuk`, menerima AST JSON, membentuk envelope IR v1, dan memvalidasinya; ini belum frontend mandiri tanpa Python.
-3. Perluas parity test antara frontend self-hosted dan referensi Python, termasuk literal string ber-escape, lalu jalankan CI pada commit yang sama. Jangan mengklaim kesetaraan di luar fixture yang benar-benar lulus.
-4. Implementasikan compiler dalam .cuk secara bertahap dan tambahkan job bootstrap: toolchain lama membangun compiler .cuk, lalu compiler baru membangun ulang dirinya; hasil build dan suite tes harus cocok.
-5. Setelah pipeline tersebut teruji, migrasikan bagian Reality Engine, formatter/test runner, dan tooling AI ke jalur .cuk. Ollama tetap opsional dan tidak boleh menjadi syarat tes inti.
-
-**Batas saat ini:** dukungan unary minus dan modulo pada prototipe ekspresi merupakan kemajuan lokal yang terukur, bukan bukti bahwa frontend penuh atau bootstrap sudah selesai. Python masih menjadi implementasi referensi dan penggerak compiler CLI saat ini.
+- Sumber frontend aktif adalah `examples/self_hosting/compiler.cuk`. `source_lexer.cuk` pada catatan bertanggal di bawah adalah prototipe historis, bukan jalur compiler aktif.
+- Frontend `.cuk` memuat lexer, parser ekspresi/program, fungsi dan return, kondisi/loop, list/dictionary/index, pemanggilan/member sederhana, serta serializer IR v1. Tes penerimaan membandingkan IR dengan parser referensi dan mengirim program collection/control-flow ke bytecode VM.
+- Jalur tersebut masih dijalankan oleh host Python; validator IR, bootstrap/check reproduksibilitas, bytecode dan VM juga memakai implementasi Python. Karena itu, parsing kode compiler sendiri bukan bukti bahwa compiler dapat berdiri sendiri.
+- Gate berikutnya: seluruh unit suite dan parity self-parse harus lulus pada commit yang sama; setelah itu bangun artefak compiler tahap pertama yang bisa menjalankan tahap kedua, compile ulang sumber compiler, bandingkan artefak, lalu jalankan konformansi yang relevan. Jangan menandai bootstrap penuh sebelum tahap tersebut terbukti di CI.
+- Gunakan `compiler/bootstrap.py`, manifest konformansi, `tools/ci_fixture_matrix.py`, dan tes yang sudah ada. Jangan membuat runner, manifest, atau status report duplikat. Ollama/AI helper bukan prasyarat compiler inti.
 
 ## Aturan perubahan
 
