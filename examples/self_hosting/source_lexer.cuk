@@ -154,6 +154,53 @@ fungsi render_tokens(tokens)
     selesai untuk
 selesai fungsi
 
+fungsi json_escape(teks)
+    lah hasil = ""
+    lah i = 0
+    lah c = ""
+    mumet i < panjang(teks)
+        c = teks[i]
+        njir c == "\""
+            hasil = hasil + "\\\""
+        kampret
+            njir c == "\\"
+                hasil = hasil + "\\\\"
+            kampret
+                njir c == "\n"
+                    hasil = hasil + "\\n"
+                kampret
+                    njir c == "\r"
+                        hasil = hasil + "\\r"
+                    kampret
+                        njir c == "\t"
+                            hasil = hasil + "\\t"
+                        kampret
+                            hasil = hasil + c
+                        selesai njir
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+        i = i + 1
+    selesai mumet
+    balek hasil
+selesai fungsi
+
+fungsi render_tokens_json(tokens)
+    lah hasil = "["
+    lah i = 0
+    lah token = {}
+    mumet i < panjang(tokens)
+        token = tokens[i]
+        njir i > 0
+            hasil = hasil + ","
+        selesai njir
+        hasil = hasil + "{\"jenis\":\"" + json_escape(token["jenis"]) + "\",\"nilai\":\"" + json_escape(token["nilai"]) + "\"}"
+        i = i + 1
+    selesai mumet
+    balek hasil + "]"
+selesai fungsi
+
 # Parser recursive-descent dan evaluator AST untuk ekspresi aritmetika.
 # Grammar: expr := term (("+" | "-") term)*
 # term := primary (("*" | "/" | "%") primary)*
