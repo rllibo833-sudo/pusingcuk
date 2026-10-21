@@ -80,6 +80,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: python scripts/check_alias_sync.py
       - run: python scripts/gen_docs_from_spec.py --check
+      - run: python tools/validate_target_manifests.py
       - run: python -m unittest discover -s tests -v
       - if: matrix.python-version == '3.12'
         run: python tools/conformance.py
