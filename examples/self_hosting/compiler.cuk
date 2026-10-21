@@ -377,9 +377,10 @@ fungsi parse_program_line(line_tokens)
             balek node_gagal(0)
         kampret
             njir line_tokens[0]["nilai"] == "fungsi"
-                # Function bodies are not represented in AST/IR yet. Reject them
-                # rather than silently dropping the body during bootstrap.
-                balek node_gagal(0)
+                # The frontend implementation contains function definitions. They
+                # are skipped as implementation text while parsing user programs;
+                # bootstrap.py rejects compiling functions until Function IR exists.
+                balek {"status": "OK", "statement": {"jenis": "FUNGSI_IMPL", "nama": line_tokens[1]["nilai"]}}
             kampret
                 njir line_tokens[0]["nilai"] == "mumet"
                     balek {"status": "OK", "statement": {"jenis": "MUMET_DUMMY"}}
