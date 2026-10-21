@@ -22,7 +22,6 @@ fungsi pindai(source)
     lah kutip = ""
     lah nilai = ""
     lah tertutup = salah
-    lah jenis_angka = "INTEGER"
     mumet i < n
         c = source[i]
         njir c == " " atau c == "\t" atau c == "\r"
@@ -37,7 +36,7 @@ fungsi pindai(source)
                         i = i + 1
                     selesai mumet
                 kampret
-                    njir c == "\"" atau c == "'"
+                    njir c == '"' atau c == "'"
                         kutip = c
                         nilai = ""
                         tertutup = salah
@@ -103,7 +102,7 @@ fungsi render_tokens_json(tokens)
         njir i > 0
             hasil = hasil + ","
         selesai njir
-        hasil = hasil + "{\"jenis\":\"" + json_escape(token["jenis"]) + "\",\"nilai\":\"" + json_escape(token["nilai"]) + "\"}"
+        hasil = hasil + '{"jenis":"' + json_escape(token["jenis"]) + '","nilai":"' + json_escape(token["nilai"]) + '"}'
         i = i + 1
     selesai mumet
     balek hasil + "]"
