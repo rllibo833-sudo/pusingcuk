@@ -53,6 +53,9 @@ def _compile_target(path: Path, target: str, output: Path) -> int:
     elif target == "python":
         from compiler.python_backend import generate
         output.write_text(generate(document), encoding="utf-8")
+    elif target == "go":
+        from compiler.go_backend import generate
+        output.write_text(generate(document), encoding="utf-8")
     else:
         raise ValueError(f"target tidak didukung: {target}")
     return 0
@@ -67,7 +70,7 @@ def main(argv=None) -> int:
     mode.add_argument("--emit-ir", metavar="FILE", help="tulis IR v1 kanonis ke FILE")
     mode.add_argument("--emit-bytecode", metavar="FILE", help="tulis bytecode VM ke FILE")
     mode.add_argument("--check", action="store_true", help="kompilasi tanpa menjalankan program")
-    parser.add_argument("--target", choices=("js", "python", "vm"), help="target kompatibilitas untuk runner Reality Engine")
+    parser.add_argument("--target", choices=("js", "python", "vm", "go"), help="target kompatibilitas untuk runner Reality Engine")
     parser.add_argument("--output", help="berkas keluaran target")
     args = parser.parse_args(argv)
 

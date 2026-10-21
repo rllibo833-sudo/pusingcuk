@@ -45,6 +45,10 @@ Jangan menyebut PusingCuk self-hosted sebelum tahap bootstrap dapat diulang dan 
 Code generation kini menguji serialisasi rekursif AST aritmetika bersarang ke ekspresi C dan menolak operator yang belum didukung. Ini tetap generator ekspresi, bukan compiler lintas bahasa penuh: inputnya belum source program umum dan belum terhubung ke IR v1/manifest backend.
 
 
+## Target CLI untuk conformance runner
+
+CLI `python -m compiler sumber.cuk --target go --output hasil.go` sekarang meneruskan kompilasi ke backend Go yang ada. Mode target ini memakai parser referensi kanonis; ia menjaga kompatibilitas matriks backend dan **bukan** bukti bahwa frontend `.cuk` sudah mandiri. Pipeline default frontend `.cuk` tetap terbatas pada subset yang didokumentasikan di atas.
+
 ## Jalur frontend self-hosted ke toolchain kanonis
 
 `compiler/self_hosted_frontend.py` menjalankan lexer/parser yang ditulis di `.cuk`, menerima AST hasil parse, lalu membungkusnya menjadi IR v1 kanonis yang divalidasi dan digunakan backend yang sudah ada. Ini jalur eksperimen terbatas untuk deklarasi, assignment, output, dan ekspresi numerik; belum menggantikan parser referensi untuk semua sintaks.
