@@ -123,41 +123,113 @@ fungsi render_tokens(tokens)
     selesai untuk
 selesai fungsi
 
-# Parser dan evaluator mini yang menggunakan token hasil pindai(source).
-# Grammar sengaja dibatasi: INTEGER OP INTEGER EOF.
-fungsi parse_ekspresi(tokens)
-    njir panjang(tokens) != 4
-        balek {"status": "PARSE_ERROR"}
+# Parser recursive-descent dan evaluator AST untuk ekspresi aritmetika.
+# Grammar: expr := term (("+" | "-") term)*
+# term := primary (("*" | "/") primary)*
+# primary := INTEGER | "(" expr ")"
+fungsi node_gagal(index)
+    balek {"status": "PARSE_ERROR", "index": index}
+selesai fungsi
+
+fungsi parse_primary(tokens, index)
+    njir index >= panjang(tokens)
+        balek node_gagal(index)
     kampret
-        njir tokens[0]["jenis"] != "INTEGER" atau tokens[1]["jenis"] != "OP" atau tokens[2]["jenis"] != "INTEGER" atau tokens[3]["jenis"] != "EOF"
-            balek {"status": "PARSE_ERROR"}
+        njir tokens[index]["jenis"] == "INTEGER"
+            balek {"status": "OK", "node": {"jenis": "INTEGER", "nilai": bilangan(tokens[index]["nilai"])}, "index": index + 1}
         kampret
-            njir tokens[1]["nilai"] != "+" dan tokens[1]["nilai"] != "-" dan tokens[1]["nilai"] != "*" dan tokens[1]["nilai"] != "/"
-                balek {"status": "PARSE_ERROR"}
+            njir tokens[index]["jenis"] == "PUNCT" dan tokens[index]["nilai"] == "("
+                lah dalam = parse_expression(tokens, index + 1)
+                njir dalam["status"] != "OK"
+                    balek dalam
+                kampret
+                    njir dalam["index"] >= panjang(tokens) atau tokens[dalam["index"]]["jenis"] != "PUNCT" atau tokens[dalam["index"]]["nilai"] != ")"
+                        balek node_gagal(dalam["index"])
+                    kampret
+                        balek {"status": "OK", "node": dalam["node"], "index": dalam["index"] + 1}
+                    selesai njir
+                selesai njir
             kampret
-                balek {"status": "OK", "kiri": bilangan(tokens[0]["nilai"]), "operator": tokens[1]["nilai"], "kanan": bilangan(tokens[2]["nilai"])}
+                balek node_gagal(index)
             selesai njir
         selesai njir
     selesai njir
 selesai fungsi
 
-fungsi evaluasi_ekspresi(ast)
-    njir ast["status"] != "OK"
-        balek "PARSE_ERROR"
+fungsi parse_term(tokens, index)
+    lah kiri = parse_primary(tokens, index)
+    njir kiri["status"] != "OK"
+        balek kiri
     kampret
-        njir ast["operator"] == "+"
-            balek ast["kiri"] + ast["kanan"]
-        kampret
-            njir ast["operator"] == "-"
-                balek ast["kiri"] - ast["kanan"]
+        lah lanjut = kiri["index"]
+        lah node = kiri["node"]
+        mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "OP" dan (tokens[lanjut]["nilai"] == "*" atau tokens[lanjut]["nilai"] == "/")
+            lah op = tokens[lanjut]["nilai"]
+            lah kanan = parse_primary(tokens, lanjut + 1)
+            njir kanan["status"] != "OK"
+                balek kanan
             kampret
-                njir ast["operator"] == "*"
-                    balek ast["kiri"] * ast["kanan"]
+                node = {"jenis": "BINARY", "operator": op, "kiri": node, "kanan": kanan["node"]}
+                lanjut = kanan["index"]
+            selesai njir
+        selesai mumet
+        balek {"status": "OK", "node": node, "index": lanjut}
+    selesai njir
+selesai fungsi
+
+fungsi parse_expression(tokens, index)
+    lah kiri = parse_term(tokens, index)
+    njir kiri["status"] != "OK"
+        balek kiri
+    kampret
+        lah lanjut = kiri["index"]
+        lah node = kiri["node"]
+        mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "OP" dan (tokens[lanjut]["nilai"] == "+" atau tokens[lanjut]["nilai"] == "-")
+            lah op = tokens[lanjut]["nilai"]
+            lah kanan = parse_term(tokens, lanjut + 1)
+            njir kanan["status"] != "OK"
+                balek kanan
+            kampret
+                node = {"jenis": "BINARY", "operator": op, "kiri": node, "kanan": kanan["node"]}
+                lanjut = kanan["index"]
+            selesai njir
+        selesai mumet
+        balek {"status": "OK", "node": node, "index": lanjut}
+    selesai njir
+selesai fungsi
+
+fungsi parse_source(tokens)
+    lah hasil = parse_expression(tokens, 0)
+    njir hasil["status"] != "OK"
+        balek hasil
+    kampret
+        njir hasil["index"] != panjang(tokens) - 1 atau tokens[hasil["index"]]["jenis"] != "EOF"
+            balek node_gagal(hasil["index"])
+        kampret
+            balek {"status": "OK", "node": hasil["node"]}
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi evaluasi(node)
+    njir node["jenis"] == "INTEGER"
+        balek node["nilai"]
+    kampret
+        lah kiri = evaluasi(node["kiri"])
+        lah kanan = evaluasi(node["kanan"])
+        njir node["operator"] == "+"
+            balek kiri + kanan
+        kampret
+            njir node["operator"] == "-"
+                balek kiri - kanan
+            kampret
+                njir node["operator"] == "*"
+                    balek kiri * kanan
                 kampret
-                    njir ast["kanan"] == 0
+                    njir kanan == 0
                         balek "DIVISION_BY_ZERO"
                     kampret
-                        balek ast["kiri"] / ast["kanan"]
+                        balek kiri / kanan
                     selesai njir
                 selesai njir
             selesai njir
@@ -165,15 +237,22 @@ fungsi evaluasi_ekspresi(ast)
     selesai njir
 selesai fungsi
 
-lah contoh = "lah x = 12 + 3\nhedeh x # komentar\n"
+lah contoh = "lah x = 12 + 3\\nhedeh x # komentar\\n"
 render_tokens(pindai(contoh))
 
-lah ast = parse_ekspresi(pindai("7 + 35"))
-hedeh "EXPR_" + ast["status"]
+lah ast = parse_source(pindai("2 + 3 * 4"))
+hedeh "PRECEDENCE_" + ast["status"]
 njir ast["status"] == "OK"
-    hedeh evaluasi_ekspresi(ast)
+    hedeh evaluasi(ast["node"])
 selesai njir
 
-lah ast_invalid = parse_ekspresi(pindai("7 % 35"))
+lah ast_group = parse_source(pindai("(2 + 3) * 4"))
+hedeh "PARENS_" + ast_group["status"]
+njir ast_group["status"] == "OK"
+    hedeh evaluasi(ast_group["node"])
+selesai njir
+
+lah ast_invalid = parse_source(pindai("7 % 35"))
 hedeh "INVALID_" + ast_invalid["status"]
+selesai jancuk
 selesai jancuk

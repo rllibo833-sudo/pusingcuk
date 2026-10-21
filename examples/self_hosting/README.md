@@ -2,14 +2,14 @@
 
 Folder ini berisi prototipe bertahap yang ditulis dengan bahasa `.cuk` untuk menguji apakah bahasa ini bisa menjadi alat bagi pengembangan toolchain-nya sendiri.
 
-**Penting:** ini belum merupakan compiler PusingCuk yang self-hosted. `source_lexer.cuk` kini menjalankan satu jalur nyata dari teks sumber → token → node ekspresi → hasil untuk `INTEGER OP INTEGER`; contoh juga menolak operator yang tidak didukung. Namun grammar-nya sangat kecil, belum memiliki prioritas operator/tanda kurung, dan belum memproses program `.cuk` umum. `parser.cuk` dan `evaluator.cuk` tetap eksperimen tahap terpisah; `codegen.cuk` hanya menghasilkan teks C dan belum menjalankan compiler.
+**Penting:** ini belum merupakan compiler PusingCuk yang self-hosted. `source_lexer.cuk` kini menjalankan jalur teks sumber → token → recursive-descent parser → AST → evaluator untuk ekspresi integer dengan `+`, `-`, `*`, `/`, prioritas operator, dan tanda kurung. Contoh menguji `2 + 3 * 4 = 14`, `(2 + 3) * 4 = 20`, serta penolakan `%`. Ini masih grammar ekspresi kecil, bukan parser program `.cuk` penuh. `codegen.cuk` belum menjalankan compiler.
 
 ## Contoh
 
 | Berkas | Peran saat ini | Batasan utama |
 |---|---|---|
 | `lexer.cuk` | Mengklasifikasikan satu token operator | Demo kecil, bukan scanner |
-| `source_lexer.cuk` | Memindai teks dan mengevaluasi satu ekspresi aritmetika sederhana | Grammar `INTEGER OP INTEGER`; belum ada prioritas operator/tanda kurung, alias keyword, angka pecahan, atau decoding escape |
+| `source_lexer.cuk` | Lexer, parser precedence, AST, evaluator ekspresi integer | Grammar ekspresi; belum mem-parse pernyataan/program penuh, alias keyword, angka pecahan, atau decoding escape |
 | `parser.cuk` | Membentuk node aritmetika dari token sederhana atau token terstruktur | Satu ekspresi `INTEGER OP INTEGER EOF`; belum ada prioritas operator atau tanda kurung |
 | `evaluator.cuk` | Mengevaluasi node aritmetika | Belum menjalankan AST bahasa `.cuk` |
 | `interpreter.cuk` | Menghubungkan tahap mini lexer → parser → evaluator | Input masih daftar token yang sudah disiapkan |
@@ -28,7 +28,7 @@ python pusingcuk_new.py examples/self_hosting/codegen.cuk
 python pusingcuk_new.py examples/self_hosting/runtime_contract.cuk
 ```
 
-Tes otomatis di `tests/test_self_hosting_examples.py` memeriksa exit code dan output yang diharapkan, termasuk hasil `7 + 35` dari teks sumber serta penolakan `7 % 35`. Lulus pada interpreter referensi hanya membuktikan prototipe berjalan di target itu; tidak berarti target native/browser mendukungnya.
+Tes otomatis di `tests/test_self_hosting_examples.py` memeriksa exit code dan output yang diharapkan, termasuk prioritas `2 + 3 * 4`, tanda kurung `(2 + 3) * 4`, serta penolakan `7 % 35`. Lulus pada interpreter referensi hanya membuktikan prototipe berjalan di target itu; tidak berarti target native/browser mendukungnya.
 
 ## Jalur menuju self-hosting sungguhan
 
