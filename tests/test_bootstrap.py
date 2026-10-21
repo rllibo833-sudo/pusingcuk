@@ -15,6 +15,18 @@ class BootstrapEvidenceTests(unittest.TestCase):
         self.assertEqual(body[0]["fields"]["body"][0]["kind"], "Return")
         self.assertIn("functions", document["features"])
         self.assertEqual(body[1]["kind"], "Print")
+    def test_cuk_frontend_parses_conditional_inside_function_without_python_fallback(self):
+        source = 'jancuk\nfungsi pilih(a)\n    njir a > 0\n        balek 1\n    kampret\n        balek 0\n    selesai njir\nselesai fungsi\nhedeh pilih(1)\nselesai jancuk\n'
+        document = self_hosted_from_source(source, "conditional-function.cuk")
+        function = document["program"]["fields"]["body"][0]
+        self.assertEqual(function["kind"], "Function")
+        conditional = function["fields"]["body"][0]
+        self.assertEqual(conditional["kind"], "If")
+        self.assertEqual(conditional["fields"]["then_body"][0]["kind"], "Return")
+        self.assertEqual(conditional["fields"]["else_body"][0]["kind"], "Return")
+        evidence = build(source, "conditional-function.cuk")
+        self.assertEqual(evidence["stages"][0]["stdout"], "1\\n")
+
     def test_two_stage_build_emits_identical_artifacts(self):
         source = 'jancuk\nlah nama = "Dunia"\nhedeh "Halo, " + nama\nselesai jancuk\n'
         evidence = build(source, "hello.cuk")
