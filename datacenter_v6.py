@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Backward-compatible, review-only DRY-RUN launcher for V6 evolution proposals."""
-from tools.datacenter_v6 import inspect_proposal, main\n\nMODE = "DRY-RUN"\nGIT_SIDE_EFFECTS = False
+from tools.datacenter_v6 import inspect_proposal, main
+
+MODE = "DRY-RUN"
+GIT_SIDE_EFFECTS = False
 
 # Keep this import visible for legacy safety checks and downstream callers.
 __all__ = ["inspect_proposal", "main"]
