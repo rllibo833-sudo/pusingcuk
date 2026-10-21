@@ -36,29 +36,29 @@ fungsi pindai(source)
     mumet i < n
         c = source[i]
 
-        njir c == " " atau c == "\\t" atau c == "\\r"
+        njir c == " " atau c == "\t" atau c == "\r"
             i = i + 1
         kampret
-            njir c == "\\n"
+            njir c == "\n"
                 tokens = tokens + [{"jenis": "NEWLINE", "nilai": "NEWLINE"}]
                 i = i + 1
             kampret
                 njir c == "#"
-                    mumet i < n dan source[i] != "\\n"
+                    mumet i < n dan source[i] != "\n"
                         i = i + 1
                     selesai mumet
                 kampret
-                    njir c == "\\"" atau c == "'"
+                    njir c == "\"" atau c == "'"
                         kutip = c
                         nilai = ""
                         tertutup = salah
                         i = i + 1
-                        mumet i < n dan source[i] != "\\n" dan bukan tertutup
+                        mumet i < n dan source[i] != "\n" dan bukan tertutup
                             njir source[i] == kutip
                                 tertutup = benar
                                 i = i + 1
                             kampret
-                                njir source[i] == "\\\\" dan i + 1 < n
+                                njir source[i] == "\\" dan i + 1 < n
                                     nilai = nilai + source[i] + source[i + 1]
                                     i = i + 2
                                 kampret
@@ -123,6 +123,6 @@ fungsi tampilkan(tokens)
     selesai untuk
 selesai fungsi
 
-lah contoh = "lah x = 12 + 3\\nhedeh x # komentar\\n"
+lah contoh = "lah x = 12 + 3\nhedeh x # komentar\n"
 tampilkan(pindai(contoh))
 selesai jancuk
