@@ -69,7 +69,23 @@ class MultiTargetCompilerTests(unittest.TestCase):
         )
         self.assertIn("fn main()", result)
         self.assertIn("pc_num((7.0) + (pc_num((5.0) * (6.0))))", result)
-        self.assertIn("pc_out(pc_num((pc_v_x) - (2.0)));", result)
+        self.assertIn("pc_v_x = pc_num((pc_v_x) - (2.0));", result)
+
+    def test_self_hosted_frontend_emits_canonical_ir_and_uses_existing_backend(self):
+        from compiler.self_hosted_frontend import from_source as selfhost_from_source
+        source = "jancuk\nlah x = 7 + 5 * 6\nx = x - 2\nhedeh x\nselesai jancuk"
+        canonical = json.loads(compile_source(source, "same.cuk", "json"))
+        selfhost_ir = selfhost_from_source(source, "same.cuk")
+        self.assertEqual(selfhost_ir["format"], canonical["format"])
+        self.assertEqual(selfhost_ir["ir_version"], canonical["ir_version"])
+        self.assertEqual(selfhost_ir["program"], canonical["program"])
+        generated = compile_source(source, "same.cuk", "js", frontend="selfhosted")
+        self.assertIn("pcOut", generated)
+
+    def test_self_hosted_frontend_rejects_malformed_program(self):
+        from compiler.self_hosted_frontend import SelfHostedFrontendError, from_source as selfhost_from_source
+        with self.assertRaises(SelfHostedFrontendError):
+            selfhost_from_source("jancuk\nlah = 4\nselesai jancuk", "broken.cuk")
 
     def test_rust_target_rejects_unsupported_constructs(self):
         with self.assertRaisesRegex(ValueError, "backend Rust subset"):

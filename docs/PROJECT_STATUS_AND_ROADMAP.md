@@ -84,3 +84,8 @@ The first core run after the nested C-expression generator failed because `tests
 ### Target Rust tahap awal (2026-10-21)
 
 CLI kini menerima `--target rust`, yang menerjemahkan IR v1 kanonis menjadi source Rust mandiri untuk subset numerik: deklarasi/assignment variabel, output, unary minus, dan operasi `+ - * / // %`. Konstruksi di luar subset ditolak secara eksplisit. Target ini menambah satu backend bahasa nyata, tetapi tidak dihitung sebagai parity penuh atau sebagai bukti target 10; hasil eksekusi harus diverifikasi dengan `rustc` bila tersedia.
+
+
+### Frontend self-hosted terhubung ke IR v1 (2026-10-21)
+
+`compiler/self_hosted_frontend.py` mengeksekusi lexer/parser dalam `examples/self_hosting/source_lexer.cuk`, mengubah AST subset tersebut menjadi envelope IR v1 yang divalidasi, dan mengirim IR yang sama ke backend existing melalui opsi `--frontend selfhosted`. Tes memeriksa kesamaan AST dengan frontend kanonis dan penolakan sintaks malformed. Cakupan masih terbatas pada deklarasi, assignment, output, serta ekspresi integer; ini bukan pengganti parser kanonis penuh. **Bootstrap berulang belum terbukti** karena implementasi compiler lengkap belum ditulis dalam `.cuk`.

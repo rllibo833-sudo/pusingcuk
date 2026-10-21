@@ -8,8 +8,14 @@ from compiler.ir import from_source
 from library.module_system import expand_file
 
 
-def compile_source(source, source_name, target):
-    ir = from_source(source, source_name)
+def compile_source(source, source_name, target, *, frontend="canonical"):
+    if frontend == "canonical":
+        ir = from_source(source, source_name)
+    elif frontend == "selfhosted":
+        from compiler.self_hosted_frontend import from_source as self_hosted_from_source
+        ir = self_hosted_from_source(source, source_name)
+    else:
+        raise ValueError("frontend tidak dikenal")
     if target == "json":
         return json.dumps(ir, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
     if target == "vm":
@@ -71,6 +77,7 @@ console.log = (...values) => { pcOutput.textContent += values.join(" ") + "\\n";
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Compiler multi-target PusingCuk")
     parser.add_argument("file", help="file sumber .pusingcuk")
+    parser.add_argument("--frontend", choices=("canonical", "selfhosted"), default="canonical", help="Frontend parser sumber")
     parser.add_argument("-t", "--target", choices=("js", "python", "c", "cpp", "go", "rust", "json", "html", "vm", "android"), default="js")
     parser.add_argument("-o", "--output", help="file keluaran; default stdout")
     args = parser.parse_args(argv)
@@ -81,7 +88,7 @@ def main(argv=None):
     try:
         # Expand only explicit, local, project-root-confined .pusingcuk imports.
         source = expand_file(source_path)
-        result = compile_source(source, source_path.name, args.target)
+        result = compile_source(source, source_path.name, args.target, frontend=args.frontend)
         if args.output:
             Path(args.output).write_text(result, encoding="utf-8")
         else:

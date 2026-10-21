@@ -43,3 +43,16 @@ Jangan menyebut PusingCuk self-hosted sebelum tahap bootstrap dapat diulang dan 
 
 
 Code generation kini menguji serialisasi rekursif AST aritmetika bersarang ke ekspresi C dan menolak operator yang belum didukung. Ini tetap generator ekspresi, bukan compiler lintas bahasa penuh: inputnya belum source program umum dan belum terhubung ke IR v1/manifest backend.
+
+
+## Jalur frontend self-hosted ke toolchain kanonis
+
+`compiler/self_hosted_frontend.py` menjalankan lexer/parser yang ditulis di `.cuk`, menerima AST hasil parse, lalu membungkusnya menjadi IR v1 kanonis yang divalidasi dan digunakan backend yang sudah ada. Ini jalur eksperimen terbatas untuk deklarasi, assignment, output, dan ekspresi numerik; belum menggantikan parser referensi untuk semua sintaks.
+
+```sh
+python -m compiler program.cuk --frontend selfhosted --target json
+python -m compiler program.cuk --frontend selfhosted --target js
+python -m compiler program.cuk --frontend selfhosted --target vm
+```
+
+Tes membandingkan AST IR frontend self-hosted dengan frontend kanonis untuk subset yang sama dan memeriksa penolakan sintaks malformed. Ini bukti integrasi frontend-ke-IR/backend untuk subset tersebut, **bukan** bukti bootstrap compiler mandiri. Bootstrap baru terbukti saat compiler yang diimplementasikan dalam `.cuk` dapat membangun ulang dirinya sendiri berulang kali.

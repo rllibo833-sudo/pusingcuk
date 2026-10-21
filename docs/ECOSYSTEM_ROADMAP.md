@@ -124,3 +124,8 @@ The nested codegen fixture was updated to expect the actual recursive output (`l
 ### Increment target lintas bahasa — Rust (2026-10-21)
 
 A first Rust source backend is wired into the existing IR v1 CLI. Its declared subset is numeric literals, variables, reassignment, output, unary minus, and `+ - * / // %`; unsupported nodes fail closed. This is a narrow sixth language target, not full Rust compatibility or a claim of 10-language support. Tests lock generated source and rejection behavior; compiler/runtime parity must be expanded before the target subset is advertised as conformant.
+
+
+### Frontend-to-IR integration (2026-10-21)
+
+The self-hosted `.cuk` lexer/parser can now be selected via `--frontend selfhosted`. Its parsed AST is wrapped in the canonical validated IR v1 envelope and sent through existing backend selection, with parity tests against the canonical frontend for the supported declaration/assignment/output arithmetic subset. This is a real integration slice, not a full frontend replacement and not a bootstrap proof. Repeated bootstrap remains blocked on implementing the compiler itself in `.cuk`.
