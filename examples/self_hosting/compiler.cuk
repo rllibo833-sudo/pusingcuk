@@ -759,11 +759,15 @@ fungsi ir_program(program)
     njir panjang(program["statements"]) > 0
         root_line = 2
     selesai njir
+    lah jumlah_emit = 0
     mumet i < panjang(program["statements"])
-        njir i > 0
-            body = body + ","
+        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT"
+            njir jumlah_emit > 0
+                body = body + ","
+            selesai njir
+            body = body + ir_statement(program["statements"][i], i + 2)
+            jumlah_emit = jumlah_emit + 1
         selesai njir
-        body = body + ir_statement(program["statements"][i], i + 2)
         i = i + 1
     selesai mumet
     balek "{\"kind\":\"Program\",\"line\":" + teks(root_line) + ",\"fields\":{\"body\":[" + body + "]}}"
@@ -795,8 +799,12 @@ fungsi ir_source_map(program)
         root_line = 2
     selesai njir
     result = result + teks(root_line) + "}"
+    lah map_index = 0
     mumet i < panjang(program["statements"])
-        result = result + ir_map_statement(program["statements"][i], "$.fields.body[" + teks(i) + "]", i + 2)
+        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT"
+            result = result + ir_map_statement(program["statements"][i], "$.fields.body[" + teks(map_index) + "]", i + 2)
+            map_index = map_index + 1
+        selesai njir
         i = i + 1
     selesai mumet
     balek "[" + result + "]"
