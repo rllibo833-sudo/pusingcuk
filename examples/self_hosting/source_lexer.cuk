@@ -510,6 +510,8 @@ fungsi evaluasi(node, lingkungan)
                     selesai njir
         selesai njir
     selesai njir
+        selesai njir
+    selesai njir
 selesai fungsi
 
 fungsi jalankan_program(program)
