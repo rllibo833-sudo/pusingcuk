@@ -20,17 +20,12 @@ jobs:
       - name: Compile driver to PVM
         run: |
           set -x
-          # Try the reference frontend, which avoids the self-hosted 100k-step runtime limit.
-          python -m compiler --help || true
-          python -m compiler examples/self_hosting/driver_lexer.cuk --emit-bytecode /tmp/driver_lexer.pvm --frontend reference || \
-          python -m compiler examples/self_hosting/driver_lexer.cuk --emit-bytecode /tmp/driver_lexer.pvm --frontend=reference || \
-          python -c "from compiler import compile_source; compile_source(open('examples/self_hosting/driver_lexer.cuk').read(), 'driver_lexer.cuk', target='vm', frontend='reference', output='/tmp/driver_lexer.pvm')" || \
-          python -m compiler.self_hosted_frontend examples/self_hosting/driver_lexer.cuk --emit-bytecode /tmp/driver_lexer.pvm || \
-          python -m compiler.bytecode examples/self_hosting/driver_lexer.cuk /tmp/driver_lexer.pvm
+          python -m compiler --help
+          python -m compiler --emit-bytecode /tmp/driver_lexer.pvm examples/self_hosting/driver_lexer.cuk
           echo "=== COMPILE RESULT ==="
           ls -lh /tmp/driver_lexer.pvm
           wc -c /tmp/driver_lexer.pvm
-          python -m compiler.self_hosted --check examples/self_hosting/driver_lexer.cuk || true
+          head -c 500 /tmp/driver_lexer.pvm
       - name: Build native
         run: |
           cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
