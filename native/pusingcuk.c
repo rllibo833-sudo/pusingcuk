@@ -1475,11 +1475,12 @@ static void print_usage(FILE *out, const char *program) {
         "Pusingcuk native %s\n"
         "Penggunaan: %s [opsi]\n"
         "           %s <program.cuk>\n"
+        "           %s -  (baca program dari stdin)\n"
         "           (ekstensi .pusingcuk tetap diterima)\n\n"
         "Opsi:\n"
         "  -h, --help       Tampilkan bantuan\n"
         "  -v, --version    Tampilkan versi runtime\n",
-        PUSINGCUK_VERSION, program, program);
+        PUSINGCUK_VERSION, program, program, program);
 }
 
 int main(int argc,char **argv) {
@@ -1500,7 +1501,8 @@ int main(int argc,char **argv) {
         print_usage(stderr, argv[0]);
         return 2;
     }
-    FILE *f=fopen(argv[1],"r");
+    int use_stdin = !strcmp(argv[1], "-");
+    FILE *f = use_stdin ? stdin : fopen(argv[1], "r");
     if(!f) {
         if (errno == ENOENT) {
             fprintf(stderr, "Kesalahan: berkas tidak ditemukan: %s\n", argv[1]);
@@ -1512,15 +1514,24 @@ int main(int argc,char **argv) {
     char buf[4096];
     while(fgets(buf,sizeof buf,f)) {
         if(program_count>=MAX_LINES) {
-            fprintf(stderr,"Program terlalu panjang\n"); fclose(f); return 2;
+            fprintf(stderr,"Program terlalu panjang\n");
+            if (!use_stdin) fclose(f);
+            return 2;
         }
         size_t n=strlen(buf);
         program_lines[program_count]=malloc(n+1);
-        if(!program_lines[program_count]) { fclose(f); return 2; }
+        if(!program_lines[program_count]) {
+            if (!use_stdin) fclose(f);
+            return 2;
+        }
         memcpy(program_lines[program_count++],buf,n+1);
     }
-    if(ferror(f)) { perror("Kesalahan membaca program"); fclose(f); return 1; }
-    fclose(f);
+    if(ferror(f)) {
+        perror("Kesalahan membaca program");
+        if (!use_stdin) fclose(f);
+        return 1;
+    }
+    if (!use_stdin) fclose(f);
     if (register_top_level_functions()) run_range(0,program_count);
     int result=syntax_err?2:(err?1:0);
     for(int i=0;i<program_count;i++) free(program_lines[i]);
