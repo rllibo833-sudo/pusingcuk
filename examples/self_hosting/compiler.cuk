@@ -869,6 +869,19 @@ fungsi ir_expr(node, line)
 selesai fungsi
 
 fungsi ir_statement(stmt, line)
+    njir stmt["jenis"] == "WHILE"
+        lah condition_json = ir_expr(stmt["condition"], line)
+        lah body_json = ""
+        lah i = 0
+        mumet i < panjang(stmt["body"])
+            njir i > 0
+                body_json = body_json + ","
+            selesai njir
+            body_json = body_json + ir_statement(stmt["body"][i], line + i + 1)
+            i = i + 1
+        selesai mumet
+        balek "{\\"kind\\":\\"While\\",\\"line\\":" + teks(line) + ",\\"fields\\":{\\"condition\\":" + condition_json + ",\\"body\\":[" + body_json + "]}}"
+    kampret
     njir stmt["jenis"] == "IF"
         lah condition_json = ir_expr(stmt["condition"], line)
         lah then_json = ""
@@ -938,7 +951,7 @@ fungsi ir_program(program)
     selesai njir
     lah jumlah_emit = 0
     mumet i < panjang(program["statements"])
-        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT" atau program["statements"][i]["jenis"] == "FUNCTION" atau program["statements"][i]["jenis"] == "IF"
+        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT" atau program["statements"][i]["jenis"] == "FUNCTION" atau program["statements"][i]["jenis"] == "IF" atau program["statements"][i]["jenis"] == "WHILE"
             njir jumlah_emit > 0
                 body = body + ","
             selesai njir
@@ -974,6 +987,14 @@ selesai fungsi
 
 fungsi ir_map_statement(stmt, path, line)
     lah result = ",{\"path\":\"" + path + "\",\"line\":" + teks(line) + "}"
+    njir stmt["jenis"] == "WHILE"
+        lah i = 0
+        mumet i < panjang(stmt["body"])
+            result = result + ir_map_statement(stmt["body"][i], path + ".fields.body[" + teks(i) + "]", line + i + 1)
+            i = i + 1
+        selesai mumet
+        result = result + ir_map_expr(stmt["condition"], path + ".fields.condition", line)
+    kampret
     njir stmt["jenis"] == "IF"
         result = result + ir_map_expr(stmt["condition"], path + ".fields.condition", line)
         lah i = 0
@@ -1014,7 +1035,7 @@ fungsi ir_source_map(program)
     result = result + teks(root_line) + "}"
     lah map_index = 0
     mumet i < panjang(program["statements"])
-        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT" atau program["statements"][i]["jenis"] == "FUNCTION" atau program["statements"][i]["jenis"] == "IF"
+        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT" atau program["statements"][i]["jenis"] == "FUNCTION" atau program["statements"][i]["jenis"] == "IF" atau program["statements"][i]["jenis"] == "WHILE"
             result = result + ir_map_statement(program["statements"][i], "$.fields.body[" + teks(map_index) + "]", i + 2)
             map_index = map_index + 1
         selesai njir
@@ -1031,8 +1052,17 @@ fungsi ir_collect_features(node, flags)
             i = i + 1
         selesai mumet
     kampret
-        njir node["jenis"] == "IF"
+        njir node["jenis"] == "WHILE"
             flags["control-flow"] = benar
+            ir_collect_features(node["condition"], flags)
+            lah i = 0
+            mumet i < panjang(node["body"])
+                ir_collect_features(node["body"][i], flags)
+                i = i + 1
+            selesai mumet
+        kampret
+            njir node["jenis"] == "IF"
+                flags["control-flow"] = benar
             ir_collect_features(node["condition"], flags)
             lah i = 0
             mumet i < panjang(node["then_body"])
