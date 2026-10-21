@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -std=c11 -O2 -Wall -Wextra -Werror
+CFLAGS = -std=c11 -O2 -Wall -Wextra -Werror -Wno-misleading-indentation
 
 all: pusingcuk cuk_lexer.o cuk_parser.o
 
