@@ -1469,7 +1469,7 @@ static Val call_user_function(const char *name, Val *args, int argc) {
 
 /* Native PVM v1 stack execution loop; CLI/file decoding follows separately. */
 #define PVM_MAX_STACK 4096
-#define PVM_MAX_STEPS 100000
+#define PVM_MAX_STEPS 10000000
 #define PVM_MAX_DEPTH 64
 typedef enum { PVM_CONST, PVM_LOAD, PVM_BINARY, PVM_CALL, PVM_RETURN } PvmOp;
 typedef struct { PvmOp op; Val value; const char *name; const char *operator_name; int argc; } PvmInstruction;
@@ -1508,7 +1508,7 @@ static int pvm_binary(PvmState *vm, const char *op) {
     if(!strcmp(op,"/")){if(b.n==0){fail("pembagian PVM dengan nol");return 0;}return pvm_push(vm,checked_num(a.n/b.n,"hasil angka tidak finite"));}
     fail("operator PVM tidak dikenal"); return 0;
 }
-static Val pvm_execute(PvmState *vm,const PvmInstruction *code,size_t count,unsigned depth) {
+Val pvm_execute(PvmState *vm,const PvmInstruction *code,size_t count,unsigned depth) {
     if(depth>PVM_MAX_DEPTH){fail("kedalaman CALL PVM terlampaui");return (Val){.t=NIL};}
     size_t base=vm->top;
     for(size_t pc=0;pc<count&&!err;pc++){
