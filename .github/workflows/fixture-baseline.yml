@@ -32,6 +32,8 @@ on:
       - "native/**"
       - "library/**"
       - "tests/conformance/**"
+      - "site/runtime.js"
+      - "tests/test_browser_differential.js"
       - "tools/ci_fixture_matrix.py"
       - "tools/conformance.py"
       - "tools/differential_runner.py"
