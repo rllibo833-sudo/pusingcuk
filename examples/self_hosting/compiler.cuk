@@ -454,30 +454,75 @@ fungsi parse_program(tokens)
     balek node_gagal(i)
 selesai fungsi
 
-fungsi evaluasi(node, lingkungan)
-    njir node["jenis"] == "INTEGER" atau node["jenis"] == "FLOAT" atau node["jenis"] == "BOOLEAN" atau node["jenis"] == "STRING"
-        balek node["nilai"]
-    kampret
-        njir node["jenis"] == "VARIABLE"
-            balek lingkungan[node["nama"]]
+fungsi evaluasi_panggilan(node, lingkungan)
+    lah argumen = node["args"]
+    njir node["nama"] == "panjang"
+        njir panjang(argumen) != 1
+            balek "RUNTIME_ERROR_ARITY:panjang"
         kampret
-            njir node["jenis"] == "UNARY"
-                njir node["operator"] == "bukan"
-                    balek bukan evaluasi(node["nilai"], lingkungan)
+            balek panjang(evaluasi(argumen[0], lingkungan))
+        selesai njir
+    kampret
+        njir node["nama"] == "teks"
+            njir panjang(argumen) != 1
+                balek "RUNTIME_ERROR_ARITY:teks"
+            kampret
+                balek teks(evaluasi(argumen[0], lingkungan))
+            selesai njir
+        kampret
+            njir node["nama"] == "bilangan"
+                njir panjang(argumen) != 1
+                    balek "RUNTIME_ERROR_ARITY:bilangan"
                 kampret
-                    balek 0 - evaluasi(node["nilai"], lingkungan)
+                    balek bilangan(evaluasi(argumen[0], lingkungan))
                 selesai njir
             kampret
-                lah kiri = evaluasi(node["kiri"], lingkungan)
-                lah kanan = evaluasi(node["kanan"], lingkungan)
-                njir node["operator"] == "+"
-                    balek kiri + kanan
-                kampret
-                    njir node["operator"] == "-"
-                        balek kiri - kanan
+                njir node["nama"] == "desimal"
+                    njir panjang(argumen) != 1
+                        balek "RUNTIME_ERROR_ARITY:desimal"
                     kampret
-                        njir node["operator"] == "*"
-                            balek kiri * kanan
+                        balek desimal(evaluasi(argumen[0], lingkungan))
+                    selesai njir
+                kampret
+                    balek "RUNTIME_ERROR_UNKNOWN_BUILTIN:" + node["nama"]
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi evaluasi_biner(node, lingkungan)
+    lah kiri = evaluasi(node["kiri"], lingkungan)
+    lah kanan = evaluasi(node["kanan"], lingkungan)
+    njir node["operator"] == "+"
+        balek kiri + kanan
+    kampret
+        njir node["operator"] == "-"
+            balek kiri - kanan
+        kampret
+            njir node["operator"] == "*"
+                balek kiri * kanan
+            kampret
+                njir node["operator"] == "/"
+                    njir kanan == 0
+                        balek "DIVISION_BY_ZERO"
+                    kampret
+                        balek kiri / kanan
+                    selesai njir
+                kampret
+                    njir node["operator"] == "//"
+                        njir kanan == 0
+                            balek "DIVISION_BY_ZERO"
+                        kampret
+                            balek lantai(kiri / kanan)
+                        selesai njir
+                    kampret
+                        njir node["operator"] == "%"
+                            njir kanan == 0
+                                balek "DIVISION_BY_ZERO"
+                            kampret
+                                balek kiri % kanan
+                            selesai njir
                         kampret
                             njir node["operator"] == "=="
                                 balek kiri == kanan
@@ -503,23 +548,7 @@ fungsi evaluasi(node, lingkungan)
                                                         njir node["operator"] == "atau"
                                                             balek kiri atau kanan
                                                         kampret
-                                                            njir node["operator"] == "%"
-                                                                njir kanan == 0
-                                                                    balek "DIVISION_BY_ZERO"
-                                                                kampret
-                                                                    balek kiri % kanan
-                                                                selesai njir
-                                                            kampret
-                                                                njir kanan == 0
-                                                                    balek "DIVISION_BY_ZERO"
-                                                                kampret
-                                                                    njir node["operator"] == "//"
-                                                                        balek lantai(kiri / kanan)
-                                                                    kampret
-                                                                        balek kiri / kanan
-                                                                    selesai njir
-                                                                selesai njir
-                                                            selesai njir
+                                                            balek "RUNTIME_ERROR_UNKNOWN_OPERATOR:" + node["operator"]
                                                         selesai njir
                                                     selesai njir
                                                 selesai njir
@@ -530,8 +559,32 @@ fungsi evaluasi(node, lingkungan)
                             selesai njir
                         selesai njir
                     selesai njir
+                selesai njir
+            selesai njir
         selesai njir
     selesai njir
+selesai fungsi
+
+fungsi evaluasi(node, lingkungan)
+    njir node["jenis"] == "INTEGER" atau node["jenis"] == "FLOAT" atau node["jenis"] == "BOOLEAN" atau node["jenis"] == "STRING"
+        balek node["nilai"]
+    kampret
+        njir node["jenis"] == "VARIABLE"
+            balek lingkungan[node["nama"]]
+        kampret
+            njir node["jenis"] == "UNARY"
+                njir node["operator"] == "bukan"
+                    balek bukan evaluasi(node["nilai"], lingkungan)
+                kampret
+                    balek 0 - evaluasi(node["nilai"], lingkungan)
+                selesai njir
+            kampret
+                njir node["jenis"] == "CALL"
+                    balek evaluasi_panggilan(node, lingkungan)
+                kampret
+                    balek evaluasi_biner(node, lingkungan)
+                selesai njir
+            selesai njir
         selesai njir
     selesai njir
 selesai fungsi
