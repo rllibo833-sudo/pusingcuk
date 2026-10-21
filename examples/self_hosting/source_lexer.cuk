@@ -138,7 +138,10 @@ fungsi parse_primary(tokens, index)
         njir tokens[index]["jenis"] == "INTEGER"
             balek {"status": "OK", "node": {"jenis": "INTEGER", "nilai": bilangan(tokens[index]["nilai"])}, "index": index + 1}
         kampret
-            njir tokens[index]["jenis"] == "OP" dan tokens[index]["nilai"] == "-"
+            njir tokens[index]["jenis"] == "IDENT"
+                balek {"status": "OK", "node": {"jenis": "VARIABLE", "nama": tokens[index]["nilai"]}, "index": index + 1}
+            kampret
+                njir tokens[index]["jenis"] == "OP" dan tokens[index]["nilai"] == "-"
                 lah hasil_negatif = parse_primary(tokens, index + 1)
                 njir hasil_negatif["status"] != "OK"
                     balek hasil_negatif
@@ -288,46 +291,73 @@ fungsi parse_program(tokens)
             selesai njir
             line_tokens = []
             njir tokens[i]["jenis"] == "EOF"
-                balek {"status": "OK", "node": {"jenis": "PROGRAM", "statements": statements}}
-            selesai njir
-        kampret
-            line_tokens = line_tokens + [tokens[i]]
-        selesai njir
-        i = i + 1
-    selesai mumet
-    balek node_gagal(i)
-selesai fungsi
-
-fungsi evaluasi(node)
+                balek {"status": "OK", "node": {"jenis": "PROGRAM", "statements": statemfungsi evaluasi(node, lingkungan)
     njir node["jenis"] == "INTEGER"
         balek node["nilai"]
     kampret
-        njir node["jenis"] == "UNARY"
-            balek 0 - evaluasi(node["nilai"])
-        kampret
-            lah kiri = evaluasi(node["kiri"])
-            lah kanan = evaluasi(node["kanan"])
-            njir node["operator"] == "+"
-                balek kiri + kanan
+        njir node["jenis"] == "VARIABLE"
+            njir node["nama"] dalam lingkungan
+                balek lingkungan[node["nama"]]
             kampret
-                njir node["operator"] == "-"
-                    balek kiri - kanan
+                balek "UNDEFINED_VARIABLE:" + node["nama"]
+            selesai njir
+        kampret
+            njir node["jenis"] == "UNARY"
+                balek 0 - evaluasi(node["nilai"], lingkungan)
+            kampret
+                lah kiri = evaluasi(node["kiri"], lingkungan)
+                lah kanan = evaluasi(node["kanan"], lingkungan)
+                njir node["operator"] == "+"
+                    balek kiri + kanan
                 kampret
-                    njir node["operator"] == "*"
-                        balek kiri * kanan
+                    njir node["operator"] == "-"
+                        balek kiri - kanan
                     kampret
-                        njir node["operator"] == "%"
-                            njir kanan == 0
-                                balek "DIVISION_BY_ZERO"
-                            kampret
-                                balek kiri % kanan
-                            selesai njir
+                        njir node["operator"] == "*"
+                            balek kiri * kanan
                         kampret
-                            njir kanan == 0
-                                balek "DIVISION_BY_ZERO"
+                            njir node["operator"] == "%"
+                                njir kanan == 0
+                                    balek "DIVISION_BY_ZERO"
+                                kampret
+                                    balek kiri % kanan
+                                selesai njir
                             kampret
-                                balek kiri / kanan
+                                njir kanan == 0
+                                    balek "DIVISION_BY_ZERO"
+                                kampret
+                                    balek kiri / kanan
+                                selesai njir
                             selesai njir
+                        selesai njir
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi jalankan_program(program)
+    lah lingkungan = {}
+    lah output = []
+    lah statements = program["statements"]
+    lah i = 0
+    lah stmt = {}
+    lah nilai = 0
+    mumet i < panjang(statements)
+        stmt = statements[i]
+        nilai = evaluasi(stmt["nilai"], lingkungan)
+        njir stmt["jenis"] == "DECLARE"
+            lingkungan[stmt["nama"]] = nilai
+        kampret
+            output = output + [nilai]
+        selesai njir
+        i = i + 1
+    selesai mumet
+    balek {"status": "OK", "output": output, "lingkungan": lingkungan}
+selesai fungsi
+
+      selesai njir
                         selesai njir
                     selesai njir
                 selesai njir
@@ -342,7 +372,7 @@ render_tokens(pindai(contoh))
 lah ast = parse_source(pindai("2 + 3 * 4"))
 hedeh "PRECEDENCE_" + ast["status"]
 njir ast["status"] == "OK"
-    hedeh evaluasi(ast["node"])
+    hedeh evaluasi(ast["node"], {})
 selesai njir
 
 lah ast_group = parse_source(pindai("(2 + 3) * 4"))
