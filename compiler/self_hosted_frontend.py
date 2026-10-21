@@ -44,19 +44,9 @@ def from_source(source: str, source_name: str = "<memory>") -> dict:
     """Parse a supported source subset in .cuk, then validate canonical IR v1."""
     if not isinstance(source_name, str) or not source_name:
         raise ValueError("source_name tidak boleh kosong")
-    # Function syntax currently has a complete, validated parser/IR path,
-    # while the .cuk-authored parser is still limited to straight-line statements.
-    # Route function-bearing input through the canonical parser instead of silently
-    # dropping function bodies. This is an explicit compatibility bridge, not a
-    # claim that the frontend is self-hosted yet.
-    import re
-    if re.search(r"(?m)^\s*fungsi\s+[A-Za-z_][A-Za-z0-9_]*\s*\(", source):
-        from compiler.ir import from_source as canonical_from_source
-        try:
-            return canonical_from_source(source, source_name)
-        except (ValueError, TypeError, RecursionError) as exc:
-            raise SelfHostedFrontendError(f"fungsi gagal diparse: {exc}") from exc
-
+    # All supported input, including function declarations and return statements,
+    # must go through the .cuk-authored parser. Do not silently delegate source
+    # parsing to compiler.ir.from_source: that would hide frontend regressions.
     # The staged parser handles statements, not the outer program delimiters.
     # Normalize those delimiters before passing source into the .cuk parser.
     source = "\n".join(line for line in source.splitlines() if line.strip() not in {"jancuk", "selesai jancuk"})
