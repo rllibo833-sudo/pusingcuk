@@ -764,13 +764,39 @@ fungsi ir_expr(node, line)
 selesai fungsi
 
 fungsi ir_statement(stmt, line)
-    njir stmt["jenis"] == "DECLARE"
-        balek "{\"kind\":\"Declare\",\"line\":" + teks(line) + ",\"fields\":{\"name\":\"" + stmt["nama"] + "\",\"value\":" + ir_expr(stmt["nilai"], line) + "}}"
+    njir stmt["jenis"] == "FUNCTION"
+        lah params_json = ""
+        lah body_json = ""
+        lah i = 0
+        mumet i < panjang(stmt["params"])
+            njir i > 0
+                params_json = params_json + ","
+            selesai njir
+            params_json = params_json + ir_quote(stmt["params"][i])
+            i = i + 1
+        selesai mumet
+        i = 0
+        mumet i < panjang(stmt["body"])
+            njir i > 0
+                body_json = body_json + ","
+            selesai njir
+            body_json = body_json + ir_statement(stmt["body"][i], line + i + 1)
+            i = i + 1
+        selesai mumet
+        balek "{\"kind\":\"Function\",\"line\":" + teks(line) + ",\"fields\":{\"name\":" + ir_quote(stmt["nama"]) + ",\"params\":[" + params_json + "],\"body\":[" + body_json + "]}}"
     kampret
-        njir stmt["jenis"] == "ASSIGN"
-            balek "{\"kind\":\"Assign\",\"line\":" + teks(line) + ",\"fields\":{\"name\":\"" + stmt["nama"] + "\",\"value\":" + ir_expr(stmt["nilai"], line) + "}}"
+        njir stmt["jenis"] == "RETURN"
+            balek "{\"kind\":\"Return\",\"line\":" + teks(line) + ",\"fields\":{\"value\":" + ir_expr(stmt["nilai"], line) + "}}"
         kampret
-            balek "{\"kind\":\"Print\",\"line\":" + teks(line) + ",\"fields\":{\"value\":" + ir_expr(stmt["nilai"], line) + "}}"
+            njir stmt["jenis"] == "DECLARE"
+                balek "{\"kind\":\"Declare\",\"line\":" + teks(line) + ",\"fields\":{\"name\":" + ir_quote(stmt["nama"]) + ",\"value\":" + ir_expr(stmt["nilai"], line) + "}}"
+            kampret
+                njir stmt["jenis"] == "ASSIGN"
+                    balek "{\"kind\":\"Assign\",\"line\":" + teks(line) + ",\"fields\":{\"name\":" + ir_quote(stmt["nama"]) + ",\"value\":" + ir_expr(stmt["nilai"], line) + "}}"
+                kampret
+                    balek "{\"kind\":\"Print\",\"line\":" + teks(line) + ",\"fields\":{\"value\":" + ir_expr(stmt["nilai"], line) + "}}"
+                selesai njir
+            selesai njir
         selesai njir
     selesai njir
 selesai fungsi
@@ -784,7 +810,7 @@ fungsi ir_program(program)
     selesai njir
     lah jumlah_emit = 0
     mumet i < panjang(program["statements"])
-        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT"
+        njir program["statements"][i]["jenis"] == "DECLARE" ou program["statements"][i]["jenis"] == "ASSIGN" ou program["statements"][i]["jenis"] == "PRINT" ou program["statements"][i]["jenis"] == "FUNCTION"
             njir jumlah_emit > 0
                 body = body + ","
             selesai njir
