@@ -1,0 +1,66 @@
+# Mini interpreter aritmetika yang ditulis dalam .cuk.
+# Pipeline: klasifikasi operator -> parse tiga token -> evaluasi node -> hasil.
+# Inputnya masih token terstruktur, belum teks sumber bebas.
+jancuk
+
+fungsi jenis_token(token)
+    njir token == "+"
+        balek "OP_PLUS"
+    kampret
+        njir token == "-"
+            balek "OP_MINUS"
+        kampret
+            njir token == "*"
+                balek "OP_MULTIPLY"
+            kampret
+                njir token == "/"
+                    balek "OP_DIVIDE"
+                kampret
+                    balek "UNKNOWN"
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi parse_aritmetika(token)
+    njir panjang(token) != 3
+        balek {"status": "PARSE_ERROR", "alasan": "BUTUH_TIGA_TOKEN"}
+    kampret
+        njir jenis_token(token[1]) == "UNKNOWN"
+            balek {"status": "PARSE_ERROR", "alasan": "OPERATOR_TIDAK_DIDUKUNG"}
+        kampret
+            balek {"status": "OK", "jenis": "BINARY", "kiri": token[0], "operator": token[1], "kanan": token[2]}
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi evaluasi(node)
+    njir node["status"] != "OK"
+        balek node["alasan"]
+    kampret
+        njir node["operator"] == "+"
+            balek node["kiri"] + node["kanan"]
+        kampret
+            njir node["operator"] == "-"
+                balek node["kiri"] - node["kanan"]
+            kampret
+                njir node["operator"] == "*"
+                    balek node["kiri"] * node["kanan"]
+                kampret
+                    njir node["operator"] == "/"
+                        balek node["kiri"] / node["kanan"]
+                    kampret
+                        balek "OPERATOR_TIDAK_DIDUKUNG"
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+lah token = [7, "+", 35]
+lah ast = parse_aritmetika(token)
+hedeh "Status parse: " + ast["status"]
+hedeh "Hasil: " + teks(evaluasi(ast))
+selesai jancuk
