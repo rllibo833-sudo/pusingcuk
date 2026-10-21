@@ -12,6 +12,8 @@ on:
       - "native/**"
       - "library/**"
       - "tests/conformance/**"
+      - "site/runtime.js"
+      - "tests/test_browser_differential.js"
       - "tools/ci_fixture_matrix.py"
       - "tools/conformance.py"
       - "tools/differential_runner.py"
@@ -44,6 +46,8 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.11'
+      - name: Compare browser runtime with Python reference
+        run: node tests/test_browser_differential.js
       - run: python tools/ci_fixture_matrix.py
       - name: Generate differential parity report
         if: always()
