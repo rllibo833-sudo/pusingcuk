@@ -15,10 +15,12 @@ class BootstrapEvidenceTests(unittest.TestCase):
         self.assertEqual(evidence["stages"][0]["bytecode_sha256"], evidence["stages"][1]["bytecode_sha256"])
         self.assertEqual(evidence["stages"][0]["stdout"], "Halo, Dunia\n")
 
-    def test_bootstrap_rejects_unsupported_compiler_source_instead_of_claiming_success(self):
-        source = 'jancuk\nfungsi tambah(a, b)\n    balek a + b\nselesai fungsi\nselesai jancuk\n'
-        with self.assertRaises(BootstrapError):
-            build(source, "compiler.cuk")
+    def test_bootstrap_compiles_function_program_through_ir_and_vm(self):
+        source = 'jancuk\nfungsi tambah(a, b)\n    balek a + b\nselesai fungsi\nhedeh tambah(20, 22)\nselesai jancuk\n'
+        evidence = build(source, "function.cuk")
+        self.assertEqual(evidence["status"], "reproducible-subset")
+        self.assertEqual(evidence["stages"][0]["stdout"], "42\\n")
+        self.assertEqual(evidence["stages"][0]["bytecode_sha256"], evidence["stages"][1]["bytecode_sha256"])
 
 
 if __name__ == "__main__":
