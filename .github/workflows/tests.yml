@@ -25,6 +25,7 @@ on:
       - "native/**"
       - "tests/**"
       - "tools/conformance.py"
+      - "tools/validate_target_manifests.py"
       - "tools/diagnostic_repair_loop.py"
       - "tools/local_ai_adapter.py"
       - "tools/reality_engine.py"
