@@ -34,7 +34,7 @@ def _frontend_script(source: str, source_name: str) -> str:
         + "\nlah source_input = " + json.dumps(source, ensure_ascii=False)
         + '\nlah hasil_parse = parse_program(pindai(source_input))'
         + '\nnjir hasil_parse["status"] != "OK"'
-        + '\n    hedeh "SELFHOST_PARSE_ERROR"'
+        + '\n    hedeh "SELFHOST_PARSE_ERROR:" + teks(hasil_parse["index"])'
         + '\nkampret'
         + '\n    hedeh ir_document(hasil_parse["node"], ir_source_name)'
         + '\nselesai njir\nselesai jancuk\n'
@@ -70,8 +70,11 @@ def from_source(source: str, source_name: str = "<memory>") -> dict:
     if run.returncode != 0:
         raise SelfHostedFrontendError(run.stderr.strip() or "frontend .cuk gagal dijalankan")
     output = run.stdout.strip().splitlines()
-    if not output or output[-1] == "SELFHOST_PARSE_ERROR":
-        raise SelfHostedFrontendError("frontend .cuk menolak sintaks source")
+    if not output or output[-1].startswith("SELFHOST_PARSE_ERROR:"):
+        token_index = output[-1].partition(":")[2] if output else "unknown"
+        raise SelfHostedFrontendError(
+            f"frontend .cuk menolak sintaks source pada token index {token_index}"
+        )
     try:
         document = json.loads(output[-1])
     except json.JSONDecodeError as exc:

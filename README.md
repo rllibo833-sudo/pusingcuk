@@ -124,7 +124,7 @@ For local AI tooling, any device-specific runtime claims require a real on-devic
 - [Compatibility matrix](docs/COMPATIBILITY.md) and [conformance fixtures](docs/CONFORMANCE_FIXTURES.md)
 - [Technical dictionary](docs/DICTIONARY.md) · [Indonesian Warung dictionary](docs/KAMUS_PUSINGCUK.md)
 - [Project overview](docs/PROJECT_OVERVIEW.md) · [project vision](docs/VISION.md) · [ecosystem implementation roadmap](docs/ECOSYSTEM_ROADMAP.md)
-- [Self-hosting frontend](examples/self_hosting/compiler.cuk) · [bootstrap evidence implementation](compiler/bootstrap.py)
+- [Self-hosting status & next steps](docs/SELF_HOSTING_STATE.md) · [self-hosting frontend](examples/self_hosting/compiler.cuk) · [bootstrap evidence implementation](compiler/bootstrap.py)
 - [Contributing](CONTRIBUTING.md) · [security policy](SECURITY.md)
 
 ## How to read feature claims
