@@ -1,0 +1,15 @@
+# Prototipe code generation: AST aritmetika -> teks kode target.
+# Hanya menghasilkan teks contoh; tidak menulis file atau menjalankan compiler C.
+jancuk
+
+fungsi hasilkan_c(node)
+    njir node["jenis"] != "BINARY"
+        balek "/* node tidak didukung */"
+    kampret
+        balek "long hasil = " + teks(node["kiri"]) + " " + node["operator"] + " " + teks(node["kanan"]) + ";"
+    selesai njir
+selesai fungsi
+
+lah ast = {"jenis": "BINARY", "kiri": 7, "operator": "+", "kanan": 35}
+hedeh hasilkan_c(ast)
+selesai jancuk
