@@ -1,23 +1,32 @@
 """Run the .cuk-authored frontend and validate its emitted canonical IR v1 artifact.
 
 The .cuk source owns tokenization, parsing, AST construction, and IR serialization.
-Python is only the current execution host and IR validator; it does not parse source.
+Python hosts execution of the trusted compiler source and validates the emitted IR;
+it never parses the user's source program as a fallback.
 """
 from __future__ import annotations
+
 import json
-import subprocess
-import sys
+from contextlib import redirect_stderr, redirect_stdout
+from io import StringIO
 import tempfile
 from pathlib import Path
+
 from compiler.ir import validate
+from evaluator import Evaluator
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_SOURCE = ROOT / "examples" / "self_hosting" / "compiler.cuk"
 MARKER = "lah contoh = "
+# These larger limits apply only while running the checked-in compiler frontend.
+# Regular .cuk programs keep the language's default execution limits.
+FRONTEND_MAX_STEPS = 10_000_000
+FRONTEND_MAX_LOOP_ITERATIONS = 250_000
+MAX_SOURCE_BYTES = 256_000
+
 
 class SelfHostedFrontendError(ValueError):
     """The .cuk frontend rejected input or failed to emit its AST."""
-
 
 
 def _frontend_script(source: str, source_name: str) -> str:
@@ -25,6 +34,8 @@ def _frontend_script(source: str, source_name: str) -> str:
         raise SelfHostedFrontendError("source kosong")
     if "\x00" in source:
         raise SelfHostedFrontendError("source mengandung NUL")
+    if len(source.encode("utf-8")) > MAX_SOURCE_BYTES:
+        raise SelfHostedFrontendError(f"source melewati batas {MAX_SOURCE_BYTES} byte")
     original = FRONTEND_SOURCE.read_text(encoding="utf-8")
     if MARKER not in original:
         raise SelfHostedFrontendError(f"marker frontend tidak ditemukan: {MARKER!r}")
@@ -40,27 +51,32 @@ def _frontend_script(source: str, source_name: str) -> str:
         + '\nselesai njir\nselesai jancuk\n'
     )
 
+
 def from_source(source: str, source_name: str = "<memory>") -> dict:
-    """Parse a supported source subset in .cuk, then validate canonical IR v1."""
+    """Parse source in the .cuk frontend, then validate canonical IR v1."""
     if not isinstance(source_name, str) or not source_name:
         raise ValueError("source_name tidak boleh kosong")
-    # Keep this path fail-closed: source grammar belongs to compiler.cuk. A Python
-    # reference-parser fallback would make self-hosting coverage pass dishonestly.
-    # The staged parser handles statements, not the outer program delimiters.
-    # Normalize those delimiters before passing source into the .cuk parser.
+    # No Python-reference-parser fallback: a syntax gap must fail visibly.
     source = "\n".join(line for line in source.splitlines() if line.strip() not in {"jancuk", "selesai jancuk"})
     normalized_name = Path(source_name.replace(chr(92), "/")).name if source_name != "<memory>" else source_name
     script = _frontend_script(source, normalized_name)
+    stdout, stderr = StringIO(), StringIO()
     with tempfile.TemporaryDirectory(prefix=".cuk-selfhost-", dir=ROOT) as tmp:
         path = Path(tmp) / "frontend_input.cuk"
         path.write_text(script, encoding="utf-8")
-        run = subprocess.run(
-            [sys.executable, str(ROOT / "pusingcuk_new.py"), str(path)], cwd=ROOT,
-            text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=15, check=False,
+        host = Evaluator(
+            source_path=path,
+            project_root=ROOT,
+            max_steps=FRONTEND_MAX_STEPS,
+            max_loop_iterations=FRONTEND_MAX_LOOP_ITERATIONS,
         )
-    if run.returncode != 0:
-        raise SelfHostedFrontendError(run.stderr.strip() or "frontend .cuk gagal dijalankan")
-    output = run.stdout.strip().splitlines()
+        try:
+            with redirect_stdout(stdout), redirect_stderr(stderr):
+                host.run(script)
+        except Exception as exc:
+            detail = str(exc).strip() or stderr.getvalue().strip() or "frontend .cuk gagal dijalankan"
+            raise SelfHostedFrontendError(detail) from exc
+    output = stdout.getvalue().strip().splitlines()
     if not output or output[-1].startswith("SELFHOST_PARSE_ERROR:"):
         token_index = output[-1].partition(":")[2] if output else "unknown"
         raise SelfHostedFrontendError(

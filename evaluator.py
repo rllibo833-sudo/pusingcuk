@@ -490,9 +490,16 @@ def _delete_project_file(project_root, raw_path):
 
 class Evaluator:
     def __init__(self, source_path=None, project_root=None, module_cache=None,
-                 module_loading_stack=None, module_depth=0, is_main=True):
+                 module_loading_stack=None, module_depth=0, is_main=True,
+                 max_steps=100000, max_loop_iterations=10000):
+        if not isinstance(max_steps, int) or isinstance(max_steps, bool) or max_steps < 1:
+            raise ValueError("max_steps harus integer positif")
+        if not isinstance(max_loop_iterations, int) or isinstance(max_loop_iterations, bool) or max_loop_iterations < 1:
+            raise ValueError("max_loop_iterations harus integer positif")
         self.functions = {}
         self.budget = 0
+        self.max_steps = max_steps
+        self.max_loop_iterations = max_loop_iterations
         self.source_path = Path(source_path).resolve() if source_path is not None else None
         self.project_root = Path(project_root or _REPO_ROOT).resolve()
         self._module_cache = module_cache if module_cache is not None else {}
@@ -507,8 +514,8 @@ class Evaluator:
 
     def step(self, line):
         self.budget += 1
-        if self.budget > 100000:
-            self.fail(line, "batas total 100000 langkah tercapai")
+        if self.budget > self.max_steps:
+            self.fail(line, f"batas total {self.max_steps} langkah tercapai")
 
     def expr(self, n, env, depth=0):
         if depth > 120:
@@ -911,8 +918,8 @@ class Evaluator:
                 count = 0
                 while self.expr(n.condition, env, depth):
                     self.step(line)
-                    if count >= 10000:
-                        self.fail(line, "batas 10000 iterasi tercapai")
+                    if count >= self.max_loop_iterations:
+                        self.fail(line, f"batas {self.max_loop_iterations} iterasi tercapai")
                     self.block(n.body, env, depth, in_function)
                     count += 1
             elif k == "For":
@@ -922,8 +929,8 @@ class Evaluator:
                 count = 0
                 for item in iterable:
                     self.step(line)
-                    if count >= 10000:
-                        self.fail(line, "batas 10000 iterasi tercapai")
+                    if count >= self.max_loop_iterations:
+                        self.fail(line, f"batas {self.max_loop_iterations} iterasi tercapai")
                     env[n.name] = item
                     self.block(n.body, env, depth, in_function)
                     count += 1

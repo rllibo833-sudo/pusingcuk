@@ -168,11 +168,12 @@ fungsi parse_call_arguments(tokens, nama, open_index)
     selesai njir
     lah args = []
     lah i = open_index + 1
+    lah hasil_arg = {}
     njir i < panjang(tokens) dan tokens[i]["jenis"] == "PUNCT" dan tokens[i]["nilai"] == ")"
         balek {"status": "OK", "node": {"jenis": "CALL", "nama": nama, "args": args}, "index": i + 1}
     selesai njir
     mumet i < panjang(tokens) dan bukan (tokens[i]["jenis"] == "PUNCT" dan tokens[i]["nilai"] == ")")
-        lah hasil_arg = parse_or(tokens, i)
+        hasil_arg = parse_or(tokens, i)
         njir hasil_arg["status"] != "OK"
             balek hasil_arg
         selesai njir
@@ -231,6 +232,9 @@ fungsi parse_primary(tokens, index)
         lah token = tokens[index]
         lah next = index + 1
         lah left = {}
+        lah index_result = {}
+        lah member = ""
+        lah method_result = {}
         njir token["jenis"] == "INTEGER" atau token["jenis"] == "FLOAT" atau token["jenis"] == "STRING"
             lah literal_value = token["nilai"]
             njir token["jenis"] == "INTEGER"
@@ -369,7 +373,7 @@ fungsi parse_primary(tokens, index)
 
         mumet next < panjang(tokens) dan ((tokens[next]["jenis"] == "PUNCT" dan tokens[next]["nilai"] == "[") atau (tokens[next]["jenis"] == "PUNCT" dan tokens[next]["nilai"] == "."))
             njir tokens[next]["jenis"] == "PUNCT" dan tokens[next]["nilai"] == "["
-                lah index_result = parse_or(tokens, next + 1)
+                index_result = parse_or(tokens, next + 1)
                 njir index_result["status"] != "OK"
                     balek index_result
                 selesai njir
@@ -382,12 +386,12 @@ fungsi parse_primary(tokens, index)
                 njir next + 1 >= panjang(tokens) atau tokens[next + 1]["jenis"] != "IDENT"
                     balek node_gagal(next)
                 selesai njir
-                lah member = tokens[next + 1]["nilai"]
+                member = tokens[next + 1]["nilai"]
                 njir next + 2 < panjang(tokens) dan tokens[next + 2]["jenis"] == "PUNCT" dan tokens[next + 2]["nilai"] == "("
                     njir left["jenis"] != "VARIABLE"
                         balek node_gagal(next)
                     selesai njir
-                    lah method_result = parse_call_arguments(tokens, left["nama"] + "." + member, next + 2)
+                    method_result = parse_call_arguments(tokens, left["nama"] + "." + member, next + 2)
                     njir method_result["status"] != "OK"
                         balek method_result
                     selesai njir
@@ -1293,7 +1297,7 @@ fungsi ir_source_map(program)
     result = result + teks(root_line) + "}"
     lah map_index = 0
     mumet i < panjang(program["statements"])
-        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT" atau program["statements"][i]["jenis"] == "FUNCTION" atau program["statements"][i]["jenis"] == "IF"
+        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "INDEX_ASSIGN" atau program["statements"][i]["jenis"] == "PRINT" atau program["statements"][i]["jenis"] == "EXPR" atau program["statements"][i]["jenis"] == "FUNCTION" atau program["statements"][i]["jenis"] == "IF" atau program["statements"][i]["jenis"] == "WHILE" atau program["statements"][i]["jenis"] == "FOR"
             result = result + ir_map_statement(program["statements"][i], "$.fields.body[" + teks(map_index) + "]", i + 2)
             map_index = map_index + 1
         selesai njir
