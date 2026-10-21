@@ -28,14 +28,12 @@ jobs:
           ls -lh /tmp/driver_lexer.pvm
           wc -c /tmp/driver_lexer.pvm
           head -c 500 /tmp/driver_lexer.pvm
-      - name: Build native
-        run: |
-          cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-          cmake --build build -j
+      - name: Build native VM
+        run: make -C native
       - name: Run native VM
         run: |
           set -o pipefail
-          ./build/pusingcuk-native --run-bytecode /tmp/driver_lexer.pvm | tee /tmp/tokens_native.json
+          ./native/pusingcuk --run-bytecode /tmp/driver_lexer.pvm | tee /tmp/tokens_native.json
           cat /tmp/tokens_native.json
           python -m json.tool /tmp/tokens_native.json
       - uses: actions/upload-artifact@v4
