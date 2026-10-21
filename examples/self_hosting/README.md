@@ -19,6 +19,7 @@ Folder ini berisi prototipe bertahap yang ditulis dengan bahasa `.cuk` untuk men
 
 ```sh
 python pusingcuk_new.py examples/self_hosting/lexer.cuk
+python pusingcuk_new.py examples/self_hosting/source_lexer.cuk
 python pusingcuk_new.py examples/self_hosting/parser.cuk
 python pusingcuk_new.py examples/self_hosting/evaluator.cuk
 python pusingcuk_new.py examples/self_hosting/interpreter.cuk
