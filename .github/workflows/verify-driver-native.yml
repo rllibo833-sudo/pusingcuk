@@ -1,0 +1,36 @@
+name: verify driver native JSON
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'examples/self_hosting/driver_lexer.cuk'
+      - 'native/**'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e .
+      - name: Compile driver to PVM
+        run: |
+          python -m compiler.bytecode examples/self_hosting/driver_lexer.cuk --emit-bytecode /tmp/driver_lexer.pvm
+          ls -lh /tmp/driver_lexer.pvm
+          wc -c /tmp/driver_lexer.pvm
+      - name: Build native
+        run: |
+          cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+          cmake --build build -j
+      - name: Run native VM
+        run: |
+          set -o pipefail
+          ./build/pusingcuk-native --run-bytecode /tmp/driver_lexer.pvm | tee /tmp/tokens_native.json
+          cat /tmp/tokens_native.json
+          python -m json.tool /tmp/tokens_native.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tokens-native
+          path: /tmp/tokens_native.json
