@@ -51,7 +51,7 @@ def compile_source(
             '<script>\n'
             'const pcOutput = document.getElementById("pc-output");\n'
             'const console = {log: (...args) => { pcOutput.textContent += args.join(" ") + "\\n"; }, '
-            'error: (...args) => { pcOutput.textContent += args.join(" ") + "\\n"; }};\n'
+            'error: (...args) => { globalThis.console.error(...args); }};\n'
             'const process = {exitCode: 0};\n'
             + javascript
             + '\n</script>\n</body>\n</html>\n'
