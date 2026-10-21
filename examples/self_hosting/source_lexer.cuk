@@ -398,12 +398,17 @@ selesai njir
 lah ast_invalid = parse_source(pindai("7 %"))
 hedeh "INVALID_" + ast_invalid["status"]
 
-lah ast_program = parse_program(pindai("lah x = 2 + 3\nhedeh x\n"))
+lah ast_program = parse_program(pindai("lah x = 2 + 3\nhedeh x\nlah y = (x + 1) * 2\nhedeh y\n"))
 hedeh "PROGRAM_" + ast_program["status"]
 njir ast_program["status"] == "OK"
     lah hasil_program = jalankan_program(ast_program["node"])
     hedeh panjang(ast_program["node"]["statements"])
     hedeh hasil_program["output"][0]
+    hedeh hasil_program["output"][1]
     hedeh hasil_program["lingkungan"]["x"]
+    hedeh hasil_program["lingkungan"]["y"]
 selesai njir
+
+lah ast_program_invalid = parse_program(pindai("lah = 4\n"))
+hedeh "INVALID_PROGRAM_" + ast_program_invalid["status"]
 selesai jancuk
