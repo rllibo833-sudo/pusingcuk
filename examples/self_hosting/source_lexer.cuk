@@ -458,10 +458,10 @@ fungsi evaluasi(node, lingkungan)
                             balek kiri * kanan
                         kampret
                             njir node["operator"] == "=="
-                                balek jenis(kiri) == jenis(kanan) dan kiri == kanan
+                                balek kiri == kanan
                             kampret
                                 njir node["operator"] == "!="
-                                    balek bukan (jenis(kiri) == jenis(kanan) dan kiri == kanan)
+                                    balek bukan (kiri == kanan)
                                 kampret
                                     njir node["operator"] == "<"
                                         balek kiri < kanan
