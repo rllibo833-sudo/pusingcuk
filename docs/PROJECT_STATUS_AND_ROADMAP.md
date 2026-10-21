@@ -19,7 +19,7 @@ Jangan menyalin tabel jumlah fixture ke banyak dokumen. Ringkasan yang dibuat ge
 
 ## Status yang sudah dibuktikan
 
-Run core terbaru yang telah selesai dan diverifikasi adalah [PusingCuk core #39533938497](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39533938497), sukses pada commit `c498bd9d82fbf9ef82ae2d95e92d511bb009f9a3`. Pada commit tersebut, kedua job Python (3.11 dan 3.12) serta native GCC dan Clang lulus; Python menjalankan 565 tes dan konformansi reference/native menghasilkan 158 PASS, 0 FAIL, 0 UNSUPPORTED (79 fixture pada dua runtime).
+**Bukti CI historis:** [PusingCuk core #39533938497](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39533938497) sukses pada commit `c498bd9d82fbf9ef82ae2d95e92d511bb009f9a3`. Run itu lulus pada Python 3.11/3.12 dan native GCC/Clang; Python menjalankan 565 tes dan konformansi reference/native menghasilkan 158 PASS, 0 FAIL, 0 UNSUPPORTED (79 fixture pada dua runtime). Angka ini khusus commit tersebut, **bukan status HEAD sekarang**. Nilai hasil untuk HEAD harus dibaca dari GitHub Actions run yang menyebut SHA HEAD yang sedang ditinjau.
 
 Baseline matriks multi-target yang tersimpan menyatakan reference, native C, JavaScript, Python transpiler, dan VM lulus 79/79, sedangkan HTML compiler masih unsupported untuk seluruh fixture. Baseline tersimpan dan run historis bukan pengganti run matriks pada HEAD saat ini; klaim untuk JS, Python transpiler, VM, atau HTML harus tetap menyebut sumber serta commit yang benar-benar diuji. CI hijau juga hanya membuktikan job yang berjalan, bukan seluruh fitur bahasa atau kesiapan produksi.
 
@@ -51,8 +51,9 @@ Status implementasi saat ini dirawat di [SELF_HOSTING_STATE.md](SELF_HOSTING_STA
 
 - Sumber frontend aktif adalah `examples/self_hosting/compiler.cuk`. `source_lexer.cuk` pada catatan bertanggal di bawah adalah prototipe historis, bukan jalur compiler aktif.
 - Frontend `.cuk` memuat lexer, parser ekspresi/program, fungsi dan return, kondisi/loop, list/dictionary/index, pemanggilan/member sederhana, serta serializer IR v1. Tes penerimaan membandingkan IR dengan parser referensi dan mengirim program collection/control-flow ke bytecode VM.
-- Jalur tersebut masih dijalankan oleh host Python; validator IR, bootstrap/check reproduksibilitas, bytecode dan VM juga memakai implementasi Python. Karena itu, parsing kode compiler sendiri bukan bukti bahwa compiler dapat berdiri sendiri.
-- Gate berikutnya: seluruh unit suite dan parity self-parse harus lulus pada commit yang sama; setelah itu bangun artefak compiler tahap pertama yang bisa menjalankan tahap kedua, compile ulang sumber compiler, bandingkan artefak, lalu jalankan konformansi yang relevan. Jangan menandai bootstrap penuh sebelum tahap tersebut terbukti di CI.
+- `compiler.bootstrap` kini membandingkan frontend yang berjalan lewat Python Evaluator dengan frontend `.cuk` yang dikompilasi ke bytecode PusingCuk dan dijalankan oleh VM. IR v1, bytecode program target, dan output harus identik untuk subset yang diuji.
+- Ini belum self-hosting penuh: driver generic masih dibentuk memakai parser referensi Python dan `compiler.bytecode.compile_ir`; validasi IR dan backend bytecode juga masih Python. Hasil ini membuktikan parity runtime frontend di VM, bukan kemampuan compiler membangun compiler tahap berikutnya secara mandiri.
+- Gate berikutnya: hapus ketergantungan parser referensi dan compiler bytecode Python dari pembentukan driver; compiler tahap pertama harus menghasilkan artefak yang dapat menjalankan tahap kedua, mengompilasi ulang sumber compiler, dan menghasilkan artefak identik sebelum konformansi relevan dijalankan. Jangan menandai bootstrap penuh sebelum bukti tersebut lulus di CI pada SHA yang sama.
 - Gunakan `compiler/bootstrap.py`, manifest konformansi, `tools/ci_fixture_matrix.py`, dan tes yang sudah ada. Jangan membuat runner, manifest, atau status report duplikat. Ollama/AI helper bukan prasyarat compiler inti.
 
 ## Aturan perubahan
@@ -84,6 +85,6 @@ The first core run after the nested C-expression generator failed because `tests
 CLI kini menerima `--target rust`, yang menerjemahkan IR v1 kanonis menjadi source Rust mandiri untuk subset numerik: deklarasi/assignment variabel, output, unary minus, dan operasi `+ - * / // %`. Konstruksi di luar subset ditolak secara eksplisit. Target ini menambah satu backend bahasa nyata, tetapi tidak dihitung sebagai parity penuh atau sebagai bukti target 10; hasil eksekusi harus diverifikasi dengan `rustc` bila tersedia.
 
 
-### Frontend self-hosted terhubung ke IR v1 (2026-10-21)
+### Prototipe frontend awal (2026-10-21; superseded)
 
-`compiler/self_hosted_frontend.py` mengeksekusi lexer/parser dalam `examples/self_hosting/source_lexer.cuk`, mengubah AST subset tersebut menjadi envelope IR v1 yang divalidasi, dan mengirim IR yang sama ke backend existing melalui opsi `--frontend selfhosted`. Tes memeriksa kesamaan AST dengan frontend kanonis dan penolakan sintaks malformed. Cakupan masih terbatas pada deklarasi, assignment, output, serta ekspresi integer; ini bukan pengganti parser kanonis penuh. **Bootstrap berulang belum terbukti** karena implementasi compiler lengkap belum ditulis dalam `.cuk`.
+Implementasi pertama memakai `examples/self_hosting/source_lexer.cuk` untuk subset deklarasi, assignment, output, dan ekspresi integer. Prototipe ini sudah digantikan sebagai jalur aktif oleh `examples/self_hosting/compiler.cuk`, yang memiliki lexer/parser dan serializer IR v1 yang lebih luas. Jangan memakai catatan ini sebagai status implementasi sekarang; status aktif berada di [SELF_HOSTING_STATE.md](SELF_HOSTING_STATE.md).

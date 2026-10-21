@@ -11,9 +11,9 @@ import argparse
 import hashlib
 import json
 import sys
-from pathlib import Path
-
+from functools import lru_cache
 from io import StringIO
+from pathlib import Path
 
 from compiler.bytecode import compile_ir
 from compiler.ir import dumps, from_source as reference_from_source, validate
@@ -68,6 +68,17 @@ def _artifact(
     }
 
 
+@lru_cache(maxsize=1)
+def _compiled_frontend_driver() -> tuple[dict, bytes]:
+    """Compile the fixed .cuk frontend driver once per bootstrap process."""
+    driver_ir = reference_from_source(frontend_driver_script(), "bootstrap_frontend.cuk")
+    driver_bytecode = compile_ir(driver_ir)
+    driver_bytes = (
+        json.dumps(driver_bytecode, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
+    ).encode("utf-8")
+    return driver_bytecode, driver_bytes
+
+
 def _compiled_frontend_document(source: str, source_name: str) -> tuple[dict, bytes]:
     """Run the .cuk frontend as compiled bytecode instead of through Evaluator."""
     normalized_source = "\n".join(
@@ -78,11 +89,7 @@ def _compiled_frontend_document(source: str, source_name: str) -> tuple[dict, by
         Path(source_name.replace(chr(92), "/")).name
         if source_name != "<memory>" else source_name
     )
-    driver_ir = reference_from_source(frontend_driver_script(), "bootstrap_frontend.cuk")
-    driver_bytecode = compile_ir(driver_ir)
-    driver_bytes = (
-        json.dumps(driver_bytecode, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
-    ).encode("utf-8")
+    driver_bytecode, driver_bytes = _compiled_frontend_driver()
     payload = json.dumps(
         {"source_name": normalized_name, "source": normalized_source},
         ensure_ascii=False,
