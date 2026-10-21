@@ -47,8 +47,10 @@ jobs:
           python-version: "3.12"
       - name: Verify .cuk gallery examples against reference interpreter
         run: python tools/check_playground_examples.py
-      - name: Test browser runtime against every gallery fixture
+      - name: Test browser runtime conformance and limits
         run: node tests/test_browser_runtime.js
+      - name: Test playground editor-to-output integration
+        run: node tests/test_browser_playground.js
       - name: Verify reference interpreter example
         run: |
           python pusingcuk_new.py site/examples/halo.pusingcuk > /tmp/halo-reference.txt
