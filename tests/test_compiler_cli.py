@@ -82,6 +82,14 @@ class MultiTargetCompilerTests(unittest.TestCase):
         generated = compile_source(source, "same.cuk", "js", frontend="selfhosted")
         self.assertIn("pcOut", generated)
 
+    def test_self_hosted_frontend_preserves_string_literals_in_canonical_ir(self):
+        from compiler.self_hosted_frontend import from_source as selfhost_from_source
+        source = 'jancuk\nlah message = "hello world"\nhedeh message\nselesai jancuk'
+        canonical = json.loads(compile_source(source, "strings.cuk", "json"))
+        selfhost_ir = selfhost_from_source(source, "strings.cuk")
+        self.assertEqual(selfhost_ir["program"], canonical["program"])
+        self.assertEqual(selfhost_ir["program"]["fields"]["body"][0]["fields"]["value"]["fields"]["value"], "hello world")
+
     def test_self_hosted_frontend_matches_canonical_print_aliases(self):
         from compiler.self_hosted_frontend import from_source as selfhost_from_source
         aliases = ("bacot", "bacrit", "berak", "berisik", "cetak", "crot", "gas",
