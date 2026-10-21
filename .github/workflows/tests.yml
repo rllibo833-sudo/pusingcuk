@@ -162,7 +162,7 @@ jobs:
                   cwd=root, check=True, capture_output=True, text=True, timeout=30,
               )
               encoded = cli_artifact.read_text(encoding="utf-8")
-              assert encoded.endswith("\\n"), "CLI bytecode artifact must end with newline"
+              assert encoded.endswith("\n"), "CLI bytecode artifact must end with newline"
               cli_bytecode = json.loads(encoded)
               cli_output = io.StringIO()
               VirtualMachine(cli_bytecode, output_stream=cli_output).run()
