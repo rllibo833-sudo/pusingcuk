@@ -48,7 +48,7 @@ def from_source(source: str, source_name: str = "<memory>") -> dict:
     # frontend parser yet. Keep those programs on the canonical compatibility path
     # instead of emitting incomplete IR; simple function bodies stay on the .cuk path.
     import re
-    if re.search(r"(?m)^\s*(?:mumet|untuk|coba)\b", source):
+    if re.search(r"(?m)^\s*(?:untuk|coba)\b", source):
         from compiler.ir import from_source as canonical_from_source
         try:
             return canonical_from_source(source, source_name)
