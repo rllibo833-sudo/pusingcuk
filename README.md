@@ -123,7 +123,7 @@ For local AI development on Android, use Termux with Ollama running on the same 
 - [Language specification](SPEC.md) → [semantic contract](docs/SEMANTIC_CONTRACT.md)
 - [Compatibility matrix](docs/COMPATIBILITY.md) and [conformance fixtures](docs/CONFORMANCE_FIXTURES.md)
 - [Technical dictionary](docs/DICTIONARY.md) · [Indonesian Warung dictionary](docs/KAMUS_PUSINGCUK.md)
-- [Project overview](docs/PROJECT_OVERVIEW.md) · [project vision](docs/VISION.md)
+- [Project overview](docs/PROJECT_OVERVIEW.md) · [project vision](docs/VISION.md) · [ecosystem implementation roadmap](docs/ECOSYSTEM_ROADMAP.md)
 - [Contributing](CONTRIBUTING.md) · [security policy](SECURITY.md)
 
 ## How to read feature claims
