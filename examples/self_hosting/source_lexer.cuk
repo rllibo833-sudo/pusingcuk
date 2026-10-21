@@ -123,6 +123,57 @@ fungsi render_tokens(tokens)
     selesai untuk
 selesai fungsi
 
+# Parser dan evaluator mini yang menggunakan token hasil pindai(source).
+# Grammar sengaja dibatasi: INTEGER OP INTEGER EOF.
+fungsi parse_ekspresi(tokens)
+    njir panjang(tokens) != 4
+        balek {"status": "PARSE_ERROR"}
+    kampret
+        njir tokens[0]["jenis"] != "INTEGER" atau tokens[1]["jenis"] != "OP" atau tokens[2]["jenis"] != "INTEGER" atau tokens[3]["jenis"] != "EOF"
+            balek {"status": "PARSE_ERROR"}
+        kampret
+            njir tokens[1]["nilai"] != "+" dan tokens[1]["nilai"] != "-" dan tokens[1]["nilai"] != "*" dan tokens[1]["nilai"] != "/"
+                balek {"status": "PARSE_ERROR"}
+            kampret
+                balek {"status": "OK", "kiri": bilangan(tokens[0]["nilai"]), "operator": tokens[1]["nilai"], "kanan": bilangan(tokens[2]["nilai"])}
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi evaluasi_ekspresi(ast)
+    njir ast["status"] != "OK"
+        balek "PARSE_ERROR"
+    kampret
+        njir ast["operator"] == "+"
+            balek ast["kiri"] + ast["kanan"]
+        kampret
+            njir ast["operator"] == "-"
+                balek ast["kiri"] - ast["kanan"]
+            kampret
+                njir ast["operator"] == "*"
+                    balek ast["kiri"] * ast["kanan"]
+                kampret
+                    njir ast["kanan"] == 0
+                        balek "DIVISION_BY_ZERO"
+                    kampret
+                        balek ast["kiri"] / ast["kanan"]
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
 lah contoh = "lah x = 12 + 3\nhedeh x # komentar\n"
 render_tokens(pindai(contoh))
+
+lah ast = parse_ekspresi(pindai("7 + 35"))
+hedeh "EXPR_" + ast["status"]
+njir ast["status"] == "OK"
+    hedeh evaluasi_ekspresi(ast)
+selesai njir
+
+lah ast_invalid = parse_ekspresi(pindai("7 % 35"))
+hedeh "INVALID_" + ast_invalid["status"]
 selesai jancuk
