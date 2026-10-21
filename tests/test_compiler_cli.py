@@ -169,7 +169,8 @@ class MultiTargetCompilerTests(unittest.TestCase):
 
         sample = "jancuk\nlah nilai = (2 + 3) * 4\nhedeh nilai\nselesai jancuk"
         expected = selfhost_from_source(sample, "stage1_probe.cuk")
-        script = _frontend_script(sample, "stage1_probe.cuk")
+        source_body = "\n".join(line for line in sample.splitlines() if line.strip() not in {"jancuk", "selesai jancuk"})
+        script = _frontend_script(source_body, "stage1_probe.cuk")
         stage0_ir = reference_from_source(script, "stage0_frontend.cuk")
         stage1_artifact = compile_ir(stage0_ir)
         output = io.StringIO()
