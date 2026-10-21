@@ -128,7 +128,8 @@ class PythonImporterTests(unittest.TestCase):
             "global.__pc = {textContent: ''};\n"
             "global.document = {getElementById: () => global.__pc};\n"
             + script
-            + "\nglobal.process.stdout.write(global.__pc.textContent);\n"
+            + "\nif (typeof process !== 'undefined' && process.exitCode) global.process.exitCode = process.exitCode;\n"
+            + "global.process.stdout.write(global.__pc.textContent);\n"
         )
         html_result = subprocess.run(
             ["node", "-e", harness], capture_output=True, text=True, check=True
@@ -165,7 +166,8 @@ class PythonImporterTests(unittest.TestCase):
             "global.__pc = {textContent: ''};\n"
             "global.document = {getElementById: () => global.__pc};\n"
             + script
-            + "\nglobal.process.stdout.write(global.__pc.textContent);\n"
+            + "\nif (typeof process !== 'undefined' && process.exitCode) global.process.exitCode = process.exitCode;\n"
+            + "global.process.stdout.write(global.__pc.textContent);\n"
         )
         html_result = subprocess.run(
             ["node", "-e", harness], capture_output=True, text=True, check=True
@@ -209,7 +211,8 @@ class PythonImporterTests(unittest.TestCase):
                 "global.__pc = {textContent: ''};\n"
                 "global.document = {getElementById: () => global.__pc};\n"
                 + script
-                + "\nglobal.process.stdout.write(global.__pc.textContent);\n"
+                + "\nif (typeof process !== 'undefined' && process.exitCode) global.process.exitCode = process.exitCode;\n"
+                + "global.process.stdout.write(global.__pc.textContent);\n"
             )
             html_result = subprocess.run(
                 ["node", "-e", harness], capture_output=True, text=True
