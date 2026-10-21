@@ -792,6 +792,7 @@ fungsi ir_map_expr(node, path, line)
             selesai njir
         selesai njir
     selesai njir
+    selesai njir
     balek result
 selesai fungsi
 
