@@ -369,73 +369,71 @@ selesai fungsi
 fungsi parse_program_line(line_tokens)
     njir panjang(line_tokens) == 0
         balek {"status": "OK", "statement": salah}
+    selesai njir
+    njir line_tokens[0]["jenis"] != "IDENT"
+        balek node_gagal(0)
+    selesai njir
+    lah mulai = 0
+    lah jenis_stmt = ""
+    lah nama_stmt = ""
+    njir line_tokens[0]["nilai"] == "fungsi"
+        balek {"status": "OK", "statement": {"jenis": "FUNCTION_HEADER"}}
     kampret
-        lah mulai = 0
-        lah jenis_stmt = ""
-        lah nama_stmt = ""
-        njir line_tokens[0]["jenis"] != "IDENT"
+        njir line_tokens[0]["nilai"] == "mumet" atau line_tokens[0]["nilai"] == "njir"
             balek node_gagal(0)
         kampret
-            njir line_tokens[0]["nilai"] == "fungsi"
-                # The frontend implementation contains function definitions. They
-                # are skipped as implementation text while parsing user programs;
-                # bootstrap.py rejects compiling functions until Function IR exists.
-                balek {"status": "OK", "statement": {"jenis": "FUNGSI_IMPL", "nama": line_tokens[1]["nilai"]}}
+            njir line_tokens[0]["nilai"] == "balek"
+                jenis_stmt = "RETURN"
+                mulai = 1
             kampret
-                njir line_tokens[0]["nilai"] == "mumet"
-                    balek {"status": "OK", "statement": {"jenis": "MUMET_DUMMY"}}
+                njir line_tokens[0]["nilai"] == "lah"
+                    njir panjang(line_tokens) < 4 atau line_tokens[1]["jenis"] != "IDENT" atau line_tokens[2]["nilai"] != "="
+                        balek node_gagal(0)
+                    selesai njir
+                    jenis_stmt = "DECLARE"
+                    nama_stmt = line_tokens[1]["nilai"]
+                    mulai = 3
                 kampret
-                    njir line_tokens[0]["nilai"] == "njir"
-                        balek {"status": "OK", "statement": {"jenis": "NJIR_DUMMY"}}
+                    njir line_tokens[0]["nilai"] == "hedeh" atau line_tokens[0]["nilai"] == "bacot" atau line_tokens[0]["nilai"] == "bacrit" atau line_tokens[0]["nilai"] == "berak" atau line_tokens[0]["nilai"] == "berisik" atau line_tokens[0]["nilai"] == "cetak" atau line_tokens[0]["nilai"] == "crot" atau line_tokens[0]["nilai"] == "gas" atau line_tokens[0]["nilai"] == "gebber" atau line_tokens[0]["nilai"] == "gembor" atau line_tokens[0]["nilai"] == "jedor" atau line_tokens[0]["nilai"] == "jir" atau line_tokens[0]["nilai"] == "keluarin" atau line_tokens[0]["nilai"] == "koar" atau line_tokens[0]["nilai"] == "muncrat" atau line_tokens[0]["nilai"] == "ngegas" atau line_tokens[0]["nilai"] == "nyalak" atau line_tokens[0]["nilai"] == "omong" atau line_tokens[0]["nilai"] == "print" atau line_tokens[0]["nilai"] == "sembur" atau line_tokens[0]["nilai"] == "semprot" atau line_tokens[0]["nilai"] == "senggol" atau line_tokens[0]["nilai"] == "spill" atau line_tokens[0]["nilai"] == "suarakan" atau line_tokens[0]["nilai"] == "tampilkan" atau line_tokens[0]["nilai"] == "teriak"
+                        jenis_stmt = "PRINT"
+                        mulai = 1
                     kampret
-                        njir line_tokens[0]["nilai"] == "balek"
-                            balek {"status": "OK", "statement": {"jenis": "BALEK_DUMMY"}}
+                        njir panjang(line_tokens) >= 3 dan line_tokens[0]["jenis"] == "IDENT" dan line_tokens[1]["nilai"] == "="
+                            jenis_stmt = "ASSIGN"
+                            nama_stmt = line_tokens[0]["nilai"]
+                            mulai = 2
+                        kampret
+                            balek node_gagal(0)
                         selesai njir
                     selesai njir
                 selesai njir
             selesai njir
-            njir line_tokens[0]["nilai"] == "lah"
-                njir panjang(line_tokens) < 4 atau line_tokens[1]["jenis"] != "IDENT" atau line_tokens[2]["jenis"] != "OP" atau line_tokens[2]["nilai"] != "="
-                    balek node_gagal(0)
-                kampret
-                    jenis_stmt = "DECLARE"
-                    nama_stmt = line_tokens[1]["nilai"]
-                    mulai = 3
-                selesai njir
-            kampret
-                njir line_tokens[0]["nilai"] == "hedeh" atau line_tokens[0]["nilai"] == "bacot" atau line_tokens[0]["nilai"] == "bacrit" atau line_tokens[0]["nilai"] == "berak" atau line_tokens[0]["nilai"] == "berisik" atau line_tokens[0]["nilai"] == "cetak" atau line_tokens[0]["nilai"] == "crot" atau line_tokens[0]["nilai"] == "gas" atau line_tokens[0]["nilai"] == "gebber" atau line_tokens[0]["nilai"] == "gembor" atau line_tokens[0]["nilai"] == "jedor" atau line_tokens[0]["nilai"] == "jir" atau line_tokens[0]["nilai"] == "keluarin" atau line_tokens[0]["nilai"] == "koar" atau line_tokens[0]["nilai"] == "muncrat" atau line_tokens[0]["nilai"] == "ngegas" atau line_tokens[0]["nilai"] == "nyalak" atau line_tokens[0]["nilai"] == "omong" atau line_tokens[0]["nilai"] == "print" atau line_tokens[0]["nilai"] == "sembur" atau line_tokens[0]["nilai"] == "semprot" atau line_tokens[0]["nilai"] == "senggol" atau line_tokens[0]["nilai"] == "spill" atau line_tokens[0]["nilai"] == "suarakan" atau line_tokens[0]["nilai"] == "tampilkan" atau line_tokens[0]["nilai"] == "teriak"
-                    jenis_stmt = "PRINT"
-                    mulai = 1
-                kampret
-                    njir panjang(line_tokens) >= 3 dan line_tokens[0]["jenis"] == "IDENT" dan line_tokens[1]["jenis"] == "OP" dan line_tokens[1]["nilai"] == "="
-                        jenis_stmt = "ASSIGN"
-                        nama_stmt = line_tokens[0]["nilai"]
-                        mulai = 2
-                    kampret
-                        balek node_gagal(0)
-                    selesai njir
-                selesai njir
-            selesai njir
         selesai njir
-        lah expr_tokens = []
-        lah i = mulai
-        mumet i < panjang(line_tokens)
-            expr_tokens = expr_tokens + [line_tokens[i]]
-            i = i + 1
-        selesai mumet
-        expr_tokens = expr_tokens + [{"jenis": "EOF", "nilai": "EOF"}]
-        lah hasil_expr = parse_source(expr_tokens)
-        njir hasil_expr["status"] != "OK"
-            balek hasil_expr
+    selesai njir
+    njir mulai >= panjang(line_tokens)
+        balek node_gagal(0)
+    selesai njir
+    lah expr_tokens = []
+    lah i = mulai
+    mumet i < panjang(line_tokens)
+        expr_tokens = expr_tokens + [line_tokens[i]]
+        i = i + 1
+    selesai mumet
+    expr_tokens = expr_tokens + [{"jenis": "EOF", "nilai": "EOF"}]
+    lah hasil_expr = parse_source(expr_tokens)
+    njir hasil_expr["status"] != "OK"
+        balek hasil_expr
+    selesai njir
+    njir jenis_stmt == "DECLARE"
+        balek {"status": "OK", "statement": {"jenis": "DECLARE", "nama": nama_stmt, "nilai": hasil_expr["node"]}}
+    kampret
+        njir jenis_stmt == "ASSIGN"
+            balek {"status": "OK", "statement": {"jenis": "ASSIGN", "nama": nama_stmt, "nilai": hasil_expr["node"]}}
         kampret
-            njir jenis_stmt == "DECLARE"
-                balek {"status": "OK", "statement": {"jenis": "DECLARE", "nama": nama_stmt, "nilai": hasil_expr["node"]}}
+            njir jenis_stmt == "RETURN"
+                balek {"status": "OK", "statement": {"jenis": "RETURN", "nilai": hasil_expr["node"]}}
             kampret
-                njir jenis_stmt == "ASSIGN"
-                    balek {"status": "OK", "statement": {"jenis": "ASSIGN", "nama": nama_stmt, "nilai": hasil_expr["node"]}}
-                kampret
-                    balek {"status": "OK", "statement": {"jenis": "PRINT", "nilai": hasil_expr["node"]}}
-                selesai njir
+                balek {"status": "OK", "statement": {"jenis": "PRINT", "nilai": hasil_expr["node"]}}
             selesai njir
         selesai njir
     selesai njir
@@ -446,45 +444,71 @@ fungsi parse_program(tokens)
     lah line_tokens = []
     lah i = 0
     lah hasil_line = {}
-    lah lewati_fungsi = salah
+    lah in_function = salah
+    lah current_function = {}
+    lah function_params = []
+    lah param_index = 0
     mumet i < panjang(tokens)
         njir tokens[i]["jenis"] == "NEWLINE" atau tokens[i]["jenis"] == "EOF"
-            njir lewati_fungsi
-                njir panjang(line_tokens) >= 2 dan line_tokens[0]["jenis"] == "IDENT" dan line_tokens[0]["nilai"] == "selesai" dan line_tokens[1]["nilai"] == "fungsi"
-                    lewati_fungsi = salah
-                selesai njir
-            kampret
-                njir panjang(line_tokens) > 0 dan line_tokens[0]["jenis"] == "IDENT" dan line_tokens[0]["nilai"] == "fungsi"
-                    hasil_line = parse_program_line(line_tokens)
-                    njir hasil_line["status"] != "OK"
-                        balek hasil_line
-                    kampret
-                        statements = statements + [hasil_line["statement"]]
-                        lewati_fungsi = benar
+            njir panjang(line_tokens) > 0
+                njir bukan in_function dan line_tokens[0]["nilai"] == "fungsi"
+                    njir panjang(line_tokens) < 4 atau line_tokens[1]["jenis"] != "IDENT" atau line_tokens[2]["nilai"] != "("
+                        balek node_gagal(i)
                     selesai njir
+                    function_params = []
+                    param_index = 3
+                    mumet param_index < panjang(line_tokens) dan line_tokens[param_index]["nilai"] != ")"
+                        njir line_tokens[param_index]["jenis"] == "IDENT"
+                            function_params = function_params + [line_tokens[param_index]["nilai"]]
+                        kampret
+                            njir line_tokens[param_index]["nilai"] != ","
+                                balek node_gagal(i)
+                            selesai njir
+                        selesai njir
+                        param_index = param_index + 1
+                    selesai mumet
+                    njir param_index >= panjang(line_tokens) atau line_tokens[param_index]["nilai"] != ")"
+                        balek node_gagal(i)
+                    selesai njir
+                    current_function = {"jenis": "FUNCTION", "nama": line_tokens[1]["nilai"], "params": function_params, "body": []}
+                    in_function = benar
                 kampret
-                    hasil_line = parse_program_line(line_tokens)
-                    njir hasil_line["status"] != "OK"
-                        balek hasil_line
+                    njir in_function dan panjang(line_tokens) >= 2 and line_tokens[0]["nilai"] == "selesai" and line_tokens[1]["nilai"] == "fungsi"
+                        statements = statements + [current_function]
+                        current_function = {}
+                        in_function = salah
                     kampret
-                        njir hasil_line["statement"] != salah
-                            statements = statements + [hasil_line["statement"]]
+                        njir in_function
+                            hasil_line = parse_program_line(line_tokens)
+                            njir hasil_line["status"] != "OK" atau hasil_line["statement"] == salah
+                                balek node_gagal(i)
+                            selesai njir
+                            current_function["body"] = current_function["body"] + [hasil_line["statement"]]
+                        kampret
+                            hasil_line = parse_program_line(line_tokens)
+                            njir hasil_line["status"] != "OK"
+                                balek hasil_line
+                            kampret
+                                njir hasil_line["statement"] != salah
+                                    statements = statements + [hasil_line["statement"]]
+                                selesai njir
+                            selesai njir
                         selesai njir
                     selesai njir
                 selesai njir
             selesai njir
             line_tokens = []
             njir tokens[i]["jenis"] == "EOF"
-                njir lewati_fungsi
+                njir in_function
                     balek node_gagal(i)
                 selesai njir
                 balek {"status": "OK", "node": {"jenis": "PROGRAM", "statements": statements}}
             selesai njir
         kampret
-            njir bukan lewati_fungsi dan (tokens[i]["jenis"] == "STRING_ERROR" atau tokens[i]["jenis"] == "UNKNOWN")
-                balek node_gagal(i)
-            kampret
+            njir bukan (tokens[i]["jenis"] == "STRING_ERROR" atau tokens[i]["jenis"] == "UNKNOWN")
                 line_tokens = line_tokens + [tokens[i]]
+            kampret
+                balek node_gagal(i)
             selesai njir
         selesai njir
         i = i + 1
