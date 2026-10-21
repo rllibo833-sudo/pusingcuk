@@ -148,6 +148,12 @@ fungsi pindai(source)
     balek tokens + [{"jenis": "EOF", "nilai": "EOF"}]
 selesai fungsi
 
+fungsi render_tokens(tokens)
+    untuk token dalam tokens
+        hedeh token["jenis"] + ":" + token["nilai"]
+    selesai untuk
+selesai fungsi
+
 fungsi json_escape(teks)
     lah hasil = ""
     lah i = 0
@@ -194,6 +200,618 @@ fungsi render_tokens_json(tokens)
     selesai mumet
     balek hasil + "]"
 selesai fungsi
+
+# Parser recursive-descent dan evaluator AST untuk ekspresi aritmetika.
+# Grammar: expr := term (("+" | "-") term)*
+# term := primary (("*" | "/" | "%") primary)*
+# primary := INTEGER | "-" primary | "(" expr ")"
+fungsi node_gagal(index)
+    balek {"status": "PARSE_ERROR", "index": index}
+selesai fungsi
+
+fungsi parse_primary(tokens, index)
+    njir index >= panjang(tokens)
+        balek node_gagal(index)
+    kampret
+        njir tokens[index]["jenis"] == "INTEGER" atau tokens[index]["jenis"] == "FLOAT" atau tokens[index]["jenis"] == "STRING"
+            lah literal_kind = tokens[index]["jenis"]
+            lah literal_value = tokens[index]["nilai"]
+            njir literal_kind == "INTEGER"
+                literal_value = bilangan(literal_value)
+            kampret
+                njir literal_kind == "FLOAT"
+                    literal_value = desimal(literal_value)
+                selesai njir
+            selesai njir
+            balek {"status": "OK", "node": {"jenis": literal_kind, "nilai": literal_value}, "index": index + 1}
+        kampret
+            njir tokens[index]["jenis"] == "IDENT"
+                njir tokens[index]["nilai"] == "benar" atau tokens[index]["nilai"] == "salah"
+                    lah boolean_value = tokens[index]["nilai"] == "benar"
+                    balek {"status": "OK", "node": {"jenis": "BOOLEAN", "nilai": boolean_value}, "index": index + 1}
+                kampret
+                    njir tokens[index]["nilai"] == "bukan"
+                        lah hasil_bukan = parse_primary(tokens, index + 1)
+                        njir hasil_bukan["status"] != "OK"
+                            balek hasil_bukan
+                        kampret
+                            balek {"status": "OK", "node": {"jenis": "UNARY", "operator": "bukan", "nilai": hasil_bukan["node"]}, "index": hasil_bukan["index"]}
+                        selesai njir
+                    kampret
+                        njir index + 1 < panjang(tokens) dan tokens[index + 1]["jenis"] == "PUNCT" dan tokens[index + 1]["nilai"] == "("
+                            lah call_args = []
+                            lah call_index = index + 2
+                            njir call_index < panjang(tokens) dan bukan (tokens[call_index]["jenis"] == "PUNCT" dan tokens[call_index]["nilai"] == ")")
+                                lah arg_result = parse_expression(tokens, call_index)
+                                njir arg_result["status"] != "OK"
+                                    balek arg_result
+                                kampret
+                                    call_args = call_args + [arg_result["node"]]
+                                    call_index = arg_result["index"]
+                                    njir call_index < panjang(tokens) dan tokens[call_index]["jenis"] == "PUNCT" dan tokens[call_index]["nilai"] == ","
+                                        call_index = call_index + 1
+                                    selesai njir
+                                selesai njir
+                            selesai njir
+                            njir call_index >= panjang(tokens) atau tokens[call_index]["jenis"] != "PUNCT" atau tokens[call_index]["nilai"] != ")"
+                                balek node_gagal(call_index)
+                            kampret
+                                balek {"status": "OK", "node": {"jenis": "CALL", "nama": tokens[index]["nilai"], "args": call_args}, "index": call_index + 1}
+                            selesai njir
+                        kampret
+                            balek {"status": "OK", "node": {"jenis": "VARIABLE", "nama": tokens[index]["nilai"]}, "index": index + 1}
+                        selesai njir
+                    selesai njir
+                selesai njir
+            kampret
+                njir tokens[index]["jenis"] == "OP" dan tokens[index]["nilai"] == "-"
+                    lah hasil_negatif = parse_primary(tokens, index + 1)
+                    njir hasil_negatif["status"] != "OK"
+                        balek hasil_negatif
+                    kampret
+                        balek {"status": "OK", "node": {"jenis": "UNARY", "operator": "-", "nilai": hasil_negatif["node"]}, "index": hasil_negatif["index"]}
+                    selesai njir
+                kampret
+                    njir tokens[index]["jenis"] == "PUNCT" dan tokens[index]["nilai"] == "("
+                        lah hasil_dalam = parse_expression(tokens, index + 1)
+                        njir hasil_dalam["status"] != "OK"
+                            balek hasil_dalam
+                        kampret
+                            njir hasil_dalam["index"] >= panjang(tokens) atau tokens[hasil_dalam["index"]]["jenis"] != "PUNCT" atau tokens[hasil_dalam["index"]]["nilai"] != ")"
+                                balek node_gagal(hasil_dalam["index"])
+                            kampret
+                                balek {"status": "OK", "node": hasil_dalam["node"], "index": hasil_dalam["index"] + 1}
+                            selesai njir
+                        selesai njir
+                    kampret
+                        balek node_gagal(index)
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi parse_term(tokens, index)
+    lah kiri = parse_primary(tokens, index)
+    njir kiri["status"] != "OK"
+        balek kiri
+    kampret
+        lah lanjut = kiri["index"]
+        lah node = kiri["node"]
+        mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "OP" dan (tokens[lanjut]["nilai"] == "*" atau tokens[lanjut]["nilai"] == "/" atau tokens[lanjut]["nilai"] == "//" atau tokens[lanjut]["nilai"] == "%")
+            lah op = tokens[lanjut]["nilai"]
+            lah kanan = parse_primary(tokens, lanjut + 1)
+            njir kanan["status"] != "OK"
+                balek kanan
+            kampret
+                node = {"jenis": "BINARY", "operator": op, "kiri": node, "kanan": kanan["node"]}
+                lanjut = kanan["index"]
+            selesai njir
+        selesai mumet
+        balek {"status": "OK", "node": node, "index": lanjut}
+    selesai njir
+selesai fungsi
+
+fungsi parse_expression(tokens, index)
+    lah kiri = parse_term(tokens, index)
+    njir kiri["status"] != "OK"
+        balek kiri
+    kampret
+        lah lanjut = kiri["index"]
+        lah node = kiri["node"]
+        mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "OP" dan (tokens[lanjut]["nilai"] == "+" atau tokens[lanjut]["nilai"] == "-")
+            lah op = tokens[lanjut]["nilai"]
+            lah kanan = parse_term(tokens, lanjut + 1)
+            njir kanan["status"] != "OK"
+                balek kanan
+            kampret
+                node = {"jenis": "BINARY", "operator": op, "kiri": node, "kanan": kanan["node"]}
+                lanjut = kanan["index"]
+            selesai njir
+        selesai mumet
+        balek {"status": "OK", "node": node, "index": lanjut}
+    selesai njir
+selesai fungsi
+
+fungsi parse_comparison(tokens, index)
+    lah kiri = parse_expression(tokens, index)
+    njir kiri["status"] != "OK"
+        balek kiri
+    kampret
+        lah lanjut = kiri["index"]
+        lah node = kiri["node"]
+        mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "OP" dan (tokens[lanjut]["nilai"] == "==" atau tokens[lanjut]["nilai"] == "!=" atau tokens[lanjut]["nilai"] == "<" atau tokens[lanjut]["nilai"] == "<=" atau tokens[lanjut]["nilai"] == ">" atau tokens[lanjut]["nilai"] == ">=")
+            lah op = tokens[lanjut]["nilai"]
+            lah kanan = parse_expression(tokens, lanjut + 1)
+            njir kanan["status"] != "OK"
+                balek kanan
+            kampret
+                node = {"jenis": "BINARY", "operator": op, "kiri": node, "kanan": kanan["node"]}
+                lanjut = kanan["index"]
+            selesai njir
+        selesai mumet
+        balek {"status": "OK", "node": node, "index": lanjut}
+    selesai njir
+selesai fungsi
+
+fungsi parse_and(tokens, index)
+    lah kiri = parse_comparison(tokens, index)
+    njir kiri["status"] != "OK"
+        balek kiri
+    kampret
+        lah lanjut = kiri["index"]
+        lah node = kiri["node"]
+        mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "IDENT" dan tokens[lanjut]["nilai"] == "dan"
+            lah kanan = parse_comparison(tokens, lanjut + 1)
+            njir kanan["status"] != "OK"
+                balek kanan
+            kampret
+                node = {"jenis": "BINARY", "operator": "dan", "kiri": node, "kanan": kanan["node"]}
+                lanjut = kanan["index"]
+            selesai njir
+        selesai mumet
+        balek {"status": "OK", "node": node, "index": lanjut}
+    selesai njir
+selesai fungsi
+
+fungsi parse_or(tokens, index)
+    lah kiri = parse_and(tokens, index)
+    njir kiri["status"] != "OK"
+        balek kiri
+    kampret
+        lah lanjut = kiri["index"]
+        lah node = kiri["node"]
+        mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "IDENT" dan tokens[lanjut]["nilai"] == "atau"
+            lah kanan = parse_and(tokens, lanjut + 1)
+            njir kanan["status"] != "OK"
+                balek kanan
+            kampret
+                node = {"jenis": "BINARY", "operator": "atau", "kiri": node, "kanan": kanan["node"]}
+                lanjut = kanan["index"]
+            selesai njir
+        selesai mumet
+        balek {"status": "OK", "node": node, "index": lanjut}
+    selesai njir
+selesai fungsi
+
+fungsi parse_source(tokens)
+    lah hasil = parse_or(tokens, 0)
+    njir hasil["status"] != "OK"
+        balek hasil
+    kampret
+        njir hasil["index"] != panjang(tokens) - 1 atau tokens[hasil["index"]]["jenis"] != "EOF"
+            balek node_gagal(hasil["index"])
+        kampret
+            balek {"status": "OK", "node": hasil["node"]}
+        selesai njir
+    selesai njir
+selesai fungsi
+
+# Parser program bertahap: deklarasi, assignment, dan output per baris.
+# Grammar: program := (declaration | assignment | print_stmt | NEWLINE)* EOF
+# declaration := "lah" IDENT "=" expr
+# assignment := IDENT "=" expr; target harus sudah dideklarasikan saat runtime
+# print_stmt := "hedeh" expr
+fungsi parse_program_line(line_tokens)
+    njir panjang(line_tokens) == 0
+        balek {"status": "OK", "statement": salah}
+    kampret
+        lah mulai = 0
+        lah jenis_stmt = ""
+        lah nama_stmt = ""
+        njir line_tokens[0]["jenis"] != "IDENT"
+            balek node_gagal(0)
+        kampret
+            njir line_tokens[0]["nilai"] == "lah"
+                njir panjang(line_tokens) < 4 atau line_tokens[1]["jenis"] != "IDENT" atau line_tokens[2]["jenis"] != "OP" atau line_tokens[2]["nilai"] != "="
+                    balek node_gagal(0)
+                kampret
+                    jenis_stmt = "DECLARE"
+                    nama_stmt = line_tokens[1]["nilai"]
+                    mulai = 3
+                selesai njir
+            kampret
+                njir line_tokens[0]["nilai"] == "hedeh" atau line_tokens[0]["nilai"] == "bacot" atau line_tokens[0]["nilai"] == "bacrit" atau line_tokens[0]["nilai"] == "berak" atau line_tokens[0]["nilai"] == "berisik" atau line_tokens[0]["nilai"] == "cetak" atau line_tokens[0]["nilai"] == "crot" atau line_tokens[0]["nilai"] == "gas" atau line_tokens[0]["nilai"] == "gebber" atau line_tokens[0]["nilai"] == "gembor" atau line_tokens[0]["nilai"] == "jedor" atau line_tokens[0]["nilai"] == "jir" atau line_tokens[0]["nilai"] == "keluarin" atau line_tokens[0]["nilai"] == "koar" atau line_tokens[0]["nilai"] == "muncrat" atau line_tokens[0]["nilai"] == "ngegas" atau line_tokens[0]["nilai"] == "nyalak" atau line_tokens[0]["nilai"] == "omong" atau line_tokens[0]["nilai"] == "print" atau line_tokens[0]["nilai"] == "sembur" atau line_tokens[0]["nilai"] == "semprot" atau line_tokens[0]["nilai"] == "senggol" atau line_tokens[0]["nilai"] == "spill" atau line_tokens[0]["nilai"] == "suarakan" atau line_tokens[0]["nilai"] == "tampilkan" atau line_tokens[0]["nilai"] == "teriak"
+                    jenis_stmt = "PRINT"
+                    mulai = 1
+                kampret
+                    njir panjang(line_tokens) >= 3 dan line_tokens[0]["jenis"] == "IDENT" dan line_tokens[1]["jenis"] == "OP" dan line_tokens[1]["nilai"] == "="
+                        jenis_stmt = "ASSIGN"
+                        nama_stmt = line_tokens[0]["nilai"]
+                        mulai = 2
+                    kampret
+                        balek node_gagal(0)
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+        lah expr_tokens = []
+        lah i = mulai
+        mumet i < panjang(line_tokens)
+            expr_tokens = expr_tokens + [line_tokens[i]]
+            i = i + 1
+        selesai mumet
+        expr_tokens = expr_tokens + [{"jenis": "EOF", "nilai": "EOF"}]
+        lah hasil_expr = parse_source(expr_tokens)
+        njir hasil_expr["status"] != "OK"
+            balek hasil_expr
+        kampret
+            njir jenis_stmt == "DECLARE"
+                balek {"status": "OK", "statement": {"jenis": "DECLARE", "nama": nama_stmt, "nilai": hasil_expr["node"]}}
+            kampret
+                njir jenis_stmt == "ASSIGN"
+                    balek {"status": "OK", "statement": {"jenis": "ASSIGN", "nama": nama_stmt, "nilai": hasil_expr["node"]}}
+                kampret
+                    balek {"status": "OK", "statement": {"jenis": "PRINT", "nilai": hasil_expr["node"]}}
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi parse_program(tokens)
+    lah statements = []
+    lah line_tokens = []
+    lah i = 0
+    lah hasil_line = {}
+    mumet i < panjang(tokens)
+        njir tokens[i]["jenis"] == "NEWLINE" atau tokens[i]["jenis"] == "EOF"
+            hasil_line = parse_program_line(line_tokens)
+            njir hasil_line["status"] != "OK"
+                balek hasil_line
+            kampret
+                njir hasil_line["statement"] != salah
+                    statements = statements + [hasil_line["statement"]]
+                selesai njir
+            selesai njir
+            line_tokens = []
+            njir tokens[i]["jenis"] == "EOF"
+                balek {"status": "OK", "node": {"jenis": "PROGRAM", "statements": statements}}
+            selesai njir
+        kampret
+            njir tokens[i]["jenis"] == "STRING_ERROR" atau tokens[i]["jenis"] == "UNKNOWN"
+                balek node_gagal(i)
+            kampret
+                line_tokens = line_tokens + [tokens[i]]
+            selesai njir
+        selesai njir
+        i = i + 1
+    selesai mumet
+    balek node_gagal(i)
+selesai fungsi
+
+fungsi evaluasi(node, lingkungan)
+    njir node["jenis"] == "INTEGER" atau node["jenis"] == "FLOAT" atau node["jenis"] == "BOOLEAN" atau node["jenis"] == "STRING"
+        balek node["nilai"]
+    kampret
+        njir node["jenis"] == "VARIABLE"
+            balek lingkungan[node["nama"]]
+        kampret
+            njir node["jenis"] == "UNARY"
+                njir node["operator"] == "bukan"
+                    balek bukan evaluasi(node["nilai"], lingkungan)
+                kampret
+                    balek 0 - evaluasi(node["nilai"], lingkungan)
+                selesai njir
+            kampret
+                lah kiri = evaluasi(node["kiri"], lingkungan)
+                lah kanan = evaluasi(node["kanan"], lingkungan)
+                njir node["operator"] == "+"
+                    balek kiri + kanan
+                kampret
+                    njir node["operator"] == "-"
+                        balek kiri - kanan
+                    kampret
+                        njir node["operator"] == "*"
+                            balek kiri * kanan
+                        kampret
+                            njir node["operator"] == "=="
+                                balek kiri == kanan
+                            kampret
+                                njir node["operator"] == "!="
+                                    balek bukan (kiri == kanan)
+                                kampret
+                                    njir node["operator"] == "<"
+                                        balek kiri < kanan
+                                    kampret
+                                        njir node["operator"] == "<="
+                                            balek kiri <= kanan
+                                        kampret
+                                            njir node["operator"] == ">"
+                                                balek kiri > kanan
+                                            kampret
+                                                njir node["operator"] == ">="
+                                                    balek kiri >= kanan
+                                                kampret
+                                                    njir node["operator"] == "dan"
+                                                        balek kiri dan kanan
+                                                    kampret
+                                                        njir node["operator"] == "atau"
+                                                            balek kiri atau kanan
+                                                        kampret
+                                                            njir node["operator"] == "%"
+                                                                njir kanan == 0
+                                                                    balek "DIVISION_BY_ZERO"
+                                                                kampret
+                                                                    balek kiri % kanan
+                                                                selesai njir
+                                                            kampret
+                                                                njir kanan == 0
+                                                                    balek "DIVISION_BY_ZERO"
+                                                                kampret
+                                                                    njir node["operator"] == "//"
+                                                                        balek lantai(kiri / kanan)
+                                                                    kampret
+                                                                        balek kiri / kanan
+                                                                    selesai njir
+                                                                selesai njir
+                                                            selesai njir
+                                                        selesai njir
+                                                    selesai njir
+                                                selesai njir
+                                            selesai njir
+                                        selesai njir
+                                    selesai njir
+                                selesai njir
+                            selesai njir
+                        selesai njir
+                    selesai njir
+        selesai njir
+    selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi jalankan_program(program)
+    lah lingkungan = {}
+    lah nama_variabel = []
+    lah output = []
+    lah statements = program["statements"]
+    lah i = 0
+    lah j = 0
+    lah stmt = {}
+    lah nilai = 0
+    lah ketemu = salah
+    mumet i < panjang(statements)
+        stmt = statements[i]
+        nilai = evaluasi(stmt["nilai"], lingkungan)
+        njir stmt["jenis"] == "DECLARE"
+            lingkungan[stmt["nama"]] = nilai
+            nama_variabel = nama_variabel + [stmt["nama"]]
+        kampret
+            njir stmt["jenis"] == "ASSIGN"
+                ketemu = salah
+                j = 0
+                mumet j < panjang(nama_variabel)
+                    njir nama_variabel[j] == stmt["nama"]
+                        ketemu = benar
+                    selesai njir
+                    j = j + 1
+                selesai mumet
+                njir bukan ketemu
+                    balek {"status": "RUNTIME_ERROR_UNDECLARED_ASSIGNMENT", "nama": stmt["nama"], "output": output, "lingkungan": lingkungan}
+                selesai njir
+                lingkungan[stmt["nama"]] = nilai
+            kampret
+                output = output + [nilai]
+            selesai njir
+        selesai njir
+        i = i + 1
+    selesai mumet
+    balek {"status": "OK", "output": output, "lingkungan": lingkungan}
+selesai fungsi
+
+fungsi ir_quote(value)
+    lah result = "\""
+    lah i = 0
+    lah c = ""
+    mumet i < panjang(value)
+        c = value[i]
+        njir c == "\\"
+            result = result + "\\\\"
+        kampret
+            njir c == "\""
+                result = result + "\\\""
+            kampret
+                njir c == "\n"
+                    result = result + "\\n"
+                kampret
+                    njir c == "\r"
+                        result = result + "\\r"
+                    kampret
+                        njir c == "\t"
+                            result = result + "\\t"
+                        kampret
+                            result = result + c
+                        selesai njir
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+        i = i + 1
+    selesai mumet
+    balek result + "\""
+selesai fungsi
+
+fungsi ir_expr(node, line)
+    njir node["jenis"] == "INTEGER" atau node["jenis"] == "FLOAT" atau node["jenis"] == "BOOLEAN" atau node["jenis"] == "STRING"
+        lah encoded_value = teks(node["nilai"])
+        njir node["jenis"] == "STRING"
+            encoded_value = ir_quote(node["nilai"])
+        kampret
+            njir node["jenis"] == "BOOLEAN"
+                njir node["nilai"]
+                    encoded_value = "true"
+                kampret
+                    encoded_value = "false"
+                selesai njir
+            selesai njir
+        selesai njir
+        balek "{\"kind\":\"Literal\",\"line\":" + teks(line) + ",\"fields\":{\"value\":" + encoded_value + "}}"
+    kampret
+        njir node["jenis"] == "VARIABLE"
+            balek "{\"kind\":\"Variable\",\"line\":" + teks(line) + ",\"fields\":{\"name\":\"" + node["nama"] + "\"}}"
+        kampret
+            njir node["jenis"] == "CALL"
+                lah call_args_json = ""
+                lah call_arg_index = 0
+                mumet call_arg_index < panjang(node["args"])
+                    njir call_arg_index > 0
+                        call_args_json = call_args_json + ","
+                    selesai njir
+                    call_args_json = call_args_json + ir_expr(node["args"][call_arg_index], line)
+                    call_arg_index = call_arg_index + 1
+                selesai mumet
+                balek "{\"kind\":\"Call\",\"line\":" + teks(line) + ",\"fields\":{\"name\":\"" + node["nama"] + "\",\"args\":[" + call_args_json + "]}}"
+            kampret
+                njir node["jenis"] == "UNARY"
+                    balek "{\"kind\":\"Unary\",\"line\":" + teks(line) + ",\"fields\":{\"op\":\"" + node["operator"] + "\",\"value\":" + ir_expr(node["nilai"], line) + "}}"
+                kampret
+                    balek "{\"kind\":\"Binary\",\"line\":" + teks(line) + ",\"fields\":{\"left\":" + ir_expr(node["kiri"], line) + ",\"op\":\"" + node["operator"] + "\",\"right\":" + ir_expr(node["kanan"], line) + "}}"
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi ir_statement(stmt, line)
+    njir stmt["jenis"] == "DECLARE"
+        balek "{\"kind\":\"Declare\",\"line\":" + teks(line) + ",\"fields\":{\"name\":\"" + stmt["nama"] + "\",\"value\":" + ir_expr(stmt["nilai"], line) + "}}"
+    kampret
+        njir stmt["jenis"] == "ASSIGN"
+            balek "{\"kind\":\"Assign\",\"line\":" + teks(line) + ",\"fields\":{\"name\":\"" + stmt["nama"] + "\",\"value\":" + ir_expr(stmt["nilai"], line) + "}}"
+        kampret
+            balek "{\"kind\":\"Print\",\"line\":" + teks(line) + ",\"fields\":{\"value\":" + ir_expr(stmt["nilai"], line) + "}}"
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi ir_program(program)
+    lah body = ""
+    lah i = 0
+    lah root_line = 1
+    njir panjang(program["statements"]) > 0
+        root_line = 2
+    selesai njir
+    mumet i < panjang(program["statements"])
+        njir i > 0
+            body = body + ","
+        selesai njir
+        body = body + ir_statement(program["statements"][i], i + 2)
+        i = i + 1
+    selesai mumet
+    balek "{\"kind\":\"Program\",\"line\":" + teks(root_line) + ",\"fields\":{\"body\":[" + body + "]}}"
+selesai fungsi
+
+
+fungsi ir_map_expr(node, path, line)
+    lah result = ",{\"path\":\"" + path + "\",\"line\":" + teks(line) + "}"
+    njir node["jenis"] == "UNARY"
+        result = result + ir_map_expr(node["nilai"], path + ".fields.value", line)
+    kampret
+        njir node["jenis"] == "BINARY"
+            result = result + ir_map_expr(node["kiri"], path + ".fields.left", line)
+            result = result + ir_map_expr(node["kanan"], path + ".fields.right", line)
+        selesai njir
+    selesai njir
+    balek result
+selesai fungsi
+
+fungsi ir_map_statement(stmt, path, line)
+    balek ",{\"path\":\"" + path + "\",\"line\":" + teks(line) + "}" + ir_map_expr(stmt["nilai"], path + ".fields.value", line)
+selesai fungsi
+
+fungsi ir_source_map(program)
+    lah result = "{\"path\":\"$\",\"line\":"
+    lah root_line = 1
+    lah i = 0
+    njir panjang(program["statements"]) > 0
+        root_line = 2
+    selesai njir
+    result = result + teks(root_line) + "}"
+    mumet i < panjang(program["statements"])
+        result = result + ir_map_statement(program["statements"][i], "$.fields.body[" + teks(i) + "]", i + 2)
+        i = i + 1
+    selesai mumet
+    balek "[" + result + "]"
+selesai fungsi
+
+fungsi ir_collect_features(node, flags)
+    njir node["jenis"] == "PROGRAM"
+        lah i = 0
+        mumet i < panjang(node["statements"])
+            ir_collect_features(node["statements"][i], flags)
+            i = i + 1
+        selesai mumet
+    kampret
+        njir node["jenis"] == "DECLARE" atau node["jenis"] == "ASSIGN"
+            flags["variables"] = benar
+            ir_collect_features(node["nilai"], flags)
+        kampret
+            njir node["jenis"] == "PRINT"
+                flags["console-output"] = benar
+                ir_collect_features(node["nilai"], flags)
+            kampret
+                njir node["jenis"] == "BINARY" atau node["jenis"] == "UNARY"
+                    flags["operators"] = benar
+                    njir node["jenis"] == "UNARY"
+                        ir_collect_features(node["nilai"], flags)
+                    kampret
+                        ir_collect_features(node["kiri"], flags)
+                        ir_collect_features(node["kanan"], flags)
+                    selesai njir
+                kampret
+                    njir node["jenis"] == "VARIABLE"
+                        flags["variables"] = benar
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi ir_features(program)
+    lah flags = {"core": benar, "console-output": salah, "operators": salah, "variables": salah}
+    ir_collect_features(program, flags)
+    lah result = "["
+    njir flags["console-output"]
+        result = result + "\"console-output\","
+    selesai njir
+    result = result + "\"core\""
+    njir flags["operators"]
+        result = result + ",\"operators\""
+    selesai njir
+    njir flags["variables"]
+        result = result + ",\"variables\""
+    selesai njir
+    balek result + "]"
+selesai fungsi
+
+fungsi ir_document(program, source_name)
+    balek "{\"format\":\"pusingcuk-ir\",\"ir_version\":1,\"language_version\":\"0.6-dev\",\"source_name\":" + ir_quote(source_name) + ",\"features\":" + ir_features(program) + ",\"source_map\":" + ir_source_map(program) + ",\"program\":" + ir_program(program) + "}"
+selesai fungsi
+
 
 lah source = "lah x = 12 + 3"
 lah tokens = pindai(source)
