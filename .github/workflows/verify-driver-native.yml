@@ -23,7 +23,7 @@ jobs:
         run: |
           set -x
           python -m compiler --help
-          python -m compiler --target vm --emit-bytecode /tmp/driver_lexer.pvm examples/self_hosting/driver_lexer_minimal.cuk
+          python -m compiler --target vm -o /tmp/driver_lexer.pvm examples/self_hosting/driver_lexer_minimal.cuk
           echo "=== COMPILE RESULT ==="
           ls -lh /tmp/driver_lexer.pvm
           wc -c /tmp/driver_lexer.pvm
