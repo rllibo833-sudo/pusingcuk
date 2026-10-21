@@ -183,7 +183,16 @@ fungsi parse_primary(tokens, index)
                     lah boolean_value = tokens[index]["nilai"] == "benar"
                     balek {"status": "OK", "node": {"jenis": "BOOLEAN", "nilai": boolean_value}, "index": index + 1}
                 kampret
-                    balek {"status": "OK", "node": {"jenis": "VARIABLE", "nama": tokens[index]["nilai"]}, "index": index + 1}
+                    njir tokens[index]["nilai"] == "bukan"
+                        lah hasil_bukan = parse_primary(tokens, index + 1)
+                        njir hasil_bukan["status"] != "OK"
+                            balek hasil_bukan
+                        kampret
+                            balek {"status": "OK", "node": {"jenis": "UNARY", "operator": "bukan", "nilai": hasil_bukan["node"]}, "index": hasil_bukan["index"]}
+                        selesai njir
+                    kampret
+                        balek {"status": "OK", "node": {"jenis": "VARIABLE", "nama": tokens[index]["nilai"]}, "index": index + 1}
+                    selesai njir
                 selesai njir
             kampret
                 njir tokens[index]["jenis"] == "OP" dan tokens[index]["nilai"] == "-"
@@ -221,7 +230,7 @@ fungsi parse_term(tokens, index)
     kampret
         lah lanjut = kiri["index"]
         lah node = kiri["node"]
-        mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "OP" dan (tokens[lanjut]["nilai"] == "*" atau tokens[lanjut]["nilai"] == "/" atau tokens[lanjut]["nilai"] == "%")
+        mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "OP" dan (tokens[lanjut]["nilai"] == "*" atau tokens[lanjut]["nilai"] == "/" atau tokens[lanjut]["nilai"] == "//" atau tokens[lanjut]["nilai"] == "%")
             lah op = tokens[lanjut]["nilai"]
             lah kanan = parse_primary(tokens, lanjut + 1)
             njir kanan["status"] != "OK"
@@ -256,8 +265,69 @@ fungsi parse_expression(tokens, index)
     selesai njir
 selesai fungsi
 
+fungsi parse_comparison(tokens, index)
+    lah kiri = parse_expression(tokens, index)
+    njir kiri["status"] != "OK"
+        balek kiri
+    kampret
+        lah lanjut = kiri["index"]
+        lah node = kiri["node"]
+        mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "OP" dan (tokens[lanjut]["nilai"] == "==" atau tokens[lanjut]["nilai"] == "!=" atau tokens[lanjut]["nilai"] == "<" atau tokens[lanjut]["nilai"] == "<=" atau tokens[lanjut]["nilai"] == ">" atau tokens[lanjut]["nilai"] == ">=")
+            lah op = tokens[lanjut]["nilai"]
+            lah kanan = parse_expression(tokens, lanjut + 1)
+            njir kanan["status"] != "OK"
+                balek kanan
+            kampret
+                node = {"jenis": "BINARY", "operator": op, "kiri": node, "kanan": kanan["node"]}
+                lanjut = kanan["index"]
+            selesai njir
+        selesai mumet
+        balek {"status": "OK", "node": node, "index": lanjut}
+    selesai njir
+selesai fungsi
+
+fungsi parse_and(tokens, index)
+    lah kiri = parse_comparison(tokens, index)
+    njir kiri["status"] != "OK"
+        balek kiri
+    kampret
+        lah lanjut = kiri["index"]
+        lah node = kiri["node"]
+        mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "IDENT" dan tokens[lanjut]["nilai"] == "dan"
+            lah kanan = parse_comparison(tokens, lanjut + 1)
+            njir kanan["status"] != "OK"
+                balek kanan
+            kampret
+                node = {"jenis": "BINARY", "operator": "dan", "kiri": node, "kanan": kanan["node"]}
+                lanjut = kanan["index"]
+            selesai njir
+        selesai mumet
+        balek {"status": "OK", "node": node, "index": lanjut}
+    selesai njir
+selesai fungsi
+
+fungsi parse_or(tokens, index)
+    lah kiri = parse_and(tokens, index)
+    njir kiri["status"] != "OK"
+        balek kiri
+    kampret
+        lah lanjut = kiri["index"]
+        lah node = kiri["node"]
+        mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "IDENT" dan tokens[lanjut]["nilai"] == "atau"
+            lah kanan = parse_and(tokens, lanjut + 1)
+            njir kanan["status"] != "OK"
+                balek kanan
+            kampret
+                node = {"jenis": "BINARY", "operator": "atau", "kiri": node, "kanan": kanan["node"]}
+                lanjut = kanan["index"]
+            selesai njir
+        selesai mumet
+        balek {"status": "OK", "node": node, "index": lanjut}
+    selesai njir
+selesai fungsi
+
 fungsi parse_source(tokens)
-    lah hasil = parse_expression(tokens, 0)
+    lah hasil = parse_or(tokens, 0)
     njir hasil["status"] != "OK"
         balek hasil
     kampret
@@ -370,7 +440,11 @@ fungsi evaluasi(node, lingkungan)
             balek lingkungan[node["nama"]]
         kampret
             njir node["jenis"] == "UNARY"
-                balek 0 - evaluasi(node["nilai"], lingkungan)
+                njir node["operator"] == "bukan"
+                    balek bukan evaluasi(node["nilai"], lingkungan)
+                kampret
+                    balek 0 - evaluasi(node["nilai"], lingkungan)
+                selesai njir
             kampret
                 lah kiri = evaluasi(node["kiri"], lingkungan)
                 lah kanan = evaluasi(node["kanan"], lingkungan)
@@ -383,23 +457,57 @@ fungsi evaluasi(node, lingkungan)
                         njir node["operator"] == "*"
                             balek kiri * kanan
                         kampret
-                            njir node["operator"] == "%"
-                                njir kanan == 0
-                                    balek "DIVISION_BY_ZERO"
-                                kampret
-                                    balek kiri % kanan
-                                selesai njir
+                            njir node["operator"] == "=="
+                                balek jenis(kiri) == jenis(kanan) dan kiri == kanan
                             kampret
-                                njir kanan == 0
-                                    balek "DIVISION_BY_ZERO"
+                                njir node["operator"] == "!="
+                                    balek bukan (jenis(kiri) == jenis(kanan) dan kiri == kanan)
                                 kampret
-                                    balek kiri / kanan
+                                    njir node["operator"] == "<"
+                                        balek kiri < kanan
+                                    kampret
+                                        njir node["operator"] == "<="
+                                            balek kiri <= kanan
+                                        kampret
+                                            njir node["operator"] == ">"
+                                                balek kiri > kanan
+                                            kampret
+                                                njir node["operator"] == ">="
+                                                    balek kiri >= kanan
+                                                kampret
+                                                    njir node["operator"] == "dan"
+                                                        balek kiri dan kanan
+                                                    kampret
+                                                        njir node["operator"] == "atau"
+                                                            balek kiri atau kanan
+                                                        kampret
+                                                            njir node["operator"] == "%"
+                                                                njir kanan == 0
+                                                                    balek "DIVISION_BY_ZERO"
+                                                                kampret
+                                                                    balek kiri % kanan
+                                                                selesai njir
+                                                            kampret
+                                                                njir kanan == 0
+                                                                    balek "DIVISION_BY_ZERO"
+                                                                kampret
+                                                                    njir node["operator"] == "//"
+                                                                        balek lantai(kiri / kanan)
+                                                                    kampret
+                                                                        balek kiri / kanan
+                                                                    selesai njir
+                                                                selesai njir
+                                                            selesai njir
+                                                        selesai njir
+                                                    selesai njir
+                                                selesai njir
+                                            selesai njir
+                                        selesai njir
+                                    selesai njir
                                 selesai njir
                             selesai njir
                         selesai njir
                     selesai njir
-                selesai njir
-            selesai njir
         selesai njir
     selesai njir
 selesai fungsi
@@ -495,7 +603,7 @@ fungsi ir_expr(node, line)
             balek "{\"kind\":\"Variable\",\"line\":" + teks(line) + ",\"fields\":{\"name\":\"" + node["nama"] + "\"}}"
         kampret
             njir node["jenis"] == "UNARY"
-                balek "{\"kind\":\"Unary\",\"line\":" + teks(line) + ",\"fields\":{\"op\":\"-\",\"value\":" + ir_expr(node["nilai"], line) + "}}"
+                balek "{\"kind\":\"Unary\",\"line\":" + teks(line) + ",\"fields\":{\"op\":\"" + node["operator"] + "\",\"value\":" + ir_expr(node["nilai"], line) + "}}"
             kampret
                 balek "{\"kind\":\"Binary\",\"line\":" + teks(line) + ",\"fields\":{\"left\":" + ir_expr(node["kiri"], line) + ",\"op\":\"" + node["operator"] + "\",\"right\":" + ir_expr(node["kanan"], line) + "}}"
             selesai njir

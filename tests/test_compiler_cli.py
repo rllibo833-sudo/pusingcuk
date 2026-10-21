@@ -139,6 +139,15 @@ class MultiTargetCompilerTests(unittest.TestCase):
         self.assertEqual(emitted["source_map"], canonical["source_map"])
         self.assertEqual(emitted["program"], canonical["program"])
 
+    def test_self_hosted_frontend_supports_comparison_logic_and_floor_division(self):
+        from compiler.self_hosted_frontend import from_source as selfhost_from_source
+        source = "jancuk\nlah pembagian = 17 // 5\nlah cocok = pembagian == 3\nlah aktif = cocok dan bukan salah\nhedeh aktif\nselesai jancuk"
+        canonical = json.loads(compile_source(source, "operators.cuk", "json"))
+        emitted = selfhost_from_source(source, "operators.cuk")
+        self.assertEqual(emitted["program"], canonical["program"])
+        self.assertEqual(emitted["features"], canonical["features"])
+        self.assertEqual(emitted["source_map"], canonical["source_map"])
+
     def test_self_hosted_frontend_rejects_malformed_program(self):
         from compiler.self_hosted_frontend import SelfHostedFrontendError, from_source as selfhost_from_source
         with self.assertRaises(SelfHostedFrontendError):
