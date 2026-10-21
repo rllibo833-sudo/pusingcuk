@@ -110,7 +110,7 @@ For local AI development on Android, use Termux with Ollama running on the same 
 | Area | Purpose |
 |---|---|
 | Language core | Lexer, parser, AST, reference interpreter, specification, and semantic contract |
-| Compiler | IR and experimental JavaScript, Python, HTML, JSON IR, and VM targets |
+| Compiler | IR and experimental JavaScript, Python, Go (curated subset), HTML, JSON IR, and VM targets |
 | Native runtime | C implementation for a tested subset of the language |
 | Library and vocabulary | Built-ins, machine-readable contracts, keywords, and aliases |
 | Conformance | Tests and fixtures for explicitly supported targets |
