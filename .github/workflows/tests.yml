@@ -113,7 +113,8 @@ jobs:
           import tempfile
           from pathlib import Path
           from evaluator import capture
-          from compiler.ir import from_source, dumps
+          from compiler.ir import from_source as canonical_from_source, dumps
+          from compiler.self_hosted_frontend import from_source as self_hosted_from_source
           from compiler.bytecode import compile_ir
           from compiler.vm import VirtualMachine
 
@@ -126,8 +127,19 @@ jobs:
                   'hedeh isi\n'
               ) + "selesai jancuk\n"
               assert capture(source, project_root=root).strip() == "halo"
-              ir1 = from_source(source, "bootstrap_probe.cuk")
-              ir2 = from_source(source, "bootstrap_probe.cuk")
+              # Runtime API is checked above. Compiler path below uses the .cuk
+              # lexer/parser; ignore source locations when comparing AST semantics.
+              frontend_source = "lah nilai = (2 + 3) * 4\nhedeh nilai\n"
+              ir1 = self_hosted_from_source(frontend_source, "frontend_probe.cuk")
+              ir2 = self_hosted_from_source(frontend_source, "frontend_probe.cuk")
+              canonical_ir = canonical_from_source(frontend_source, "frontend_probe.cuk")
+              def without_locations(value):
+                  if isinstance(value, dict):
+                      return {key: without_locations(item) for key, item in value.items() if key != "line"}
+                  if isinstance(value, list):
+                      return [without_locations(item) for item in value]
+                  return value
+              assert without_locations(ir1["program"]) == without_locations(canonical_ir["program"]), "self-hosted frontend AST diverges from canonical parser"
               assert dumps(ir1) == dumps(ir2), "IR serialization is not deterministic"
               bytecode1 = compile_ir(ir1)
               bytecode2 = compile_ir(ir2)
