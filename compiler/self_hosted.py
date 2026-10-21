@@ -54,7 +54,7 @@ def main(argv=None) -> int:
             print(f"IR v{document['ir_version']} ditulis: {args.emit_ir}")
         elif args.emit_bytecode:
             Path(args.emit_bytecode).write_text(
-                json.dumps(bytecode, ensure_ascii=False, sort_keys=True, indent=2) + "\\n",
+                json.dumps(bytecode, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
                 encoding="utf-8",
             )
             print(f"Bytecode v{bytecode['bytecode_version']} ditulis: {args.emit_bytecode}")

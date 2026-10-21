@@ -18,88 +18,7 @@ MARKER = "lah contoh = "
 class SelfHostedFrontendError(ValueError):
     """The .cuk frontend rejected input or failed to emit its AST."""
 
-SERIALIZER = r'''
-fungsi ir_quote(value)
-    lah result = "\""
-    lah i = 0
-    lah c = ""
-    mumet i < panjang(value)
-        c = value[i]
-        njir c == "\\"
-            result = result + "\\\\"
-        kampret
-            njir c == "\""
-                result = result + "\\\""
-            kampret
-                njir c == "\n"
-                    result = result + "\\n"
-                kampret
-                    njir c == "\r"
-                        result = result + "\\r"
-                    kampret
-                        njir c == "\t"
-                            result = result + "\\t"
-                        kampret
-                            result = result + c
-                        selesai njir
-                    selesai njir
-                selesai njir
-            selesai njir
-        selesai njir
-        i = i + 1
-    selesai mumet
-    balek result + "\""
-selesai fungsi
 
-fungsi ir_expr(node, line)
-    njir node["jenis"] == "INTEGER" atau node["jenis"] == "STRING"
-        lah encoded_value = teks(node["nilai"])
-        njir node["jenis"] == "STRING"
-            encoded_value = ir_quote(node["nilai"])
-        selesai njir
-        balek "{\"kind\":\"Literal\",\"line\":" + teks(line) + ",\"fields\":{\"value\":" + encoded_value + "}}"
-    kampret
-        njir node["jenis"] == "VARIABLE"
-            balek "{\"kind\":\"Variable\",\"line\":" + teks(line) + ",\"fields\":{\"name\":\"" + node["nama"] + "\"}}"
-        kampret
-            njir node["jenis"] == "UNARY"
-                balek "{\"kind\":\"Unary\",\"line\":" + teks(line) + ",\"fields\":{\"op\":\"-\",\"value\":" + ir_expr(node["nilai"], line) + "}}"
-            kampret
-                balek "{\"kind\":\"Binary\",\"line\":" + teks(line) + ",\"fields\":{\"left\":" + ir_expr(node["kiri"], line) + ",\"op\":\"" + node["operator"] + "\",\"right\":" + ir_expr(node["kanan"], line) + "}}"
-            selesai njir
-        selesai njir
-    selesai njir
-selesai fungsi
-
-fungsi ir_statement(stmt, line)
-    njir stmt["jenis"] == "DECLARE"
-        balek "{\"kind\":\"Declare\",\"line\":" + teks(line) + ",\"fields\":{\"name\":\"" + stmt["nama"] + "\",\"value\":" + ir_expr(stmt["nilai"], line) + "}}"
-    kampret
-        njir stmt["jenis"] == "ASSIGN"
-            balek "{\"kind\":\"Assign\",\"line\":" + teks(line) + ",\"fields\":{\"name\":\"" + stmt["nama"] + "\",\"value\":" + ir_expr(stmt["nilai"], line) + "}}"
-        kampret
-            balek "{\"kind\":\"Print\",\"line\":" + teks(line) + ",\"fields\":{\"value\":" + ir_expr(stmt["nilai"], line) + "}}"
-        selesai njir
-    selesai njir
-selesai fungsi
-
-fungsi ir_program(program)
-    lah body = ""
-    lah i = 0
-    lah root_line = 1
-    njir panjang(program["statements"]) > 0
-        root_line = 2
-    selesai njir
-    mumet i < panjang(program["statements"])
-        njir i > 0
-            body = body + ","
-        selesai njir
-        body = body + ir_statement(program["statements"][i], i + 2)
-        i = i + 1
-    selesai mumet
-    balek "{\"kind\":\"Program\",\"line\":" + teks(root_line) + ",\"fields\":{\"body\":[" + body + "]}}"
-selesai fungsi
-'''
 
 def _frontend_script(source: str) -> str:
     if not isinstance(source, str) or not source.strip():
@@ -111,7 +30,7 @@ def _frontend_script(source: str) -> str:
         raise SelfHostedFrontendError(f"marker frontend tidak ditemukan: {MARKER!r}")
     prefix = original.split(MARKER, 1)[0]
     return (
-        prefix + SERIALIZER + "\nlah source_input = " + json.dumps(source, ensure_ascii=False)
+        prefix + "\nlah source_input = " + json.dumps(source, ensure_ascii=False)
         + '\nlah hasil_parse = parse_program(pindai(source_input))'
         + '\nnjir hasil_parse["status"] != "OK"'
         + '\n    hedeh "SELFHOST_PARSE_ERROR"'
