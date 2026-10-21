@@ -28,7 +28,7 @@ python program.py
 # HTML mandiri untuk browser; JavaScript disematkan
 python -m compiler program.pusingcuk --target html --output program.html
 
-# JSON IR untuk tooling, editor, dan integrasi AI
+\n# Rust untuk subset numerik mandiri\npython -m compiler program.cuk --target rust --output program.rs\nrustc program.rs -o program\n./program\n\n# JSON IR untuk tooling, editor, dan integrasi AI
 python -m compiler program.pusingcuk --target json --output program.ir.json
 
 # Bytecode VM portabel
