@@ -30,6 +30,35 @@ class SelfHostedFrontendError(ValueError):
     """The .cuk frontend rejected input or failed to emit its AST."""
 
 
+def _frontend_prefix() -> str:
+    original = FRONTEND_SOURCE.read_text(encoding="utf-8")
+    if MARKER not in original:
+        raise SelfHostedFrontendError(f"marker frontend tidak ditemukan: {MARKER!r}")
+    return original.split(MARKER, 1)[0]
+
+
+def frontend_driver_script() -> str:
+    """Return a reusable .cuk frontend that reads a JSON source payload from stdin."""
+    return _frontend_prefix() + '''
+lah input_payload_json = ""
+tanya input_payload_json ""
+lah input_payload = jadi_json(input_payload_json)
+njir input_payload == salah
+    hedeh "SELFHOST_INPUT_ERROR"
+kampret
+    lah ir_source_name = input_payload["source_name"]
+    lah source_input = input_payload["source"]
+    lah hasil_parse = parse_program(pindai(source_input))
+    njir hasil_parse["status"] != "OK"
+        hedeh "SELFHOST_PARSE_ERROR:" + teks(hasil_parse["index"])
+    kampret
+        hedeh ir_document(hasil_parse["node"], ir_source_name)
+    selesai njir
+selesai njir
+selesai jancuk
+'''
+
+
 def _frontend_script(source: str, source_name: str) -> str:
     if not isinstance(source, str) or not source.strip():
         raise SelfHostedFrontendError("source kosong")
@@ -37,10 +66,7 @@ def _frontend_script(source: str, source_name: str) -> str:
         raise SelfHostedFrontendError("source mengandung NUL")
     if len(source.encode("utf-8")) > MAX_SOURCE_BYTES:
         raise SelfHostedFrontendError(f"source melewati batas {MAX_SOURCE_BYTES} byte")
-    original = FRONTEND_SOURCE.read_text(encoding="utf-8")
-    if MARKER not in original:
-        raise SelfHostedFrontendError(f"marker frontend tidak ditemukan: {MARKER!r}")
-    prefix = original.split(MARKER, 1)[0]
+    prefix = _frontend_prefix()
     return (
         prefix + "\nlah ir_source_name = " + json.dumps(source_name, ensure_ascii=False)
         + "\nlah source_input = " + json.dumps(source, ensure_ascii=False)

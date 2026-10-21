@@ -8,15 +8,16 @@ Dokumen ini adalah satu-satunya handoff aktif menuju compiler .cuk mandiri. SPEC
 - compiler/self_hosted_frontend.py: menjalankan sumber compiler .cuk melalui `Evaluator` pada `evaluator.py`, mengambil JSON IR, lalu memvalidasinya dengan validator Python. Ini menghindari CLI/launcher tambahan, bukan menghilangkan host Python. Jalur ini tidak boleh fallback ke parser Python referensi.
 - compiler/ir.py: IR v1 kanonis beserta validator schema, path, source map dan feature.
 - compiler/bytecode.py + compiler/vm.py: backend bytecode dan VM Python untuk IR v1.
-- compiler/bootstrap.py: menjalankan build identik dua kali melalui fungsi frontend yang sama. Ini membuktikan reproduksibilitas pada host yang sama, belum compiler mandiri.
+- compiler/bootstrap.py: membandingkan dua jalur eksekusi frontend untuk source yang sama. Stage 1 berjalan melalui Python Evaluator; stage 2 menjalankan frontend .cuk yang dikompilasi menjadi bytecode PusingCuk dan dieksekusi oleh VM. IR, bytecode, dan output harus identik.
+- Batas stage 2 saat ini: driver frontend masih dibentuk memakai parser referensi Python dan dikompilasi oleh compiler bytecode Python. Runtime frontend sudah diuji di VM, tetapi proses membangun driver belum mandiri.
 
 ## Gate pembuktian
 
-1. tests/test_compiled_frontend_vm.py membandingkan IR frontend .cuk dengan parser referensi saat frontend mem-parsing compiler.cuk itu sendiri; tes terpisah mengirim collections/control flow ke VM.
-2. Setiap dokumen IR harus lolos compiler.ir.validate, termasuk feature terurut dan source_map yang mengikuti traversal node.
-3. Host Python dan backend Python disebutkan dengan jujur sampai bootstrap dua tahap benar-benar menjalankan artefak compiler tahap pertama sebagai compiler tahap kedua.
-4. Jangan mengubah kegagalan menjadi fallback; perbaiki parser/serializer .cuk atau catat batasan yang nyata.
-5. Gunakan runner konformansi, manifest dan tes yang sudah ada. Jangan membuat branch, PR, daemon, status report per-fitur, atau suite duplikat bila tes yang ada sudah menyatakan kontrak.
+1. tests/test_compiled_frontend_vm.py membandingkan IR frontend .cuk dengan parser referensi ketika frontend mem-parsing compiler.cuk itu sendiri; tes yang sama memastikan hasilnya dapat masuk ke bytecode VM.
+2. compiler.bootstrap membuktikan parity antara frontend .cuk yang dijalankan via Evaluator dan frontend yang dijalankan dari bytecode VM, untuk subset yang didukung.
+3. Setiap IR harus lolos compiler.ir.validate; source map, fitur, bytecode, dan output dibandingkan dari kedua jalur.
+4. Tahap berikutnya adalah membuat driver .cuk dapat menghasilkan compiler tahap berikutnya tanpa parser referensi atau compiler bytecode Python. Baru sesudah artefak hasil stage 1 menjalankan stage 2 dan lulus konformansi, status boleh disebut self-hosted penuh.
+5. Jangan mengubah kegagalan menjadi fallback. Gunakan manifest dan suite yang ada; jangan membuat branch, daemon, status report per-fitur, atau suite duplikat.
 
 ## Urutan kerja
 
