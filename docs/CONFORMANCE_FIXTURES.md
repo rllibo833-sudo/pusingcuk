@@ -19,6 +19,8 @@ Fixture mengikat empat sumber: spesifikasi bahasa, implementasi, dokumentasi, se
 
 Manifest aktif berada di `tests/conformance/manifest.json`. Setiap fixture mendefinisikan ID unik, sumber relatif di direktori fixture, profil, fitur yang diperlukan, hasil yang diharapkan, dan status runtime.
 
+Subset backend tambahan yang belum menjadi baseline reference/native dipisahkan secara eksplisit: `tests/conformance/go_manifest.json` memilih fixture untuk backend Go eksperimental. Fixture di luar daftar tersebut berstatus unsupported untuk Go, bukan dianggap lulus.
+
 Contoh kasus positif:
 
 ```json
