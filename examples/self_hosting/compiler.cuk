@@ -440,57 +440,113 @@ fungsi parse_program_line(line_tokens)
 selesai fungsi
 
 fungsi parse_program(tokens)
-    lah statements = []
+    lah program = {"jenis": "PROGRAM", "statements": []}
+    lah contexts = [program]
     lah line_tokens = []
     lah i = 0
     lah hasil_line = {}
-    lah in_function = salah
-    lah current_function = {}
+    lah current = {}
     lah function_params = []
     lah param_index = 0
+    lah expr_tokens = []
+    lah expr_index = 0
+    lah condition_result = {}
+    lah if_node = {}
     mumet i < panjang(tokens)
         njir tokens[i]["jenis"] == "NEWLINE" atau tokens[i]["jenis"] == "EOF"
             njir panjang(line_tokens) > 0
-                njir bukan in_function dan line_tokens[0]["nilai"] == "fungsi"
-                    njir panjang(line_tokens) < 4 atau line_tokens[1]["jenis"] != "IDENT" atau line_tokens[2]["nilai"] != "("
+                current = contexts[panjang(contexts) - 1]
+                njir line_tokens[0]["nilai"] == "kampret" dan panjang(line_tokens) == 1
+                    njir current["jenis"] != "IF" atau current["aktif_else"]
                         balek node_gagal(i)
                     selesai njir
-                    function_params = []
-                    param_index = 3
-                    mumet param_index < panjang(line_tokens) dan line_tokens[param_index]["nilai"] != ")"
-                        njir line_tokens[param_index]["jenis"] == "IDENT"
-                            function_params = function_params + [line_tokens[param_index]["nilai"]]
-                        kampret
-                            njir line_tokens[param_index]["nilai"] != ","
-                                balek node_gagal(i)
-                            selesai njir
-                        selesai njir
-                        param_index = param_index + 1
-                    selesai mumet
-                    njir param_index >= panjang(line_tokens) atau line_tokens[param_index]["nilai"] != ")"
-                        balek node_gagal(i)
-                    selesai njir
-                    current_function = {"jenis": "FUNCTION", "nama": line_tokens[1]["nilai"], "params": function_params, "body": []}
-                    in_function = benar
+                    current["aktif_else"] = benar
                 kampret
-                    njir in_function dan panjang(line_tokens) >= 2 dan line_tokens[0]["nilai"] == "selesai" dan line_tokens[1]["nilai"] == "fungsi"
-                        statements = statements + [current_function]
-                        current_function = {}
-                        in_function = salah
+                    njir panjang(line_tokens) >= 2 and line_tokens[0]["nilai"] == "selesai" and line_tokens[1]["nilai"] == "njir"
+                        njir current["jenis"] != "IF"
+                            balek node_gagal(i)
+                        selesai njir
+                        contexts = contexts[:panjang(contexts) - 1]
                     kampret
-                        njir in_function
-                            hasil_line = parse_program_line(line_tokens)
-                            njir hasil_line["status"] != "OK" atau hasil_line["statement"] == salah
+                        njir panjang(line_tokens) >= 2 and line_tokens[0]["nilai"] == "selesai" and line_tokens[1]["nilai"] == "fungsi"
+                            njir current["jenis"] != "FUNCTION" atau panjang(contexts) != 2
                                 balek node_gagal(i)
                             selesai njir
-                            current_function["body"] = current_function["body"] + [hasil_line["statement"]]
+                            contexts = contexts[:panjang(contexts) - 1]
+                            program["statements"] = program["statements"] + [current]
                         kampret
-                            hasil_line = parse_program_line(line_tokens)
-                            njir hasil_line["status"] != "OK"
-                                balek hasil_line
+                            njir panjang(contexts) == 1 dan line_tokens[0]["nilai"] == "fungsi"
+                                njir panjang(line_tokens) < 4 atau line_tokens[1]["jenis"] != "IDENT" atau line_tokens[2]["nilai"] != "("
+                                    balek node_gagal(i)
+                                selesai njir
+                                function_params = []
+                                param_index = 3
+                                mumet param_index < panjang(line_tokens) dan line_tokens[param_index]["nilai"] != ")"
+                                    njir line_tokens[param_index]["jenis"] == "IDENT"
+                                        function_params = function_params + [line_tokens[param_index]["nilai"]]
+                                    kampret
+                                        njir line_tokens[param_index]["nilai"] != ","
+                                            balek node_gagal(i)
+                                        selesai njir
+                                    selesai njir
+                                    param_index = param_index + 1
+                                selesai mumet
+                                njir param_index >= panjang(line_tokens) atau line_tokens[param_index]["nilai"] != ")" atau param_index + 1 != panjang(line_tokens)
+                                    balek node_gagal(i)
+                                selesai njir
+                                contexts = contexts + [{"jenis": "FUNCTION", "nama": line_tokens[1]["nilai"], "params": function_params, "body": []}]
                             kampret
-                                njir hasil_line["statement"] != salah
-                                    statements = statements + [hasil_line["statement"]]
+                                njir line_tokens[0]["nilai"] == "njir"
+                                    expr_tokens = []
+                                    expr_index = 1
+                                    mumet expr_index < panjang(line_tokens)
+                                        expr_tokens = expr_tokens + [line_tokens[expr_index]]
+                                        expr_index = expr_index + 1
+                                    selesai mumet
+                                    expr_tokens = expr_tokens + [{"jenis": "EOF", "nilai": "EOF"}]
+                                    condition_result = parse_source(expr_tokens)
+                                    njir condition_result["status"] != "OK"
+                                        balek node_gagal(i)
+                                    selesai njir
+                                    if_node = {"jenis": "IF", "condition": condition_result["node"], "then_body": [], "else_body": [], "aktif_else": salah}
+                                    current = contexts[panjang(contexts) - 1]
+                                    njir current["jenis"] == "PROGRAM"
+                                        current["statements"] = current["statements"] + [if_node]
+                                    kampret
+                                        njir current["jenis"] == "FUNCTION"
+                                            current["body"] = current["body"] + [if_node]
+                                        kampret
+                                            njir current["jenis"] == "IF"
+                                                njir current["aktif_else"]
+                                                    current["else_body"] = current["else_body"] + [if_node]
+                                                kampret
+                                                    current["then_body"] = current["then_body"] + [if_node]
+                                                selesai njir
+                                            selesai njir
+                                        selesai njir
+                                    selesai njir
+                                    contexts = contexts + [if_node]
+                                kampret
+                                    hasil_line = parse_program_line(line_tokens)
+                                    njir hasil_line["status"] != "OK" atau hasil_line["statement"] == salah
+                                        balek node_gagal(i)
+                                    selesai njir
+                                    current = contexts[panjang(contexts) - 1]
+                                    njir current["jenis"] == "PROGRAM"
+                                        current["statements"] = current["statements"] + [hasil_line["statement"]]
+                                    kampret
+                                        njir current["jenis"] == "FUNCTION"
+                                            current["body"] = current["body"] + [hasil_line["statement"]]
+                                        kampret
+                                            njir current["jenis"] == "IF"
+                                                njir current["aktif_else"]
+                                                    current["else_body"] = current["else_body"] + [hasil_line["statement"]]
+                                                kampret
+                                                    current["then_body"] = current["then_body"] + [hasil_line["statement"]]
+                                                selesai njir
+                                            selesai njir
+                                        selesai njir
+                                    selesai njir
                                 selesai njir
                             selesai njir
                         selesai njir
@@ -499,10 +555,10 @@ fungsi parse_program(tokens)
             selesai njir
             line_tokens = []
             njir tokens[i]["jenis"] == "EOF"
-                njir in_function
+                njir panjang(contexts) != 1
                     balek node_gagal(i)
                 selesai njir
-                balek {"status": "OK", "node": {"jenis": "PROGRAM", "statements": statements}}
+                balek {"status": "OK", "node": program}
             selesai njir
         kampret
             njir bukan (tokens[i]["jenis"] == "STRING_ERROR" atau tokens[i]["jenis"] == "UNKNOWN")
