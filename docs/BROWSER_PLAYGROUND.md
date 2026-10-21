@@ -11,8 +11,13 @@ The GitHub Pages playground is an in-browser execution target implemented in `si
 
 ## Explicit limitations
 
-The browser runtime is intentionally a separate, capability-limited target, not a claim of full parity with the Python reference interpreter. Interactive `tanya` input, filesystem access, imports, shell commands, and network built-ins are unavailable. Execution is bounded by source size, interpreter steps, recursion depth, collection size, and output size. Unsupported behavior raises a visible error rather than executing host JavaScript.
+The browser runtime is intentionally a separate, capability-limited target, not a claim of full parity with the Python reference interpreter. Interactive `tanya` input, filesystem access, imports, shell commands, and network built-ins are unavailable. Execution is bounded by source size (64 KiB), interpreter steps (50,000), recursion depth (100), collection/iteration size (10,000 items), and output size (64 KiB). Some limits apply to specific operations: for example, loops and generated collections have their own item caps. Unsupported behavior raises a visible error rather than executing host JavaScript.
 
 ## Verification
 
-`node tests/test_browser_runtime.js` runs every curated gallery program and compares output with the checked-in expected output, then exercises arithmetic, short-circuiting, nested JSON, escaping, invalid input, loop limits, and the no-host-eval boundary. The Pages workflow runs this suite before publishing.
+Run these commands from the repository root:
+
+- `node tests/test_browser_runtime.js` — executes every curated gallery program against its expected output and covers arithmetic edge cases, short-circuiting, nested JSON, HTML/CSV escaping, functions, mutable indexes, iteration, exception handling, malformed syntax, invalid JSON, host-code isolation, and resource limits.
+- `node tests/test_browser_playground.js` — exercises the actual inline playground controller with a small DOM harness: initial execution, Run button, runtime diagnostics, Ctrl+Enter, clear output, successful example loading, and preservation of editor contents after a failed example fetch.
+
+The Pages workflow runs both suites, in addition to checking the reference interpreter and compiled examples, before publishing. These tests cover the supported browser subset and editor integration; they do not establish full language parity or replace a real-device/browser compatibility matrix.
