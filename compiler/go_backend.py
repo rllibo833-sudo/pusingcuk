@@ -419,6 +419,7 @@ class GoBackend:
             function_code.append(f'func pcFn_{name}(args []any, closure *PCEnv, callLine int) any {{')
             function_code.append(f'    if len(args) != {len(params)} {{ pcFail(callLine, {json.dumps(name + "() membutuhkan " + str(len(params)) + " argumen")}) }}')
             function_code.append('    env := pcNewEnv(closure)')
+            function_code.append('    _ = env')
             for i, param in enumerate(params):
                 function_code.append(f'    env.define({json.dumps(param)}, args[{i}], callLine)')
             function_code.extend(self.block(fields["body"], "    ", True))
