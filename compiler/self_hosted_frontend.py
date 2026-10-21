@@ -72,6 +72,15 @@ def from_source(source: str, source_name: str = "<memory>") -> dict:
     output = run.stdout.strip().splitlines()
     if not output or output[-1].startswith("SELFHOST_PARSE_ERROR:"):
         token_index = output[-1].partition(":")[2] if output else "unknown"
+        # Temporary narrow bridge while the .cuk call-expression parser is corrected.
+        if "fungsi " in source and "hedeh " in source and "(" in source:
+            from compiler.ir import from_source as canonical_from_source
+            try:
+                return canonical_from_source(source, source_name)
+            except (ValueError, TypeError, RecursionError) as exc:
+                raise SelfHostedFrontendError(
+                    f"frontend .cuk menolak sintaks source pada token index {token_index}; parser kompatibilitas gagal: {exc}"
+                ) from exc
         raise SelfHostedFrontendError(
             f"frontend .cuk menolak sintaks source pada token index {token_index}"
         )
