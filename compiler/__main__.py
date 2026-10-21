@@ -42,20 +42,8 @@ def compile_source(
         from compiler.rust_backend import generate
         return generate(document)
     if target == "html":
-        from compiler.js_backend import generate
-        javascript = generate(document)
-        return (
-            '<!doctype html>\n<html lang="id">\n<head><meta charset="utf-8">'
-            '<meta name="viewport" content="width=device-width, initial-scale=1">'
-            '<title>PusingCuk</title></head>\n<body><pre id="pc-output"></pre>\n'
-            '<script>\n'
-            'const pcOutput = document.getElementById("pc-output");\n'
-            'const console = {log: (...args) => { pcOutput.textContent += args.join(" ") + "\\n"; }, '
-            'error: (...args) => { globalThis.console.error(...args); }};\n'
-            'const process = {exitCode: 0};\n'
-            + javascript
-            + '\n</script>\n</body>\n</html>\n'
-        )
+        from compiler.html_backend import generate
+        return generate(document)
     raise ValueError(f"target tidak dikenal: {target}")
 
 
