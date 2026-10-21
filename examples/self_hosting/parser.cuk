@@ -26,7 +26,7 @@ fungsi parse_source_expression(tokens)
             njir tokens[1]["nilai"] != "+" dan tokens[1]["nilai"] != "-" dan tokens[1]["nilai"] != "*" dan tokens[1]["nilai"] != "/"
                 balek {"status": "PARSE_ERROR", "alasan": "OPERATOR_TIDAK_DIDUKUNG"}
             kampret
-                balek {"status": "OK", "jenis": "BINARY", "kiri": angka(tokens[0]["nilai"]), "operator": tokens[1]["nilai"], "kanan": angka(tokens[2]["nilai"])}
+                balek {"status": "OK", "jenis": "BINARY", "kiri": bilangan(tokens[0]["nilai"]), "operator": tokens[1]["nilai"], "kanan": bilangan(tokens[2]["nilai"])}
             selesai njir
         selesai njir
     selesai njir

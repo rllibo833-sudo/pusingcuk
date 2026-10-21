@@ -47,7 +47,7 @@ Let a person describe an application in ordinary language, produce a supported `
 ### M2A — Self-hosting language tools
 
 - Treat `examples/self_hosting/` as small, executable experiments, not proof that PusingCuk can compile itself.
-- Grow the stages in order: token scanning from source text, parser and AST, evaluator/VM, stable IR, then code generation. The current `source_lexer.cuk` scans only a documented subset; it is not yet equivalent to `lexer.py`.
+- Grow the stages in order: token scanning from source text, parser and AST, evaluator/VM, stable IR, then code generation. `source_lexer.cuk` scans a documented subset, and `parser.cuk` accepts structured lexer tokens for one `INTEGER OP INTEGER EOF` expression. Neither is equivalent to the full reference frontend.
 - Keep each stage runnable and covered by expected-output tests in the reference runtime before attempting cross-runtime parity.
 - Add explicit module/import support and a stable host/runtime interface before splitting the compiler into reusable `.cuk` modules.
 - Prove self-hosting only with a repeatable bootstrap: a trusted existing toolchain builds the `.cuk` compiler, and that compiler rebuilds itself with equivalent verified output.
