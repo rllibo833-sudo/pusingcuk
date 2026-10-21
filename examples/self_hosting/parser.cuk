@@ -1,0 +1,22 @@
+# Prototipe parser untuk token yang sudah dipisahkan: nilai operator nilai.
+# Parser ini sengaja hanya menerima bentuk tiga token, bukan grammar penuh.
+jancuk
+
+fungsi parse_aritmetika(token)
+    njir panjang(token) != 3
+        balek {"status": "PARSE_ERROR", "alasan": "BUTUH_TIGA_TOKEN"}
+    kampret
+        njir token[1] != "+" dan token[1] != "-" dan token[1] != "*" dan token[1] != "/"
+            balek {"status": "PARSE_ERROR", "alasan": "OPERATOR_TIDAK_DIDUKUNG"}
+        kampret
+            balek {"status": "OK", "jenis": "BINARY", "kiri": token[0], "operator": token[1], "kanan": token[2]}
+        selesai njir
+    selesai njir
+selesai fungsi
+
+lah hasil = parse_aritmetika([7, "+", 35])
+hedeh hasil["status"]
+hedeh hasil["kiri"]
+hedeh hasil["operator"]
+hedeh hasil["kanan"]
+selesai jancuk
