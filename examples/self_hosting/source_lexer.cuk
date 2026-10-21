@@ -59,7 +59,19 @@ fungsi pindai(source)
                                 i = i + 1
                             kampret
                                 njir source[i] == "\\" dan i + 1 < n
-                                    nilai = nilai + source[i] + source[i + 1]
+                                    njir source[i + 1] == "n"
+                                        nilai = nilai + "\\n"
+                                    kampret
+                                        njir source[i + 1] == "t"
+                                            nilai = nilai + "\\t"
+                                        kampret
+                                            njir source[i + 1] == "r"
+                                                nilai = nilai + "\\r"
+                                            kampret
+                                                nilai = nilai + source[i] + source[i + 1]
+                                            selesai njir
+                                        selesai njir
+                                    selesai njir
                                     i = i + 2
                                 kampret
                                     nilai = nilai + source[i]
@@ -138,7 +150,10 @@ fungsi parse_primary(tokens, index)
         njir tokens[index]["jenis"] == "INTEGER"
             balek {"status": "OK", "node": {"jenis": "INTEGER", "nilai": bilangan(tokens[index]["nilai"])}, "index": index + 1}
         kampret
-            njir tokens[index]["jenis"] == "IDENT"
+            njir tokens[index]["jenis"] == "STRING"
+                balek {"status": "OK", "node": {"jenis": "STRING", "nilai": tokens[index]["nilai"]}, "index": index + 1}
+            kampret
+                njir tokens[index]["jenis"] == "IDENT"
                 balek {"status": "OK", "node": {"jenis": "VARIABLE", "nama": tokens[index]["nilai"]}, "index": index + 1}
             kampret
                 njir tokens[index]["jenis"] == "OP" dan tokens[index]["nilai"] == "-"
