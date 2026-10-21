@@ -532,6 +532,95 @@ fungsi ir_program(program)
     balek "{\"kind\":\"Program\",\"line\":" + teks(root_line) + ",\"fields\":{\"body\":[" + body + "]}}"
 selesai fungsi
 
+
+fungsi ir_map_expr(node, path, line)
+    lah result = ",{\"path\":\"" + path + "\",\"line\":" + teks(line) + "}"
+    njir node["jenis"] == "UNARY"
+        result = result + ir_map_expr(node["nilai"], path + ".fields.value", line)
+    kampret
+        njir node["jenis"] == "BINARY"
+            result = result + ir_map_expr(node["kiri"], path + ".fields.left", line)
+            result = result + ir_map_expr(node["kanan"], path + ".fields.right", line)
+        selesai njir
+    selesai njir
+    balek result
+selesai fungsi
+
+fungsi ir_map_statement(stmt, path, line)
+    balek ",{\"path\":\"" + path + "\",\"line\":" + teks(line) + "}" + ir_map_expr(stmt["nilai"], path + ".fields.value", line)
+selesai fungsi
+
+fungsi ir_source_map(program)
+    lah result = "{\"path\":\"$\",\"line\":"
+    lah root_line = 1
+    lah i = 0
+    njir panjang(program["statements"]) > 0
+        root_line = 2
+    selesai njir
+    result = result + teks(root_line) + "}"
+    mumet i < panjang(program["statements"])
+        result = result + ir_map_statement(program["statements"][i], "$.fields.body[" + teks(i) + "]", i + 2)
+        i = i + 1
+    selesai mumet
+    balek "[" + result + "]"
+selesai fungsi
+
+fungsi ir_collect_features(node, flags)
+    njir node["jenis"] == "PROGRAM"
+        lah i = 0
+        mumet i < panjang(node["statements"])
+            ir_collect_features(node["statements"][i], flags)
+            i = i + 1
+        selesai mumet
+    kampret
+        njir node["jenis"] == "DECLARE" atau node["jenis"] == "ASSIGN"
+            flags["variables"] = benar
+            ir_collect_features(node["nilai"], flags)
+        kampret
+            njir node["jenis"] == "PRINT"
+                flags["console-output"] = benar
+                ir_collect_features(node["nilai"], flags)
+            kampret
+                njir node["jenis"] == "BINARY" atau node["jenis"] == "UNARY"
+                    flags["operators"] = benar
+                    njir node["jenis"] == "UNARY"
+                        ir_collect_features(node["nilai"], flags)
+                    kampret
+                        ir_collect_features(node["kiri"], flags)
+                        ir_collect_features(node["kanan"], flags)
+                    selesai njir
+                kampret
+                    njir node["jenis"] == "VARIABLE"
+                        flags["variables"] = benar
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi ir_features(program)
+    lah flags = {"core": benar, "console-output": salah, "operators": salah, "variables": salah}
+    ir_collect_features(program, flags)
+    lah result = "["
+    njir flags["console-output"]
+        result = result + "\"console-output\","
+    selesai njir
+    result = result + "\"core\""
+    njir flags["operators"]
+        result = result + ",\"operators\""
+    selesai njir
+    njir flags["variables"]
+        result = result + ",\"variables\""
+    selesai njir
+    balek result + "]"
+selesai fungsi
+
+fungsi ir_document(program, source_name)
+    balek "{\"format\":\"pusingcuk-ir\",\"ir_version\":1,\"language_version\":\"0.6-dev\",\"source_name\":" + ir_quote(source_name) + ",\"features\":" + ir_features(program) + ",\"source_map\":" + ir_source_map(program) + ",\"program\":" + ir_program(program) + "}"
+selesai fungsi
+
+
 lah contoh = "lah x = 12 + 3\nhedeh x # komentar\n"
 render_tokens(pindai(contoh))
 

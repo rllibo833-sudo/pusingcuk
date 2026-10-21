@@ -126,6 +126,19 @@ class MultiTargetCompilerTests(unittest.TestCase):
         ]
         self.assertEqual(values, [True, False])
 
+    def test_self_hosted_frontend_emits_its_own_ir_envelope(self):
+        from compiler.self_hosted_frontend import from_source as selfhost_from_source
+        source = "jancuk\nlah x = 2 + 3\nhedeh x\nselesai jancuk"
+        canonical = json.loads(compile_source(source, "envelope.cuk", "json"))
+        emitted = selfhost_from_source(source, "envelope.cuk")
+        self.assertEqual(emitted["format"], canonical["format"])
+        self.assertEqual(emitted["ir_version"], canonical["ir_version"])
+        self.assertEqual(emitted["language_version"], canonical["language_version"])
+        self.assertEqual(emitted["source_name"], canonical["source_name"])
+        self.assertEqual(emitted["features"], canonical["features"])
+        self.assertEqual(emitted["source_map"], canonical["source_map"])
+        self.assertEqual(emitted["program"], canonical["program"])
+
     def test_self_hosted_frontend_rejects_malformed_program(self):
         from compiler.self_hosted_frontend import SelfHostedFrontendError, from_source as selfhost_from_source
         with self.assertRaises(SelfHostedFrontendError):

@@ -1,7 +1,7 @@
-"""Self-hosted .cuk frontend bridge for the currently implemented statement subset.
+"""Run the .cuk-authored frontend and validate its emitted canonical IR v1 artifact.
 
-The lexer/parser grammar lives in examples/self_hosting/source_lexer.cuk.
-It emits AST JSON, which is wrapped in canonical, validated IR v1 for existing backends.
+The .cuk source owns tokenization, parsing, AST construction, and IR serialization.
+Python is only the current execution host and IR validator; it does not parse source.
 """
 from __future__ import annotations
 import json
@@ -9,7 +9,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from compiler.ir import FORMAT, IR_VERSION, LANGUAGE_VERSION, _collect_node_locations, _features, validate
+from compiler.ir import validate
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_SOURCE = ROOT / "examples" / "self_hosting" / "source_lexer.cuk"
@@ -20,7 +20,7 @@ class SelfHostedFrontendError(ValueError):
 
 
 
-def _frontend_script(source: str) -> str:
+def _frontend_script(source: str, source_name: str) -> str:
     if not isinstance(source, str) or not source.strip():
         raise SelfHostedFrontendError("source kosong")
     if "\x00" in source:
@@ -30,12 +30,13 @@ def _frontend_script(source: str) -> str:
         raise SelfHostedFrontendError(f"marker frontend tidak ditemukan: {MARKER!r}")
     prefix = original.split(MARKER, 1)[0]
     return (
-        prefix + "\nlah source_input = " + json.dumps(source, ensure_ascii=False)
+        prefix + "\nlah ir_source_name = " + json.dumps(source_name, ensure_ascii=False)
+        + "\nlah source_input = " + json.dumps(source, ensure_ascii=False)
         + '\nlah hasil_parse = parse_program(pindai(source_input))'
         + '\nnjir hasil_parse["status"] != "OK"'
         + '\n    hedeh "SELFHOST_PARSE_ERROR"'
         + '\nkampret'
-        + '\n    hedeh ir_program(hasil_parse["node"])'
+        + '\n    hedeh ir_document(hasil_parse["node"], ir_source_name)'
         + '\nselesai njir\nselesai jancuk\n'
     )
 
@@ -46,7 +47,8 @@ def from_source(source: str, source_name: str = "<memory>") -> dict:
     # The staged parser handles statements, not the outer program delimiters.
     # Normalize those delimiters before passing source into the .cuk parser.
     source = "\n".join(line for line in source.splitlines() if line.strip() not in {"jancuk", "selesai jancuk"})
-    script = _frontend_script(source)
+    normalized_name = Path(source_name.replace(chr(92), "/")).name if source_name != "<memory>" else source_name
+    script = _frontend_script(source, normalized_name)
     with tempfile.TemporaryDirectory(prefix=".cuk-selfhost-", dir=ROOT) as tmp:
         path = Path(tmp) / "frontend_input.cuk"
         path.write_text(script, encoding="utf-8")
@@ -60,15 +62,10 @@ def from_source(source: str, source_name: str = "<memory>") -> dict:
     if not output or output[-1] == "SELFHOST_PARSE_ERROR":
         raise SelfHostedFrontendError("frontend .cuk menolak sintaks source")
     try:
-        program = json.loads(output[-1])
+        document = json.loads(output[-1])
     except json.JSONDecodeError as exc:
-        raise SelfHostedFrontendError("frontend .cuk menghasilkan AST bukan JSON valid") from exc
-    if not isinstance(program, dict) or program.get("kind") != "Program":
-        raise SelfHostedFrontendError("frontend .cuk tidak menghasilkan node Program")
-    document = {
-        "format": FORMAT, "ir_version": IR_VERSION, "language_version": LANGUAGE_VERSION,
-        "source_name": Path(source_name.replace(chr(92), "/")).name if source_name != "<memory>" else source_name,
-        "features": _features(program), "source_map": _collect_node_locations(program), "program": program,
-    }
+        raise SelfHostedFrontendError("frontend .cuk menghasilkan IR bukan JSON valid") from exc
+    if not isinstance(document, dict) or not isinstance(document.get("program"), dict) or document["program"].get("kind") != "Program":
+        raise SelfHostedFrontendError("frontend .cuk tidak menghasilkan dokumen IR v1")
     validate(document)
     return document
