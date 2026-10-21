@@ -1,0 +1,202 @@
+# Lexer source nyata untuk subset bahasa .cuk.
+# Dukungan: identifier ASCII, integer, string sederhana, operator,
+# tanda baca, komentar #, newline, dan EOF.
+# Dukungan string: escape newline/tab/CR, kutip, dan backslash; angka pecahan/eksponen belum didukung.
+jancuk
+
+fungsi huruf(c)
+    balek (c >= "a" dan c <= "z") atau (c >= "A" dan c <= "Z") atau c == "_"
+selesai fungsi
+
+fungsi digit(c)
+    balek c >= "0" dan c <= "9"
+selesai fungsi
+
+fungsi bagian_nama(c)
+    balek huruf(c) atau digit(c)
+selesai fungsi
+
+fungsi operator(c)
+    balek c == "+" atau c == "-" atau c == "*" atau c == "/" atau c == "%" atau c == "=" atau c == "<" atau c == ">" atau c == "!"
+selesai fungsi
+
+fungsi tanda(c)
+    balek c == "(" atau c == ")" atau c == "[" atau c == "]" atau c == "{" atau c == "}" atau c == "," atau c == ":" atau c == "."
+selesai fungsi
+
+fungsi pindai(source)
+    lah tokens = []
+    lah i = 0
+    lah n = panjang(source)
+    lah c = ""
+    lah kutip = ""
+    lah nilai = ""
+    lah tertutup = salah
+    lah jenis_angka = "INTEGER"
+
+    mumet i < n
+        c = source[i]
+
+        njir c == " " atau c == "\t" atau c == "\r"
+            i = i + 1
+        kampret
+            njir c == "\n"
+                tokens = tokens + [{"jenis": "NEWLINE", "nilai": "NEWLINE"}]
+                i = i + 1
+            kampret
+                njir c == "#"
+                    mumet i < n dan source[i] != "\n"
+                        i = i + 1
+                    selesai mumet
+                kampret
+                    njir c == "\"" atau c == "'"
+                        kutip = c
+                        nilai = ""
+                        tertutup = salah
+                        i = i + 1
+                        mumet i < n dan source[i] != "\n" dan tertutup == salah
+                            njir source[i] == kutip
+                                tertutup = benar
+                                i = i + 1
+                            kampret
+                                njir source[i] == "\\" dan i + 1 < n
+                                    njir source[i + 1] == "n"
+                                        nilai = nilai + "\n"
+                                    kampret
+                                        njir source[i + 1] == "t"
+                                            nilai = nilai + "\t"
+                                        kampret
+                                            njir source[i + 1] == "r"
+                                                nilai = nilai + "\r"
+                                            kampret
+                                                njir source[i + 1] == "\\" 
+                                                    nilai = nilai + "\\"
+                                                kampret
+                                                    njir source[i + 1] == "\"" atau source[i + 1] == "'"
+                                                        nilai = nilai + source[i + 1]
+                                                    kampret
+                                                        nilai = nilai + source[i] + source[i + 1]
+                                                    selesai njir
+                                                selesai njir
+                                            selesai njir
+                                        selesai njir
+                                    selesai njir
+                                    i = i + 2
+                                kampret
+                                    nilai = nilai + source[i]
+                                    i = i + 1
+                                selesai njir
+                            selesai njir
+                        selesai mumet
+                        njir tertutup
+                            tokens = tokens + [{"jenis": "STRING", "nilai": nilai}]
+                        kampret
+                            tokens = tokens + [{"jenis": "STRING_ERROR", "nilai": "STRING_BELUM_DITUTUP"}]
+                        selesai njir
+                    kampret
+                        njir digit(c)
+                            nilai = ""
+                            mumet i < n dan digit(source[i])
+                                nilai = nilai + source[i]
+                                i = i + 1
+                            selesai mumet
+                            jenis_angka = "INTEGER"
+                            njir i + 1 < n dan source[i] == "." dan digit(source[i + 1])
+                                jenis_angka = "FLOAT"
+                                nilai = nilai + "."
+                                i = i + 1
+                                mumet i < n dan digit(source[i])
+                                    nilai = nilai + source[i]
+                                    i = i + 1
+                                selesai mumet
+                            selesai njir
+                            tokens = tokens + [{"jenis": jenis_angka, "nilai": nilai}]
+                        kampret
+                            njir huruf(c)
+                                nilai = ""
+                                mumet i < n dan bagian_nama(source[i])
+                                    nilai = nilai + source[i]
+                                    i = i + 1
+                                selesai mumet
+                                tokens = tokens + [{"jenis": "IDENT", "nilai": nilai}]
+                            kampret
+                                njir operator(c)
+                                    nilai = c
+                                    i = i + 1
+                                    njir i < n dan ((c == "=" dan source[i] == "=") atau (c == "!" dan source[i] == "=") atau (c == "<" dan source[i] == "=") atau (c == ">" dan source[i] == "=") atau (c == "/" dan source[i] == "/"))
+                                        nilai = nilai + source[i]
+                                        i = i + 1
+                                    selesai njir
+                                    tokens = tokens + [{"jenis": "OP", "nilai": nilai}]
+                                kampret
+                                    njir tanda(c)
+                                        tokens = tokens + [{"jenis": "PUNCT", "nilai": c}]
+                                        i = i + 1
+                                    kampret
+                                        tokens = tokens + [{"jenis": "UNKNOWN", "nilai": c}]
+                                        i = i + 1
+                                    selesai njir
+                                selesai njir
+                            selesai njir
+                        selesai njir
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai mumet
+
+    balek tokens + [{"jenis": "EOF", "nilai": "EOF"}]
+selesai fungsi
+
+fungsi json_escape(teks)
+    lah hasil = ""
+    lah i = 0
+    lah c = ""
+    mumet i < panjang(teks)
+        c = teks[i]
+        njir c == "\""
+            hasil = hasil + "\\\""
+        kampret
+            njir c == "\\"
+                hasil = hasil + "\\\\"
+            kampret
+                njir c == "\n"
+                    hasil = hasil + "\\n"
+                kampret
+                    njir c == "\r"
+                        hasil = hasil + "\\r"
+                    kampret
+                        njir c == "\t"
+                            hasil = hasil + "\\t"
+                        kampret
+                            hasil = hasil + c
+                        selesai njir
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+        i = i + 1
+    selesai mumet
+    balek hasil
+selesai fungsi
+
+fungsi render_tokens_json(tokens)
+    lah hasil = "["
+    lah i = 0
+    lah token = {}
+    mumet i < panjang(tokens)
+        token = tokens[i]
+        njir i > 0
+            hasil = hasil + ","
+        selesai njir
+        hasil = hasil + "{\"jenis\":\"" + json_escape(token["jenis"]) + "\",\"nilai\":\"" + json_escape(token["nilai"]) + "\"}"
+        i = i + 1
+    selesai mumet
+    balek hasil + "]"
+selesai fungsi
+
+lah source = "lah x = 12 + 3"
+lah tokens = pindai(source)
+lah json = render_tokens_json(tokens)
+hedeh json
+selesai jancuk
