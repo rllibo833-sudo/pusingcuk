@@ -50,6 +50,10 @@ selesai fungsi
 fungsi ir_program(program)
     lah body = ""
     lah i = 0
+    lah root_line = 1
+    njir panjang(program["statements"]) > 0
+        root_line = 2
+    selesai njir
     mumet i < panjang(program["statements"])
         njir i > 0
             body = body + ","
@@ -57,7 +61,7 @@ fungsi ir_program(program)
         body = body + ir_statement(program["statements"][i], i + 2)
         i = i + 1
     selesai mumet
-    balek "{\"kind\":\"Program\",\"line\":1,\"fields\":{\"body\":[" + body + "]}}"
+    balek "{\\"kind\\":\\"Program\\",\\"line\\":" + teks(root_line) + ",\\"fields\\":{\\"body\\":[" + body + "]}}"
 selesai fungsi
 '''
 
