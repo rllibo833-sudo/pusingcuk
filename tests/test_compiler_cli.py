@@ -73,7 +73,7 @@ class MultiTargetCompilerTests(unittest.TestCase):
 
     def test_rust_target_rejects_unsupported_constructs(self):
         with self.assertRaisesRegex(ValueError, "backend Rust subset"):
-            compile_source("jancuk\nhedeh benar\nselesai jancuk", "demo.cuk", "rust")
+            compile_source("jancuk\nmumet benar\n    hedeh 1\nselesai mumet\nselesai jancuk", "demo.cuk", "rust")
 
     def test_unknown_target_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "target tidak dikenal"):
