@@ -56,6 +56,12 @@ class MultiTargetCompilerTests(unittest.TestCase):
         self.assertIn("func main()", result)
         self.assertIn("pcOut(pcLiteral(float64(42), 2))", result)
 
+    def test_cpp_target_emits_standalone_cpp17_source(self):
+        result = compile_source(SOURCE, "demo.cuk", "cpp")
+        self.assertIn("#include <variant>", result)
+        self.assertIn("int main()", result)
+        self.assertIn("pcOut(Value(pcSafe", result)
+
     def test_unknown_target_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "target tidak dikenal"):
             compile_source(SOURCE, "demo.pusingcuk", "wasm")

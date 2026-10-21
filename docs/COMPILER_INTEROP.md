@@ -43,7 +43,7 @@ Pusingcuk source (.pusingcuk)
   -> conformance tests + artifact/runtime checks
 ```
 
-Pipeline ini adalah arah desain, bukan daftar backend yang sudah stabil. Saat ini interpreter modular Python menjadi jalur referensi dan runtime C native menjalankan subset teruji. Front-end menghasilkan IR v1 yang mempertahankan AST dan dapat divalidasi. CLI compiler memiliki target eksperimental JavaScript, Python, HTML, JSON IR, dan VM JSON dengan cakupan berbeda; backend C terpisah hanya mendukung subset integer terbatas. Optimizer umum, WebAssembly, ABI/FFI stabil, dan sistem modul/paket lintas-runtime belum tersedia.
+Pipeline ini adalah arah desain, bukan daftar backend yang sudah stabil. Saat ini interpreter modular Python menjadi jalur referensi dan runtime C native menjalankan subset teruji. Front-end menghasilkan IR v1 yang mempertahankan AST dan dapat divalidasi. CLI compiler memiliki target eksperimental JavaScript, Python, C++17, Go, HTML, JSON IR, dan VM JSON dengan cakupan berbeda; backend C terpisah hanya mendukung subset integer terbatas. Backend C++17 memiliki manifest konformansi awal 55 fixture dan belum mengklaim fitur di luar daftar tersebut. Optimizer umum, WebAssembly, ABI/FFI stabil, dan sistem modul/paket lintas-runtime belum tersedia.
 
 ## Batas antara bahasa inti dan platform
 
