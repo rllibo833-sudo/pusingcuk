@@ -25,7 +25,7 @@ class BootstrapEvidenceTests(unittest.TestCase):
         self.assertEqual(conditional["fields"]["then_body"][0]["kind"], "Return")
         self.assertEqual(conditional["fields"]["else_body"][0]["kind"], "Return")
         evidence = build(source, "conditional-function.cuk")
-        self.assertEqual(evidence["stages"][0]["stdout"], "1\\n")
+        self.assertEqual(evidence["stages"][0]["stdout"], "1\n")
 
     def test_two_stage_build_emits_identical_artifacts(self):
         source = 'jancuk\nlah nama = "Dunia"\nhedeh "Halo, " + nama\nselesai jancuk\n'
