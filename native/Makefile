@@ -1,7 +1,7 @@
 CC = clang
 CFLAGS = -std=c11 -O2 -Wall -Wextra -Werror -Wno-misleading-indentation
 
-all: pusingcuk cuk_lexer.o cuk_parser.o
+all: pusingcuk cuk_lexer.o cuk_parser.o cuk_ir.o
 
 pusingcuk: pusingcuk.c
 	$(CC) $(CFLAGS) pusingcuk.c -o pusingcuk -lm
@@ -12,5 +12,8 @@ cuk_lexer.o: cuk_lexer.c cuk_lexer.h
 cuk_parser.o: cuk_parser.c cuk_parser.h cuk_lexer.h
 	$(CC) $(CFLAGS) -c cuk_parser.c -o cuk_parser.o
 
+cuk_ir.o: cuk_ir.c cuk_ir.h cuk_parser.h
+	$(CC) $(CFLAGS) -c cuk_ir.c -o cuk_ir.o
+
 clean:
-	rm -f pusingcuk cuk_lexer.o cuk_parser.o
+	rm -f pusingcuk cuk_lexer.o cuk_parser.o cuk_ir.o
