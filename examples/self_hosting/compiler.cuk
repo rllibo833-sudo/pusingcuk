@@ -463,11 +463,17 @@ fungsi parse_program(tokens)
                     selesai njir
                     current["aktif_else"] = benar
                 kampret
-                    njir panjang(line_tokens) >= 2 dan line_tokens[0]["nilai"] == "selesai" dan line_tokens[1]["nilai"] == "njir"
-                        njir current["jenis"] != "IF"
+                    njir panjang(line_tokens) >= 2 dan line_tokens[0]["nilai"] == "selesai" dan line_tokens[1]["nilai"] == "mumet"
+                        njir current["jenis"] != "WHILE"
                             balek node_gagal(i)
                         selesai njir
                         depth = depth - 1
+                    kampret
+                        njir panjang(line_tokens) >= 2 dan line_tokens[0]["nilai"] == "selesai" dan line_tokens[1]["nilai"] == "njir"
+                            njir current["jenis"] != "IF"
+                                balek node_gagal(i)
+                            selesai njir
+                            depth = depth - 1
                     kampret
                         njir panjang(line_tokens) >= 2 dan line_tokens[0]["nilai"] == "selesai" dan line_tokens[1]["nilai"] == "fungsi"
                             njir current["jenis"] != "FUNCTION" atau depth != 1
@@ -498,8 +504,42 @@ fungsi parse_program(tokens)
                                 contexts = contexts + [{"jenis": "FUNCTION", "nama": line_tokens[1]["nilai"], "params": function_params, "body": []}]
                                 depth = depth + 1
                             kampret
-                                njir line_tokens[0]["nilai"] == "njir"
+                                njir line_tokens[0]["nilai"] == "mumet"
                                     expr_tokens = []
+                                    expr_index = 1
+                                    mumet expr_index < panjang(line_tokens)
+                                        expr_tokens = expr_tokens + [line_tokens[expr_index]]
+                                        expr_index = expr_index + 1
+                                    selesai mumet
+                                    expr_tokens = expr_tokens + [{"jenis": "EOF", "nilai": "EOF"}]
+                                    condition_result = parse_source(expr_tokens)
+                                    njir condition_result["status"] != "OK"
+                                        balek node_gagal(i)
+                                    selesai njir
+                                    lah while_node = {"jenis": "WHILE", "condition": condition_result["node"], "body": []}
+                                    current = contexts[depth]
+                                    njir current["jenis"] == "PROGRAM"
+                                        current["statements"] = current["statements"] + [while_node]
+                                    kampret
+                                        njir current["jenis"] == "FUNCTION"
+                                            current["body"] = current["body"] + [while_node]
+                                        kampret
+                                            njir current["jenis"] == "IF"
+                                                njir current["aktif_else"]
+                                                    current["else_body"] = current["else_body"] + [while_node]
+                                                kampret
+                                                    current["then_body"] = current["then_body"] + [while_node]
+                                                selesai njir
+                                            kampret
+                                                current["body"] = current["body"] + [while_node]
+                                            selesai njir
+                                        selesai njir
+                                    selesai njir
+                                    contexts = contexts + [while_node]
+                                    depth = depth + 1
+                                kampret
+                                    njir line_tokens[0]["nilai"] == "njir"
+                                        expr_tokens = []
                                     expr_index = 1
                                     mumet expr_index < panjang(line_tokens)
                                         expr_tokens = expr_tokens + [line_tokens[expr_index]]
@@ -518,7 +558,10 @@ fungsi parse_program(tokens)
                                         njir current["jenis"] == "FUNCTION"
                                             current["body"] = current["body"] + [if_node]
                                         kampret
-                                            njir current["jenis"] == "IF"
+                                            njir current["jenis"] == "WHILE"
+                                                current["body"] = current["body"] + [if_node]
+                                            kampret
+                                                njir current["jenis"] == "IF"
                                                 njir current["aktif_else"]
                                                     current["else_body"] = current["else_body"] + [if_node]
                                                 kampret
@@ -541,7 +584,10 @@ fungsi parse_program(tokens)
                                         njir current["jenis"] == "FUNCTION"
                                             current["body"] = current["body"] + [hasil_line["statement"]]
                                         kampret
-                                            njir current["jenis"] == "IF"
+                                            njir current["jenis"] == "WHILE"
+                                                current["body"] = current["body"] + [hasil_line["statement"]]
+                                            kampret
+                                                njir current["jenis"] == "IF"
                                                 njir current["aktif_else"]
                                                     current["else_body"] = current["else_body"] + [hasil_line["statement"]]
                                                 kampret
