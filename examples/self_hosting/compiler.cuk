@@ -473,7 +473,7 @@ fungsi parse_program(tokens)
                     current_function = {"jenis": "FUNCTION", "nama": line_tokens[1]["nilai"], "params": function_params, "body": []}
                     in_function = benar
                 kampret
-                    njir in_function dan panjang(line_tokens) >= 2 and line_tokens[0]["nilai"] == "selesai" and line_tokens[1]["nilai"] == "fungsi"
+                    njir in_function dan panjang(line_tokens) >= 2 dan line_tokens[0]["nilai"] == "selesai" dan line_tokens[1]["nilai"] == "fungsi"
                         statements = statements + [current_function]
                         current_function = {}
                         in_function = salah
