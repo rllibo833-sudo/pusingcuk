@@ -99,7 +99,17 @@ fungsi pindai(source)
                                 nilai = nilai + source[i]
                                 i = i + 1
                             selesai mumet
-                            tokens = tokens + [{"jenis": "INTEGER", "nilai": nilai}]
+                            lah jenis_angka = "INTEGER"
+                            njir i + 1 < n dan source[i] == "." dan digit(source[i + 1])
+                                jenis_angka = "FLOAT"
+                                nilai = nilai + "."
+                                i = i + 1
+                                mumet i < n dan digit(source[i])
+                                    nilai = nilai + source[i]
+                                    i = i + 1
+                                selesai mumet
+                            selesai njir
+                            tokens = tokens + [{"jenis": jenis_angka, "nilai": nilai}]
                         kampret
                             njir huruf(c)
                                 nilai = ""
@@ -155,16 +165,24 @@ fungsi parse_primary(tokens, index)
     njir index >= panjang(tokens)
         balek node_gagal(index)
     kampret
-        njir tokens[index]["jenis"] == "INTEGER" atau tokens[index]["jenis"] == "STRING"
+        njir tokens[index]["jenis"] == "INTEGER" atau tokens[index]["jenis"] == "FLOAT" atau tokens[index]["jenis"] == "STRING"
             lah literal_kind = tokens[index]["jenis"]
             lah literal_value = tokens[index]["nilai"]
             njir literal_kind == "INTEGER"
                 literal_value = bilangan(literal_value)
+            kampret
+                njir literal_kind == "FLOAT"
+                    literal_value = desimal(literal_value)
+                selesai njir
             selesai njir
             balek {"status": "OK", "node": {"jenis": literal_kind, "nilai": literal_value}, "index": index + 1}
         kampret
-            njir tokens[index]["jenis"] == "IDENT"
-                balek {"status": "OK", "node": {"jenis": "VARIABLE", "nama": tokens[index]["nilai"]}, "index": index + 1}
+            njir tokens[index]["jenis"] == "IDENT" dan (tokens[index]["nilai"] == "benar" atau tokens[index]["nilai"] == "salah")
+                lah boolean_value = tokens[index]["nilai"] == "benar"
+                balek {"status": "OK", "node": {"jenis": "BOOLEAN", "nilai": boolean_value}, "index": index + 1}
+            kampret
+                njir tokens[index]["jenis"] == "IDENT"
+                    balek {"status": "OK", "node": {"jenis": "VARIABLE", "nama": tokens[index]["nilai"]}, "index": index + 1}
             kampret
                 njir tokens[index]["jenis"] == "OP" dan tokens[index]["nilai"] == "-"
                     lah hasil_negatif = parse_primary(tokens, index + 1)
@@ -343,7 +361,7 @@ fungsi parse_program(tokens)
 selesai fungsi
 
 fungsi evaluasi(node, lingkungan)
-    njir node["jenis"] == "INTEGER"
+    njir node["jenis"] == "INTEGER" atau node["jenis"] == "FLOAT" atau node["jenis"] == "BOOLEAN" atau node["jenis"] == "STRING"
         balek node["nilai"]
     kampret
         njir node["jenis"] == "VARIABLE"
@@ -456,10 +474,18 @@ fungsi ir_quote(value)
 selesai fungsi
 
 fungsi ir_expr(node, line)
-    njir node["jenis"] == "INTEGER" atau node["jenis"] == "STRING"
+    njir node["jenis"] == "INTEGER" atau node["jenis"] == "FLOAT" atau node["jenis"] == "BOOLEAN" atau node["jenis"] == "STRING"
         lah encoded_value = teks(node["nilai"])
         njir node["jenis"] == "STRING"
             encoded_value = ir_quote(node["nilai"])
+        kampret
+            njir node["jenis"] == "BOOLEAN"
+                njir node["nilai"]
+                    encoded_value = "true"
+                kampret
+                    encoded_value = "false"
+                selesai njir
+            selesai njir
         selesai njir
         balek "{\"kind\":\"Literal\",\"line\":" + teks(line) + ",\"fields\":{\"value\":" + encoded_value + "}}"
     kampret
