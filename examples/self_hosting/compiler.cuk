@@ -810,7 +810,7 @@ fungsi ir_program(program)
     selesai njir
     lah jumlah_emit = 0
     mumet i < panjang(program["statements"])
-        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" ou program["statements"][i]["jenis"] == "PRINT" ou program["statements"][i]["jenis"] == "FUNCTION"
+        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT" atau program["statements"][i]["jenis"] == "FUNCTION"
             njir jumlah_emit > 0
                 body = body + ","
             selesai njir
