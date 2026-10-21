@@ -1,6 +1,6 @@
 # Lexer source nyata untuk subset bahasa .cuk.
-# Dukungan: identifier ASCII, keyword mentah, integer, string sederhana,
-# operator, tanda baca, komentar #, newline, dan EOF.
+# Dukungan: identifier ASCII, integer, string sederhana, operator,
+# tanda baca, komentar #, newline, dan EOF.
 # Batasan: belum normalisasi alias keyword, angka pecahan/eksponen, atau escape decoding.
 jancuk
 
@@ -17,7 +17,7 @@ fungsi bagian_nama(c)
 selesai fungsi
 
 fungsi operator(c)
-    balek c == "+" atau c == "-" atau c == "*" atau c == "/" atau c == "%" atau c == "=" atau c == "<" atau c == ">"
+    balek c == "+" atau c == "-" atau c == "*" atau c == "/" atau c == "%" atau c == "=" atau c == "<" atau c == ">" atau c == "!"
 selesai fungsi
 
 fungsi tanda(c)
@@ -28,77 +28,81 @@ fungsi pindai(source)
     lah tokens = []
     lah i = 0
     lah n = panjang(source)
+    lah c = ""
+    lah kutip = ""
+    lah nilai = ""
+    lah tertutup = salah
 
     mumet i < n
-        lah c = source[i]
+        c = source[i]
 
-        njir c == " " atau c == "\t" atau c == "\r"
+        njir c == " " atau c == "\\t" atau c == "\\r"
             i = i + 1
         kampret
-            njir c == "\n"
-                lah tokens = tokens + [{"jenis": "NEWLINE", "nilai": "NEWLINE"}]
+            njir c == "\\n"
+                tokens = tokens + [{"jenis": "NEWLINE", "nilai": "NEWLINE"}]
                 i = i + 1
             kampret
                 njir c == "#"
-                    mumet i < n dan source[i] != "\n"
+                    mumet i < n dan source[i] != "\\n"
                         i = i + 1
                     selesai mumet
                 kampret
-                    njir c == "\"" atau c == "'"
-                        lah kutip = c
-                        lah nilai = ""
-                        lah tertutup = salah
+                    njir c == "\\"" atau c == "'"
+                        kutip = c
+                        nilai = ""
+                        tertutup = salah
                         i = i + 1
-                        mumet i < n dan source[i] != "\n" dan bukan tertutup
+                        mumet i < n dan source[i] != "\\n" dan bukan tertutup
                             njir source[i] == kutip
-                                lah tertutup = benar
+                                tertutup = benar
                                 i = i + 1
                             kampret
-                                njir source[i] == "\\" dan i + 1 < n
-                                    lah nilai = nilai + source[i] + source[i + 1]
+                                njir source[i] == "\\\\" dan i + 1 < n
+                                    nilai = nilai + source[i] + source[i + 1]
                                     i = i + 2
                                 kampret
-                                    lah nilai = nilai + source[i]
+                                    nilai = nilai + source[i]
                                     i = i + 1
                                 selesai njir
                             selesai njir
                         selesai mumet
                         njir tertutup
-                            lah tokens = tokens + [{"jenis": "STRING", "nilai": nilai}]
+                            tokens = tokens + [{"jenis": "STRING", "nilai": nilai}]
                         kampret
-                            lah tokens = tokens + [{"jenis": "STRING_ERROR", "nilai": "STRING_BELUM_DITUTUP"}]
+                            tokens = tokens + [{"jenis": "STRING_ERROR", "nilai": "STRING_BELUM_DITUTUP"}]
                         selesai njir
                     kampret
                         njir digit(c)
-                            lah nilai = ""
+                            nilai = ""
                             mumet i < n dan digit(source[i])
-                                lah nilai = nilai + source[i]
+                                nilai = nilai + source[i]
                                 i = i + 1
                             selesai mumet
-                            lah tokens = tokens + [{"jenis": "INTEGER", "nilai": nilai}]
+                            tokens = tokens + [{"jenis": "INTEGER", "nilai": nilai}]
                         kampret
                             njir huruf(c)
-                                lah nilai = ""
+                                nilai = ""
                                 mumet i < n dan bagian_nama(source[i])
-                                    lah nilai = nilai + source[i]
+                                    nilai = nilai + source[i]
                                     i = i + 1
                                 selesai mumet
-                                lah tokens = tokens + [{"jenis": "IDENT", "nilai": nilai}]
+                                tokens = tokens + [{"jenis": "IDENT", "nilai": nilai}]
                             kampret
                                 njir operator(c)
-                                    lah nilai = c
+                                    nilai = c
                                     i = i + 1
                                     njir i < n dan ((c == "=" dan source[i] == "=") atau (c == "!" dan source[i] == "=") atau (c == "<" dan source[i] == "=") atau (c == ">" dan source[i] == "=") atau (c == "/" dan source[i] == "/"))
-                                        lah nilai = nilai + source[i]
+                                        nilai = nilai + source[i]
                                         i = i + 1
                                     selesai njir
-                                    lah tokens = tokens + [{"jenis": "OP", "nilai": nilai}]
+                                    tokens = tokens + [{"jenis": "OP", "nilai": nilai}]
                                 kampret
                                     njir tanda(c)
-                                        lah tokens = tokens + [{"jenis": "PUNCT", "nilai": c}]
+                                        tokens = tokens + [{"jenis": "PUNCT", "nilai": c}]
                                         i = i + 1
                                     kampret
-                                        lah tokens = tokens + [{"jenis": "UNKNOWN", "nilai": c}]
+                                        tokens = tokens + [{"jenis": "UNKNOWN", "nilai": c}]
                                         i = i + 1
                                     selesai njir
                                 selesai njir
@@ -119,6 +123,6 @@ fungsi tampilkan(tokens)
     selesai untuk
 selesai fungsi
 
-lah contoh = "lah x = 12 + 3\nhedeh x # komentar\n"
+lah contoh = "lah x = 12 + 3\\nhedeh x # komentar\\n"
 tampilkan(pindai(contoh))
 selesai jancuk
