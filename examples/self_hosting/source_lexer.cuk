@@ -60,13 +60,13 @@ fungsi pindai(source)
                             kampret
                                 njir source[i] == "\\" dan i + 1 < n
                                     njir source[i + 1] == "n"
-                                        nilai = nilai + "\\n"
+                                        nilai = nilai + "\n"
                                     kampret
                                         njir source[i + 1] == "t"
-                                            nilai = nilai + "\\t"
+                                            nilai = nilai + "\t"
                                         kampret
                                             njir source[i + 1] == "r"
-                                                nilai = nilai + "\\r"
+                                                nilai = nilai + "\r"
                                             kampret
                                                 nilai = nilai + source[i] + source[i + 1]
                                             selesai njir
