@@ -20,20 +20,11 @@ jobs:
       - name: Compile driver to PVM
         run: |
           set -x
-          python -m compiler.bytecode --help || true
-          python -m compiler.self_hosted --help || true
-          ls compiler/
-          cat compiler/__main__.py | head -n 100 || true
-          # Try supported module entry points in order; preserve the final failure.
-          python -m compiler.bytecode examples/self_hosting/driver_lexer.cuk --emit-bytecode /tmp/driver_lexer.pvm ||
-          python -m pusingcuk.compiler examples/self_hosting/driver_lexer.cuk --emit-bytecode /tmp/driver_lexer.pvm ||
-          python -m compiler examples/self_hosting/driver_lexer.cuk --emit-bytecode /tmp/driver_lexer.pvm ||
-          python compiler/bytecode.py examples/self_hosting/driver_lexer.cuk /tmp/driver_lexer.pvm
-          echo "=== after compile attempt ==="
-          ls -lh /tmp/ || true
-          wc -c /tmp/driver_lexer.pvm || echo "PVM NOT CREATED"
-          cat /tmp/driver_lexer.pvm | head -c 500 || true
-          test -s /tmp/driver_lexer.pvm
+          python -m compiler.self_hosted examples/self_hosting/driver_lexer.cuk --emit-bytecode /tmp/driver_lexer.pvm
+          echo "=== COMPILE RESULT ==="
+          ls -lh /tmp/driver_lexer.pvm
+          wc -c /tmp/driver_lexer.pvm
+          head -c 1000 /tmp/driver_lexer.pvm
       - name: Build native
         run: |
           cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
