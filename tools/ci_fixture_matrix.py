@@ -23,7 +23,7 @@ from tools.conformance import load_manifest, build_native, classify_stderr, sour
 OUT = Path(os.environ.get("PUSINGCUK_MATRIX_OUT", "artifacts/fixture-matrix"))
 OUT.mkdir(parents=True, exist_ok=True)
 TIMEOUT = 8
-TARGETS = ("reference", "native", "javascript", "python_transpiler", "html", "vm")
+TARGETS = ("reference", "native", "javascript", "python_transpiler", "html", "vm", "go")
 
 
 def execute(command, stdin_text=""):
@@ -61,6 +61,7 @@ def main():
         native_path = tmp / "pusingcuk-native"
         native_ready, native_error = build_native(native_path)
         node = shutil.which("node")
+        go = shutil.which("go")
         for item, source_path in fixtures:
             expected = item["expected"]
             stdin_text = expected.get("stdin", "")
@@ -74,6 +75,10 @@ def main():
                     status, reason, observation = "unsupported", "manifest declares unsupported", {}
                 elif target == "html":
                     status, reason, observation = "unsupported", "HTML executable backend not present in repository", {}
+                elif target == "go" and declared.get("go") != "required":
+                    status, reason, observation = "unsupported", "manifest does not declare Go backend coverage", {}
+                elif target == "go" and not go:
+                    status, reason, observation = "unavailable", "Go compiler is not installed on runner", {}
                 elif target == "javascript" and not node:
                     status, reason, observation = "unsupported", "Node.js is not installed on runner", {}
                 elif target == "native" and not native_ready:
@@ -126,6 +131,27 @@ def main():
                             raw_lines.append(f"[{item['id']}][{target}] {status}: {reason}\n{ce}")
                             continue
                         command = [sys.executable, "-m", "compiler.vm", str(generated)]
+                    elif target == "go":
+                        generated = generated.with_suffix(".go")
+                        binary = generated.with_suffix("")
+                        compile_cmd = [sys.executable, "-m", "compiler", str(source_path), "--target", "go", "-o", str(generated)]
+                        cr, co, ce, err = execute(compile_cmd)
+                        if err or cr != 0:
+                            if expected.get("stderr_class") == "syntax_error" and compile_rejection_matches(item, cr, ce):
+                                status, reason, observation = "passed", "", {"phase": "compile", "compile_stderr": ce, "compile_exit_code": cr, "matched": True}
+                            else:
+                                status, reason, observation = "failed", "Go source generation failed" + (": " + ce.strip() if ce.strip() else ""), {"compile_stdout": co, "compile_stderr": ce, "compile_exit_code": cr}
+                            per_fixture["targets"][target] = {"status": status, **({"reason": reason} if reason else {}), **observation}
+                            raw_lines.append(f"[{item['id']}][{target}] {status}: {reason}\\n{ce}")
+                            continue
+                        build_cmd = [go, "build", "-o", str(binary), str(generated)]
+                        br, bo, be, build_error = execute(build_cmd)
+                        if build_error or br != 0:
+                            status, reason, observation = "failed", "Go compile failed" + (": " + be.strip() if be.strip() else ""), {"build_stdout": bo, "build_stderr": be, "build_exit_code": br}
+                            per_fixture["targets"][target] = {"status": status, "reason": reason, **observation}
+                            raw_lines.append(f"[{item['id']}][{target}] {status}: {reason}\\n{be}")
+                            continue
+                        command = [str(binary)]
                     rc, stdout, stderr, run_error = execute(command, stdin_text)
                     actual_class = classify_stderr(rc if rc is not None else 1, stderr)
                     actual_line = source_line_from_stderr(stderr)
@@ -188,7 +214,9 @@ def main():
     ET.indent(suite, space="  ")
     ET.ElementTree(suite).write(OUT / "results.xml", encoding="utf-8", xml_declaration=True)
     print(json.dumps(summary, indent=2, ensure_ascii=False))
-    return 1 if any(v["failed"] or v["timeout"] or v["unavailable"] for k, v in summary["targets"].items() if k in {"reference", "native"}) else 0
+    required_go = {item["id"] for item, _path in fixtures if item.get("runtimes", {}).get("go") == "required"}
+    go_regressed = any(row["id"] in required_go and row["targets"]["go"]["status"] != "passed" for row in rows)
+    return 1 if go_regressed or any(v["failed"] or v["timeout"] or v["unavailable"] for k, v in summary["targets"].items() if k in {"reference", "native"}) else 0
 
 
 if __name__ == "__main__":
