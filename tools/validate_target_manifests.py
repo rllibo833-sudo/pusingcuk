@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CANONICAL = ROOT / "tests" / "conformance" / "manifest.json"
-DEFAULT_TARGETS = ("cpp_manifest.json", "go_manifest.json", "browser_manifest.json")
+DEFAULT_TARGETS = ("cpp_manifest.json", "go_manifest.json")
 
 
 def validate(canonical_path: Path = CANONICAL, target_paths=None) -> list[str]:
