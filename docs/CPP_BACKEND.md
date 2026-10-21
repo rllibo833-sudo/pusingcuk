@@ -35,7 +35,7 @@ Run the target suite:
 
 ~~~sh
 python -m unittest tests.test_cpp_backend -v
-python -m compiler examples/halo.cuk --target cpp --output /tmp/halo.cpp
+python -m compiler tests/conformance/output_arithmetic.pusingcuk --target cpp --output /tmp/halo.cpp
 g++ -std=c++17 /tmp/halo.cpp -o /tmp/halo
 /tmp/halo
 ~~~
