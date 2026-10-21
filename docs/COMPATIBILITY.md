@@ -63,7 +63,7 @@ The host adapters under `library/adapters/` remain Python host-side primitives. 
 
 Pusingcuk dirancang agar dapat memiliki beberapa backend tanpa mengubah semantik bahasa. Lihat [arsitektur compiler dan interoperabilitas](COMPILER_INTEROP.md) untuk pipeline front-end → AST → analisis semantik → IR berversi → backend, serta batas rancangan ABI/FFI. Lihat [kontrak fixture konformansi](CONFORMANCE_FIXTURES.md) untuk format tes yang akan dipakai lintas runtime.
 
-IR v1 tersedia sebagai format AST-preserving yang tervalidasi, tetapi bukan ABI stabil. CLI compiler memiliki target eksperimental JavaScript, Python, HTML, JSON IR, dan VM JSON; cakupan tiap target berbeda dan belum menjamin kesetaraan penuh. Backend C terpisah hanya mendukung subset integer yang terdokumentasi. Backend WebAssembly dan ABI/FFI stabil **belum tersedia**. Backend baru hanya dapat diklaim kompatibel setelah lulus fixture yang sama untuk fitur yang dinyatakan didukung.
+IR v1 tersedia sebagai format AST-preserving yang tervalidasi, tetapi bukan ABI stabil. CLI compiler memiliki target eksperimental JavaScript, Python, Go (subset eksplisit), HTML, JSON IR, dan VM JSON; cakupan tiap target berbeda dan belum menjamin kesetaraan penuh. Backend Go memakai daftar `tests/conformance/go_manifest.json`; fitur yang tidak tercantum belum diklaim kompatibel. Lihat [Go backend](GO_BACKEND.md). Backend C terpisah hanya mendukung subset integer yang terdokumentasi. Backend WebAssembly dan ABI/FFI stabil **belum tersedia**. Backend baru hanya dapat diklaim kompatibel setelah lulus fixture yang sama untuk fitur yang dinyatakan didukung.
 
 ## Tingkat kompatibilitas fitur
 

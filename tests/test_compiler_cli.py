@@ -50,6 +50,12 @@ class MultiTargetCompilerTests(unittest.TestCase):
         self.assertIn("pc_max(4, 9)", py)
         self.assertIn("pc_round(2.5)", py)
 
+    def test_go_target_emits_standalone_source(self):
+        result = compile_source(SOURCE, "demo.cuk", "go")
+        self.assertIn("package main", result)
+        self.assertIn("func main()", result)
+        self.assertIn("pcOut(pcLiteral(float64(42), 2))", result)
+
     def test_unknown_target_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "target tidak dikenal"):
             compile_source(SOURCE, "demo.pusingcuk", "wasm")

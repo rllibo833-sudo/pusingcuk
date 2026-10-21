@@ -21,6 +21,44 @@ def load_results(path: Path) -> list[dict]:
     return data
 
 
+def compare_additional_target(results: list[dict], target: str) -> dict:
+    comparisons, mismatches, incomplete, unsupported = [], [], [], []
+    for row in results:
+        fixture_id = row.get("id", "unknown")
+        targets = row.get("targets", {})
+        reference, observed = targets.get("reference", {}), targets.get(target, {})
+        if observed.get("status") == "unsupported":
+            unsupported.append(fixture_id)
+            continue
+        if observed.get("status") == "unavailable":
+            incomplete.append(fixture_id)
+            comparisons.append({"id": fixture_id, "status": "incomplete", "reason": observed.get("reason", "target unavailable")})
+            continue
+        if not all(field in reference and field in observed for field in FIELDS):
+            incomplete.append(fixture_id)
+            comparisons.append({"id": fixture_id, "status": "incomplete"})
+            continue
+        differences = {
+            field: {"reference": reference[field], target: observed[field]}
+            for field in FIELDS if reference[field] != observed[field]
+        }
+        comparison = {"id": fixture_id, "status": "fail" if differences else "pass", "differences": differences}
+        comparisons.append(comparison)
+        if differences: mismatches.append(comparison)
+    return {
+        "status": "fail" if mismatches or incomplete else "pass",
+        "ok": not mismatches and not incomplete,
+        "compared": len(comparisons) - len(incomplete),
+        "mismatch_count": len(mismatches),
+        "incomplete_count": len(incomplete),
+        "unsupported_count": len(unsupported),
+        "regressions": [item["id"] for item in mismatches],
+        "incomplete": incomplete,
+        "unsupported": unsupported,
+        "comparisons": comparisons,
+    }
+
+
 def compare(results: list[dict]) -> dict:
     comparisons = []
     mismatches = []
@@ -50,11 +88,13 @@ def compare(results: list[dict]) -> dict:
         comparisons.append(comparison)
         if differences:
             mismatches.append(comparison)
+    go = compare_additional_target(results, "go")
+    ok = not mismatches and not incomplete and go["ok"]
     return {
         "schema_version": 1,
-        "status": "pass" if not mismatches and not incomplete else "fail",
-        "ok": not mismatches and not incomplete,
-        "complete": not incomplete,
+        "status": "pass" if ok else "fail",
+        "ok": ok,
+        "complete": not incomplete and go["incomplete_count"] == 0,
         "compared": len(comparisons) - len(unsupported) - len(incomplete),
         "mismatch_count": len(mismatches),
         "incomplete_count": len(incomplete),
@@ -63,6 +103,7 @@ def compare(results: list[dict]) -> dict:
         "incomplete": incomplete,
         "unsupported": unsupported,
         "comparisons": comparisons,
+        "additional_pairs": {"reference_vs_go": go},
     }
 
 
@@ -78,9 +119,12 @@ def main(argv=None) -> int:
         return 2
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Differential {report['status'].upper()}: compared={report['compared']}, "
+    go = report.get("additional_pairs", {}).get("reference_vs_go", {})
+    print(f"Differential {report['status'].upper()}: reference/native compared={report['compared']}, "
           f"mismatches={report['mismatch_count']}, incomplete={report['incomplete_count']}, "
-          f"unsupported={report['unsupported_count']}")
+          f"unsupported={report['unsupported_count']}; reference/Go compared={go.get('compared', 0)}, "
+          f"mismatches={go.get('mismatch_count', 0)}, incomplete={go.get('incomplete_count', 0)}, "
+          f"unsupported={go.get('unsupported_count', 0)}")
     return 0 if report["ok"] else 1
 
 
