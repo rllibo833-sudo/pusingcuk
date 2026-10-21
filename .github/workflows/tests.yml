@@ -110,6 +110,8 @@ jobs:
           import hashlib
           import io
           import json
+          import subprocess
+          import sys
           import tempfile
           from pathlib import Path
           from evaluator import capture
@@ -150,7 +152,22 @@ jobs:
               output = io.StringIO()
               VirtualMachine(bytecode1, output_stream=output).run()
               assert output.getvalue().strip() == "20", output.getvalue()
-          print("Safe file APIs + IR v1 -> bytecode -> VM reproducibility: OK")
+
+              # Exercise the public module CLI and require valid, newline-terminated JSON.
+              cli_source = Path(temp_name) / "cli_probe.cuk"
+              cli_artifact = Path(temp_name) / "cli_probe.bytecode.json"
+              cli_source.write_text(frontend_source, encoding="utf-8")
+              subprocess.run(
+                  [sys.executable, "-m", "compiler", "--emit-bytecode", str(cli_artifact), str(cli_source)],
+                  cwd=root, check=True, capture_output=True, text=True, timeout=30,
+              )
+              encoded = cli_artifact.read_text(encoding="utf-8")
+              assert encoded.endswith("\\n"), "CLI bytecode artifact must end with newline"
+              cli_bytecode = json.loads(encoded)
+              cli_output = io.StringIO()
+              VirtualMachine(cli_bytecode, output_stream=cli_output).run()
+              assert cli_output.getvalue().strip() == "20", cli_output.getvalue()
+          print("Safe file APIs + .cuk frontend -> IR v1 -> bytecode -> VM + public CLI: OK")
           PY
       - run: python -m unittest discover -s tests -v
       - if: matrix.python-version == '3.12'
