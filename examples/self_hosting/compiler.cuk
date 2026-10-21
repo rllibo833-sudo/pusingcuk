@@ -442,6 +442,7 @@ selesai fungsi
 fungsi parse_program(tokens)
     lah program = {"jenis": "PROGRAM", "statements": []}
     lah contexts = [program]
+    lah depth = 0
     lah line_tokens = []
     lah i = 0
     lah hasil_line = {}
@@ -455,7 +456,7 @@ fungsi parse_program(tokens)
     mumet i < panjang(tokens)
         njir tokens[i]["jenis"] == "NEWLINE" atau tokens[i]["jenis"] == "EOF"
             njir panjang(line_tokens) > 0
-                current = contexts[panjang(contexts) - 1]
+                current = contexts[depth]
                 njir line_tokens[0]["nilai"] == "kampret" dan panjang(line_tokens) == 1
                     njir current["jenis"] != "IF" atau current["aktif_else"]
                         balek node_gagal(i)
@@ -466,16 +467,16 @@ fungsi parse_program(tokens)
                         njir current["jenis"] != "IF"
                             balek node_gagal(i)
                         selesai njir
-                        contexts = contexts[:panjang(contexts) - 1]
+                        depth = depth - 1
                     kampret
                         njir panjang(line_tokens) >= 2 and line_tokens[0]["nilai"] == "selesai" and line_tokens[1]["nilai"] == "fungsi"
-                            njir current["jenis"] != "FUNCTION" atau panjang(contexts) != 2
+                            njir current["jenis"] != "FUNCTION" atau depth != 1
                                 balek node_gagal(i)
                             selesai njir
-                            contexts = contexts[:panjang(contexts) - 1]
+                            depth = depth - 1
                             program["statements"] = program["statements"] + [current]
                         kampret
-                            njir panjang(contexts) == 1 dan line_tokens[0]["nilai"] == "fungsi"
+                            njir depth == 0 dan line_tokens[0]["nilai"] == "fungsi"
                                 njir panjang(line_tokens) < 4 atau line_tokens[1]["jenis"] != "IDENT" atau line_tokens[2]["nilai"] != "("
                                     balek node_gagal(i)
                                 selesai njir
@@ -495,6 +496,7 @@ fungsi parse_program(tokens)
                                     balek node_gagal(i)
                                 selesai njir
                                 contexts = contexts + [{"jenis": "FUNCTION", "nama": line_tokens[1]["nilai"], "params": function_params, "body": []}]
+                                depth = depth + 1
                             kampret
                                 njir line_tokens[0]["nilai"] == "njir"
                                     expr_tokens = []
@@ -509,7 +511,7 @@ fungsi parse_program(tokens)
                                         balek node_gagal(i)
                                     selesai njir
                                     if_node = {"jenis": "IF", "condition": condition_result["node"], "then_body": [], "else_body": [], "aktif_else": salah}
-                                    current = contexts[panjang(contexts) - 1]
+                                    current = contexts[depth]
                                     njir current["jenis"] == "PROGRAM"
                                         current["statements"] = current["statements"] + [if_node]
                                     kampret
@@ -526,12 +528,13 @@ fungsi parse_program(tokens)
                                         selesai njir
                                     selesai njir
                                     contexts = contexts + [if_node]
+                                    depth = depth + 1
                                 kampret
                                     hasil_line = parse_program_line(line_tokens)
                                     njir hasil_line["status"] != "OK" atau hasil_line["statement"] == salah
                                         balek node_gagal(i)
                                     selesai njir
-                                    current = contexts[panjang(contexts) - 1]
+                                    current = contexts[depth]
                                     njir current["jenis"] == "PROGRAM"
                                         current["statements"] = current["statements"] + [hasil_line["statement"]]
                                     kampret
@@ -555,7 +558,7 @@ fungsi parse_program(tokens)
             selesai njir
             line_tokens = []
             njir tokens[i]["jenis"] == "EOF"
-                njir panjang(contexts) != 1
+                njir depth != 0
                     balek node_gagal(i)
                 selesai njir
                 balek {"status": "OK", "node": program}
