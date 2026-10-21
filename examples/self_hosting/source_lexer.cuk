@@ -237,7 +237,7 @@ fungsi evaluasi(node)
     selesai njir
 selesai fungsi
 
-lah contoh = "lah x = 12 + 3\\nhedeh x # komentar\\n"
+lah contoh = "lah x = 12 + 3\nhedeh x # komentar\n"
 render_tokens(pindai(contoh))
 
 lah ast = parse_source(pindai("2 + 3 * 4"))
