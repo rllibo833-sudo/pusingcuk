@@ -1471,10 +1471,12 @@ static Val call_user_function(const char *name, Val *args, int argc) {
 #define PVM_MAX_STACK 4096
 #define PVM_MAX_STEPS 10000000
 #define PVM_MAX_DEPTH 64
-typedef enum { PVM_CONST, PVM_LOAD, PVM_BINARY, PVM_CALL, PVM_RETURN } PvmOp;
-typedef struct { PvmOp op; Val value; const char *name; const char *operator_name; int argc; } PvmInstruction;
+typedef enum { PVM_CONST, PVM_LOAD, PVM_BINARY, PVM_CALL, PVM_RETURN, PVM_DECLARE, PVM_STORE, PVM_POP, PVM_GET, PVM_MAKE_LIST, PVM_MAKE_DICT, PVM_UNARY, PVM_TO_BOOL, PVM_JUMP, PVM_JUMP_IF_FALSE, PVM_ITER_INIT, PVM_ITER_NEXT, PVM_PRINT } PvmOp;
+typedef struct { PvmOp op; Val value; const char *name; const char *operator_name; int argc; int target; int slot; const char *iter_name; } PvmInstruction;
 typedef struct { const char *name; const char **params; int param_count; const PvmInstruction *code; size_t code_count; } PvmFunction;
-typedef struct { Val stack[PVM_MAX_STACK]; size_t top; unsigned steps; const PvmFunction *functions; size_t function_count; } PvmState;
+typedef struct { Val iterable; size_t index; int active; } PvmIterator;
+typedef struct { Val stack[PVM_MAX_STACK]; size_t top; unsigned steps; const PvmFunction *functions; size_t function_count; PvmIterator iterators[10001]; } PvmState;
+static void pvm_init(PvmState *vm) { memset(vm,0,sizeof *vm); }
 static int pvm_push(PvmState *vm, Val v) {
     if (vm->top >= PVM_MAX_STACK) { fail("PVM stack melampaui batas"); return 0; }
     vm->stack[vm->top++] = v; return 1;
@@ -1511,20 +1513,98 @@ static int pvm_binary(PvmState *vm, const char *op) {
 Val pvm_execute(PvmState *vm,const PvmInstruction *code,size_t count,unsigned depth) {
     if(depth>PVM_MAX_DEPTH){fail("kedalaman CALL PVM terlampaui");return (Val){.t=NIL};}
     size_t base=vm->top;
-    for(size_t pc=0;pc<count&&!err;pc++){
+    for(size_t pc=0;pc<count&&!err;){
         const PvmInstruction *in=&code[pc];
         if(++vm->steps>PVM_MAX_STEPS){fail("batas instruksi PVM tercapai");break;}
+        pc++;
         switch(in->op){
         case PVM_CONST: pvm_push(vm,in->value); break;
         case PVM_LOAD:{int i=in->name?pvm_find_var(in->name):-1;if(i<0)fail("variabel PVM belum dibuat");else pvm_push(vm,vars[i].v);break;}
+        case PVM_DECLARE:{
+            if(!in->name||pvm_find_var(in->name)>=0){fail("DECLARE PVM: nama variabel tidak valid atau sudah ada");break;}
+            if(nvars>=NV){fail("slot variabel PVM habis");break;}
+            Val v=pvm_pop(vm);if(err)break;
+            snprintf(vars[nvars].name,sizeof vars[nvars].name,"%s",in->name);vars[nvars++].v=v;break;
+        }
+        case PVM_STORE:{int i=in->name?pvm_find_var(in->name):-1;if(i<0){fail("STORE PVM: variabel belum dibuat");break;}Val v=pvm_pop(vm);if(!err)vars[i].v=v;break;}
+        case PVM_POP:(void)pvm_pop(vm);break;
+        case PVM_GET:{
+            Val key=pvm_pop(vm), collection=pvm_pop(vm), result={.t=NIL};if(err)break;
+            if(collection.t==DICT)result=dict_get(collection.dict,key);
+            else if(collection.t==LIST){size_t idx;if(list_index(collection,key,&idx))result=collection.list->items[idx];}
+            else if(collection.t==STR){size_t a,b;if(string_index(collection,key,&a,&b)){char tmp[SZ];size_t n=b-a;if(n>=sizeof tmp)n=sizeof tmp;memcpy(tmp,collection.s+a,n);tmp[n]='\0';result=string(tmp);}}
+            else fail("GET PVM hanya mendukung dict, list, dan teks");
+            if(!err)pvm_push(vm,result);break;
+        }
+        case PVM_MAKE_LIST:{
+            int n=in->argc;if(n<0||n>MAX_LIST_ITEMS|| (size_t)n>vm->top-base){fail("MAKE_LIST operand tidak valid");break;}
+            List *l=new_list();if(!l)break;
+            size_t begin=vm->top-(size_t)n;
+            for(size_t i=begin;i<vm->top&&!err;i++)append_list(l,vm->stack[i]);
+            vm->top=begin;if(!err)pvm_push(vm,listval(l));break;
+        }
+        case PVM_MAKE_DICT:{
+            int n=in->argc;if(n<0||n>MAX_DICT_ITEMS||(size_t)(2*n)>vm->top-base){fail("MAKE_DICT operand tidak valid");break;}
+            Dict *d=new_dict();if(!d)break;size_t begin=vm->top-(size_t)(2*n);
+            for(size_t i=begin;i<vm->top&&!err;i+=2)dict_set(d,vm->stack[i],vm->stack[i+1]);
+            vm->top=begin;if(!err)pvm_push(vm,dictval(d));break;
+        }
+        case PVM_UNARY:{
+            Val v=pvm_pop(vm);if(err)break;
+            if(in->operator_name&&!strcmp(in->operator_name,"bukan"))pvm_push(vm,boolean(!truth(v)));
+            else if(in->operator_name&&!strcmp(in->operator_name,"-")&&v.t==NUM)pvm_push(vm,checked_num(-v.n,"negasi menghasilkan angka tidak valid"));
+            else fail("operator UNARY PVM tidak dikenal");break;
+        }
+        case PVM_TO_BOOL:{Val v=pvm_pop(vm);if(!err)pvm_push(vm,boolean(truth(v)));break;}
+        case PVM_JUMP:
+            if(in->target<0||(size_t)in->target>count){fail("target JUMP PVM di luar kode");break;}pc=(size_t)in->target;break;
+        case PVM_JUMP_IF_FALSE:{
+            Val v=pvm_pop(vm);if(err)break;
+            if(!truth(v)){if(in->target<0||(size_t)in->target>count)fail("target JUMP_IF_FALSE di luar kode");else pc=(size_t)in->target;}break;
+        }
+        case PVM_ITER_INIT:{
+            Val iterable=pvm_pop(vm);if(err)break;
+            if(in->slot<0||in->slot>=10001){fail("slot iterator PVM di luar batas");break;}
+            if(iterable.t!=LIST&&iterable.t!=STR&&iterable.t!=RANGE){fail("ITER_INIT membutuhkan koleksi iterable");break;}
+            vm->iterators[in->slot]=(PvmIterator){iterable,0,1};break;
+        }
+        case PVM_ITER_NEXT:{
+            if(in->slot<0||in->slot>=10001||!vm->iterators[in->slot].active){fail("iterator PVM tidak ditemukan");break;}
+            PvmIterator *it=&vm->iterators[in->slot];Val next={.t=NIL};int has=0;
+            if(it->iterable.t==LIST&&it->iterable.list&&it->index<it->iterable.list->len){next=it->iterable.list->items[it->index++];has=1;}
+            else if(it->iterable.t==STR){size_t a=0;for(size_t k=0;k<it->index;k++)a=utf8_next(it->iterable.s,a);if(it->iterable.s[a]){size_t b=utf8_next(it->iterable.s,a);char tmp[SZ];size_t n=b-a;if(n>=sizeof tmp)n=sizeof tmp;memcpy(tmp,it->iterable.s+a,n);tmp[n]='\0';next=string(tmp);it->index++;has=1;}}
+            else if(it->iterable.t==RANGE&&it->index<(size_t)range_length(it->iterable)){next=num(it->iterable.range_start+(double)it->index*it->iterable.range_step);it->index++;has=1;}
+            if(!has){if(in->target<0||(size_t)in->target>count)fail("target ITER_NEXT di luar kode");else pc=(size_t)in->target;break;}
+            if(!in->iter_name||pvm_find_var(in->iter_name)<0){if(!in->iter_name||nvars>=NV){fail("variabel ITER_NEXT tidak valid");break;}snprintf(vars[nvars].name,sizeof vars[nvars].name,"%s",in->iter_name);vars[nvars++].v=next;}
+            else vars[pvm_find_var(in->iter_name)].v=next;break;
+        }
+        case PVM_PRINT:{
+            Val v=pvm_pop(vm);if(err)break;
+            if(v.t==BOOL)puts(v.b?"okelah":"tidak");
+            else if(v.t==STR)puts(v.s);
+            else if(v.t==NUM){char out[SZ];format_number(v.n,out,sizeof out);puts(out);}
+            else if(v.t==NIL)puts("null");
+            else if(v.t==LIST){putchar('[');for(size_t i=0;v.list&&i<v.list->len;i++){if(i)printf(", ");Val item=v.list->items[i];if(item.t==STR)printf("%s",item.s);else if(item.t==NUM)printf("%.15g",item.n);else if(item.t==BOOL)printf("%s",item.b?"okelah":"tidak");else printf("...");}puts("]");}
+            else puts("<nilai>");
+            break;
+        }
         case PVM_BINARY: if(!in->operator_name)fail("operator PVM kosong");else pvm_binary(vm,in->operator_name);break;
         case PVM_CALL:{
             if(!in->name||in->argc<0||(size_t)in->argc>vm->top-base){fail("operand CALL PVM tidak valid");break;}
+            Val args[MAX_PARAMS];if(in->argc>MAX_PARAMS){fail("argumen CALL PVM terlalu banyak");break;}
+            for(int i=in->argc-1;i>=0;i--)args[i]=pvm_pop(vm);
+            if(!strcmp(in->name,"panjang")&&in->argc==1){
+                Val a=args[0];double n=0;if(a.t==LIST&&a.list)n=(double)a.list->len;else if(a.t==DICT&&a.dict)n=(double)a.dict->len;else if(a.t==STR){for(size_t q=0;a.s[q];q=utf8_next(a.s,q))n++;}else if(a.t==RANGE)n=range_length(a);else {fail("panjang() menerima koleksi atau teks");break;}pvm_push(vm,num(n));break;
+            }
+            if((!strcmp(in->name,"bilangan")||!strcmp(in->name,"desimal"))&&in->argc==1){
+                char *end=NULL;double n;
+                if(args[0].t==NUM)n=args[0].n;else if(args[0].t==STR){errno=0;n=strtod(args[0].s,&end);if(errno||end==args[0].s||*end||!isfinite(n)){fail("konversi angka PVM gagal");break;}}else {fail("konversi angka PVM menerima angka atau teks");break;}
+                pvm_push(vm,checked_num(n,"konversi angka tidak finite"));break;
+            }
             const PvmFunction *fn=NULL;
             for(size_t i=0;i<vm->function_count;i++)if(vm->functions[i].name&&!strcmp(vm->functions[i].name,in->name)){fn=&vm->functions[i];break;}
             if(!fn||fn->param_count!=in->argc||in->argc>MAX_PARAMS){fail("fungsi PVM tidak ditemukan atau aritas salah");break;}
-            Val args[MAX_PARAMS];for(int i=in->argc-1;i>=0;i--)args[i]=pvm_pop(vm);
-            int oldn=nvars; Var *saved=malloc(sizeof vars);if(!saved){fail("memori CALL PVM habis");break;}memcpy(saved,vars,sizeof vars);
+            int oldn=nvars;Var *saved=malloc(sizeof vars);if(!saved){fail("memori CALL PVM habis");break;}memcpy(saved,vars,sizeof vars);
             for(int i=0;i<in->argc&&!err;i++){if(nvars>=NV){fail("variabel CALL PVM melampaui batas");break;}snprintf(vars[nvars].name,sizeof vars[nvars].name,"%s",fn->params[i]);vars[nvars++].v=args[i];}
             Val result=pvm_execute(vm,fn->code,fn->code_count,depth+1);memcpy(vars,saved,sizeof vars);free(saved);nvars=oldn;if(!err)pvm_push(vm,result);break;
         }
