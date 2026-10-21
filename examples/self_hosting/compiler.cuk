@@ -483,6 +483,7 @@ fungsi parse_and(tokens, index)
     kampret
         lah lanjut = kiri["index"]
         lah node = kiri["node"]
+        lah kanan = {}
         mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "IDENT" dan tokens[lanjut]["nilai"] == "dan"
             kanan = parse_comparison(tokens, lanjut + 1)
             njir kanan["status"] != "OK"
@@ -503,6 +504,7 @@ fungsi parse_or(tokens, index)
     kampret
         lah lanjut = kiri["index"]
         lah node = kiri["node"]
+        lah kanan = {}
         mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "IDENT" dan tokens[lanjut]["nilai"] == "atau"
             kanan = parse_and(tokens, lanjut + 1)
             njir kanan["status"] != "OK"

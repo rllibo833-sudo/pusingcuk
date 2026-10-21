@@ -5,7 +5,7 @@ Dokumen ini adalah satu-satunya handoff aktif menuju compiler .cuk mandiri. SPEC
 ## Arsitektur yang benar-benar ada
 
 - examples/self_hosting/compiler.cuk: lexer/parser .cuk, AST sementara, dan serializer AST → IR v1. Grammar mencakup deklarasi, assignment variabel/indeks, output, ekspresi, pemanggilan fungsi, fungsi/return, kondisi, loop, list, dictionary, index, dan akses member sederhana.
-- compiler/self_hosted_frontend.py: menjalankan frontend .cuk melalui host pusingcuk_new.py, mengambil JSON IR dari stdout, lalu memvalidasinya dengan validator Python. Jalur ini tidak boleh fallback ke parser Python referensi.
+- compiler/self_hosted_frontend.py: menjalankan sumber compiler .cuk melalui `Evaluator` pada `evaluator.py`, mengambil JSON IR, lalu memvalidasinya dengan validator Python. Ini menghindari CLI/launcher tambahan, bukan menghilangkan host Python. Jalur ini tidak boleh fallback ke parser Python referensi.
 - compiler/ir.py: IR v1 kanonis beserta validator schema, path, source map dan feature.
 - compiler/bytecode.py + compiler/vm.py: backend bytecode dan VM Python untuk IR v1.
 - compiler/bootstrap.py: menjalankan build identik dua kali melalui fungsi frontend yang sama. Ini membuktikan reproduksibilitas pada host yang sama, belum compiler mandiri.

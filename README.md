@@ -14,7 +14,7 @@ Python-free runtime, native C: **79 dari 79 fixture aktif lulus**. Ini cakupan f
 
 **Status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. Not yet a stable release.
 
-**Self-hosting status:** the `.cuk` frontend is being extended to parse its own source, including functions/returns, conditions, while/for loops, lists, dictionaries, indexing and calls. Execution still uses `pusingcuk_new.py`; IR validation and bytecode generation are Python-hosted, and bootstrap repeats that same path. This is **not yet full self-hosting**; do not treat self-parsing or deterministic output as proof of compiler independence.
+**Self-hosting status:** the `.cuk` frontend is being extended to parse its own source, including functions/returns, conditions, while/for loops, lists, dictionaries, indexing and calls. Execution is hosted by the Python `Evaluator` in `evaluator.py` (the runtime also used by `pusingcuk_new.py`); IR validation and bytecode generation remain Python-hosted, and bootstrap repeats the same host path. This is **not yet full self-hosting**; do not treat self-parsing or deterministic output as proof of compiler independence.
 
 ## Run your first program
 
