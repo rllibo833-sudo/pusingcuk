@@ -2,12 +2,13 @@ CC ?= cc
 CFLAGS ?= -std=c11 -O2 -Wall -Wextra
 LDLIBS ?= -lm
 NATIVE_BIN ?= $(CURDIR)/pusingcuk-native
+BOOTSTRAP_BIN ?= $(CURDIR)/pusingcuk-bootstrap
 VERSION ?= 0.8.0.dev0
 LANGUAGE_VERSION ?= 0.6-dev
 PREFIX ?= /usr/local
 DESTDIR ?=
 
-.PHONY: native run-native test test-native test-cli test-registered-rules version language-version install package
+.PHONY: native run-native native-bootstrap run-native-bootstrap test test-native test-cli test-registered-rules version language-version install package
 
 version:
 	@printf '%s\n' '$(VERSION)'
@@ -26,6 +27,14 @@ native:
 run-native: native
 	@test -n "$(FILE)" || (echo "Gunakan: make run-native FILE=program.cuk" >&2; exit 2)
 	"$(NATIVE_BIN)" "$(FILE)"
+
+# Native source frontend: .cuk -> native lexer/parser/AST -> IR v1 JSON.
+native-bootstrap:
+	$(CC) $(CFLAGS) native/pusingcuk_bootstrap.c native/cuk_lexer.c native/cuk_parser.c native/cuk_ir.c -o "$(BOOTSTRAP_BIN)"
+
+run-native-bootstrap: native-bootstrap
+	@test -n "$(FILE)" || (echo "Gunakan: make run-native-bootstrap FILE=program.cuk" >&2; exit 2)
+	"$(BOOTSTRAP_BIN)" "$(FILE)"
 
 install: native
 	install -d "$(DESTDIR)$(PREFIX)/bin"
