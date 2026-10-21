@@ -154,27 +154,29 @@ func (d *PCDict) set(key, value any, line int) {
     d.Entries = append(d.Entries, PCPair{Key: key, Value: value})
 }
 func pcIndex(value any, index any, line int) any {
-    raw := pcNumber(index, "indeks", line)
-    if raw != math.Trunc(raw) || math.Abs(raw) > 9007199254740991 { pcFail(line, "indeks harus bilangan bulat") }
-    i := int(raw)
     switch v := value.(type) {
     case []any:
-        if i < 0 { i += len(v) }; if i < 0 || i >= len(v) { pcFail(line, "indeks di luar batas") }; return v[i]
+        raw := pcNumber(index, "indeks", line)
+        if raw != math.Trunc(raw) || math.Abs(raw) > 9007199254740991 { pcFail(line, "indeks harus bilangan bulat") }
+        i := int(raw); if i < 0 { i += len(v) }; if i < 0 || i >= len(v) { pcFail(line, "indeks di luar batas") }; return v[i]
     case string:
-        chars := []rune(v); if i < 0 { i += len(chars) }; if i < 0 || i >= len(chars) { pcFail(line, "indeks di luar batas") }; return string(chars[i])
+        raw := pcNumber(index, "indeks", line)
+        if raw != math.Trunc(raw) || math.Abs(raw) > 9007199254740991 { pcFail(line, "indeks harus bilangan bulat") }
+        chars := []rune(v); i := int(raw); if i < 0 { i += len(chars) }; if i < 0 || i >= len(chars) { pcFail(line, "indeks di luar batas") }; return string(chars[i])
     case *PCRange:
-        if i < 0 { pcFail(line, "indeks rentang harus bilangan bulat nonnegatif") }; if i >= len(v.Values) { pcFail(line, "indeks di luar batas") }; return v.Values[i]
+        raw := pcNumber(index, "indeks", line)
+        if raw != math.Trunc(raw) || math.Abs(raw) > 9007199254740991 { pcFail(line, "indeks harus bilangan bulat") }
+        i := int(raw); if i < 0 { pcFail(line, "indeks rentang harus bilangan bulat nonnegatif") }; if i >= len(v.Values) { pcFail(line, "indeks di luar batas") }; return v.Values[i]
     case *PCDict: return v.get(index, line)
     default: pcFail(line, "nilai tidak dapat diindeks")
     }
     return nil
 }
 func pcSetIndex(value any, index, next any, line int) {
-    raw, ok := index.(float64); if !ok || raw != math.Trunc(raw) || math.Abs(raw) > 9007199254740991 { pcFail(line, "indeks harus bilangan bulat") }
-    i := int(raw)
     switch v := value.(type) {
     case []any:
-        if i < 0 { i += len(v) }; if i < 0 || i >= len(v) { pcFail(line, "indeks di luar batas") }; v[i] = next
+        raw, ok := index.(float64); if !ok || raw != math.Trunc(raw) || math.Abs(raw) > 9007199254740991 { pcFail(line, "indeks harus bilangan bulat") }
+        i := int(raw); if i < 0 { i += len(v) }; if i < 0 || i >= len(v) { pcFail(line, "indeks di luar batas") }; v[i] = next
     case *PCDict: v.set(index, next, line)
     default: pcFail(line, "assignment indeks hanya mendukung daftar dan kamus")
     }
@@ -425,7 +427,7 @@ class GoBackend:
             function_code.append("")
 
         runtime = RUNTIME.replace("__FUNCTION_DISPATCH__", "\n".join(dispatch))
-        runtime = runtime.replace("func pcProgram()\nfunc main()", "func pcProgram() {\n    env := pcNewEnv(nil)\n" + "\n".join(
+        runtime = runtime.replace("func pcProgram()\nfunc main()", "func pcProgram() {\n    env := pcNewEnv(nil)\n    _ = env\n" + "\n".join(
             f'    env.define({json.dumps(item["fields"]["name"])}, PCFunction{{Name: {json.dumps(item["fields"]["name"])}, Params: []string{{{", ".join(json.dumps(p) for p in item["fields"]["params"])}}}, Closure: env}}, {item["line"]})'
             for item in functions
         ) + "\n" + "\n".join(self.block([n for n in body if n["kind"] != "Function"], "    ")) + "\n}\nfunc main()")
