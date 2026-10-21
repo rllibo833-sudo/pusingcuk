@@ -398,7 +398,7 @@ selesai njir
 lah ast_invalid = parse_source(pindai("7 %"))
 hedeh "INVALID_" + ast_invalid["status"]
 
-lah ast_program = parse_program(pindai("lah x = 2 + 3\\nhedeh x\\n"))
+lah ast_program = parse_program(pindai("lah x = 2 + 3\nhedeh x\n"))
 hedeh "PROGRAM_" + ast_program["status"]
 njir ast_program["status"] == "OK"
     lah hasil_program = jalankan_program(ast_program["node"])
