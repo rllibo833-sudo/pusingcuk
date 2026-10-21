@@ -195,7 +195,7 @@ fungsi parse_primary(tokens, index)
                             lah call_args = []
                             lah call_index = index + 2
                             njir call_index < panjang(tokens) dan bukan (tokens[call_index]["jenis"] == "PUNCT" dan tokens[call_index]["nilai"] == ")")
-                                lah arg_result = parse_expression(tokens, call_index)
+                                lah arg_result = parse_or(tokens, call_index)
                                 njir arg_result["status"] != "OK"
                                     balek arg_result
                                 kampret

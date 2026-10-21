@@ -127,6 +127,8 @@ For local AI tooling, any device-specific runtime claims require a real on-devic
 - [Self-hosting status & next steps](docs/SELF_HOSTING_STATE.md) · [self-hosting frontend](examples/self_hosting/compiler.cuk) · [bootstrap evidence implementation](compiler/bootstrap.py)
 - [Contributing](CONTRIBUTING.md) · [security policy](SECURITY.md)
 
+Metadata paket pada `main` adalah `0.8.0.dev0`.
+
 ## How to read feature claims
 
 - **Present in the repository** means a file or implementation exists.
