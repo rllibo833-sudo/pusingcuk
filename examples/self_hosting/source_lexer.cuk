@@ -292,7 +292,21 @@ fungsi parse_program(tokens)
             selesai njir
             line_tokens = []
             njir tokens[i]["jenis"] == "EOF"
-                balek {"status": "OK", "node": {"jenis": "PROGRAM", "statements": statemfungsi evaluasi(node, lingkungan)
+                balek {"status": "OK", "node": {"jenis": "PROGRAM", "statements": statements}}
+            selesai njir
+        kampret
+            njir tokens[i]["jenis"] == "STRING_ERROR" atau tokens[i]["jenis"] == "UNKNOWN"
+                balek node_gagal(i)
+            kampret
+                line_tokens = line_tokens + [tokens[i]]
+            selesai njir
+        selesai njir
+        i = i + 1
+    selesai mumet
+    balek node_gagal(i)
+selesai fungsi
+
+fungsi evaluasi(node, lingkungan)
     njir node["jenis"] == "INTEGER"
         balek node["nilai"]
     kampret
