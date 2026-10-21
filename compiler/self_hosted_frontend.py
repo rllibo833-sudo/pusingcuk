@@ -50,7 +50,7 @@ def from_source(source: str, source_name: str = "<memory>") -> dict:
     # dropping function bodies. This is an explicit compatibility bridge, not a
     # claim that the frontend is self-hosted yet.
     import re
-    if re.search(r"(?m)^\\s*fungsi\\s+[A-Za-z_][A-Za-z0-9_]*\\s*\\(", source):
+    if re.search(r"(?m)^\s*fungsi\s+[A-Za-z_][A-Za-z0-9_]*\s*\(", source):
         from compiler.ir import from_source as canonical_from_source
         try:
             return canonical_from_source(source, source_name)
