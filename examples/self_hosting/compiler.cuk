@@ -843,7 +843,7 @@ fungsi ir_statement(stmt, line)
             else_json = else_json + ir_statement(stmt["else_body"][i], line + i + 1)
             i = i + 1
         selesai mumet
-        balek "{\\"kind\\":\\"If\\",\\"line\\":" + teks(line) + ",\\"fields\\":{\\"condition\\":" + condition_json + ",\\"then_body\\":[" + then_json + "],\\"else_body\\":[" + else_json + "]}}"
+        balek "{\"kind\":\"If\",\"line\":" + teks(line) + ",\"fields\":{\"condition\":" + condition_json + ",\"then_body\":[" + then_json + "],\"else_body\":[" + else_json + "]}}"
     kampret
     njir stmt["jenis"] == "FUNCTION"
         lah params_json = ""
