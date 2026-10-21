@@ -25,6 +25,6 @@ class NativeBootstrapTests(unittest.TestCase):
  def test_unsupported_syntax_fails_closed(self):
   with tempfile.TemporaryDirectory() as d:
    d=Path(d);b=d/"cukc";built=self.build(b);self.assertEqual(built.returncode,0,built.stderr)
-   src=d/"bad.cuk";src.write_text("jancuk\nhedeh 1 * 2\nselesai jancuk\n",encoding="utf-8")
+   src=d/"bad.cuk";src.write_text("jancuk\nfungsi sapa()\nselesai jancuk\n",encoding="utf-8")
    out=subprocess.run([str(b),str(src)],capture_output=True,text=True,timeout=5);self.assertNotEqual(out.returncode,0);self.assertEqual(out.stdout,"")
 if __name__=="__main__":unittest.main()
