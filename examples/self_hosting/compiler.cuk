@@ -1046,6 +1046,7 @@ fungsi ir_collect_features(node, flags)
             selesai njir
         selesai njir
     selesai njir
+    selesai njir
 selesai fungsi
 
 fungsi ir_features(program)
