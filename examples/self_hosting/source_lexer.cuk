@@ -32,6 +32,7 @@ fungsi pindai(source)
     lah kutip = ""
     lah nilai = ""
     lah tertutup = salah
+    lah jenis_angka = "INTEGER"
 
     mumet i < n
         c = source[i]
@@ -99,7 +100,7 @@ fungsi pindai(source)
                                 nilai = nilai + source[i]
                                 i = i + 1
                             selesai mumet
-                            lah jenis_angka = "INTEGER"
+                            jenis_angka = "INTEGER"
                             njir i + 1 < n dan source[i] == "." dan digit(source[i + 1])
                                 jenis_angka = "FLOAT"
                                 nilai = nilai + "."
