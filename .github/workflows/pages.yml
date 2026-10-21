@@ -19,6 +19,7 @@ on:
       - "library/builtin_contract.json"
       - "tools/prepare_playground.py"
       - "tools/check_playground_examples.py"
+      - "compiler/**"
       - ".github/workflows/pages.yml"
   pull_request:
     paths:
@@ -36,6 +37,7 @@ on:
       - "library/builtin_contract.py"
       - "library/builtin_contract.json"
       - "tools/check_playground_examples.py"
+      - "compiler/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
