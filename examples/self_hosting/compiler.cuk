@@ -791,6 +791,7 @@ fungsi ir_map_expr(node, path, line)
             result = result + ir_map_expr(node["kanan"], path + ".fields.right", line)
         selesai njir
     selesai njir
+    selesai njir
     balek result
 selesai fungsi
 
