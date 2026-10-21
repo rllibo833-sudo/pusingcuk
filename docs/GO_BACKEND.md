@@ -20,3 +20,12 @@ Backend Go adalah **eksperimental dan bertahap**. Daftar sumber kebenaran untuk 
 ## CI
 
 `tools/ci_fixture_matrix.py` membangun program Go terpilih, menjalankannya, dan membandingkan exit code, stdout, kelas error, serta nomor baris terhadap kontrak fixture. `tools/differential_runner.py` juga menghasilkan pasangan perbandingan reference-versus-Go. Menambahkan fixture ke manifest Go hanya boleh dilakukan setelah backend dan test target benar-benar lulus; jangan menambahkan semua fixture hanya untuk memperbesar angka dukungan.
+
+## Latest verified evidence
+
+On the merged `main` commit [`48a525b`](https://github.com/rllibo833-sudo/pusingcuk/commit/48a525b42354a29ec1920cd18c7ef4ab66add039), [fixture matrix run #39521825873](https://github.com/rllibo833-sudo/pusingcuk/actions/runs/39521825873) recorded:
+
+- Go backend: **55 passed, 0 failed, 0 timeout, 24 unsupported** out of the 79-fixture general corpus.
+- Direct reference-versus-Go comparison: **55 compared, 0 mismatches, 0 incomplete, 24 unsupported**.
+
+This evidence is scoped to the explicit Go manifest. The 24 unsupported fixtures are excluded from Go parity claims, not counted as passes.
