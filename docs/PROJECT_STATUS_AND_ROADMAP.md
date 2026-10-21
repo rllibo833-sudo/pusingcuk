@@ -49,7 +49,7 @@ Baseline matriks multi-target yang tersimpan menyatakan reference, native C, Jav
 
 Komponen ekosistem yang sudah ada tidak boleh dihitung ulang sebagai pekerjaan baru. Fokus berikutnya adalah menghubungkan prototipe self-hosting dengan toolchain yang ada:
 
-1. Perluas `examples/self_hosting/source_lexer.cuk` dari parser ekspresi ke grammar program secara bertahap. Langkah awal sudah mengenali deklarasi `lah nama = ekspresi` dan `hedeh ekspresi` per baris; referensi nama, kontrol alur, dan diagnostik lengkap masih terbuka.
+1. Perluas `examples/self_hosting/source_lexer.cuk` dari parser ekspresi ke grammar program secara bertahap. Langkah awal mengenali deklarasi `lah nama = ekspresi` dan `hedeh ekspresi` per baris; lookup variabel dalam lingkungan lokal kini diuji. Assignment ulang, kontrol alur, fungsi, dan diagnostik lengkap masih terbuka.
 2. Tetapkan pemetaan AST self-hosted ke IR v1/bytecode VM yang sudah ada, tanpa membuat format paralel kecuali ada kebutuhan kompatibilitas yang jelas.
 3. Bandingkan hasil frontend baru dengan frontend referensi Python melalui fixture konformansi yang relevan; perluas cakupan bertahap dan jangan mengklaim kesetaraan sebelum fixture lulus.
 4. Implementasikan compiler dalam .cuk secara bertahap dan tambahkan job bootstrap: toolchain lama membangun compiler .cuk, lalu compiler baru membangun ulang dirinya; hasil build dan suite tes harus cocok.

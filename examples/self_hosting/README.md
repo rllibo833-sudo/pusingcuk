@@ -2,14 +2,14 @@
 
 Folder ini berisi prototipe bertahap yang ditulis dengan bahasa `.cuk` untuk menguji apakah bahasa ini bisa menjadi alat bagi pengembangan toolchain-nya sendiri.
 
-**Penting:** ini belum merupakan compiler PusingCuk yang self-hosted. `source_lexer.cuk` kini menjalankan jalur teks sumber → token → recursive-descent parser → AST → evaluator untuk ekspresi integer dengan `+`, `-`, `*`, `/`, `%`, unary minus, prioritas operator, dan tanda kurung. Contoh menguji `2 + 3 * 4 = 14`, `(2 + 3) * 4 = 20`, `17 % 5 = 2`, `-3 * 4 = -12`, serta penolakan ekspresi `%` yang tidak lengkap. Parser kini juga mengenali struktur program multi-baris terbatas untuk deklarasi `lah nama = ekspresi` dan pernyataan `hedeh ekspresi`; referensi nama dan eksekusi statement end-to-end belum didukung. Ini belum parser/compiler `.cuk` penuh. `codegen.cuk` belum menjalankan compiler.
+**Penting:** ini belum merupakan compiler PusingCuk yang self-hosted. `source_lexer.cuk` kini menjalankan jalur teks sumber → token → recursive-descent parser → AST → evaluator untuk ekspresi integer dengan `+`, `-`, `*`, `/`, `%`, unary minus, prioritas operator, dan tanda kurung. Contoh menguji `2 + 3 * 4 = 14`, `(2 + 3) * 4 = 20`, `17 % 5 = 2`, `-3 * 4 = -12`, serta penolakan ekspresi `%` yang tidak lengkap. Parser kini juga mengenali struktur program multi-baris terbatas untuk deklarasi `lah nama = ekspresi` dan pernyataan `hedeh ekspresi`; referensi nama sekarang dievaluasi melalui lingkungan variabel lokal dan program mini dapat menjalankan deklarasi lalu output variabel; assignment ulang, kontrol alur, fungsi, dan diagnostik penuh belum didukung. Ini belum parser/compiler `.cuk` penuh. `codegen.cuk` belum menjalankan compiler.
 
 ## Contoh
 
 | Berkas | Peran saat ini | Batasan utama |
 |---|---|---|
 | `lexer.cuk` | Mengklasifikasikan satu token operator | Demo kecil, bukan scanner |
-| `source_lexer.cuk` | Lexer, parser precedence, AST, evaluator ekspresi integer | Grammar ekspresi dan statement terbatas (`lah`/`hedeh`); belum menyelesaikan referensi variabel, kontrol alur, alias keyword, angka pecahan, floor division, atau decoding escape |
+| `source_lexer.cuk` | Lexer, parser precedence, AST, evaluator ekspresi integer | Grammar ekspresi dan statement terbatas (`lah`/`hedeh`) dengan lookup variabel lokal; belum ada assignment ulang, kontrol alur, alias keyword, angka pecahan, floor division, atau decoding escape |
 | `parser.cuk` | Membentuk node aritmetika dari token sederhana atau token terstruktur | Satu ekspresi `INTEGER OP INTEGER EOF`; belum ada prioritas operator atau tanda kurung |
 | `evaluator.cuk` | Mengevaluasi node aritmetika | Belum menjalankan AST bahasa `.cuk` |
 | `interpreter.cuk` | Menghubungkan tahap mini lexer → parser → evaluator | Input masih daftar token yang sudah disiapkan |

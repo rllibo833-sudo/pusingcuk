@@ -97,3 +97,10 @@ The roadmap is a plan, not a completion badge. The authoritative status is the r
 Prototipe `examples/self_hosting/source_lexer.cuk` kini menambahkan parsing struktur program multi-baris terbatas untuk deklarasi `lah nama = ekspresi` dan pernyataan `hedeh ekspresi`. Ini menghasilkan node statement, tetapi belum menyelesaikan referensi nama, eksekusi program penuh, kontrol alur, IR lowering, atau bootstrap. Tes referensi mengunci output dan status parser; jangan menafsirkan ini sebagai compiler mandiri.
 
 Arsitektur penggunaan lokal tetap **Android + Termux sebagai adapter/data center lokal** untuk PusingCuk AI dan Cuk Reality Engine. Perubahan toolchain tidak boleh menghapus, mereset, memigrasikan secara destruktif, atau mengubah endpoint/config matrix lokal secara diam-diam. Ollama tetap opsional untuk tes inti; provider lokal harus eksplisit loopback, dan proposal evolusi tetap review-only tanpa commit/push otomatis.
+
+
+## Increment self-hosting terbaru — 2026-10-21
+
+Parser program prototipe kini membentuk node `VARIABLE` untuk identifier dalam ekspresi dan evaluator menerima lingkungan variabel. `jalankan_program` menjalankan deklarasi dan mengumpulkan output `hedeh`, sehingga contoh multi-baris mendeklarasikan `x` lalu mencetak nilainya. Cakupan tetap terbatas pada integer/ekspresi aritmetika dan statement `lah`/`hedeh`; belum mendukung assignment ulang, kontrol alur, fungsi, lowering ke IR v1, atau bootstrap. Tes runtime harus membuktikan perilaku ini sebelum milestone dinyatakan selesai.
+
+Untuk penggunaan lokal, HP Android + Termux tetap adapter/data center PusingCuk AI dan Cuk Reality Engine. Perubahan ini hanya menyentuh prototipe dan dokumentasi; jangan reset/migrasi matrix lokal atau mengubah endpoint/provider. Ollama tetap opsional untuk core CI, tidak ada fallback cloud diam-diam, dan evolusi AI tidak melakukan commit/push otomatis.
