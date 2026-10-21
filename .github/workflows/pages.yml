@@ -6,6 +6,9 @@ on:
     paths:
       - "site/**"
       - "tests/test_browser_runtime.js"
+      - "tests/test_browser_playground.js"
+      - "tests/test_browser_differential.js"
+      - "tests/conformance/**"
       - "pusingcuk_new.py"
       - "evaluator.py"
       - "parser.py"
@@ -21,6 +24,18 @@ on:
     paths:
       - "site/**"
       - "tests/test_browser_runtime.js"
+      - "tests/test_browser_playground.js"
+      - "tests/test_browser_differential.js"
+      - "tests/conformance/**"
+      - "pusingcuk_new.py"
+      - "evaluator.py"
+      - "parser.py"
+      - "lexer.py"
+      - "ast_nodes.py"
+      - "library/stdlib.py"
+      - "library/builtin_contract.py"
+      - "library/builtin_contract.json"
+      - "tools/check_playground_examples.py"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -51,6 +66,8 @@ jobs:
         run: node tests/test_browser_runtime.js
       - name: Test playground editor-to-output integration
         run: node tests/test_browser_playground.js
+      - name: Compare browser semantics with Python reference
+        run: node tests/test_browser_differential.js
       - name: Verify reference interpreter example
         run: |
           python pusingcuk_new.py site/examples/halo.pusingcuk > /tmp/halo-reference.txt
