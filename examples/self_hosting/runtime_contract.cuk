@@ -1,0 +1,20 @@
+# Contoh kontrak fitur runtime: status dukungan tidak boleh diasumsikan.
+# Data ini ilustratif dan tidak mengklaim target tertentu sudah lulus tes.
+jancuk
+
+fungsi status_fitur(dukungan, sudah_diuji)
+    njir dukungan == "tidak_didukung"
+        balek "UNSUPPORTED"
+    kampret
+        njir sudah_diuji == benar
+            balek "VERIFIED_FOR_THIS_TARGET"
+        kampret
+            balek "NOT_YET_VERIFIED"
+        selesai njir
+    selesai njir
+selesai fungsi
+
+hedeh status_fitur("didukung", benar)
+hedeh status_fitur("didukung", salah)
+hedeh status_fitur("tidak_didukung", benar)
+selesai jancuk
