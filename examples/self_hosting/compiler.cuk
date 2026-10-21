@@ -880,6 +880,7 @@ fungsi ir_statement(stmt, line)
             selesai njir
         selesai njir
     selesai njir
+    selesai njir
 selesai fungsi
 
 fungsi ir_program(program)
