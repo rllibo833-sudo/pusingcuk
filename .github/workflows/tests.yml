@@ -104,6 +104,41 @@ jobs:
       - run: python scripts/check_alias_sync.py
       - run: python scripts/gen_docs_from_spec.py --check
       - run: python tools/validate_target_manifests.py
+      - name: Verify safe file APIs and deterministic IR-to-VM pipeline
+        run: |
+          python - <<'PY'
+          import hashlib
+          import io
+          import json
+          import tempfile
+          from pathlib import Path
+          from evaluator import capture
+          from compiler.ir import from_source, dumps
+          from compiler.bytecode import compile_ir
+          from compiler.vm import VirtualMachine
+
+          root = Path.cwd()
+          with tempfile.TemporaryDirectory(dir=root) as temp_name:
+              relative = Path(temp_name).relative_to(root).as_posix()
+              source = "jancuk\n" + (
+                  f'lah ok = tulis_file("{relative}/probe.txt", "halo")\n'
+                  f'lah isi = baca_file("{relative}/probe.txt")\n'
+                  'hedeh isi\n'
+              ) + "selesai jancuk\n"
+              assert capture(source, project_root=root).strip() == "halo"
+              ir1 = from_source(source, "bootstrap_probe.cuk")
+              ir2 = from_source(source, "bootstrap_probe.cuk")
+              assert dumps(ir1) == dumps(ir2), "IR serialization is not deterministic"
+              bytecode1 = compile_ir(ir1)
+              bytecode2 = compile_ir(ir2)
+              artifact1 = json.dumps(bytecode1, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+              artifact2 = json.dumps(bytecode2, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+              assert hashlib.sha256(artifact1).digest() == hashlib.sha256(artifact2).digest(), "bytecode stage hash mismatch"
+              output = io.StringIO()
+              VirtualMachine(bytecode1, output_stream=output).run()
+              assert output.getvalue().strip() == "halo", output.getvalue()
+          print("Safe file APIs + IR v1 -> bytecode -> VM reproducibility: OK")
+          PY
       - run: python -m unittest discover -s tests -v
       - if: matrix.python-version == '3.12'
         run: python tools/conformance.py

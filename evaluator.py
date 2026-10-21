@@ -685,19 +685,23 @@ class Evaluator:
                     if len(args) != 1 or not isinstance(args[0], str):
                         self.fail(line, "tanya membutuhkan satu prompt teks")
                     return input(args[0])
-                if n.name == "tulis":
+                if n.name in {"tulis", "tulis_file"}:
                     if len(args) != 2 or not all(isinstance(x, str) for x in args):
-                        self.fail(line, "tulis membutuhkan path dan teks berupa string")
+                        self.fail(line, f"{n.name} membutuhkan path dan teks berupa string")
+                    if len(args[1].encode("utf-8")) > MAX_MODULE_FILE_BYTES:
+                        return False
                     try:
                         _write_project_text(self.project_root, args[0], args[1])
                         return True
                     except (OSError, ValueError):
                         return False
-                if n.name == "baca":
+                if n.name in {"baca", "baca_file"}:
                     if len(args) != 1 or not isinstance(args[0], str):
-                        self.fail(line, "baca membutuhkan satu path berupa string")
+                        self.fail(line, f"{n.name} membutuhkan satu path berupa string")
                     try:
-                        return _read_project_text(self.project_root, args[0])
+                        return _read_project_text(
+                            self.project_root, args[0], max_bytes=MAX_MODULE_FILE_BYTES
+                        )
                     except (OSError, ValueError, UnicodeError):
                         return False
                 if n.name == "tulis_json":

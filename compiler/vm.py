@@ -9,7 +9,7 @@ import io
 from pathlib import Path
 
 from compiler.bytecode import BytecodeError, validate_bytecode
-from evaluator import PusingDict, language_equal
+from evaluator import (PusingDict, language_equal, _REPO_ROOT, _read_project_text, _write_project_text, MAX_MODULE_FILE_BYTES)
 from library.builtin_contract import BUILTIN_BY_NAME
 
 
@@ -214,6 +214,24 @@ class VirtualMachine:
                     if len(args) != 1: self.fail(line, "jadi_teks() membutuhkan 1 argumen")
                     try: result = json.dumps(_json_ready(args[0]), ensure_ascii=False, separators=(",", ":"), allow_nan=False)
                     except (TypeError, ValueError) as exc: self.fail(line, str(exc))
+                elif name in {"baca_file", "baca"}:
+                    if len(args) != 1 or not isinstance(args[0], str):
+                        self.fail(line, f"{name}() membutuhkan satu path berupa teks")
+                    try:
+                        result = _read_project_text(_REPO_ROOT, args[0], max_bytes=MAX_MODULE_FILE_BYTES)
+                    except (OSError, ValueError, UnicodeError):
+                        result = False
+                elif name in {"tulis_file", "tulis"}:
+                    if len(args) != 2 or not all(isinstance(item, str) for item in args):
+                        self.fail(line, f"{name}() membutuhkan path dan teks berupa string")
+                    elif len(args[1].encode("utf-8")) > MAX_MODULE_FILE_BYTES:
+                        result = False
+                    else:
+                        try:
+                            _write_project_text(_REPO_ROOT, args[0], args[1])
+                            result = True
+                        except (OSError, ValueError):
+                            result = False
                 elif name in BUILTIN_BY_NAME:
                     from library.stdlib import call_builtin
                     try:
