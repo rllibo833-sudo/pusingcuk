@@ -71,7 +71,7 @@ fungsi pindai(source)
                                                 njir source[i + 1] == "\\" 
                                                     nilai = nilai + "\\"
                                                 kampret
-                                                    njir source[i + 1] == "\"" or source[i + 1] == "'"
+                                                    njir source[i + 1] == "\"" atau source[i + 1] == "'"
                                                         nilai = nilai + source[i + 1]
                                                     kampret
                                                         nilai = nilai + source[i] + source[i + 1]
