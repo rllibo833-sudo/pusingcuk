@@ -148,6 +148,18 @@ class MultiTargetCompilerTests(unittest.TestCase):
         self.assertEqual(emitted["features"], canonical["features"])
         self.assertEqual(emitted["source_map"], canonical["source_map"])
 
+    def test_vm_discards_return_value_of_standalone_function_call(self):
+        from compiler.bytecode import compile_ir
+        from compiler.ir import from_source
+        from compiler.vm import VirtualMachine
+        import io
+
+        source = "jancuk\nfungsi noop()\n    balek 7\nselesai fungsi\nnoop()\nhedeh 9\nselesai jancuk"
+        artifact = compile_ir(from_source(source, "call_statement.cuk"))
+        output = io.StringIO()
+        VirtualMachine(artifact, output_stream=output).run()
+        self.assertEqual(output.getvalue(), "9\n")
+
     def test_frontend_artifact_executes_in_vm_without_python_parser_at_runtime(self):
         import io
         from compiler.bytecode import compile_ir

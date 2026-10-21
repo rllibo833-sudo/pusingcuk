@@ -82,6 +82,8 @@ class Compiler:
                 self.expression(f["prompt"]); self.emit("INPUT", f["name"], line)
             elif kind == "Print":
                 self.expression(f["value"]); self.emit("PRINT", None, line)
+            elif kind == "Call":
+                self.expression(stmt); self.emit("POP", None, line)
             elif kind == "IndexAssign":
                 self.expression(f["collection"]); self.expression(f["index"]); self.expression(f["value"])
                 self.emit("SET_INDEX", None, line)
