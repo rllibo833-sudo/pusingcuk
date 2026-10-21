@@ -17,8 +17,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -113,8 +112,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -152,8 +150,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -173,8 +170,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -193,8 +189,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -212,8 +207,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -250,8 +244,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -270,8 +263,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -309,8 +301,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -329,8 +320,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -350,8 +340,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -392,8 +381,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -413,8 +401,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -433,8 +420,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -513,8 +499,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -533,8 +518,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -553,8 +537,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -574,8 +557,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -595,8 +577,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -616,8 +597,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -637,8 +617,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -659,8 +638,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -680,8 +658,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -701,8 +678,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -722,8 +698,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -743,8 +718,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -764,8 +738,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -785,8 +758,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -806,8 +778,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -827,8 +798,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -848,8 +818,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -869,8 +838,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -890,8 +858,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       },
       "profile": "core"
     },
@@ -911,8 +878,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       },
       "profile": "core"
     },
@@ -932,8 +898,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       },
       "profile": "core"
     },
@@ -953,8 +918,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       },
       "profile": "core"
     },
@@ -974,8 +938,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       },
       "profile": "core"
     },
@@ -1162,8 +1125,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       },
       "profile": "core"
     },
@@ -1183,8 +1145,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       },
       "profile": "core"
     },
@@ -1204,8 +1165,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       },
       "profile": "core"
     },
@@ -1225,8 +1185,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       },
       "profile": "core"
     },
@@ -1246,8 +1205,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       },
       "profile": "core"
     },
@@ -1267,8 +1225,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       },
       "profile": "core"
     },
@@ -1289,8 +1246,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       },
       "profile": "core"
     },
@@ -1346,8 +1302,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -1367,8 +1322,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -1388,8 +1342,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -1432,8 +1385,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -1452,8 +1404,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -1473,8 +1424,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -1494,8 +1444,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -1517,8 +1466,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -1538,8 +1486,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -1559,8 +1506,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
@@ -1580,8 +1526,7 @@
       },
       "runtimes": {
         "reference": "required",
-        "native": "required",
-        "go": "required"
+        "native": "required"
       }
     },
     {
