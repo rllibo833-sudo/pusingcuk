@@ -57,7 +57,7 @@ class BootstrapDeterminismTests(unittest.TestCase):
                 outputs.append(ran.stdout)
 
             self.assertEqual(outputs[0], outputs[1])
-            self.assertEqual(outputs[0], "Halo, Dunia\\n")
+            self.assertEqual(outputs[0], "Halo, Dunia\n")
             self.assertTrue(ir_bytes, "Python frontend produced an empty IR artifact")
 
 

@@ -50,7 +50,7 @@ class CBackendTests(unittest.TestCase):
             c_path = root / "program.c"
             exe_path = root / "program"
             source.write_text(
-                "jancuk\\nlah angka = 6 * 7\\nhedeh angka\\nselesai jancuk\\n",
+                "jancuk\nlah angka = 6 * 7\nhedeh angka\nselesai jancuk\n",
                 encoding="utf-8",
             )
             generated_ir = subprocess.run(
@@ -70,7 +70,7 @@ class CBackendTests(unittest.TestCase):
             self.assertEqual(built.returncode, 0, built.stderr)
             result = subprocess.run([str(exe_path)], text=True, capture_output=True, timeout=5, check=False)
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertEqual(result.stdout, "42\\n")
+            self.assertEqual(result.stdout, "42\n")
 
     def test_compiles_and_runs_integer_arithmetic(self):
         result = self.compile_and_run(
