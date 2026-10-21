@@ -12,6 +12,11 @@ python -m compiler program.cuk --target c --output program.c
 cc -std=c11 -O2 -Wall -Wextra -Werror program.c -lm -o program
 ./program
 
+# C++17 untuk executable mandiri
+python -m compiler program.cuk --target cpp --output program.cpp
+g++ -std=c++17 -O2 program.cpp -o program
+./program
+
 # JavaScript untuk Node.js
 python -m compiler program.pusingcuk --target js --output program.js
 node program.js
@@ -35,6 +40,7 @@ Target default adalah `js`. Tanpa `--output`, hasil ditulis ke stdout.
 
 ## Arti target keluar
 
+- **cpp**: source C++17 mandiri dengan runtime nilai PusingCuk tertanam; subset awal diuji terhadap 55 fixture konformansi. `Input`, `Try`, JSON/HTML/CSV, impor, dan fitur di luar manifest C++ belum diklaim kompatibel. Compile-time berjalan melalui Python; executable hasil C++ berjalan tanpa interpreter Python.
 - **c**: source C11 untuk subset yang didukung backend native. Compiler saat build masih dijalankan dengan Python; setelah source C dikompilasi menjadi executable, program hasilnya tidak membutuhkan interpreter Python. Fitur di luar subset C ditolak dengan diagnostik, bukan dijalankan lewat fallback Python.
 - **js**: source JavaScript yang dapat dijalankan Node.js; input terminal memakai stdin dan di browser memakai prompt.
 - **python**: source Python mandiri untuk subset bahasa yang didukung backend Python.
@@ -62,11 +68,11 @@ Backend menolak konstruksi yang belum dikenali alih-alih diam-diam menerjemahkan
 
 `PusingCuk → parser/IR → backend`
 
-Untuk bahasa yang masuk, jalurnya dimulai dari parser khusus bahasa sumber, diterjemahkan ke bentuk yang didukung Pusingcuk, lalu divalidasi dan diuji. IR dirancang sebagai titik integrasi untuk backend baru, language server, formatter, editor, alat AI, dan pipeline build. Target berikutnya adalah memperluas interoperabilitas modul dan package, browser APIs, WebAssembly, server/API, database adapters, serta blockchain SDK. Semua itu memerlukan backend atau pustaka integrasi khusus; tidak otomatis tersedia hanya karena target JS/Python/HTML ada.
+Untuk bahasa yang masuk, jalurnya dimulai dari parser khusus bahasa sumber, diterjemahkan ke bentuk yang didukung Pusingcuk, lalu divalidasi dan diuji. IR dirancang sebagai titik integrasi untuk backend baru, language server, formatter, editor, alat AI, dan pipeline build. Target berikutnya adalah memperluas cakupan C++ lalu menambahkan backend Kotlin mandiri; setelah itu interoperabilitas modul dan package, browser APIs, WebAssembly, server/API, database adapters, serta blockchain SDK. Semua itu memerlukan backend atau pustaka integrasi khusus; tidak otomatis tersedia hanya karena target JS/Python/HTML ada.
 
 ## Builtin lintas target
 
-Target JavaScript, Python, dan VM mendukung builtin numerik `mutlak(angka)`,
+Target C++17, JavaScript, Python, dan VM mendukung builtin numerik `mutlak(angka)`,
 `minimum(a, b)`, `maksimum(a, b)`, dan `bulatkan(angka)`. Input harus berupa
 angka finite; boolean ditolak. Pembulatan `.5` menggunakan aturan ties-to-even
 agar hasil konsisten antartarget. Builtin konversi lain yang tercatat di
@@ -76,7 +82,7 @@ diaktifkan di semua backend.
 
 ## Statistics builtins and compatibility
 
-The importer supports `statistics.mean` and `statistics.median`, mapped to `rata_rata(daftar)` and `median(daftar)`. These are implemented and tested on JavaScript, Python, and HTML (which embeds the JS runtime). Inputs must be a non-empty list of finite numbers; booleans are rejected. The VM and native C runtime do not claim support. The presence of these builtins does not mean the full Python `statistics` module is compatible.
+The importer supports `statistics.mean` and `statistics.median`, mapped to `rata_rata(daftar)` and `median(daftar)`. These are implemented and tested on JavaScript, Python, and HTML (which embeds the JS runtime). Inputs must be a non-empty list of finite numbers; booleans are rejected. The VM and native C runtime do not claim support. C++17 support is limited to the explicitly selected compiler fixture manifest. The presence of these builtins does not mean the full Python `statistics` module is compatible.
 
 
 ## Kontrak builtin bersama
