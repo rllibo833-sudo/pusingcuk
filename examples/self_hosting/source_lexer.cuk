@@ -125,8 +125,8 @@ selesai fungsi
 
 # Parser recursive-descent dan evaluator AST untuk ekspresi aritmetika.
 # Grammar: expr := term (("+" | "-") term)*
-# term := primary (("*" | "/") primary)*
-# primary := INTEGER | "(" expr ")"
+# term := primary (("*" | "/" | "%") primary)*
+# primary := INTEGER | "-" primary | "(" expr ")"
 fungsi node_gagal(index)
     balek {"status": "PARSE_ERROR", "index": index}
 selesai fungsi
@@ -138,19 +138,28 @@ fungsi parse_primary(tokens, index)
         njir tokens[index]["jenis"] == "INTEGER"
             balek {"status": "OK", "node": {"jenis": "INTEGER", "nilai": bilangan(tokens[index]["nilai"])}, "index": index + 1}
         kampret
-            njir tokens[index]["jenis"] == "PUNCT" dan tokens[index]["nilai"] == "("
-                lah hasil_dalam = parse_expression(tokens, index + 1)
-                njir hasil_dalam["status"] != "OK"
-                    balek hasil_dalam
+            njir tokens[index]["jenis"] == "OP" dan tokens[index]["nilai"] == "-"
+                lah hasil_negatif = parse_primary(tokens, index + 1)
+                njir hasil_negatif["status"] != "OK"
+                    balek hasil_negatif
                 kampret
-                    njir hasil_dalam["index"] >= panjang(tokens) atau tokens[hasil_dalam["index"]]["jenis"] != "PUNCT" atau tokens[hasil_dalam["index"]]["nilai"] != ")"
-                        balek node_gagal(hasil_dalam["index"])
-                    kampret
-                        balek {"status": "OK", "node": hasil_dalam["node"], "index": hasil_dalam["index"] + 1}
-                    selesai njir
+                    balek {"status": "OK", "node": {"jenis": "UNARY", "operator": "-", "nilai": hasil_negatif["node"]}, "index": hasil_negatif["index"]}
                 selesai njir
             kampret
-                balek node_gagal(index)
+                njir tokens[index]["jenis"] == "PUNCT" dan tokens[index]["nilai"] == "("
+                    lah hasil_dalam = parse_expression(tokens, index + 1)
+                    njir hasil_dalam["status"] != "OK"
+                        balek hasil_dalam
+                    kampret
+                        njir hasil_dalam["index"] >= panjang(tokens) atau tokens[hasil_dalam["index"]]["jenis"] != "PUNCT" atau tokens[hasil_dalam["index"]]["nilai"] != ")"
+                            balek node_gagal(hasil_dalam["index"])
+                        kampret
+                            balek {"status": "OK", "node": hasil_dalam["node"], "index": hasil_dalam["index"] + 1}
+                        selesai njir
+                    selesai njir
+                kampret
+                    balek node_gagal(index)
+                selesai njir
             selesai njir
         selesai njir
     selesai njir
@@ -163,7 +172,7 @@ fungsi parse_term(tokens, index)
     kampret
         lah lanjut = kiri["index"]
         lah node = kiri["node"]
-        mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "OP" dan (tokens[lanjut]["nilai"] == "*" atau tokens[lanjut]["nilai"] == "/")
+        mumet lanjut < panjang(tokens) dan tokens[lanjut]["jenis"] == "OP" dan (tokens[lanjut]["nilai"] == "*" atau tokens[lanjut]["nilai"] == "/" atau tokens[lanjut]["nilai"] == "%")
             lah op = tokens[lanjut]["nilai"]
             lah kanan = parse_primary(tokens, lanjut + 1)
             njir kanan["status"] != "OK"
@@ -215,21 +224,33 @@ fungsi evaluasi(node)
     njir node["jenis"] == "INTEGER"
         balek node["nilai"]
     kampret
-        lah kiri = evaluasi(node["kiri"])
-        lah kanan = evaluasi(node["kanan"])
-        njir node["operator"] == "+"
-            balek kiri + kanan
+        njir node["jenis"] == "UNARY"
+            balek 0 - evaluasi(node["nilai"])
         kampret
-            njir node["operator"] == "-"
-                balek kiri - kanan
+            lah kiri = evaluasi(node["kiri"])
+            lah kanan = evaluasi(node["kanan"])
+            njir node["operator"] == "+"
+                balek kiri + kanan
             kampret
-                njir node["operator"] == "*"
-                    balek kiri * kanan
+                njir node["operator"] == "-"
+                    balek kiri - kanan
                 kampret
-                    njir kanan == 0
-                        balek "DIVISION_BY_ZERO"
+                    njir node["operator"] == "*"
+                        balek kiri * kanan
                     kampret
-                        balek kiri / kanan
+                        njir node["operator"] == "%"
+                            njir kanan == 0
+                                balek "DIVISION_BY_ZERO"
+                            kampret
+                                balek kiri % kanan
+                            selesai njir
+                        kampret
+                            njir kanan == 0
+                                balek "DIVISION_BY_ZERO"
+                            kampret
+                                balek kiri / kanan
+                            selesai njir
+                        selesai njir
                     selesai njir
                 selesai njir
             selesai njir
@@ -252,6 +273,18 @@ njir ast_group["status"] == "OK"
     hedeh evaluasi(ast_group["node"])
 selesai njir
 
-lah ast_invalid = parse_source(pindai("7 % 35"))
+lah ast_modulo = parse_source(pindai("17 % 5"))
+hedeh "MODULO_" + ast_modulo["status"]
+njir ast_modulo["status"] == "OK"
+    hedeh evaluasi(ast_modulo["node"])
+selesai njir
+
+lah ast_negative = parse_source(pindai("-3 * 4"))
+hedeh "UNARY_" + ast_negative["status"]
+njir ast_negative["status"] == "OK"
+    hedeh evaluasi(ast_negative["node"])
+selesai njir
+
+lah ast_invalid = parse_source(pindai("7 %"))
 hedeh "INVALID_" + ast_invalid["status"]
 selesai jancuk

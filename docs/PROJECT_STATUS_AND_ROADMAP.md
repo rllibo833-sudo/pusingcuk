@@ -45,6 +45,18 @@ Baseline matriks multi-target yang tersimpan menyatakan reference, native C, Jav
 - [ ] Dokumentasi pengguna, quickstart, built-ins, compiler targets, website, package metadata, dan release notes konsisten.
 - [ ] CI wajib hijau untuk semua workflow rilis yang relevan; tidak ada run wajib yang masih berjalan atau dilewati.
 
+## Prioritas aktif — frontend mandiri dan bootstrap
+
+Komponen ekosistem yang sudah ada tidak boleh dihitung ulang sebagai pekerjaan baru. Fokus berikutnya adalah menghubungkan prototipe self-hosting dengan toolchain yang ada:
+
+1. Perluas `examples/self_hosting/source_lexer.cuk` dari parser ekspresi menjadi parser program .cuk yang nyata, dengan AST yang konsisten dan diagnostik untuk sintaks tidak valid.
+2. Tetapkan pemetaan AST self-hosted ke IR v1/bytecode VM yang sudah ada, tanpa membuat format paralel kecuali ada kebutuhan kompatibilitas yang jelas.
+3. Bandingkan hasil frontend baru dengan frontend referensi Python melalui fixture konformansi yang relevan; perluas cakupan bertahap dan jangan mengklaim kesetaraan sebelum fixture lulus.
+4. Implementasikan compiler dalam .cuk secara bertahap dan tambahkan job bootstrap: toolchain lama membangun compiler .cuk, lalu compiler baru membangun ulang dirinya; hasil build dan suite tes harus cocok.
+5. Setelah pipeline tersebut teruji, migrasikan bagian Reality Engine, formatter/test runner, dan tooling AI ke jalur .cuk. Ollama tetap opsional dan tidak boleh menjadi syarat tes inti.
+
+**Batas saat ini:** dukungan unary minus dan modulo pada prototipe ekspresi merupakan kemajuan lokal yang terukur, bukan bukti bahwa frontend penuh atau bootstrap sudah selesai. Python masih menjadi implementasi referensi dan penggerak compiler CLI saat ini.
+
 ## Aturan perubahan
 
 1. Satu perubahan bahasa harus menyentuh implementasi, kontrak, fixture, dokumentasi relevan, dan generator yang terkait dalam satu perubahan terulas.
