@@ -105,7 +105,7 @@ class MultiTargetCompilerTests(unittest.TestCase):
 
     def test_self_hosted_frontend_supports_decimal_literals(self):
         from compiler.self_hosted_frontend import from_source as selfhost_from_source
-        source = "jancuk\\nlah pi = 3.125\\nhedeh pi\\nselesai jancuk"
+        source = "jancuk\nlah pi = 3.125\nhedeh pi\nselesai jancuk"
         canonical = json.loads(compile_source(source, "decimal.cuk", "json"))
         selfhost_ir = selfhost_from_source(source, "decimal.cuk")
         self.assertEqual(selfhost_ir["program"], canonical["program"])
@@ -116,7 +116,7 @@ class MultiTargetCompilerTests(unittest.TestCase):
 
     def test_self_hosted_frontend_supports_boolean_literals(self):
         from compiler.self_hosted_frontend import from_source as selfhost_from_source
-        source = "jancuk\\nlah aktif = benar\\nlah nonaktif = salah\\nhedeh aktif\\nselesai jancuk"
+        source = "jancuk\nlah aktif = benar\nlah nonaktif = salah\nhedeh aktif\nselesai jancuk"
         canonical = json.loads(compile_source(source, "boolean.cuk", "json"))
         selfhost_ir = selfhost_from_source(source, "boolean.cuk")
         self.assertEqual(selfhost_ir["program"], canonical["program"])
