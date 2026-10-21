@@ -23,7 +23,6 @@ SUPPORTED = {
 RUNTIME = r'''package main
 
 import (
-    "bufio"
     "fmt"
     "math"
     "os"
@@ -82,6 +81,11 @@ func pcNumber(value any, name string, line int) float64 {
 func pcSafe(name string, value float64, line int) float64 {
     if math.IsNaN(value) || math.IsInf(value, 0) { pcFail(line, name+": hasil angka non-finite") }
     if value == math.Trunc(value) && math.Abs(value) > 9007199254740991 { pcFail(line, name+": integer di luar rentang aman") }
+    return value
+}
+func pcLiteral(value float64, line int) any {
+    if math.IsNaN(value) || math.IsInf(value, 0) { pcFail(line, "angka non-finite") }
+    if value == math.Trunc(value) && math.Abs(value) > 9007199254740991 { pcFail(line, "angka di luar rentang aman") }
     return value
 }
 func pcString(value any) string {
@@ -312,7 +316,7 @@ class GoBackend:
             if value is None: return "nil"
             if isinstance(value, bool): return "true" if value else "false"
             if isinstance(value, str): return json.dumps(value, ensure_ascii=False)
-            if isinstance(value, (int, float)): return f"float64({repr(value)})"
+            if isinstance(value, (int, float)): return f"pcLiteral(float64({repr(value)}), {line})"
             raise GoBackendError(f"baris {line}: literal tidak didukung")
         if kind == "Variable": return f'env.get({json.dumps(fields["name"])}, {line})'
         if kind == "List": return "[]any{" + ", ".join(self.expr(x) for x in fields["items"]) + "}"
