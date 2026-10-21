@@ -140,13 +140,13 @@ fungsi parse_primary(tokens, index)
         kampret
             njir tokens[index]["jenis"] == "PUNCT" dan tokens[index]["nilai"] == "("
                 lah hasil_dalam = parse_expression(tokens, index + 1)
-                njir hasil_hasil_dalam["status"] != "OK"
+                njir hasil_dalam["status"] != "OK"
                     balek hasil_dalam
                 kampret
-                    njir hasil_hasil_dalam["index"] >= panjang(tokens) atau tokens[hasil_hasil_dalam["index"]]["jenis"] != "PUNCT" atau tokens[hasil_hasil_dalam["index"]]["nilai"] != ")"
-                        balek node_gagal(hasil_hasil_dalam["index"])
+                    njir hasil_dalam["index"] >= panjang(tokens) atau tokens[hasil_dalam["index"]]["jenis"] != "PUNCT" atau tokens[hasil_dalam["index"]]["nilai"] != ")"
+                        balek node_gagal(hasil_dalam["index"])
                     kampret
-                        balek {"status": "OK", "node": hasil_hasil_dalam["node"], "index": hasil_hasil_dalam["index"] + 1}
+                        balek {"status": "OK", "node": hasil_dalam["node"], "index": hasil_dalam["index"] + 1}
                     selesai njir
                 selesai njir
             kampret
@@ -254,5 +254,4 @@ selesai njir
 
 lah ast_invalid = parse_source(pindai("7 % 35"))
 hedeh "INVALID_" + ast_invalid["status"]
-selesai jancuk
 selesai jancuk
