@@ -5,7 +5,7 @@
 
 PusingCuk combines approachable Indonesian syntax with a reference interpreter, experimental compiler targets, a native runtime, and conformance tooling. It is an open learning and language-engineering project—not a claim that every target is equivalent or production-ready.
 
-**[Try the browser playground →](https://rllibo833-sudo.github.io/pusingcuk/playground.html)** — experimental; its current interpreter runs on Python through Pyodide, not a standalone native .cuk runtime.
+**[Try the browser playground →](https://rllibo833-sudo.github.io/pusingcuk/playground.html)** — experimental; it runs a bounded JavaScript AST interpreter in `site/runtime.js`, locally in the browser. It does not use Pyodide or a server-side code executor.
 
 <!-- BEGIN GENERATED PYTHON-FREE SCORE BADGE -->
 [![Python-free runtime · native C · 79/79 fixtures](docs/assets/python-free-score.svg)](docs/PYTHON_FREE_SCORE.md)

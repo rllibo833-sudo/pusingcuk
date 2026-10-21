@@ -32,4 +32,8 @@ assert.throws(() => run('hedeh json_teks({1: "x"})'), /kunci objek JSON harus te
 assert.throws(() => runtime.run('jancuk\nhedeh "x" * 65536\nselesai jancuk'), /output melebihi batas|hasil pengulangan terlalu besar/, "large output must be bounded");
 assert.throws(() => runtime.run("x".repeat(65537)), /kode melewati batas/, "source byte limit must be enforced");
 assert.throws(() => run("hedeh rentang(0, 10001)"), /10000 item/, "collection item limit must be enforced");
-console.log("Browser runtime passed " + count + " gallery fixtures plus arithmetic, short-circuit, nested JSON, escaping, functions, mutable indexes, iteration, exception handling, malformed syntax, input validation, safety, and resource-limit tests.");
+assert.equal(run("hedeh bulatkan(2.5)\nhedeh bulatkan(3.5)\nhedeh bulatkan(-2.5)\nhedeh bulatkan(-3.5)").stdout, "2\n4\n-2\n-4\n", "rounding must use ties-to-even");
+assert.equal(run("lah xs = rentang(1, 4)\nhedeh panjang(xs)\nhedeh xs[2]").stdout, "3\n3\n", "range values must support length and nonnegative indexing");
+assert.throws(() => run("lah xs = rentang(1, 4)\nhedeh xs[-1]"), /indeks rentang harus bilangan bulat nonnegatif/, "range values must reject negative indexing");
+assert.throws(() => run("hedeh jumlah([9007199254740991, 1, -1])"), /di luar rentang aman/, "sum must reject an unsafe intermediate integer even if later values cancel it");
+console.log("Browser runtime passed " + count + " gallery fixtures plus arithmetic, short-circuit, nested JSON, escaping, functions, range semantics, ties-to-even rounding, numeric boundaries, exception handling, malformed syntax, input validation, safety, and resource-limit tests.");
