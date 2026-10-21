@@ -954,6 +954,7 @@ fungsi ir_map_statement(stmt, path, line)
             result = result + ir_map_expr(stmt["nilai"], path + ".fields.value", line)
         selesai njir
     selesai njir
+    selesai njir
     balek result
 selesai fungsi
 
