@@ -2,7 +2,7 @@
 from __future__ import annotations
 import argparse, json, re, sys
 from pathlib import Path
-from compiler.ir import from_source, validate
+from compiler.ir import from_source, loads, validate
 
 class CBackendError(ValueError):
     """Source uses a feature outside the current C backend subset."""
@@ -205,14 +205,23 @@ def generate(document: dict) -> str:
     return C_RUNTIME+"\n"+"\n".join(prototypes)+"\n"+"\n".join(definitions)+"\nint main(void) {\n"+("\n".join(main_lines) if main_lines else "    (void)0;")+"\n    return EXIT_SUCCESS;\n}\n"
 
 def main(argv=None) -> int:
-    parser=argparse.ArgumentParser(description="Kompilasi subset Pusingcuk menjadi source C11.")
-    parser.add_argument("source",help="berkas sumber .pusingcuk"); parser.add_argument("-o","--output",help="berkas source C tujuan; default stdout")
+    parser=argparse.ArgumentParser(description="Kompilasi subset Pusingcuk atau artefak IR v1 menjadi source C11.")
+    parser.add_argument("source",nargs="?",help="berkas sumber .cuk/.pusingcuk")
+    parser.add_argument("--ir",help="berkas artefak JSON pusingcuk-ir v1; tidak menjalankan parser sumber")
+    parser.add_argument("-o","--output",help="berkas source C tujuan; default stdout")
     args=parser.parse_args(argv)
+    if bool(args.source) == bool(args.ir):
+        parser.error("berikan tepat satu input: source atau --ir FILE")
     try:
-        path=Path(args.source); output=generate(from_source(path.read_text(encoding="utf-8"),path.name))
+        if args.ir:
+            document=loads(Path(args.ir).read_text(encoding="utf-8"))
+        else:
+            path=Path(args.source)
+            document=from_source(path.read_text(encoding="utf-8"),path.name)
+        output=generate(document)
         if args.output: Path(args.output).write_text(output,encoding="utf-8")
         else: sys.stdout.write(output)
         return 0
-    except (OSError,UnicodeError,ValueError,TypeError) as exc:
+    except (OSError,UnicodeError,ValueError,TypeError,RecursionError) as exc:
         print(f"Kesalahan backend C: {exc}",file=sys.stderr); return 1
 if __name__=="__main__": raise SystemExit(main())

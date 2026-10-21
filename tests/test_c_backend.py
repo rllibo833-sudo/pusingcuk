@@ -42,6 +42,36 @@ class CBackendTests(unittest.TestCase):
             if reference.returncode != 0:
                 self.assertEqual(compiled.stdout, "")
 
+    def test_cli_compiles_validated_ir_artifact_to_c(self):
+        with tempfile.TemporaryDirectory(prefix="pusingcuk-c-ir-") as temp:
+            root = Path(temp)
+            source = root / "program.cuk"
+            ir_path = root / "program.ir.json"
+            c_path = root / "program.c"
+            exe_path = root / "program"
+            source.write_text(
+                "jancuk\\nlah angka = 6 * 7\\nhedeh angka\\nselesai jancuk\\n",
+                encoding="utf-8",
+            )
+            generated_ir = subprocess.run(
+                [sys.executable, "-m", "compiler.ir", str(source), "-o", str(ir_path)],
+                cwd=ROOT, text=True, capture_output=True, timeout=10, check=False,
+            )
+            self.assertEqual(generated_ir.returncode, 0, generated_ir.stderr)
+            generated_c = subprocess.run(
+                [sys.executable, "-m", "compiler.c_backend", "--ir", str(ir_path), "-o", str(c_path)],
+                cwd=ROOT, text=True, capture_output=True, timeout=10, check=False,
+            )
+            self.assertEqual(generated_c.returncode, 0, generated_c.stderr)
+            built = subprocess.run(
+                [COMPILER, "-std=c11", "-Wall", "-Wextra", "-Werror", str(c_path), "-o", str(exe_path)],
+                text=True, capture_output=True, timeout=20, check=False,
+            )
+            self.assertEqual(built.returncode, 0, built.stderr)
+            result = subprocess.run([str(exe_path)], text=True, capture_output=True, timeout=5, check=False)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout, "42\\n")
+
     def test_compiles_and_runs_integer_arithmetic(self):
         result = self.compile_and_run(
             "jancuk\nlah angka = 6 * 7\nangka = angka + 1\nhedeh angka\nselesai jancuk"
