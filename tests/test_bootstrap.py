@@ -7,7 +7,7 @@ from compiler.self_hosted_frontend import from_source as self_hosted_from_source
 class BootstrapEvidenceTests(unittest.TestCase):
 
     def test_cuk_frontend_emits_function_and_return_ir_without_fallback(self):
-        source = 'jancuk\\nfungsi tambah(a, b)\\n    balek a + b\\nselesai fungsi\\nhedeh tambah(20, 22)\\nselesai jancuk\\n'
+        source = 'jancuk\nfungsi tambah(a, b)\n    balek a + b\nselesai fungsi\nhedeh tambah(20, 22)\nselesai jancuk\n'
         document = self_hosted_from_source(source, "function.cuk")
         body = document["program"]["fields"]["body"]
         self.assertEqual(body[0]["kind"], "Function")
