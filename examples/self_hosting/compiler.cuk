@@ -810,7 +810,7 @@ fungsi ir_program(program)
     selesai njir
     lah jumlah_emit = 0
     mumet i < panjang(program["statements"])
-        njir program["statements"][i]["jenis"] == "DECLARE" ou program["statements"][i]["jenis"] == "ASSIGN" ou program["statements"][i]["jenis"] == "PRINT" ou program["statements"][i]["jenis"] == "FUNCTION"
+        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" ou program["statements"][i]["jenis"] == "PRINT" ou program["statements"][i]["jenis"] == "FUNCTION"
             njir jumlah_emit > 0
                 body = body + ","
             selesai njir
@@ -845,7 +845,21 @@ fungsi ir_map_expr(node, path, line)
 selesai fungsi
 
 fungsi ir_map_statement(stmt, path, line)
-    balek ",{\"path\":\"" + path + "\",\"line\":" + teks(line) + "}" + ir_map_expr(stmt["nilai"], path + ".fields.value", line)
+    lah result = ",{\"path\":\"" + path + "\",\"line\":" + teks(line) + "}"
+    njir stmt["jenis"] == "FUNCTION"
+        lah i = 0
+        mumet i < panjang(stmt["body"])
+            result = result + ir_map_statement(stmt["body"][i], path + ".fields.body[" + teks(i) + "]", line + i + 1)
+            i = i + 1
+        selesai mumet
+    kampret
+        njir stmt["jenis"] == "RETURN"
+            result = result + ir_map_expr(stmt["nilai"], path + ".fields.value", line)
+        kampret
+            result = result + ir_map_expr(stmt["nilai"], path + ".fields.value", line)
+        selesai njir
+    selesai njir
+    balek result
 selesai fungsi
 
 fungsi ir_source_map(program)
@@ -858,7 +872,7 @@ fungsi ir_source_map(program)
     result = result + teks(root_line) + "}"
     lah map_index = 0
     mumet i < panjang(program["statements"])
-        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT"
+        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT" atau program["statements"][i]["jenis"] == "FUNCTION"
             result = result + ir_map_statement(program["statements"][i], "$.fields.body[" + teks(map_index) + "]", i + 2)
             map_index = map_index + 1
         selesai njir
