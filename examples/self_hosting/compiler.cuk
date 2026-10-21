@@ -880,7 +880,7 @@ fungsi ir_statement(stmt, line)
             body_json = body_json + ir_statement(stmt["body"][i], line + i + 1)
             i = i + 1
         selesai mumet
-        balek "{\\"kind\\":\\"While\\",\\"line\\":" + teks(line) + ",\\"fields\\":{\\"condition\\":" + condition_json + ",\\"body\\":[" + body_json + "]}}"
+        balek "{\"kind\":\"While\",\"line\":" + teks(line) + ",\"fields\":{\"condition\":" + condition_json + ",\"body\":[" + body_json + "]}}"
     kampret
     njir stmt["jenis"] == "IF"
         lah condition_json = ir_expr(stmt["condition"], line)
