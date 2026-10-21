@@ -776,7 +776,14 @@ selesai fungsi
 
 fungsi ir_map_expr(node, path, line)
     lah result = ",{\"path\":\"" + path + "\",\"line\":" + teks(line) + "}"
-    njir node["jenis"] == "UNARY"
+    njir node["jenis"] == "CALL"
+        lah map_arg_index = 0
+        mumet map_arg_index < panjang(node["args"])
+            result = result + ir_map_expr(node["args"][map_arg_index], path + ".fields.args[" + teks(map_arg_index) + "]", line)
+            map_arg_index = map_arg_index + 1
+        selesai mumet
+    kampret
+        njir node["jenis"] == "UNARY"
         result = result + ir_map_expr(node["nilai"], path + ".fields.value", line)
     kampret
         njir node["jenis"] == "BINARY"
@@ -837,6 +844,15 @@ fungsi ir_collect_features(node, flags)
                 kampret
                     njir node["jenis"] == "VARIABLE"
                         flags["variables"] = benar
+                    kampret
+                        njir node["jenis"] == "CALL"
+                            flags["calls"] = benar
+                            lah call_feature_index = 0
+                            mumet call_feature_index < panjang(node["args"])
+                                ir_collect_features(node["args"][call_feature_index], flags)
+                                call_feature_index = call_feature_index + 1
+                            selesai mumet
+                        selesai njir
                     selesai njir
                 selesai njir
             selesai njir
@@ -845,7 +861,7 @@ fungsi ir_collect_features(node, flags)
 selesai fungsi
 
 fungsi ir_features(program)
-    lah flags = {"core": benar, "console-output": salah, "operators": salah, "variables": salah}
+    lah flags = {"core": benar, "console-output": salah, "operators": salah, "variables": salah, "calls": salah}
     ir_collect_features(program, flags)
     lah result = "["
     njir flags["console-output"]
@@ -857,6 +873,9 @@ fungsi ir_features(program)
     selesai njir
     njir flags["variables"]
         result = result + ",\"variables\""
+    selesai njir
+    njir flags["calls"]
+        result = result + ",\"calls\""
     selesai njir
     balek result + "]"
 selesai fungsi
