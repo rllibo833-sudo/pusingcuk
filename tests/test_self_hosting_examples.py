@@ -37,7 +37,7 @@ class SelfHostingExampleTests(unittest.TestCase):
             "source_lexer.cuk",
             "IDENT:lah\nIDENT:x\nOP:=\nINTEGER:12\nOP:+\nINTEGER:3\n"
             "NEWLINE:NEWLINE\nIDENT:hedeh\nIDENT:x\nNEWLINE:NEWLINE\nEOF:EOF\n"
-            "PRECEDENCE_OK\n14\nPARENS_OK\n20\nMODULO_OK\n2\nUNARY_OK\n-12\nINVALID_PARSE_ERROR\n",
+            "PRECEDENCE_OK\n14\nPARENS_OK\n20\nMODULO_OK\n2\nUNARY_OK\n-12\nINVALID_PARSE_ERROR\nPROGRAM_OK\n2\n5\n5\n",
         )
 
     def test_parser_builds_arithmetic_node(self) -> None:
