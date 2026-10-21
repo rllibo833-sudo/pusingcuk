@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'examples/self_hosting/driver_lexer.cuk'
+      - 'examples/self_hosting/driver_lexer_minimal.cuk'
       - 'native/**'
       - 'compiler/**'
       - '.github/workflows/verify-driver-native.yml'
@@ -21,7 +22,7 @@ jobs:
         run: |
           set -x
           python -m compiler --help
-          python -m compiler --emit-bytecode /tmp/driver_lexer.pvm examples/self_hosting/driver_lexer.cuk
+          python -m compiler --emit-bytecode /tmp/driver_lexer.pvm examples/self_hosting/driver_lexer_minimal.cuk
           echo "=== COMPILE RESULT ==="
           ls -lh /tmp/driver_lexer.pvm
           wc -c /tmp/driver_lexer.pvm
