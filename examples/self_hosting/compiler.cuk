@@ -784,13 +784,13 @@ fungsi ir_map_expr(node, path, line)
         selesai mumet
     kampret
         njir node["jenis"] == "UNARY"
-        result = result + ir_map_expr(node["nilai"], path + ".fields.value", line)
-    kampret
-        njir node["jenis"] == "BINARY"
-            result = result + ir_map_expr(node["kiri"], path + ".fields.left", line)
-            result = result + ir_map_expr(node["kanan"], path + ".fields.right", line)
+            result = result + ir_map_expr(node["nilai"], path + ".fields.value", line)
+        kampret
+            njir node["jenis"] == "BINARY"
+                result = result + ir_map_expr(node["kiri"], path + ".fields.left", line)
+                result = result + ir_map_expr(node["kanan"], path + ".fields.right", line)
+            selesai njir
         selesai njir
-    selesai njir
     selesai njir
     balek result
 selesai fungsi
