@@ -491,15 +491,19 @@ def _delete_project_file(project_root, raw_path):
 class Evaluator:
     def __init__(self, source_path=None, project_root=None, module_cache=None,
                  module_loading_stack=None, module_depth=0, is_main=True,
-                 max_steps=100000, max_loop_iterations=10000):
+                 max_steps=100000, max_loop_iterations=10000,
+                 max_intermediate_size=100000):
         if not isinstance(max_steps, int) or isinstance(max_steps, bool) or max_steps < 1:
             raise ValueError("max_steps harus integer positif")
         if not isinstance(max_loop_iterations, int) or isinstance(max_loop_iterations, bool) or max_loop_iterations < 1:
             raise ValueError("max_loop_iterations harus integer positif")
+        if not isinstance(max_intermediate_size, int) or isinstance(max_intermediate_size, bool) or max_intermediate_size < 1:
+            raise ValueError("max_intermediate_size harus integer positif")
         self.functions = {}
         self.budget = 0
         self.max_steps = max_steps
         self.max_loop_iterations = max_loop_iterations
+        self.max_intermediate_size = max_intermediate_size
         self.source_path = Path(source_path).resolve() if source_path is not None else None
         self.project_root = Path(project_root or _REPO_ROOT).resolve()
         self._module_cache = module_cache if module_cache is not None else {}
@@ -605,9 +609,9 @@ class Evaluator:
                     self.fail(line, "hasil angka terlalu besar")
                 if isinstance(result, float) and not math.isfinite(result):
                     self.fail(line, "hasil angka desimal terlalu besar atau tidak valid")
-                if n.op == "*" and isinstance(result, (str, list)) and len(result) > 100000:
+                if n.op == "*" and isinstance(result, (str, list)) and len(result) > self.max_intermediate_size:
                     self.fail(line, "hasil perkalian terlalu besar")
-                if n.op == "+" and isinstance(result, (str, list)) and len(result) > 100000:
+                if n.op == "+" and isinstance(result, (str, list)) and len(result) > self.max_intermediate_size:
                     self.fail(line, "hasil penggabungan terlalu besar")
                 return result
             if k == "Call":

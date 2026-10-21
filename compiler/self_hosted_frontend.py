@@ -22,6 +22,7 @@ MARKER = "lah contoh = "
 # Regular .cuk programs keep the language's default execution limits.
 FRONTEND_MAX_STEPS = 10_000_000
 FRONTEND_MAX_LOOP_ITERATIONS = 250_000
+FRONTEND_MAX_INTERMEDIATE_SIZE = 8 * 1024 * 1024
 MAX_SOURCE_BYTES = 256_000
 
 
@@ -69,6 +70,7 @@ def from_source(source: str, source_name: str = "<memory>") -> dict:
             project_root=ROOT,
             max_steps=FRONTEND_MAX_STEPS,
             max_loop_iterations=FRONTEND_MAX_LOOP_ITERATIONS,
+            max_intermediate_size=FRONTEND_MAX_INTERMEDIATE_SIZE,
         )
         try:
             with redirect_stdout(stdout), redirect_stderr(stderr):
