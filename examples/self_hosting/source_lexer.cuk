@@ -248,7 +248,7 @@ fungsi parse_program_line(line_tokens)
                     mulai = 3
                 selesai njir
             kampret
-                njir line_tokens[0]["nilai"] == "hedeh"
+                njir line_tokens[0]["nilai"] == "hedeh" atau line_tokens[0]["nilai"] == "bacot" atau line_tokens[0]["nilai"] == "bacrit" atau line_tokens[0]["nilai"] == "berak" atau line_tokens[0]["nilai"] == "berisik" atau line_tokens[0]["nilai"] == "cetak" atau line_tokens[0]["nilai"] == "crot" atau line_tokens[0]["nilai"] == "gas" atau line_tokens[0]["nilai"] == "gebber" atau line_tokens[0]["nilai"] == "gembor" atau line_tokens[0]["nilai"] == "jedor" atau line_tokens[0]["nilai"] == "jir" atau line_tokens[0]["nilai"] == "keluarin" atau line_tokens[0]["nilai"] == "koar" atau line_tokens[0]["nilai"] == "muncrat" atau line_tokens[0]["nilai"] == "ngegas" atau line_tokens[0]["nilai"] == "nyalak" atau line_tokens[0]["nilai"] == "omong" atau line_tokens[0]["nilai"] == "print" atau line_tokens[0]["nilai"] == "sembur" atau line_tokens[0]["nilai"] == "semprot" atau line_tokens[0]["nilai"] == "senggol" atau line_tokens[0]["nilai"] == "spill" atau line_tokens[0]["nilai"] == "suarakan" atau line_tokens[0]["nilai"] == "tampilkan" atau line_tokens[0]["nilai"] == "teriak"
                     jenis_stmt = "PRINT"
                     mulai = 1
                 kampret
