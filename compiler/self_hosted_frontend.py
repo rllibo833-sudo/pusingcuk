@@ -12,7 +12,7 @@ from pathlib import Path
 from compiler.ir import validate
 
 ROOT = Path(__file__).resolve().parents[1]
-FRONTEND_SOURCE = ROOT / "examples" / "self_hosting" / "source_lexer.cuk"
+FRONTEND_SOURCE = ROOT / "examples" / "self_hosting" / "compiler.cuk"
 MARKER = "lah contoh = "
 
 class SelfHostedFrontendError(ValueError):

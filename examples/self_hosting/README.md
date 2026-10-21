@@ -2,14 +2,16 @@
 
 Folder ini berisi prototipe bertahap yang ditulis dengan bahasa `.cuk` untuk menguji apakah bahasa ini bisa menjadi alat bagi pengembangan toolchain-nya sendiri.
 
-**Status:** belum self-hosted penuh. `source_lexer.cuk` menjalankan lexer dan recursive-descent parser yang ditulis dalam `.cuk`, membentuk AST, lalu menyerialisasi envelope IR v1 (`format`, versi, `source_name`, `features`, `source_map`, dan `program`) langsung dari `.cuk`. Grammar yang sudah diuji mencakup deklarasi, assignment, alias output, integer/desimal, boolean, string dengan escape dasar, unary minus/`bukan`, prioritas aritmetika (`+`, `-`, `*`, `/`, `//`, `%`), perbandingan (`==`, `!=`, `<`, `<=`, `>`, `>=`), dan operator logika `dan`/`atau`. Parser program masih terbatas pada deklarasi, assignment, dan output per baris; kontrol alur, fungsi, input, koleksi/indeks, diagnostik sumber penuh, serta compiler yang dapat membangun ulang dirinya belum didukung. `compiler/self_hosted_frontend.py` saat ini memakai interpreter referensi Python sebagai host untuk menjalankan program frontend `.cuk`, lalu hanya memvalidasi IR yang dihasilkan; Python tidak lagi menyusun AST atau envelope IR. Ini kemajuan jalur `.cuk` → IR v1 → VM/backend, bukan bukti bootstrap mandiri. `codegen.cuk` masih generator ekspresi, bukan compiler penuh.
+**Status:** belum self-hosted penuh. `compiler.cuk` kini menjadi sumber utama frontend `.cuk`: lexer, parser ekspresi, AST subset, dan serializer IR v1. Frontend mengenali pemanggilan fungsi dengan argumen pada ekspresi, tetapi grammar program masih terbatas pada deklarasi, assignment, dan output; fungsi sebagai pernyataan, kontrol alur, input, koleksi/indeks, serta bootstrap dua tahap belum selesai. `source_lexer.cuk` dipertahankan sebagai prototipe kompatibilitas. `html.cuk` adalah generator halaman HTML mandiri dengan escaping teks; ini belum menggantikan backend HTML penuh yang ada di toolchain. `compiler/self_hosted_frontend.py` masih memakai interpreter referensi Python sebagai host untuk menjalankan kode frontend `.cuk`, lalu memvalidasi IR yang dihasilkan. Jadi jalur `.cuk` → IR v1 → VM/backend sudah tersedia untuk subset, tetapi compiler belum membangun ulang dirinya sendiri.
 
 ## Contoh
 
 | Berkas | Peran saat ini | Batasan utama |
 |---|---|---|
 | `lexer.cuk` | Mengklasifikasikan satu token operator | Demo kecil, bukan scanner |
-| `source_lexer.cuk` | Lexer, parser precedence dan IR v1 serializer yang ditulis dalam `.cuk` | Deklarasi/assignment/output; ekspresi aritmetika, perbandingan, logika, dan literal scalar; belum ada kontrol alur, fungsi, koleksi, input, atau bootstrap mandiri |
+| `compiler.cuk` | Sumber utama frontend `.cuk` → AST subset → IR v1 | Ekspresi dan pemanggilan fungsi dalam ekspresi; pernyataan program masih terbatas; belum self-hosting penuh |
+| `source_lexer.cuk` | Prototipe frontend lama untuk kompatibilitas | Jangan gunakan sebagai sumber utama untuk pengembangan baru |
+| `html.cuk` | Generator HTML dengan escaping karakter khusus | Generator halaman sederhana, bukan backend HTML IR lengkap |
 | `parser.cuk` | Membentuk node aritmetika dari token sederhana atau token terstruktur | Satu ekspresi `INTEGER OP INTEGER EOF`; belum ada prioritas operator atau tanda kurung |
 | `evaluator.cuk` | Mengevaluasi node aritmetika | Belum menjalankan AST bahasa `.cuk` |
 | `interpreter.cuk` | Menghubungkan tahap mini lexer → parser → evaluator | Input masih daftar token yang sudah disiapkan |
@@ -20,6 +22,8 @@ Folder ini berisi prototipe bertahap yang ditulis dengan bahasa `.cuk` untuk men
 
 ```sh
 python pusingcuk_new.py examples/self_hosting/lexer.cuk
+python pusingcuk_new.py examples/self_hosting/compiler.cuk
+python pusingcuk_new.py examples/self_hosting/html.cuk
 python pusingcuk_new.py examples/self_hosting/source_lexer.cuk
 python pusingcuk_new.py examples/self_hosting/parser.cuk
 python pusingcuk_new.py examples/self_hosting/evaluator.cuk

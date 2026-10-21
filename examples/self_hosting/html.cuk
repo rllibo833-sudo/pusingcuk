@@ -1,0 +1,44 @@
+# Generator HTML mandiri yang ditulis dalam .cuk.
+# Escape karakter HTML sebelum memasukkan teks ke dokumen.
+jancuk
+
+fungsi html_escape(teks_input)
+    lah hasil = ""
+    lah i = 0
+    mumet i < panjang(teks_input)
+        lah karakter = teks_input[i]
+        njir karakter == "&"
+            hasil = hasil + "&amp;"
+        kampret
+            njir karakter == "<"
+                hasil = hasil + "&lt;"
+            kampret
+                njir karakter == ">"
+                    hasil = hasil + "&gt;"
+                kampret
+                    njir karakter == "\""
+                        hasil = hasil + "&quot;"
+                    kampret
+                        njir karakter == "'"
+                            hasil = hasil + "&#39;"
+                        kampret
+                            hasil = hasil + karakter
+                        selesai njir
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+        i = i + 1
+    selesai mumet
+    balek hasil
+selesai fungsi
+
+fungsi buat_halaman(judul, isi)
+    lah judul_aman = html_escape(judul)
+    lah isi_aman = html_escape(isi)
+    balek "<!doctype html>\n<html lang=\"id\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>" + judul_aman + "</title>\n</head>\n<body>\n<main>\n<h1>" + judul_aman + "</h1>\n<p>" + isi_aman + "</p>\n</main>\n</body>\n</html>\n"
+selesai fungsi
+
+lah halaman = buat_halaman("PusingCuk", "HTML dibuat oleh program .cuk.")
+hedeh halaman
+selesai jancuk
