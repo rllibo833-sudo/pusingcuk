@@ -50,6 +50,7 @@ Target default adalah `js`. Tanpa `--output`, hasil ditulis ke stdout.
 - **c**: source C11 untuk subset yang didukung backend native. Compiler saat build masih dijalankan dengan Python; setelah source C dikompilasi menjadi executable, program hasilnya tidak membutuhkan interpreter Python. Fitur di luar subset C ditolak dengan diagnostik, bukan dijalankan lewat fallback Python.
 - **js**: source JavaScript yang dapat dijalankan Node.js; input terminal memakai stdin dan di browser memakai prompt.
 - **python**: source Python mandiri untuk subset bahasa yang didukung backend Python.
+- **rust**: source Rust mandiri untuk subset numerik terbatas: literal angka, variabel, assignment, output, unary minus, dan `+ - * / // %`. Gunakan `rustc` untuk membangun executable. Fitur lain ditolak saat kompilasi; ini belum kompatibilitas penuh Rust.
 - **html**: halaman browser dengan JavaScript tersemat dan panel output. Ini bukan framework frontend dan belum menyediakan DOM bindings PusingCuk.
 - **json**: serialisasi IR v1 yang tervalidasi. JSON IR adalah format pertukaran compiler, bukan program yang dapat dieksekusi langsung.
 - **vm**: bytecode stack versi 1 yang dijalankan oleh VM referensi melalui `python -m compiler.vm`.
