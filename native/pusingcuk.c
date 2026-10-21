@@ -1615,6 +1615,105 @@ Val pvm_execute(PvmState *vm,const PvmInstruction *code,size_t count,unsigned de
     Val result=vm->top>base?pvm_pop(vm):(Val){.t=NIL};vm->top=base;return result;
 }
 
+
+#define PVM_MAX_CODE 100000
+#define PVM_MAX_JSON_BYTES (32u * 1024u * 1024u)
+static char *pvm_copy_text(const char *s) {
+    size_t n=strlen(s)+1; char *out=malloc(n); if(out)memcpy(out,s,n); return out;
+}
+static Val pvm_field(Val object,const char *key) {
+    if(object.t!=DICT||!object.dict)return (Val){.t=NIL};
+    for(size_t i=0;i<object.dict->len;i++)
+        if(object.dict->keys[i].t==STR&&!strcmp(object.dict->keys[i].s,key))return object.dict->values[i];
+    return (Val){.t=NIL};
+}
+static int pvm_integer(Val v,int *out) {
+    if(v.t!=NUM||!isfinite(v.n)||v.n<0||v.n>10000000||floor(v.n)!=v.n)return 0;
+    *out=(int)v.n;return 1;
+}
+static int pvm_decode_code(Val encoded,PvmInstruction **out,size_t *out_count) {
+    if(encoded.t!=LIST||!encoded.list||encoded.list->len>PVM_MAX_CODE)return 0;
+    size_t count=encoded.list->len;
+    PvmInstruction *code=calloc(count?count:1,sizeof *code);if(!code)return 0;
+    for(size_t i=0;i<count;i++){
+        Val ins=encoded.list->items[i];
+        if(ins.t!=LIST||!ins.list||ins.list->len!=3){free(code);return 0;}
+        Val ov=ins.list->items[0],arg=ins.list->items[1];
+        if(ov.t!=STR){free(code);return 0;}
+        const char *op=ov.s;PvmInstruction *p=&code[i];
+        if(!strcmp(op,"CONST")){p->op=PVM_CONST;p->value=arg;}
+        else if(!strcmp(op,"LOAD")){p->op=PVM_LOAD;if(arg.t!=STR)goto bad;p->name=pvm_copy_text(arg.s);}
+        else if(!strcmp(op,"DECLARE")){p->op=PVM_DECLARE;if(arg.t!=STR)goto bad;p->name=pvm_copy_text(arg.s);}
+        else if(!strcmp(op,"STORE")){p->op=PVM_STORE;if(arg.t!=STR)goto bad;p->name=pvm_copy_text(arg.s);}
+        else if(!strcmp(op,"POP"))p->op=PVM_POP;
+        else if(!strcmp(op,"GET"))p->op=PVM_GET;
+        else if(!strcmp(op,"PRINT"))p->op=PVM_PRINT;
+        else if(!strcmp(op,"MAKE_LIST")){p->op=PVM_MAKE_LIST;if(!pvm_integer(arg,&p->argc))goto bad;}
+        else if(!strcmp(op,"MAKE_DICT")){p->op=PVM_MAKE_DICT;if(!pvm_integer(arg,&p->argc))goto bad;}
+        else if(!strcmp(op,"UNARY")){p->op=PVM_UNARY;if(arg.t!=STR)goto bad;p->operator_name=pvm_copy_text(arg.s);}
+        else if(!strcmp(op,"BINARY")){p->op=PVM_BINARY;if(arg.t!=STR)goto bad;p->operator_name=pvm_copy_text(arg.s);}
+        else if(!strcmp(op,"TO_BOOL"))p->op=PVM_TO_BOOL;
+        else if(!strcmp(op,"JUMP")||!strcmp(op,"JUMP_IF_FALSE")){
+            p->op=!strcmp(op,"JUMP")?PVM_JUMP:PVM_JUMP_IF_FALSE;if(!pvm_integer(arg,&p->target))goto bad;
+        }
+        else if(!strcmp(op,"ITER_INIT")){p->op=PVM_ITER_INIT;if(!pvm_integer(arg,&p->slot)||p->slot>=10001)goto bad;}
+        else if(!strcmp(op,"ITER_NEXT")){
+            if(arg.t!=LIST||!arg.list||arg.list->len!=3)goto bad;
+            p->op=PVM_ITER_NEXT;
+            if(!pvm_integer(arg.list->items[0],&p->slot)||p->slot>=10001||arg.list->items[1].t!=STR||!pvm_integer(arg.list->items[2],&p->target))goto bad;
+            p->iter_name=pvm_copy_text(arg.list->items[1].s);
+        }
+        else if(!strcmp(op,"CALL")){
+            if(arg.t!=LIST||!arg.list||arg.list->len!=2||arg.list->items[0].t!=STR||!pvm_integer(arg.list->items[1],&p->argc)||p->argc>MAX_PARAMS)goto bad;
+            p->op=PVM_CALL;p->name=pvm_copy_text(arg.list->items[0].s);
+        }
+        else if(!strcmp(op,"RETURN"))p->op=PVM_RETURN;
+        else goto bad;
+        if((p->name==NULL&&(!strcmp(op,"LOAD")||!strcmp(op,"DECLARE")||!strcmp(op,"STORE")||!strcmp(op,"CALL")))||
+           (p->operator_name==NULL&&(!strcmp(op,"UNARY")||!strcmp(op,"BINARY")))||
+           (p->iter_name==NULL&&!strcmp(op,"ITER_NEXT")))goto bad;
+    }
+    *out=code;*out_count=count;return 1;
+bad:
+    for(size_t j=0;j<count;j++){free((void*)code[j].name);free((void*)code[j].operator_name);free((void*)code[j].iter_name);}free(code);return 0;
+}
+static int pvm_load_and_run(const char *path) {
+    FILE *file=fopen(path,"rb");if(!file){fprintf(stderr,"PVM: tidak bisa membuka %s: %s\n",path,strerror(errno));return 1;}
+    if(fseek(file,0,SEEK_END)!=0){fclose(file);return 1;}long size=ftell(file);
+    if(size<0||(unsigned long)size>PVM_MAX_JSON_BYTES){fclose(file);fprintf(stderr,"PVM: ukuran bytecode tidak valid\n");return 1;}
+    rewind(file);char *source=malloc((size_t)size+1);if(!source){fclose(file);return 1;}
+    size_t got=fread(source,1,(size_t)size,file);fclose(file);source[got]='\0';
+    JsonParser jp={source,0,1};Val document=json_parse_value(&jp,0);json_ws(&jp);
+    if(!jp.valid||err||source[jp.pos]!='\0'||document.t!=DICT){fprintf(stderr,"PVM: JSON bytecode tidak valid\n");free(source);return 1;}
+    Val root_code=pvm_field(document,"code"), encoded_functions=pvm_field(document,"functions");
+    PvmInstruction *code=NULL;size_t count=0;
+    if(!pvm_decode_code(root_code,&code,&count)){fprintf(stderr,"PVM: array code tidak valid\n");free(source);return 1;}
+    PvmFunction *functions=NULL;size_t function_count=0;
+    if(encoded_functions.t!=DICT||!encoded_functions.dict){fprintf(stderr,"PVM: tabel functions tidak valid\n");free(source);free(code);return 1;}
+    function_count=encoded_functions.dict->len;
+    if(function_count>MAX_FUNCTIONS){fprintf(stderr,"PVM: terlalu banyak fungsi\n");free(source);free(code);return 1;}
+    functions=calloc(function_count?function_count:1,sizeof *functions);
+    if(!functions){free(source);free(code);return 1;}
+    int ok=1;
+    for(size_t i=0;i<function_count&&ok;i++){
+        Val fnname=encoded_functions.dict->keys[i],entry=encoded_functions.dict->values[i];
+        Val params=pvm_field(entry,"params"),fncode=pvm_field(entry,"code");
+        if(fnname.t!=STR||params.t!=LIST||!params.list||params.list->len>MAX_PARAMS){ok=0;break;}
+        functions[i].name=pvm_copy_text(fnname.s);functions[i].param_count=(int)params.list->len;
+        const char **names=calloc(params.list->len?params.list->len:1,sizeof *names);
+        if(!functions[i].name||!names){free(names);ok=0;break;}functions[i].params=names;
+        for(size_t j=0;j<params.list->len;j++){if(params.list->items[j].t!=STR){ok=0;break;}names[j]=pvm_copy_text(params.list->items[j].s);if(!names[j]){ok=0;break;}}
+        if(ok&&!pvm_decode_code(fncode,(PvmInstruction**)&functions[i].code,&functions[i].code_count))ok=0;
+    }
+    if(!ok){fprintf(stderr,"PVM: fungsi bytecode malformed\n");free(source);free(code);free(functions);return 1;}
+    PvmState vm;pvm_init(&vm);vm.functions=functions;vm.function_count=function_count;
+    (void)pvm_execute(&vm,code,count,0);
+    int status=err?1:0;
+    free(source);free(code);
+    for(size_t i=0;i<function_count;i++){free((void*)functions[i].name);for(int j=0;j<functions[i].param_count;j++)free((void*)functions[i].params[j]);free((void*)functions[i].params);free((void*)functions[i].code);}
+    free(functions);return status;
+}
+
 #ifndef PUSINGCUK_VERSION
 #define PUSINGCUK_VERSION "0.8.0.dev0"
 #endif
@@ -1633,6 +1732,7 @@ static void print_usage(FILE *out, const char *program) {
 }
 
 int main(int argc,char **argv) {
+    if (argc == 3 && !strcmp(argv[1], "--run-bytecode")) return pvm_load_and_run(argv[2]);
     if (argc == 2 && (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v"))) {
         printf("Pusingcuk native %s\n", PUSINGCUK_VERSION);
         return 0;
