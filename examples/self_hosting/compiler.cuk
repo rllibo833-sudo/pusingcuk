@@ -377,11 +377,9 @@ fungsi parse_program_line(line_tokens)
             balek node_gagal(0)
         kampret
             njir line_tokens[0]["nilai"] == "fungsi"
-                njir panjang(line_tokens) < 2 atau line_tokens[1]["jenis"] != "IDENT"
-                    balek node_gagal(0)
-                kampret
-                    balek {"status": "OK", "statement": {"jenis": "FUNGSI", "nama": line_tokens[1]["nilai"]}}
-                selesai njir
+                # Function bodies are not represented in AST/IR yet. Reject them
+                # rather than silently dropping the body during bootstrap.
+                balek node_gagal(0)
             kampret
                 njir line_tokens[0]["nilai"] == "mumet"
                     balek {"status": "OK", "statement": {"jenis": "MUMET_DUMMY"}}
