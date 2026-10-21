@@ -311,11 +311,7 @@ fungsi evaluasi(node, lingkungan)
         balek node["nilai"]
     kampret
         njir node["jenis"] == "VARIABLE"
-            njir node["nama"] dalam lingkungan
-                balek lingkungan[node["nama"]]
-            kampret
-                balek "UNDEFINED_VARIABLE:" + node["nama"]
-            selesai njir
+            balek lingkungan[node["nama"]]
         kampret
             njir node["jenis"] == "UNARY"
                 balek 0 - evaluasi(node["nilai"], lingkungan)
