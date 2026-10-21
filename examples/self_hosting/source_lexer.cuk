@@ -118,7 +118,7 @@ fungsi pindai(source)
 selesai fungsi
 
 fungsi render_tokens(tokens)
-    untuk token hasil_dalam tokens
+    untuk token dalam tokens
         hedeh token["jenis"] + ":" + token["nilai"]
     selesai untuk
 selesai fungsi
