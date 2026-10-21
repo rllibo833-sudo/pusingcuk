@@ -131,7 +131,7 @@ int cuk_lex(const char *source, CukTokenList *out) {
         char c=peek(&s,0);
         if(c==' '||c=='\t'||c=='\r'){advance(&s);continue;}
         size_t line=s.line,col=s.col,start=s.pos;
-        if(c=='\n'){advance(&s);if(!append_token(&s,CUK_T_NEWLINE,"\\n",2,line,col))goto fail;continue;}
+        if(c=='\n'){advance(&s);if(!append_token(&s,CUK_T_NEWLINE,"\n",1,line,col))goto fail;continue;}
         if(c=='#'){while(peek(&s,0)&&peek(&s,0)!='\n')advance(&s);continue;}
         if(c=='"'||c=='\''){if(!scan_string(&s))goto fail;continue;}
         if(c>='0'&&c<='9') {
