@@ -132,7 +132,8 @@ jobs:
               frontend_source = "lah nilai = (2 + 3) * 4\nhedeh nilai\n"
               ir1 = self_hosted_from_source(frontend_source, "frontend_probe.cuk")
               ir2 = self_hosted_from_source(frontend_source, "frontend_probe.cuk")
-              canonical_ir = canonical_from_source(frontend_source, "frontend_probe.cuk")
+              canonical_source = "jancuk\\n" + frontend_source + "selesai jancuk\\n"
+              canonical_ir = canonical_from_source(canonical_source, "frontend_probe.cuk")
               def without_locations(value):
                   if isinstance(value, dict):
                       return {key: without_locations(item) for key, item in value.items() if key != "line"}
