@@ -71,7 +71,7 @@ def main(argv=None) -> int:
     mode.add_argument("--emit-bytecode", metavar="FILE", help="tulis bytecode VM ke FILE")
     mode.add_argument("--check", action="store_true", help="kompilasi tanpa menjalankan program")
     parser.add_argument("--target", choices=("js", "python", "vm", "go"), help="target kompatibilitas untuk runner Reality Engine")
-    parser.add_argument("--output", help="berkas keluaran target")
+    parser.add_argument("-o", "--output", help="berkas keluaran target")
     args = parser.parse_args(argv)
 
     source_path = Path(args.source)

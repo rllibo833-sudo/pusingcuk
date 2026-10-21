@@ -21,7 +21,7 @@ class CompilerTargetCompatibilityTests(unittest.TestCase):
             result = subprocess.run(
                 [
                     sys.executable, "-m", "compiler", str(source),
-                    "--target", "go", "--output", str(output),
+                    "--target", "go", "-o", str(output),
                 ],
                 cwd=ROOT,
                 text=True,
