@@ -26,7 +26,7 @@ Contoh tersebut sengaja berfokus pada program deterministik tanpa input terminal
 
 ## Prototipe self-hosting
 
-`self_hosting/` berisi program `.cuk` untuk mengeksplorasi tahap lexer, parser, evaluator, interpreter mini, code generation, dan kontrak runtime. Ini adalah prototipe kecil, **bukan** compiler PusingCuk yang self-hosted. Batasan dan urutan menuju bootstrap sungguhan dijelaskan di [`self_hosting/README.md`](self_hosting/README.md).
+`self_hosting/` berisi program `.cuk` untuk mengeksplorasi tahap lexer, parser, evaluator, interpreter mini, code generation, dan kontrak runtime. `source_lexer.cuk` kini memindai subset teks sumber menjadi token, tetapi belum setara dengan lexer referensi Python. Ini adalah prototipe kecil, **bukan** compiler PusingCuk yang self-hosted. Batasan dan urutan menuju bootstrap sungguhan dijelaskan di [`self_hosting/README.md`](self_hosting/README.md).
 
 Jalankan pemeriksaan runtime otomatis dari root repository dengan `python -m unittest discover -s tests -p 'test_self_hosting_examples.py' -v`. Lulus di interpreter referensi bukan bukti dukungan pada runtime lain; dukungan lintas target harus dibuktikan terpisah.
 
