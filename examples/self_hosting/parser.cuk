@@ -14,9 +14,33 @@ fungsi parse_aritmetika(token)
     selesai njir
 selesai fungsi
 
+# Tahap lanjutan: parser menerima token terstruktur dari source_lexer.cuk.
+# Grammar yang diterima saat ini hanya INTEGER OP INTEGER EOF.
+fungsi parse_source_expression(tokens)
+    njir panjang(tokens) != 4
+        balek {"status": "PARSE_ERROR", "alasan": "BUTUH_TIGA_TOKEN_DAN_EOF"}
+    kampret
+        njir tokens[0]["jenis"] != "INTEGER" atau tokens[1]["jenis"] != "OP" atau tokens[2]["jenis"] != "INTEGER" atau tokens[3]["jenis"] != "EOF"
+            balek {"status": "PARSE_ERROR", "alasan": "BENTUK_TOKEN_TIDAK_VALID"}
+        kampret
+            njir tokens[1]["nilai"] != "+" dan tokens[1]["nilai"] != "-" dan tokens[1]["nilai"] != "*" dan tokens[1]["nilai"] != "/"
+                balek {"status": "PARSE_ERROR", "alasan": "OPERATOR_TIDAK_DIDUKUNG"}
+            kampret
+                balek {"status": "OK", "jenis": "BINARY", "kiri": angka(tokens[0]["nilai"]), "operator": tokens[1]["nilai"], "kanan": angka(tokens[2]["nilai"])}
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
 lah hasil = parse_aritmetika([7, "+", 35])
 hedeh hasil["status"]
 hedeh hasil["kiri"]
 hedeh hasil["operator"]
 hedeh hasil["kanan"]
+
+lah source_ast = parse_source_expression([{"jenis": "INTEGER", "nilai": "7"}, {"jenis": "OP", "nilai": "+"}, {"jenis": "INTEGER", "nilai": "35"}, {"jenis": "EOF", "nilai": "EOF"}])
+hedeh "SOURCE_" + source_ast["status"]
+hedeh source_ast["kiri"]
+hedeh source_ast["operator"]
+hedeh source_ast["kanan"]
 selesai jancuk
