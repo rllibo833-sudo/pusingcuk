@@ -92,7 +92,7 @@ def load_manifest():
         if not isinstance(runtimes, dict) or not runtimes:
             raise ManifestError(f"{fixture_id}: runtimes harus berupa objek")
         for runtime, state in runtimes.items():
-            if runtime not in {"reference", "native"}:
+            if runtime not in {"reference", "native", "go"}:
                 raise ManifestError(f"{fixture_id}: runtime tidak dikenal: {runtime}")
             if not isinstance(state, str) or state not in ALLOWED_RUNTIME_STATES:
                 raise ManifestError(f"{fixture_id}: status runtime tidak valid: {runtime}")
