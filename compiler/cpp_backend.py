@@ -400,11 +400,17 @@ static Value pcBuiltin(const std::string& name, const std::vector<Value>& args, 
         pcArity(name,args,1,1,line);
         const auto* list = std::get_if<Value::ListPtr>(&args[0].data);
         if (!list || !*list) pcFail(line,name+"() membutuhkan daftar");
-        if ((*list)->empty()) pcFail(line,name+"() membutuhkan daftar tidak kosong");
+        if ((*list)->empty() && name!="jumlah") pcFail(line,name+"() membutuhkan daftar tidak kosong");
         std::vector<double> nums; nums.reserve((*list)->size()); double total=0;
-        for (const auto& item : **list) { double n=pcNumber(item,name,line); if (std::trunc(n)==n && std::abs(n)>PC_MAX_SAFE) pcFail(line,name+"() integer input di luar rentang aman"); nums.push_back(n); total=pcSafe(name,total+n,line); }
+        for (const auto& item : **list) {
+            double n=pcNumber(item,name,line);
+            if (std::trunc(n)==n && std::abs(n)>PC_MAX_SAFE) pcFail(line,name+"() integer input di luar rentang aman");
+            nums.push_back(n);
+            if (name=="jumlah") total=pcSafe(name,total+n,line);
+            else if (name=="rata_rata") total=pcSafe(name,total+n/static_cast<double>((*list)->size()),line);
+        }
         if (name=="jumlah") return Value(total);
-        if (name=="rata_rata") return Value(pcSafe(name,total/static_cast<double>(nums.size()),line));
+        if (name=="rata_rata") return Value(pcSafe(name,total,line));
         std::sort(nums.begin(),nums.end()); const auto middle=nums.size()/2;
         return Value(pcSafe(name,nums.size()%2?nums[middle]:nums[middle-1]/2.0+nums[middle]/2.0,line));
     }
