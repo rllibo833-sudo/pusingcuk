@@ -820,6 +820,28 @@ fungsi ir_expr(node, line)
 selesai fungsi
 
 fungsi ir_statement(stmt, line)
+    njir stmt["jenis"] == "IF"
+        lah condition_json = ir_expr(stmt["condition"], line)
+        lah then_json = ""
+        lah else_json = ""
+        lah i = 0
+        mumet i < panjang(stmt["then_body"])
+            njir i > 0
+                then_json = then_json + ","
+            selesai njir
+            then_json = then_json + ir_statement(stmt["then_body"][i], line + i + 1)
+            i = i + 1
+        selesai mumet
+        i = 0
+        mumet i < panjang(stmt["else_body"])
+            njir i > 0
+                else_json = else_json + ","
+            selesai njir
+            else_json = else_json + ir_statement(stmt["else_body"][i], line + i + 1)
+            i = i + 1
+        selesai mumet
+        balek "{\\"kind\\":\\"If\\",\\"line\\":" + teks(line) + ",\\"fields\\":{\\"condition\\":" + condition_json + ",\\"then_body\\":[" + then_json + "],\\"else_body\\":[" + else_json + "]}}"
+    kampret
     njir stmt["jenis"] == "FUNCTION"
         lah params_json = ""
         lah body_json = ""
@@ -866,7 +888,7 @@ fungsi ir_program(program)
     selesai njir
     lah jumlah_emit = 0
     mumet i < panjang(program["statements"])
-        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT" atau program["statements"][i]["jenis"] == "FUNCTION"
+        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT" atau program["statements"][i]["jenis"] == "FUNCTION" atau program["statements"][i]["jenis"] == "IF"
             njir jumlah_emit > 0
                 body = body + ","
             selesai njir
@@ -902,6 +924,19 @@ selesai fungsi
 
 fungsi ir_map_statement(stmt, path, line)
     lah result = ",{\"path\":\"" + path + "\",\"line\":" + teks(line) + "}"
+    njir stmt["jenis"] == "IF"
+        result = result + ir_map_expr(stmt["condition"], path + ".fields.condition", line)
+        lah i = 0
+        mumet i < panjang(stmt["else_body"])
+            result = result + ir_map_statement(stmt["else_body"][i], path + ".fields.else_body[" + teks(i) + "]", line + i + 1)
+            i = i + 1
+        selesai mumet
+        i = 0
+        mumet i < panjang(stmt["then_body"])
+            result = result + ir_map_statement(stmt["then_body"][i], path + ".fields.then_body[" + teks(i) + "]", line + i + 1)
+            i = i + 1
+        selesai mumet
+    kampret
     njir stmt["jenis"] == "FUNCTION"
         lah i = 0
         mumet i < panjang(stmt["body"])
@@ -928,7 +963,7 @@ fungsi ir_source_map(program)
     result = result + teks(root_line) + "}"
     lah map_index = 0
     mumet i < panjang(program["statements"])
-        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT" atau program["statements"][i]["jenis"] == "FUNCTION"
+        njir program["statements"][i]["jenis"] == "DECLARE" atau program["statements"][i]["jenis"] == "ASSIGN" atau program["statements"][i]["jenis"] == "PRINT" atau program["statements"][i]["jenis"] == "FUNCTION" atau program["statements"][i]["jenis"] == "IF"
             result = result + ir_map_statement(program["statements"][i], "$.fields.body[" + teks(map_index) + "]", i + 2)
             map_index = map_index + 1
         selesai njir
@@ -945,8 +980,22 @@ fungsi ir_collect_features(node, flags)
             i = i + 1
         selesai mumet
     kampret
-        njir node["jenis"] == "FUNCTION"
-            flags["functions"] = benar
+        njir node["jenis"] == "IF"
+            flags["control-flow"] = benar
+            ir_collect_features(node["condition"], flags)
+            lah i = 0
+            mumet i < panjang(node["then_body"])
+                ir_collect_features(node["then_body"][i], flags)
+                i = i + 1
+            selesai mumet
+            i = 0
+            mumet i < panjang(node["else_body"])
+                ir_collect_features(node["else_body"][i], flags)
+                i = i + 1
+            selesai mumet
+        kampret
+            njir node["jenis"] == "FUNCTION"
+                flags["functions"] = benar
             lah i = 0
             mumet i < panjang(node["body"])
                 ir_collect_features(node["body"][i], flags)
