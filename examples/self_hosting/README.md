@@ -55,4 +55,4 @@ python -m compiler program.cuk --frontend selfhosted --target js
 python -m compiler program.cuk --frontend selfhosted --target vm
 ```
 
-Tes membandingkan AST IR frontend self-hosted dengan frontend kanonis untuk subset yang sama dan memeriksa penolakan sintaks malformed. Ini bukti integrasi frontend-ke-IR/backend untuk subset tersebut, **bukan** bukti bootstrap compiler mandiri. Bootstrap baru terbukti saat compiler yang diimplementasikan dalam `.cuk` dapat membangun ulang dirinya sendiri berulang kali.
+Tes membandingkan AST IR frontend self-hosted dengan frontend kanonis untuk subset yang sama dan memeriksa penolakan sintaks malformed. Parser `.cuk` juga mengenali seluruh alias output yang dipetakan di grammar kanonis; tes parity menjalankan semua alias dalam satu program. Dukungan kontrol alur dan input belum dipetakan di bridge ini. Ini bukti integrasi frontend-ke-IR/backend untuk subset tersebut, **bukan** bukti bootstrap compiler mandiri. Bootstrap baru terbukti saat compiler yang diimplementasikan dalam `.cuk` dapat membangun ulang dirinya sendiri berulang kali.
