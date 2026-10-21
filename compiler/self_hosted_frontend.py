@@ -19,9 +19,45 @@ class SelfHostedFrontendError(ValueError):
     """The .cuk frontend rejected input or failed to emit its AST."""
 
 SERIALIZER = r'''
+fungsi ir_quote(value)
+    lah result = "\""
+    lah i = 0
+    lah c = ""
+    mumet i < panjang(value)
+        c = value[i]
+        njir c == "\\"
+            result = result + "\\\\"
+        kampret
+            njir c == "\""
+                result = result + "\\\""
+            kampret
+                njir c == "\n"
+                    result = result + "\\n"
+                kampret
+                    njir c == "\r"
+                        result = result + "\\r"
+                    kampret
+                        njir c == "\t"
+                            result = result + "\\t"
+                        kampret
+                            result = result + c
+                        selesai njir
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+        i = i + 1
+    selesai mumet
+    balek result + "\""
+selesai fungsi
+
 fungsi ir_expr(node, line)
-    njir node["jenis"] == "INTEGER"
-        balek "{\"kind\":\"Literal\",\"line\":" + teks(line) + ",\"fields\":{\"value\":" + teks(node["nilai"]) + "}}"
+    njir node["jenis"] == "INTEGER" atau node["jenis"] == "STRING"
+        lah encoded_value = teks(node["nilai"])
+        njir node["jenis"] == "STRING"
+            encoded_value = ir_quote(node["nilai"])
+        selesai njir
+        balek "{\"kind\":\"Literal\",\"line\":" + teks(line) + ",\"fields\":{\"value\":" + encoded_value + "}}"
     kampret
         njir node["jenis"] == "VARIABLE"
             balek "{\"kind\":\"Variable\",\"line\":" + teks(line) + ",\"fields\":{\"name\":\"" + node["nama"] + "\"}}"
