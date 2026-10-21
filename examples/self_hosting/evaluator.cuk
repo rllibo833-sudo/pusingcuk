@@ -1,0 +1,31 @@
+# Evaluator AST mini: menerima node binary sederhana dan menghasilkan angka.
+# AST ini adalah data biasa; program ini belum mengevaluasi AST bahasa .cuk penuh.
+jancuk
+
+fungsi evaluasi(node)
+    njir node["jenis"] != "BINARY"
+        balek "EVAL_ERROR: JENIS_NODE_TIDAK_DIDUKUNG"
+    kampret
+        njir node["operator"] == "+"
+            balek node["kiri"] + node["kanan"]
+        kampret
+            njir node["operator"] == "-"
+                balek node["kiri"] - node["kanan"]
+            kampret
+                njir node["operator"] == "*"
+                    balek node["kiri"] * node["kanan"]
+                kampret
+                    njir node["operator"] == "/"
+                        balek node["kiri"] / node["kanan"]
+                    kampret
+                        balek "EVAL_ERROR: OPERATOR_TIDAK_DIDUKUNG"
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+lah contoh_ast = {"jenis": "BINARY", "kiri": 7, "operator": "+", "kanan": 35}
+hedeh evaluasi(contoh_ast)
+selesai jancuk
