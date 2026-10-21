@@ -1,0 +1,59 @@
+name: dump lexer opcodes
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package
+        run: python -m pip install -e .
+      - name: Compile self-hosted lexer to PVM JSON
+        run: python -m compiler.self_hosted examples/self_hosting/source_lexer.cuk --emit-bytecode /tmp/lexer.pvm
+      - name: Dump every opcode and instruction
+        shell: bash
+        run: |
+          python - <<'PY' | tee /tmp/dump.txt
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          artifact = json.loads(Path("/tmp/lexer.pvm").read_text(encoding="utf-8"))
+          print(f"format: {artifact['format']}")
+          print(f"bytecode_version: {artifact['bytecode_version']}")
+          print(f"source_name: {artifact['source_name']}")
+          all_ops = Counter()
+
+          def dump_code(label, code):
+              print(f"\n## {label} ({len(code)} instructions)")
+              for pc, instruction in enumerate(code):
+                  op, arg, line = instruction
+                  all_ops[op] += 1
+                  print(f"{pc:04d} line={line:<4} {op:<16} {json.dumps(arg, ensure_ascii=False)}")
+
+          dump_code("<module>", artifact["code"])
+          for name, function in artifact["functions"].items():
+              dump_code(f"function {name}", function["code"])
+          print("\n## OPCODE COUNTS")
+          for op, count in sorted(all_ops.items()):
+              print(f"{op}: {count}")
+          print(f"TOTAL_INSTRUCTIONS: {sum(all_ops.values())}")
+          PY
+      - name: Upload lexer dump
+        uses: actions/upload-artifact@v4
+        with:
+          name: lexer-dump
+          path: /tmp/dump.txt
+          if-no-files-found: error
+          retention-days: 7
