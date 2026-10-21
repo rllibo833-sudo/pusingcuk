@@ -90,3 +90,10 @@ No coding knowledge is required to review progress. Each milestone should be rep
 ## Current status policy
 
 The roadmap is a plan, not a completion badge. The authoritative status is the repository's current code, compatibility documentation, fixtures, and successful checks on the same commit. Device-specific behavior must be tested on-device; a Linux CI result is not proof of Termux or Android compatibility.
+
+
+## Catatan implementasi self-hosting — 2026-10-21
+
+Prototipe `examples/self_hosting/source_lexer.cuk` kini menambahkan parsing struktur program multi-baris terbatas untuk deklarasi `lah nama = ekspresi` dan pernyataan `hedeh ekspresi`. Ini menghasilkan node statement, tetapi belum menyelesaikan referensi nama, eksekusi program penuh, kontrol alur, IR lowering, atau bootstrap. Tes referensi mengunci output dan status parser; jangan menafsirkan ini sebagai compiler mandiri.
+
+Arsitektur penggunaan lokal tetap **Android + Termux sebagai adapter/data center lokal** untuk PusingCuk AI dan Cuk Reality Engine. Perubahan toolchain tidak boleh menghapus, mereset, memigrasikan secara destruktif, atau mengubah endpoint/config matrix lokal secara diam-diam. Ollama tetap opsional untuk tes inti; provider lokal harus eksplisit loopback, dan proposal evolusi tetap review-only tanpa commit/push otomatis.

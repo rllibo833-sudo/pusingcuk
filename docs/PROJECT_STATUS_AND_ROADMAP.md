@@ -49,7 +49,7 @@ Baseline matriks multi-target yang tersimpan menyatakan reference, native C, Jav
 
 Komponen ekosistem yang sudah ada tidak boleh dihitung ulang sebagai pekerjaan baru. Fokus berikutnya adalah menghubungkan prototipe self-hosting dengan toolchain yang ada:
 
-1. Perluas `examples/self_hosting/source_lexer.cuk` dari parser ekspresi menjadi parser program .cuk yang nyata, dengan AST yang konsisten dan diagnostik untuk sintaks tidak valid.
+1. Perluas `examples/self_hosting/source_lexer.cuk` dari parser ekspresi ke grammar program secara bertahap. Langkah awal sudah mengenali deklarasi `lah nama = ekspresi` dan `hedeh ekspresi` per baris; referensi nama, kontrol alur, dan diagnostik lengkap masih terbuka.
 2. Tetapkan pemetaan AST self-hosted ke IR v1/bytecode VM yang sudah ada, tanpa membuat format paralel kecuali ada kebutuhan kompatibilitas yang jelas.
 3. Bandingkan hasil frontend baru dengan frontend referensi Python melalui fixture konformansi yang relevan; perluas cakupan bertahap dan jangan mengklaim kesetaraan sebelum fixture lulus.
 4. Implementasikan compiler dalam .cuk secara bertahap dan tambahkan job bootstrap: toolchain lama membangun compiler .cuk, lalu compiler baru membangun ulang dirinya; hasil build dan suite tes harus cocok.
@@ -64,3 +64,8 @@ Komponen ekosistem yang sudah ada tidak boleh dihitung ulang sebagai pekerjaan b
 3. Jangan pakai penggantian teks global, `|| true` untuk tes wajib, atau loop otomatis yang commit/push ke `main`.
 4. Jangan menambah dokumen status duplikat. Audit bertanggal tetap sebagai sejarah; update dokumen ini dan sumber kanonis.
 5. CI hijau membuktikan job yang benar-benar berjalan pada commit tersebut saja—bukan semua fitur atau target.
+
+
+### Batas operasional lokal yang wajib dipertahankan
+
+Perangkat Android pengguna dengan Termux adalah adapter dan data center lokal bagi PusingCuk AI serta Cuk Reality Engine. Semua pekerjaan lanjutan harus mempertahankan konfigurasi matrix, endpoint loopback, dan data lokal yang sudah diperbaiki; tidak boleh melakukan reset, migrasi destruktif, atau mengubah alamat/provider diam-diam. Ollama bersifat opsional untuk core CI, tidak ada fallback cloud diam-diam, dan tooling evolusi tetap menghasilkan proposal untuk review—bukan auto-commit/push.

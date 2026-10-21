@@ -220,6 +220,84 @@ fungsi parse_source(tokens)
     selesai njir
 selesai fungsi
 
+# Parser program bertahap: deklarasi lah dan output hedeh per baris.
+# Grammar: program := (declaration | print_stmt | NEWLINE)* EOF
+# declaration := "lah" IDENT "=" expr
+# print_stmt := "hedeh" expr
+fungsi parse_program_line(line_tokens)
+    njir panjang(line_tokens) == 0
+        balek {"status": "OK", "statement": salah}
+    kampret
+        lah mulai = 0
+        lah jenis_stmt = ""
+        lah nama_stmt = ""
+        njir line_tokens[0]["jenis"] != "IDENT"
+            balek node_gagal(0)
+        kampret
+            njir line_tokens[0]["nilai"] == "lah"
+                njir panjang(line_tokens) < 4 atau line_tokens[1]["jenis"] != "IDENT" atau line_tokens[2]["jenis"] != "OP" atau line_tokens[2]["nilai"] != "="
+                    balek node_gagal(0)
+                kampret
+                    jenis_stmt = "DECLARE"
+                    nama_stmt = line_tokens[1]["nilai"]
+                    mulai = 3
+                selesai njir
+            kampret
+                njir line_tokens[0]["nilai"] == "hedeh"
+                    jenis_stmt = "PRINT"
+                    mulai = 1
+                kampret
+                    balek node_gagal(0)
+                selesai njir
+            selesai njir
+        selesai njir
+        lah expr_tokens = []
+        lah i = mulai
+        mumet i < panjang(line_tokens)
+            expr_tokens = expr_tokens + [line_tokens[i]]
+            i = i + 1
+        selesai mumet
+        expr_tokens = expr_tokens + [{"jenis": "EOF", "nilai": "EOF"}]
+        lah hasil_expr = parse_source(expr_tokens)
+        njir hasil_expr["status"] != "OK"
+            balek hasil_expr
+        kampret
+            njir jenis_stmt == "DECLARE"
+                balek {"status": "OK", "statement": {"jenis": "DECLARE", "nama": nama_stmt, "nilai": hasil_expr["node"]}}
+            kampret
+                balek {"status": "OK", "statement": {"jenis": "PRINT", "nilai": hasil_expr["node"]}}
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi parse_program(tokens)
+    lah statements = []
+    lah line_tokens = []
+    lah i = 0
+    lah hasil_line = {}
+    mumet i < panjang(tokens)
+        njir tokens[i]["jenis"] == "NEWLINE" atau tokens[i]["jenis"] == "EOF"
+            hasil_line = parse_program_line(line_tokens)
+            njir hasil_line["status"] != "OK"
+                balek hasil_line
+            kampret
+                njir hasil_line["statement"] != salah
+                    statements = statements + [hasil_line["statement"]]
+                selesai njir
+            selesai njir
+            line_tokens = []
+            njir tokens[i]["jenis"] == "EOF"
+                balek {"status": "OK", "node": {"jenis": "PROGRAM", "statements": statements}}
+            selesai njir
+        kampret
+            line_tokens = line_tokens + [tokens[i]]
+        selesai njir
+        i = i + 1
+    selesai mumet
+    balek node_gagal(i)
+selesai fungsi
+
 fungsi evaluasi(node)
     njir node["jenis"] == "INTEGER"
         balek node["nilai"]
@@ -287,4 +365,12 @@ selesai njir
 
 lah ast_invalid = parse_source(pindai("7 %"))
 hedeh "INVALID_" + ast_invalid["status"]
+
+lah ast_program = parse_program(pindai("lah x = 2 + 3\nhedeh x\n"))
+hedeh "PROGRAM_" + ast_program["status"]
+njir ast_program["status"] == "OK"
+    hedeh panjang(ast_program["node"]["statements"])
+    hedeh evaluasi(ast_program["node"]["statements"][0]["nilai"])
+    hedeh evaluasi(ast_program["node"]["statements"][1]["nilai"])
+selesai njir
 selesai jancuk
