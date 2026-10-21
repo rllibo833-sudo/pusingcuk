@@ -463,13 +463,13 @@ fungsi parse_program(tokens)
                     selesai njir
                     current["aktif_else"] = benar
                 kampret
-                    njir panjang(line_tokens) >= 2 and line_tokens[0]["nilai"] == "selesai" and line_tokens[1]["nilai"] == "njir"
+                    njir panjang(line_tokens) >= 2 dan line_tokens[0]["nilai"] == "selesai" dan line_tokens[1]["nilai"] == "njir"
                         njir current["jenis"] != "IF"
                             balek node_gagal(i)
                         selesai njir
                         depth = depth - 1
                     kampret
-                        njir panjang(line_tokens) >= 2 and line_tokens[0]["nilai"] == "selesai" and line_tokens[1]["nilai"] == "fungsi"
+                        njir panjang(line_tokens) >= 2 dan line_tokens[0]["nilai"] == "selesai" dan line_tokens[1]["nilai"] == "fungsi"
                             njir current["jenis"] != "FUNCTION" atau depth != 1
                                 balek node_gagal(i)
                             selesai njir
