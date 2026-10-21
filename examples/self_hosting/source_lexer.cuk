@@ -224,9 +224,10 @@ fungsi parse_source(tokens)
     selesai njir
 selesai fungsi
 
-# Parser program bertahap: deklarasi lah dan output hedeh per baris.
-# Grammar: program := (declaration | print_stmt | NEWLINE)* EOF
+# Parser program bertahap: deklarasi, assignment, dan output per baris.
+# Grammar: program := (declaration | assignment | print_stmt | NEWLINE)* EOF
 # declaration := "lah" IDENT "=" expr
+# assignment := IDENT "=" expr; target harus sudah dideklarasikan saat runtime
 # print_stmt := "hedeh" expr
 fungsi parse_program_line(line_tokens)
     njir panjang(line_tokens) == 0
@@ -251,7 +252,13 @@ fungsi parse_program_line(line_tokens)
                     jenis_stmt = "PRINT"
                     mulai = 1
                 kampret
-                    balek node_gagal(0)
+                    njir panjang(line_tokens) >= 3 dan line_tokens[0]["jenis"] == "IDENT" dan line_tokens[1]["jenis"] == "OP" dan line_tokens[1]["nilai"] == "="
+                        jenis_stmt = "ASSIGN"
+                        nama_stmt = line_tokens[0]["nilai"]
+                        mulai = 2
+                    kampret
+                        balek node_gagal(0)
+                    selesai njir
                 selesai njir
             selesai njir
         selesai njir
@@ -269,7 +276,11 @@ fungsi parse_program_line(line_tokens)
             njir jenis_stmt == "DECLARE"
                 balek {"status": "OK", "statement": {"jenis": "DECLARE", "nama": nama_stmt, "nilai": hasil_expr["node"]}}
             kampret
-                balek {"status": "OK", "statement": {"jenis": "PRINT", "nilai": hasil_expr["node"]}}
+                njir jenis_stmt == "ASSIGN"
+                    balek {"status": "OK", "statement": {"jenis": "ASSIGN", "nama": nama_stmt, "nilai": hasil_expr["node"]}}
+                kampret
+                    balek {"status": "OK", "statement": {"jenis": "PRINT", "nilai": hasil_expr["node"]}}
+                selesai njir
             selesai njir
         selesai njir
     selesai njir
@@ -350,18 +361,37 @@ selesai fungsi
 
 fungsi jalankan_program(program)
     lah lingkungan = {}
+    lah nama_variabel = []
     lah output = []
     lah statements = program["statements"]
     lah i = 0
+    lah j = 0
     lah stmt = {}
     lah nilai = 0
+    lah ketemu = salah
     mumet i < panjang(statements)
         stmt = statements[i]
         nilai = evaluasi(stmt["nilai"], lingkungan)
         njir stmt["jenis"] == "DECLARE"
             lingkungan[stmt["nama"]] = nilai
+            nama_variabel = nama_variabel + [stmt["nama"]]
         kampret
-            output = output + [nilai]
+            njir stmt["jenis"] == "ASSIGN"
+                ketemu = salah
+                j = 0
+                mumet j < panjang(nama_variabel)
+                    njir nama_variabel[j] == stmt["nama"]
+                        ketemu = benar
+                    selesai njir
+                    j = j + 1
+                selesai mumet
+                njir bukan ketemu
+                    balek {"status": "RUNTIME_ERROR_UNDECLARED_ASSIGNMENT", "nama": stmt["nama"], "output": output, "lingkungan": lingkungan}
+                selesai njir
+                lingkungan[stmt["nama"]] = nilai
+            kampret
+                output = output + [nilai]
+            selesai njir
         selesai njir
         i = i + 1
     selesai mumet
@@ -398,7 +428,7 @@ selesai njir
 lah ast_invalid = parse_source(pindai("7 %"))
 hedeh "INVALID_" + ast_invalid["status"]
 
-lah ast_program = parse_program(pindai("lah x = 2 + 3\nhedeh x\nlah y = (x + 1) * 2\nhedeh y\n"))
+lah ast_program = parse_program(pindai("lah x = 2 + 3\nx = x + 4\nhedeh x\nlah y = (x + 1) * 2\nhedeh y\n"))
 hedeh "PROGRAM_" + ast_program["status"]
 njir ast_program["status"] == "OK"
     lah hasil_program = jalankan_program(ast_program["node"])
@@ -408,6 +438,10 @@ njir ast_program["status"] == "OK"
     hedeh hasil_program["lingkungan"]["x"]
     hedeh hasil_program["lingkungan"]["y"]
 selesai njir
+
+lah ast_assignment_invalid = parse_program(pindai("z = 9\n"))
+lah hasil_assignment_invalid = jalankan_program(ast_assignment_invalid["node"])
+hedeh "INVALID_ASSIGNMENT_" + hasil_assignment_invalid["status"]
 
 lah ast_program_invalid = parse_program(pindai("lah = 4\n"))
 hedeh "INVALID_PROGRAM_" + ast_program_invalid["status"]
