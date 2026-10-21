@@ -1,0 +1,28 @@
+# Prototipe tahap lexer: mengklasifikasikan satu token yang sudah dipisahkan.
+# Ini belum memindai seluruh teks sumber atau menangani escape/string.
+jancuk
+
+fungsi jenis_token(token)
+    njir token == "+"
+        balek "OP_PLUS"
+    kampret
+        njir token == "-"
+            balek "OP_MINUS"
+        kampret
+            njir token == "*"
+                balek "OP_MULTIPLY"
+            kampret
+                njir token == "/"
+                    balek "OP_DIVIDE"
+                kampret
+                    balek "LITERAL_OR_UNKNOWN"
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai fungsi
+
+hedeh jenis_token("+")
+hedeh jenis_token("-")
+hedeh jenis_token("nama")
+selesai jancuk
