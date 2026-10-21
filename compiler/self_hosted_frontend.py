@@ -84,7 +84,10 @@ def from_source(source: str, source_name: str = "<memory>") -> dict:
     """Parse a supported source subset in .cuk, then validate canonical IR v1."""
     if not isinstance(source_name, str) or not source_name:
         raise ValueError("source_name tidak boleh kosong")
-    # The staged parser handles statements, not the outer program delimiters.\n    # Normalize those delimiters before passing source into the .cuk parser.\n    source = "\\n".join(line for line in source.splitlines() if line.strip() not in {"jancuk", "selesai jancuk"})\n    script = _frontend_script(source)
+    # The staged parser handles statements, not the outer program delimiters.
+    # Normalize those delimiters before passing source into the .cuk parser.
+    source = "\n".join(line for line in source.splitlines() if line.strip() not in {"jancuk", "selesai jancuk"})
+    script = _frontend_script(source)
     with tempfile.TemporaryDirectory(prefix=".cuk-selfhost-", dir=ROOT) as tmp:
         path = Path(tmp) / "frontend_input.cuk"
         path.write_text(script, encoding="utf-8")
