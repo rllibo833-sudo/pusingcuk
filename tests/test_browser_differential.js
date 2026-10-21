@@ -14,6 +14,18 @@ assert.equal(selected.schema_version, 1, "browser manifest schema must be versio
 const byId = new Map(corpus.fixtures.map(item => [item.id, item]));
 assert.ok(selected.fixtures.length >= 50, "browser parity suite must cover at least 50 fixtures");
 assert.equal(new Set(selected.fixtures).size, selected.fixtures.length, "browser manifest must not contain duplicate IDs");
+const excluded = selected.excluded ?? {};
+assert.ok(excluded && typeof excluded === "object" && !Array.isArray(excluded), "browser manifest exclusions must be an object of explicit reasons");
+const selectedIds = new Set(selected.fixtures);
+for (const [id, reason] of Object.entries(excluded)) {
+  assert.ok(typeof reason === "string" && reason.trim().length >= 12, id + " browser exclusion must explain the unsupported behavior");
+  assert.ok(!selectedIds.has(id), id + " cannot be both selected and excluded");
+}
+for (const item of corpus.fixtures) {
+  assert.ok(selectedIds.has(item.id) || Object.hasOwn(excluded, item.id), item.id + " must be explicitly selected for browser parity or excluded with a reason");
+}
+for (const id of selectedIds) assert.ok(byId.has(id), "browser manifest references unknown conformance fixture: " + id);
+for (const id of Object.keys(excluded)) assert.ok(byId.has(id), "browser exclusion references unknown conformance fixture: " + id);
 
 function classifyReference(result) {
   if (result.status === null) return "harness_error";
