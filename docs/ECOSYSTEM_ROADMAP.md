@@ -119,4 +119,8 @@ The `.cuk` codegen example now recursively emits nested integer/binary AST nodes
 ## CI correction — 2026-10-21
 
 The nested codegen fixture was updated to expect the actual recursive output (`long hasil = (7 + (5 * 6));`) and the explicit `UNSUPPORTED_OPERATOR` result. The first core run caught a stale assertion from the previous flat-expression demo; the generator behavior itself matched the new fixture. The core suite must be rerun on the correction commit before this increment is considered green.
-\n\n### Increment target lintas bahasa — Rust (2026-10-21)\n\nA first Rust source backend is wired into the existing IR v1 CLI. Its declared subset is numeric literals, variables, reassignment, output, unary minus, and `+ - * / // %`; unsupported nodes fail closed. This is a narrow sixth language target, not full Rust compatibility or a claim of 10-language support. Tests lock generated source and rejection behavior; compiler/runtime parity must be expanded before the target subset is advertised as conformant.\n
+
+
+### Increment target lintas bahasa — Rust (2026-10-21)
+
+A first Rust source backend is wired into the existing IR v1 CLI. Its declared subset is numeric literals, variables, reassignment, output, unary minus, and `+ - * / // %`; unsupported nodes fail closed. This is a narrow sixth language target, not full Rust compatibility or a claim of 10-language support. Tests lock generated source and rejection behavior; compiler/runtime parity must be expanded before the target subset is advertised as conformant.
