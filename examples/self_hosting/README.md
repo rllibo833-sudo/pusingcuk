@@ -2,14 +2,14 @@
 
 Folder ini berisi prototipe bertahap yang ditulis dengan bahasa `.cuk` untuk menguji apakah bahasa ini bisa menjadi alat bagi pengembangan toolchain-nya sendiri.
 
-**Penting:** ini belum merupakan compiler PusingCuk yang self-hosted. `source_lexer.cuk` menjalankan jalur teks sumber → token → recursive-descent parser → AST → evaluator untuk ekspresi integer/desimal, literal boolean, operator aritmetika (`+`, `-`, `*`, `/`, `%`), unary minus, prioritas operator, tanda kurung, serta literal string dengan escape dasar (`\\n`, `\\t`, `\\r`, kutip, dan backslash). Parser program terbatas pada deklarasi `lah nama = ekspresi`, assignment `nama = ekspresi`, dan alias output yang tercantum di parser (tidak termasuk `gas`, yang merupakan alias pembuka program pada lexer kanonis). `compiler/self_hosted_frontend.py` mengubah AST subset tersebut menjadi IR v1 kanonis yang divalidasi dan dipakai backend yang sudah ada; tes membandingkan hasilnya dengan frontend Python termasuk literal string ber-escape. Kontrol alur, fungsi, angka pecahan, diagnostik sumber lengkap, dan frontend mandiri tanpa adapter Python belum didukung. Ini belum parser/compiler `.cuk` penuh. `codegen.cuk` belum menjalankan compiler.
+**Status:** belum self-hosted penuh. `source_lexer.cuk` menjalankan lexer dan recursive-descent parser yang ditulis dalam `.cuk`, membentuk AST, lalu menyerialisasi envelope IR v1 (`format`, versi, `source_name`, `features`, `source_map`, dan `program`) langsung dari `.cuk`. Grammar yang sudah diuji mencakup deklarasi, assignment, alias output, integer/desimal, boolean, string dengan escape dasar, unary minus/`bukan`, prioritas aritmetika (`+`, `-`, `*`, `/`, `//`, `%`), perbandingan (`==`, `!=`, `<`, `<=`, `>`, `>=`), dan operator logika `dan`/`atau`. Parser program masih terbatas pada deklarasi, assignment, dan output per baris; kontrol alur, fungsi, input, koleksi/indeks, diagnostik sumber penuh, serta compiler yang dapat membangun ulang dirinya belum didukung. `compiler/self_hosted_frontend.py` saat ini memakai interpreter referensi Python sebagai host untuk menjalankan program frontend `.cuk`, lalu hanya memvalidasi IR yang dihasilkan; Python tidak lagi menyusun AST atau envelope IR. Ini kemajuan jalur `.cuk` → IR v1 → VM/backend, bukan bukti bootstrap mandiri. `codegen.cuk` masih generator ekspresi, bukan compiler penuh.
 
 ## Contoh
 
 | Berkas | Peran saat ini | Batasan utama |
 |---|---|---|
 | `lexer.cuk` | Mengklasifikasikan satu token operator | Demo kecil, bukan scanner |
-| `source_lexer.cuk` | Lexer, parser precedence, AST/evaluator ekspresi integer dan string, program terbatas | Deklarasi/assignment/output dan ekspresi integer/desimal/boolean/string; belum ada kontrol alur, angka pecahan, floor division, diagnostik sumber lengkap, atau compiler mandiri |
+| `source_lexer.cuk` | Lexer, parser precedence dan IR v1 serializer yang ditulis dalam `.cuk` | Deklarasi/assignment/output; ekspresi aritmetika, perbandingan, logika, dan literal scalar; belum ada kontrol alur, fungsi, koleksi, input, atau bootstrap mandiri |
 | `parser.cuk` | Membentuk node aritmetika dari token sederhana atau token terstruktur | Satu ekspresi `INTEGER OP INTEGER EOF`; belum ada prioritas operator atau tanda kurung |
 | `evaluator.cuk` | Mengevaluasi node aritmetika | Belum menjalankan AST bahasa `.cuk` |
 | `interpreter.cuk` | Menghubungkan tahap mini lexer → parser → evaluator | Input masih daftar token yang sudah disiapkan |
@@ -51,7 +51,7 @@ CLI `python -m compiler sumber.cuk --target go --output hasil.go` sekarang mener
 
 ## Jalur frontend self-hosted ke toolchain kanonis
 
-`compiler/self_hosted_frontend.py` menjalankan lexer/parser yang ditulis di `.cuk`, menerima AST hasil parse, lalu membungkusnya menjadi IR v1 kanonis yang divalidasi dan digunakan backend yang sudah ada. Ini jalur eksperimen terbatas untuk deklarasi, assignment, output, dan ekspresi numerik; belum menggantikan parser referensi untuk semua sintaks.
+`compiler/self_hosted_frontend.py` menjalankan lexer/parser dan serializer IR yang ditulis di `.cuk`. Envelope IR v1 berasal dari output frontend `.cuk`; Python hanya menjalankan kode `.cuk` melalui interpreter referensi saat ini dan memvalidasi dokumen IR sebelum backend yang ada memakainya. Grammar yang didukung masih subset dan belum menggantikan parser referensi untuk semua sintaks.
 
 ```sh
 python -m compiler program.cuk --frontend selfhosted --target json
@@ -59,4 +59,4 @@ python -m compiler program.cuk --frontend selfhosted --target js
 python -m compiler program.cuk --frontend selfhosted --target vm
 ```
 
-Tes membandingkan AST IR frontend self-hosted dengan frontend kanonis untuk subset yang sama dan memeriksa penolakan sintaks malformed. Parser `.cuk` juga mengenali seluruh alias output yang dipetakan di grammar kanonis; tes parity menjalankan semua alias dalam satu program. Dukungan kontrol alur dan input belum dipetakan di bridge ini. Ini bukti integrasi frontend-ke-IR/backend untuk subset tersebut, **bukan** bukti bootstrap compiler mandiri. Bootstrap baru terbukti saat compiler yang diimplementasikan dalam `.cuk` dapat membangun ulang dirinya sendiri berulang kali.
+Tes membandingkan `program`, `features`, dan `source_map` IR hasil frontend `.cuk` dengan IR kanonis, termasuk alias output, literal desimal/boolean, operator perbandingan/logika, dan penolakan sintaks malformed. Jalur `.cuk` → IR v1 → bytecode → VM dan backend lintas bahasa yang sudah ada tetap dipertahankan. **Bootstrap dua tahap belum dibuktikan:** frontend belum mampu membaca seluruh grammar/spec dan membangun ulang compiler penuh. Jangan menyebut bahasa ini self-hosted sampai compiler yang ditulis dalam `.cuk` dapat membangun ulang dirinya dua tahap dengan artefak deterministik yang dibandingkan di CI.
