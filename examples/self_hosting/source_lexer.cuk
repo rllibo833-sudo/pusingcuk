@@ -155,13 +155,15 @@ fungsi parse_primary(tokens, index)
     njir index >= panjang(tokens)
         balek node_gagal(index)
     kampret
-        njir tokens[index]["jenis"] == "INTEGER"
-            balek {"status": "OK", "node": {"jenis": "INTEGER", "nilai": bilangan(tokens[index]["nilai"])}, "index": index + 1}
+        njir tokens[index]["jenis"] == "INTEGER" atau tokens[index]["jenis"] == "STRING"
+            lah literal_kind = tokens[index]["jenis"]
+            lah literal_value = tokens[index]["nilai"]
+            njir literal_kind == "INTEGER"
+                literal_value = bilangan(literal_value)
+            selesai njir
+            balek {"status": "OK", "node": {"jenis": literal_kind, "nilai": literal_value}, "index": index + 1}
         kampret
-            njir tokens[index]["jenis"] == "STRING"
-                balek {"status": "OK", "node": {"jenis": "STRING", "nilai": tokens[index]["nilai"]}, "index": index + 1}
-            kampret
-                njir tokens[index]["jenis"] == "IDENT"
+            njir tokens[index]["jenis"] == "IDENT"
                 balek {"status": "OK", "node": {"jenis": "VARIABLE", "nama": tokens[index]["nilai"]}, "index": index + 1}
             kampret
                 njir tokens[index]["jenis"] == "OP" dan tokens[index]["nilai"] == "-"
