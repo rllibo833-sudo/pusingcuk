@@ -174,7 +174,9 @@ class MultiTargetCompilerTests(unittest.TestCase):
         stage1_artifact = compile_ir(stage0_ir)
         output = io.StringIO()
         VirtualMachine(stage1_artifact, output_stream=output).run()
-        emitted = json.loads(output.getvalue().strip().splitlines()[-1])
+        output_text = output.getvalue().strip()
+        self.assertTrue(output_text.startswith("{"), f"VM-hosted .cuk frontend did not emit IR JSON: {output_text!r}")
+        emitted = json.loads(output_text.splitlines()[-1])
         self.assertEqual(emitted, expected)
 
     def test_self_hosted_frontend_rejects_malformed_program(self):
