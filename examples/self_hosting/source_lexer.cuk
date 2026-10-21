@@ -1,0 +1,124 @@
+# Lexer source nyata untuk subset bahasa .cuk.
+# Dukungan: identifier ASCII, keyword mentah, integer, string sederhana,
+# operator, tanda baca, komentar #, newline, dan EOF.
+# Batasan: belum normalisasi alias keyword, angka pecahan/eksponen, atau escape decoding.
+jancuk
+
+fungsi huruf(c)
+    balek (c >= "a" dan c <= "z") atau (c >= "A" dan c <= "Z") atau c == "_"
+selesai fungsi
+
+fungsi digit(c)
+    balek c >= "0" dan c <= "9"
+selesai fungsi
+
+fungsi bagian_nama(c)
+    balek huruf(c) atau digit(c)
+selesai fungsi
+
+fungsi operator(c)
+    balek c == "+" atau c == "-" atau c == "*" atau c == "/" atau c == "%" atau c == "=" atau c == "<" atau c == ">"
+selesai fungsi
+
+fungsi tanda(c)
+    balek c == "(" atau c == ")" atau c == "[" atau c == "]" atau c == "{" atau c == "}" atau c == "," atau c == ":" atau c == "."
+selesai fungsi
+
+fungsi pindai(source)
+    lah tokens = []
+    lah i = 0
+    lah n = panjang(source)
+
+    mumet i < n
+        lah c = source[i]
+
+        njir c == " " atau c == "\t" atau c == "\r"
+            i = i + 1
+        kampret
+            njir c == "\n"
+                lah tokens = tokens + [{"jenis": "NEWLINE", "nilai": "NEWLINE"}]
+                i = i + 1
+            kampret
+                njir c == "#"
+                    mumet i < n dan source[i] != "\n"
+                        i = i + 1
+                    selesai mumet
+                kampret
+                    njir c == "\"" atau c == "'"
+                        lah kutip = c
+                        lah nilai = ""
+                        lah tertutup = salah
+                        i = i + 1
+                        mumet i < n dan source[i] != "\n" dan bukan tertutup
+                            njir source[i] == kutip
+                                lah tertutup = benar
+                                i = i + 1
+                            kampret
+                                njir source[i] == "\\" dan i + 1 < n
+                                    lah nilai = nilai + source[i] + source[i + 1]
+                                    i = i + 2
+                                kampret
+                                    lah nilai = nilai + source[i]
+                                    i = i + 1
+                                selesai njir
+                            selesai njir
+                        selesai mumet
+                        njir tertutup
+                            lah tokens = tokens + [{"jenis": "STRING", "nilai": nilai}]
+                        kampret
+                            lah tokens = tokens + [{"jenis": "STRING_ERROR", "nilai": "STRING_BELUM_DITUTUP"}]
+                        selesai njir
+                    kampret
+                        njir digit(c)
+                            lah nilai = ""
+                            mumet i < n dan digit(source[i])
+                                lah nilai = nilai + source[i]
+                                i = i + 1
+                            selesai mumet
+                            lah tokens = tokens + [{"jenis": "INTEGER", "nilai": nilai}]
+                        kampret
+                            njir huruf(c)
+                                lah nilai = ""
+                                mumet i < n dan bagian_nama(source[i])
+                                    lah nilai = nilai + source[i]
+                                    i = i + 1
+                                selesai mumet
+                                lah tokens = tokens + [{"jenis": "IDENT", "nilai": nilai}]
+                            kampret
+                                njir operator(c)
+                                    lah nilai = c
+                                    i = i + 1
+                                    njir i < n dan ((c == "=" dan source[i] == "=") atau (c == "!" dan source[i] == "=") atau (c == "<" dan source[i] == "=") atau (c == ">" dan source[i] == "=") atau (c == "/" dan source[i] == "/"))
+                                        lah nilai = nilai + source[i]
+                                        i = i + 1
+                                    selesai njir
+                                    lah tokens = tokens + [{"jenis": "OP", "nilai": nilai}]
+                                kampret
+                                    njir tanda(c)
+                                        lah tokens = tokens + [{"jenis": "PUNCT", "nilai": c}]
+                                        i = i + 1
+                                    kampret
+                                        lah tokens = tokens + [{"jenis": "UNKNOWN", "nilai": c}]
+                                        i = i + 1
+                                    selesai njir
+                                selesai njir
+                            selesai njir
+                        selesai njir
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai mumet
+
+    balek tokens + [{"jenis": "EOF", "nilai": "EOF"}]
+selesai fungsi
+
+fungsi tampilkan(tokens)
+    untuk token dalam tokens
+        hedeh token["jenis"] + ":" + token["nilai"]
+    selesai untuk
+selesai fungsi
+
+lah contoh = "lah x = 12 + 3\nhedeh x # komentar\n"
+tampilkan(pindai(contoh))
+selesai jancuk
