@@ -368,15 +368,6 @@ fungsi jalankan_program(program)
     balek {"status": "OK", "output": output, "lingkungan": lingkungan}
 selesai fungsi
 
-      selesai njir
-                        selesai njir
-                    selesai njir
-                selesai njir
-            selesai njir
-        selesai njir
-    selesai njir
-selesai fungsi
-
 lah contoh = "lah x = 12 + 3\nhedeh x # komentar\n"
 render_tokens(pindai(contoh))
 
