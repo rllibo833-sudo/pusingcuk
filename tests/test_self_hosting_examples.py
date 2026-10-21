@@ -40,7 +40,10 @@ class SelfHostingExampleTests(unittest.TestCase):
         )
 
     def test_parser_builds_arithmetic_node(self) -> None:
-        self.run_example("parser.cuk", "OK\n7\n+\n35\nSOURCE_OK\n7\n+\n35\nPARSE_ERROR\n")
+        self.run_example(
+            "parser.cuk",
+            "OK\n7\n+\n35\nSOURCE_OK\n7\n+\n35\nPARSE_ERROR\n",
+        )
 
     def test_evaluator_computes_node(self) -> None:
         self.run_example("evaluator.cuk", "42\n")

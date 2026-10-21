@@ -2,13 +2,14 @@
 
 Folder ini berisi prototipe bertahap yang ditulis dengan bahasa `.cuk` untuk menguji apakah bahasa ini bisa menjadi alat bagi pengembangan toolchain-nya sendiri.
 
-**Penting:** ini belum merupakan compiler PusingCuk yang self-hosted. `lexer.cuk` hanya mengklasifikasikan satu token, sedangkan `source_lexer.cuk` sudah memindai subset teks sumber menjadi token; parser kini juga menerima token terstruktur dari kontrak lexer untuk satu ekspresi `INTEGER OP INTEGER EOF`; evaluator hanya menghitung node biner kecil; dan code generator hanya menghasilkan teks C sebagai demonstrasi. Belum ada pemindaian source penuh, grammar bahasa `.cuk`, modul yang saling mengimpor, atau compiler mandiri.
+**Penting:** ini belum merupakan compiler PusingCuk yang self-hosted. `lexer.cuk` hanya mengklasifikasikan satu token, sedangkan `source_lexer.cuk` memindai subset teks sumber menjadi token; parser menerima token terstruktur untuk satu ekspresi `INTEGER OP INTEGER EOF`; evaluator hanya menghitung node biner kecil; dan code generator hanya menghasilkan teks C sebagai demonstrasi. Belum ada pemindaian source penuh, grammar bahasa `.cuk`, modul yang saling mengimpor, atau compiler mandiri.
 
 ## Contoh
 
 | Berkas | Peran saat ini | Batasan utama |
 |---|---|---|
-| `lexer.cuk` | Mengklasifikasikan satu token operator | Demo kecil, bukan scanner |\n| `source_lexer.cuk` | Memindai teks sumber menjadi token sederhana | Hanya integer dan string sederhana; alias keyword, angka pecahan, dan decoding escape belum didukung |
+| `lexer.cuk` | Mengklasifikasikan satu token operator | Demo kecil, bukan scanner |
+| `source_lexer.cuk` | Memindai teks sumber menjadi token sederhana | Hanya integer dan string sederhana; alias keyword, angka pecahan, dan decoding escape belum didukung |
 | `parser.cuk` | Membentuk node aritmetika dari token sederhana atau token terstruktur | Satu ekspresi `INTEGER OP INTEGER EOF`; belum ada prioritas operator atau tanda kurung |
 | `evaluator.cuk` | Mengevaluasi node aritmetika | Belum menjalankan AST bahasa `.cuk` |
 | `interpreter.cuk` | Menghubungkan tahap mini lexer → parser → evaluator | Input masih daftar token yang sudah disiapkan |
@@ -27,7 +28,7 @@ python pusingcuk_new.py examples/self_hosting/codegen.cuk
 python pusingcuk_new.py examples/self_hosting/runtime_contract.cuk
 ```
 
-Tes otomatis di `tests/test_self_hosting_examples.py` memeriksa exit code dan output yang diharapkan. Lulus pada interpreter referensi hanya membuktikan prototipe berjalan di target itu; tidak berarti target native/browser mendukungnya.
+Tes otomatis di `tests/test_self_hosting_examples.py` memeriksa exit code dan output yang diharapkan, termasuk penolakan operator yang belum didukung. Lulus pada interpreter referensi hanya membuktikan prototipe berjalan di target itu; tidak berarti target native/browser mendukungnya.
 
 ## Jalur menuju self-hosting sungguhan
 

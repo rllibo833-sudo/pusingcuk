@@ -43,4 +43,7 @@ hedeh "SOURCE_" + source_ast["status"]
 hedeh source_ast["kiri"]
 hedeh source_ast["operator"]
 hedeh source_ast["kanan"]
+
+lah invalid_ast = parse_source_expression([{"jenis": "INTEGER", "nilai": "7"}, {"jenis": "OP", "nilai": "%"}, {"jenis": "INTEGER", "nilai": "35"}, {"jenis": "EOF", "nilai": "EOF"}])
+hedeh invalid_ast["status"]
 selesai jancuk
