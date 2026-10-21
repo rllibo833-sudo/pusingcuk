@@ -378,29 +378,30 @@ selesai njir
 lah ast_group = parse_source(pindai("(2 + 3) * 4"))
 hedeh "PARENS_" + ast_group["status"]
 njir ast_group["status"] == "OK"
-    hedeh evaluasi(ast_group["node"])
+    hedeh evaluasi(ast_group["node"], {})
 selesai njir
 
 lah ast_modulo = parse_source(pindai("17 % 5"))
 hedeh "MODULO_" + ast_modulo["status"]
 njir ast_modulo["status"] == "OK"
-    hedeh evaluasi(ast_modulo["node"])
+    hedeh evaluasi(ast_modulo["node"], {})
 selesai njir
 
 lah ast_negative = parse_source(pindai("-3 * 4"))
 hedeh "UNARY_" + ast_negative["status"]
 njir ast_negative["status"] == "OK"
-    hedeh evaluasi(ast_negative["node"])
+    hedeh evaluasi(ast_negative["node"], {})
 selesai njir
 
 lah ast_invalid = parse_source(pindai("7 %"))
 hedeh "INVALID_" + ast_invalid["status"]
 
-lah ast_program = parse_program(pindai("lah x = 2 + 3\nhedeh 5\n"))
+lah ast_program = parse_program(pindai("lah x = 2 + 3\\nhedeh x\\n"))
 hedeh "PROGRAM_" + ast_program["status"]
 njir ast_program["status"] == "OK"
+    lah hasil_program = jalankan_program(ast_program["node"])
     hedeh panjang(ast_program["node"]["statements"])
-    hedeh evaluasi(ast_program["node"]["statements"][0]["nilai"])
-    hedeh evaluasi(ast_program["node"]["statements"][1]["nilai"])
+    hedeh hasil_program["output"][0]
+    hedeh hasil_program["lingkungan"]["x"]
 selesai njir
 selesai jancuk
