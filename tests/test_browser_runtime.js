@@ -35,5 +35,5 @@ assert.throws(() => run("hedeh rentang(0, 10001)"), /10000 item/, "collection it
 assert.equal(run("hedeh bulatkan(2.5)\nhedeh bulatkan(3.5)\nhedeh bulatkan(-2.5)\nhedeh bulatkan(-3.5)").stdout, "2\n4\n-2\n-4\n", "rounding must use ties-to-even");
 assert.equal(run("lah xs = rentang(1, 4)\nhedeh panjang(xs)\nhedeh xs[2]").stdout, "3\n3\n", "range values must support length and nonnegative indexing");
 assert.throws(() => run("lah xs = rentang(1, 4)\nhedeh xs[-1]"), /indeks rentang harus bilangan bulat nonnegatif/, "range values must reject negative indexing");
-assert.throws(() => run("hedeh jumlah([9007199254740992, -9007199254740992])"), /integer input di luar rentang aman/, "sum must reject unsafe integer inputs even when they cancel");
+assert.throws(() => run("hedeh jumlah([9007199254740991, 1, -1])"), /di luar rentang aman/, "sum must reject an unsafe intermediate integer even if later values cancel it");
 console.log("Browser runtime passed " + count + " gallery fixtures plus arithmetic, short-circuit, nested JSON, escaping, functions, range semantics, ties-to-even rounding, numeric boundaries, exception handling, malformed syntax, input validation, safety, and resource-limit tests.");
