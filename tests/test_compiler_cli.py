@@ -148,6 +148,23 @@ class MultiTargetCompilerTests(unittest.TestCase):
         self.assertEqual(emitted["features"], canonical["features"])
         self.assertEqual(emitted["source_map"], canonical["source_map"])
 
+    def test_frontend_artifact_executes_in_vm_without_python_parser_at_runtime(self):
+        import io
+        from compiler.bytecode import compile_ir
+        from compiler.ir import from_source as reference_from_source
+        from compiler.self_hosted_frontend import _frontend_script, from_source as selfhost_from_source
+        from compiler.vm import VirtualMachine
+
+        sample = "jancuk\nlah nilai = (2 + 3) * 4\nhedeh nilai\nselesai jancuk"
+        expected = selfhost_from_source(sample, "stage1_probe.cuk")
+        script = _frontend_script(sample, "stage1_probe.cuk")
+        stage0_ir = reference_from_source(script, "stage0_frontend.cuk")
+        stage1_artifact = compile_ir(stage0_ir)
+        output = io.StringIO()
+        VirtualMachine(stage1_artifact, output_stream=output).run()
+        emitted = json.loads(output.getvalue().strip().splitlines()[-1])
+        self.assertEqual(emitted, expected)
+
     def test_self_hosted_frontend_rejects_malformed_program(self):
         from compiler.self_hosted_frontend import SelfHostedFrontendError, from_source as selfhost_from_source
         with self.assertRaises(SelfHostedFrontendError):
