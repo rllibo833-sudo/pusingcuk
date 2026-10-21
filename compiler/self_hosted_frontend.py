@@ -41,7 +41,7 @@ def frontend_driver_script() -> str:
     """Return a reusable .cuk frontend that reads a JSON source payload from stdin."""
     return _frontend_prefix() + '''
 lah input_payload_json = ""
-tanya input_payload_json ""
+tanya input_payload_json = ""
 lah input_payload = jadi_json(input_payload_json)
 njir input_payload == salah
     hedeh "SELFHOST_INPUT_ERROR"
