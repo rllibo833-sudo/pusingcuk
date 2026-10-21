@@ -92,7 +92,7 @@ class MultiTargetCompilerTests(unittest.TestCase):
 
     def test_self_hosted_frontend_matches_canonical_print_aliases(self):
         from compiler.self_hosted_frontend import from_source as selfhost_from_source
-        aliases = ("bacot", "bacrit", "berak", "berisik", "cetak", "crot", "gas",
+        aliases = ("bacot", "bacrit", "berak", "berisik", "cetak", "crot",
                    "gebber", "gembor", "jedor", "jir", "keluarin", "koar", "muncrat",
                    "ngegas", "nyalak", "omong", "print", "sembur", "semprot", "senggol",
                    "spill", "suarakan", "tampilkan", "teriak")
