@@ -1466,6 +1466,75 @@ static Val call_user_function(const char *name, Val *args, int argc) {
 }
 
 
+
+/* Native PVM v1 stack execution loop; CLI/file decoding follows separately. */
+#define PVM_MAX_STACK 4096
+#define PVM_MAX_STEPS 100000
+#define PVM_MAX_DEPTH 64
+typedef enum { PVM_CONST, PVM_LOAD, PVM_BINARY, PVM_CALL, PVM_RETURN } PvmOp;
+typedef struct { PvmOp op; Val value; const char *name; const char *operator_name; int argc; } PvmInstruction;
+typedef struct { const char *name; const char **params; int param_count; const PvmInstruction *code; size_t code_count; } PvmFunction;
+typedef struct { Val stack[PVM_MAX_STACK]; size_t top; unsigned steps; const PvmFunction *functions; size_t function_count; } PvmState;
+static int pvm_push(PvmState *vm, Val v) {
+    if (vm->top >= PVM_MAX_STACK) { fail("PVM stack melampaui batas"); return 0; }
+    vm->stack[vm->top++] = v; return 1;
+}
+static Val pvm_pop(PvmState *vm) {
+    if (!vm->top) { fail("PVM stack kosong"); return (Val){.t=NIL}; }
+    return vm->stack[--vm->top];
+}
+static int pvm_find_var(const char *name) {
+    for (int i=nvars-1; i>=0; --i) if (!strcmp(vars[i].name,name)) return i;
+    return -1;
+}
+static int pvm_binary(PvmState *vm, const char *op) {
+    Val b=pvm_pop(vm), a=pvm_pop(vm); if (err) return 0;
+    if (!strcmp(op,"<=")||!strcmp(op,"<")||!strcmp(op,">=")||!strcmp(op,">")) {
+        int cmp;
+        if (a.t==STR && b.t==STR) cmp=strcmp(a.s,b.s);
+        else if (a.t==NUM && b.t==NUM) cmp=a.n < b.n ? -1 : a.n > b.n ? 1 : 0;
+        else { fail("PVM perbandingan membutuhkan dua angka atau dua teks"); return 0; }
+        return pvm_push(vm,boolean(!strcmp(op,"<=")?cmp<=0:!strcmp(op,"<")?cmp<0:!strcmp(op,">=")?cmp>=0:cmp>0));
+    }
+    if (!strcmp(op,"==")||!strcmp(op,"!=")) { int eq=equal(a,b); return pvm_push(vm,boolean(!strcmp(op,"==")?eq:!eq)); }
+    if (!strcmp(op,"+") && a.t==STR && b.t==STR) {
+        char out[SZ]; int n=snprintf(out,sizeof out,"%s%s",a.s,b.s);
+        if(n<0||(size_t)n>=sizeof out){fail("teks PVM terlalu panjang");return 0;} return pvm_push(vm,string(out));
+    }
+    if(a.t!=NUM||b.t!=NUM){fail("operator PVM membutuhkan angka");return 0;}
+    if(!strcmp(op,"+"))return pvm_push(vm,checked_num(a.n+b.n,"hasil angka tidak finite"));
+    if(!strcmp(op,"-"))return pvm_push(vm,checked_num(a.n-b.n,"hasil angka tidak finite"));
+    if(!strcmp(op,"*"))return pvm_push(vm,checked_num(a.n*b.n,"hasil angka tidak finite"));
+    if(!strcmp(op,"/")){if(b.n==0){fail("pembagian PVM dengan nol");return 0;}return pvm_push(vm,checked_num(a.n/b.n,"hasil angka tidak finite"));}
+    fail("operator PVM tidak dikenal"); return 0;
+}
+static Val pvm_execute(PvmState *vm,const PvmInstruction *code,size_t count,unsigned depth) {
+    if(depth>PVM_MAX_DEPTH){fail("kedalaman CALL PVM terlampaui");return (Val){.t=NIL};}
+    size_t base=vm->top;
+    for(size_t pc=0;pc<count&&!err;pc++){
+        const PvmInstruction *in=&code[pc];
+        if(++vm->steps>PVM_MAX_STEPS){fail("batas instruksi PVM tercapai");break;}
+        switch(in->op){
+        case PVM_CONST: pvm_push(vm,in->value); break;
+        case PVM_LOAD:{int i=in->name?pvm_find_var(in->name):-1;if(i<0)fail("variabel PVM belum dibuat");else pvm_push(vm,vars[i].v);break;}
+        case PVM_BINARY: if(!in->operator_name)fail("operator PVM kosong");else pvm_binary(vm,in->operator_name);break;
+        case PVM_CALL:{
+            if(!in->name||in->argc<0||(size_t)in->argc>vm->top-base){fail("operand CALL PVM tidak valid");break;}
+            const PvmFunction *fn=NULL;
+            for(size_t i=0;i<vm->function_count;i++)if(vm->functions[i].name&&!strcmp(vm->functions[i].name,in->name)){fn=&vm->functions[i];break;}
+            if(!fn||fn->param_count!=in->argc||in->argc>MAX_PARAMS){fail("fungsi PVM tidak ditemukan atau aritas salah");break;}
+            Val args[MAX_PARAMS];for(int i=in->argc-1;i>=0;i--)args[i]=pvm_pop(vm);
+            int oldn=nvars; Var *saved=malloc(sizeof vars);if(!saved){fail("memori CALL PVM habis");break;}memcpy(saved,vars,sizeof vars);
+            for(int i=0;i<in->argc&&!err;i++){if(nvars>=NV){fail("variabel CALL PVM melampaui batas");break;}snprintf(vars[nvars].name,sizeof vars[nvars].name,"%s",fn->params[i]);vars[nvars++].v=args[i];}
+            Val result=pvm_execute(vm,fn->code,fn->code_count,depth+1);memcpy(vars,saved,sizeof vars);free(saved);nvars=oldn;if(!err)pvm_push(vm,result);break;
+        }
+        case PVM_RETURN:{Val v=vm->top>base?pvm_pop(vm):(Val){.t=NIL};vm->top=base;return v;}
+        default:fail("opcode PVM tidak dikenal");break;
+        }
+    }
+    Val result=vm->top>base?pvm_pop(vm):(Val){.t=NIL};vm->top=base;return result;
+}
+
 #ifndef PUSINGCUK_VERSION
 #define PUSINGCUK_VERSION "0.8.0.dev0"
 #endif
