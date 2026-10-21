@@ -5,6 +5,7 @@ on:
     paths:
       - 'examples/self_hosting/driver_lexer.cuk'
       - 'examples/self_hosting/driver_lexer_minimal.cuk'
+      - 'examples/self_hosting/compiler.cuk'
       - 'native/**'
       - 'compiler/**'
       - '.github/workflows/verify-driver-native.yml'
