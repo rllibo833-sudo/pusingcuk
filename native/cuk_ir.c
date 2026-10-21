@@ -80,10 +80,12 @@ int cuk_ir_write_json(FILE *out,const CukAst *root,const char *source_name) {
     if(!out||!root||root->kind!=CUK_AST_PROGRAM||!source_name||!*source_name||
        strchr(source_name,'/')||strchr(source_name,'\\')||!strcmp(source_name,".")||!strcmp(source_name,".."))return 0;
     fputs("{\"format\":\"pusingcuk-ir\",\"ir_version\":1,\"language_version\":\"0.6-dev\",\"source_name\":",out);
-    json_string(out,source_name);fputs(",\"features\":[\"core\"",out);
-    if(has_kind(root,CUK_AST_PRINT))fputs(",\"console-output\"",out);
-    if(has_kind(root,CUK_AST_DECLARE)||has_kind(root,CUK_AST_VARIABLE))fputs(",\"variables\"",out);
-    if(has_kind(root,CUK_AST_BINARY))fputs(",\"operators\"",out);
+    json_string(out,source_name);fputs(",\"features\":[",out);
+    int comma=0;
+    if(has_kind(root,CUK_AST_PRINT)){fputs("\"console-output\"",out);comma=1;}
+    if(comma)fputc(44,out);fputs("\"core\"",out);comma=1;
+    if(has_kind(root,CUK_AST_BINARY)){if(comma)fputc(44,out);fputs("\"operators\"",out);comma=1;}
+    if(has_kind(root,CUK_AST_DECLARE)||has_kind(root,CUK_AST_VARIABLE)){if(comma)fputc(44,out);fputs("\"variables\"",out);}
     fputs("],\"source_map\":[",out);source_map(out,root,"$.program");
     fputs("],\"program\":",out);node_json(out,root);fputs("}\n",out);
     return !ferror(out);
