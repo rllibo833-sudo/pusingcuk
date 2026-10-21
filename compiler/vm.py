@@ -154,16 +154,20 @@ class VirtualMachine:
                     elif arg == "!=":
                         result = not language_equal(left, right)
                     elif arg in ("+", "-", "*", "/", "//", "%", "<", "<=", ">", ">="):
-                        # Match the native C runtime: booleans are not numbers,
-                        # and arithmetic/comparison never inherit Python's
-                        # list concatenation or mixed-type comparison rules.
-                        if (isinstance(left, bool) or isinstance(right, bool)
+                        # Strings support ordered comparison only against strings;
+                        # booleans remain distinct from numbers in the language contract.
+                        if arg in ("<", "<=", ">", ">=") and isinstance(left, str) and isinstance(right, str):
+                            if arg == "<": result = left < right
+                            elif arg == "<=": result = left <= right
+                            elif arg == ">": result = left > right
+                            else: result = left >= right
+                        elif (isinstance(left, bool) or isinstance(right, bool)
                                 or not isinstance(left, (int, float))
                                 or not isinstance(right, (int, float))):
                             if arg == "+" and isinstance(left, str) and isinstance(right, str):
                                 result = left + right
                             else:
-                                self.fail(line, f"operator '{arg}' membutuhkan dua angka")
+                                self.fail(line, f"operator '{arg}' membutuhkan dua angka atau dua teks untuk perbandingan")
                         elif arg == "+":
                             result = left + right
                         elif arg == "-":
