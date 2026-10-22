@@ -6,6 +6,7 @@ if [ "$#" -ne 2 ]; then
 fi
 native=$1
 payload=$2
+# Compile the frontend with the native runtime; the driver is appended as a module.
 tmp=$(mktemp "${TMPDIR:-/tmp}/pusingcuk-selfhost.XXXXXX.cuk")
 trap 'rm -f "$tmp"' EXIT HUP INT TERM
 sed '$d' examples/self_hosting/compiler.cuk > "$tmp"
