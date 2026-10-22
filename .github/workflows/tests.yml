@@ -85,7 +85,7 @@ jobs:
             # Exercise the actual native frontend -> IR v1 -> .cuk codegen -> native VM path.
             make native-bootstrap
             bootstrap_ir="$(mktemp)"
-            trap 'rm -f "$bootstrap_ir"' EXIT
+            trap "rm -f \"$bootstrap_ir\" \"$bootstrap_ir.cuk\" \"$bootstrap_ir.out\"" EXIT
             printf "%s\n" "jancuk" "lah value = 7" "hedeh value" "selesai jancuk" > "$bootstrap_ir.cuk"
             make run-native-bootstrap FILE="$bootstrap_ir.cuk" > "$bootstrap_ir"
             grep -q '"format":"pusingcuk-ir"' "$bootstrap_ir"
