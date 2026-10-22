@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class CliModuleOutsideRootTests(unittest.TestCase):
     def test_cli_resolves_mutually_importing_cuk_files_in_temp_project(self):
-        with tempfile.TemporaryDirectory(prefix="warung_test_", dir="/tmp") as directory:
+        with tempfile.TemporaryDirectory(prefix="warung_test_") as directory:
             project = Path(directory)
             main_file = project / "main.cuk"
             helper_file = project / "helper.cuk"
