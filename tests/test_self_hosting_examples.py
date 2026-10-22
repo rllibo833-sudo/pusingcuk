@@ -41,8 +41,8 @@ class SelfHostingExampleTests(unittest.TestCase):
         }
         frontend = (
             (EXAMPLES / "compiler.cuk").read_text(encoding="utf-8").rsplit("selesai jancuk", 1)[0]
-            + (EXAMPLES / "compiler_driver.cuk").read_text(encoding="utf-8")
-            + "selesai jancuk\\n"
+            + (EXAMPLES / "compiler_driver.cuk").read_text(encoding="utf-8").splitlines()[1:-1]
+            and "\\n".join((EXAMPLES / "compiler_driver.cuk").read_text(encoding="utf-8").splitlines()[1:-1]) + "\\nselesai jancuk\\n"
         )
         with tempfile.TemporaryDirectory() as directory:
             combined = Path(directory) / "compiler_combined.cuk"

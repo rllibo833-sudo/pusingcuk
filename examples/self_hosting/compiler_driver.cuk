@@ -1,4 +1,4 @@
-# Driver produksi untuk compiler.cuk. Gabungkan setelah compiler.cuk tanpa wrapper penutup.
+jancuk
 tanya input_payload_json = ""
 lah input_payload = jadi_json(input_payload_json)
 njir input_payload == salah
@@ -13,3 +13,4 @@ kampret
         hedeh ir_document(hasil_parse["node"], ir_source_name)
     selesai njir
 selesai njir
+selesai jancuk
