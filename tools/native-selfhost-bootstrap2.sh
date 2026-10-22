@@ -25,6 +25,18 @@ require_ir() {
     fi
 }
 
+require_bytecode() {
+    file=$1
+    label=$2
+    if grep -q '^BYTECODE_ERROR:' "$file" ||
+       ! grep -q '"format":"pusingcuk-bytecode"' "$file" ||
+       ! grep -q '"bytecode_version":1' "$file"; then
+        echo "bootstrap gagal: $label bukan bytecode v1 yang valid" >&2
+        cat "$file" >&2
+        exit 1
+    fi
+}
+
 # Assemble the frontend and JSON driver into one valid .cuk module.
 sed '$d' examples/self_hosting/compiler.cuk > "$tmp/frontend.cuk"
 sed '1d;$d' examples/self_hosting/compiler_driver.cuk >> "$tmp/frontend.cuk"
@@ -38,10 +50,7 @@ require_ir "$tmp/stage0.compiler.ir" "stage-0 compiler"
 
 # Stage 0 .cuk code generator emits executable stage-1 frontend bytecode.
 "$native" examples/self_hosting/ir_codegen.cuk < "$tmp/stage0.compiler.ir" > "$tmp/stage1.bytecode"
-if grep -q '^BYTECODE_ERROR:' "$tmp/stage1.bytecode"; then
-    cat "$tmp/stage1.bytecode" >&2
-    exit 1
-fi
+require_bytecode "$tmp/stage1.bytecode" "stage-1 frontend"
 
 # Stage 1 recompiles the same frontend source. This output, not a probe,
 # is the input used to build the stage-2 frontend.
@@ -55,10 +64,7 @@ fi
 
 # Stage 1 IR codegen builds stage-2 frontend bytecode.
 "$native" examples/self_hosting/ir_codegen.cuk < "$tmp/stage1.compiler.ir" > "$tmp/stage2.bytecode"
-if grep -q '^BYTECODE_ERROR:' "$tmp/stage2.bytecode"; then
-    cat "$tmp/stage2.bytecode" >&2
-    exit 1
-fi
+require_bytecode "$tmp/stage2.bytecode" "stage-2 frontend"
 
 # Run the stage-1 and stage-2 frontends on the exact same deterministic probe.
 printf '%s\n' 'jancuk' 'hedeh 123' 'selesai jancuk' > "$tmp/probe.cuk"
