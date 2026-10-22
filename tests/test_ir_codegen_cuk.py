@@ -9,7 +9,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from compiler.bytecode import compile_ir
+from compiler.bytecode import BytecodeError, compile_ir
 from compiler.ir import from_source
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,6 +70,24 @@ class IRCukCodegenParityTests(unittest.TestCase):
             with self.subTest(source=index):
                 ir = from_source(source, "probe.cuk")
                 self.assertEqual(self.run_codegen(ir), compile_ir(ir))
+
+    def test_builtin_name_cannot_be_redefined_as_function(self):
+        source = program("fungsi panjang(nilai)", "    balek nilai", "selesai fungsi")
+        ir = from_source(source, "builtin-collision.cuk")
+        with self.assertRaisesRegex(BytecodeError, "nama bawaan"):
+            compile_ir(ir)
+
+        result = subprocess.run(
+            [self.native_binary, str(CODEGEN)],
+            cwd=ROOT,
+            input=json.dumps(ir, ensure_ascii=False, separators=(",", ":")) + chr(10),
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("BYTECODE_ERROR:", result.stdout)
+        self.assertIn("nama bawaan", result.stdout)
 
     def test_try_is_rejected_without_fallback(self):
         ir = from_source(program("hedeh 1"), "reject.cuk")

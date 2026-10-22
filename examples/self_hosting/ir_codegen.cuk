@@ -199,10 +199,16 @@ fungsi compile_ir(d)
     lah functions = {}
     lah name = ""
     lah duplicate = salah
+    lah builtins = ["panjang", "teks", "bilangan", "desimal", "logika", "rentang", "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah", "atas", "pangkat", "logaritma", "log10", "sinus", "kosinus", "jumlah", "rata_rata", "median", "json_teks", "json_baca", "html_aman", "csv_baris"]
     lah fn = {}
     untuk n dalam body
         njir n["kind"] == "Function"
             name = n["fields"]["name"]
+            untuk builtin dalam builtins
+                njir builtin == name
+                    balek {"error": "fungsi duplikat atau nama bawaan: " + name, "bytecode": {}}
+                selesai njir
+            selesai untuk
             untuk prior dalam names
                 njir prior == name
                     balek {"error": "fungsi duplikat: " + name, "bytecode": {}}
