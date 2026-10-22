@@ -46,7 +46,10 @@ Let a person describe an application in ordinary language, produce a supported `
 
 **Exit evidence:** per-target parity results with fixture IDs and no untested support claims.
 
-### M2A — Self-hosting language tools
+### M2A — Self-hosting language tools (maintenance milestone)
+
+- The bootstrap work is retained and should receive regression fixes when needed; it is not the default destination for ongoing feature development. Avoid expanding self-hosting infrastructure unless a concrete product need requires it.
+- Prioritize usable compiler workflows, terminal applications, and interop experiments. The Jeklyn-to-`.cuk` idea remains exploratory until a language contract, source examples, and target design are agreed.
 
 - Use `examples/self_hosting/compiler.cuk` as the current `.cuk`-authored frontend; `source_lexer.cuk` entries below are dated history from an earlier prototype.
 - Keep one current implementation status in [SELF_HOSTING_STATE.md](SELF_HOSTING_STATE.md). This roadmap states direction; it does not duplicate the changing test/status checklist.
