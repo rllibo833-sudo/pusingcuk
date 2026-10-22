@@ -1,0 +1,3011 @@
+{
+  "features": [
+    "calls",
+    "console-output",
+    "control-flow",
+    "core",
+    "dictionaries",
+    "functions",
+    "indexing",
+    "lists",
+    "operators",
+    "variables"
+  ],
+  "format": "pusingcuk-ir",
+  "ir_version": 1,
+  "language_version": "0.6-dev",
+  "program": {
+    "fields": {
+      "body": [
+        {
+          "fields": {
+            "body": [
+              {
+                "fields": {
+                  "condition": {
+                    "fields": {
+                      "left": {
+                        "fields": {
+                          "args": [
+                            {
+                              "fields": {
+                                "name": "token"
+                              },
+                              "kind": "Variable",
+                              "line": 3
+                            }
+                          ],
+                          "name": "panjang"
+                        },
+                        "kind": "Call",
+                        "line": 3
+                      },
+                      "op": "!=",
+                      "right": {
+                        "fields": {
+                          "value": 3
+                        },
+                        "kind": "Literal",
+                        "line": 3
+                      }
+                    },
+                    "kind": "Binary",
+                    "line": 3
+                  },
+                  "else_body": [
+                    {
+                      "fields": {
+                        "condition": {
+                          "fields": {
+                            "left": {
+                              "fields": {
+                                "left": {
+                                  "fields": {
+                                    "left": {
+                                      "fields": {
+                                        "left": {
+                                          "fields": {
+                                            "collection": {
+                                              "fields": {
+                                                "name": "token"
+                                              },
+                                              "kind": "Variable",
+                                              "line": 4
+                                            },
+                                            "index": {
+                                              "fields": {
+                                                "value": 1
+                                              },
+                                              "kind": "Literal",
+                                              "line": 4
+                                            }
+                                          },
+                                          "kind": "Index",
+                                          "line": 4
+                                        },
+                                        "op": "!=",
+                                        "right": {
+                                          "fields": {
+                                            "value": "+"
+                                          },
+                                          "kind": "Literal",
+                                          "line": 4
+                                        }
+                                      },
+                                      "kind": "Binary",
+                                      "line": 4
+                                    },
+                                    "op": "dan",
+                                    "right": {
+                                      "fields": {
+                                        "left": {
+                                          "fields": {
+                                            "collection": {
+                                              "fields": {
+                                                "name": "token"
+                                              },
+                                              "kind": "Variable",
+                                              "line": 4
+                                            },
+                                            "index": {
+                                              "fields": {
+                                                "value": 1
+                                              },
+                                              "kind": "Literal",
+                                              "line": 4
+                                            }
+                                          },
+                                          "kind": "Index",
+                                          "line": 4
+                                        },
+                                        "op": "!=",
+                                        "right": {
+                                          "fields": {
+                                            "value": "-"
+                                          },
+                                          "kind": "Literal",
+                                          "line": 4
+                                        }
+                                      },
+                                      "kind": "Binary",
+                                      "line": 4
+                                    }
+                                  },
+                                  "kind": "Binary",
+                                  "line": 4
+                                },
+                                "op": "dan",
+                                "right": {
+                                  "fields": {
+                                    "left": {
+                                      "fields": {
+                                        "collection": {
+                                          "fields": {
+                                            "name": "token"
+                                          },
+                                          "kind": "Variable",
+                                          "line": 4
+                                        },
+                                        "index": {
+                                          "fields": {
+                                            "value": 1
+                                          },
+                                          "kind": "Literal",
+                                          "line": 4
+                                        }
+                                      },
+                                      "kind": "Index",
+                                      "line": 4
+                                    },
+                                    "op": "!=",
+                                    "right": {
+                                      "fields": {
+                                        "value": "*"
+                                      },
+                                      "kind": "Literal",
+                                      "line": 4
+                                    }
+                                  },
+                                  "kind": "Binary",
+                                  "line": 4
+                                }
+                              },
+                              "kind": "Binary",
+                              "line": 4
+                            },
+                            "op": "dan",
+                            "right": {
+                              "fields": {
+                                "left": {
+                                  "fields": {
+                                    "collection": {
+                                      "fields": {
+                                        "name": "token"
+                                      },
+                                      "kind": "Variable",
+                                      "line": 4
+                                    },
+                                    "index": {
+                                      "fields": {
+                                        "value": 1
+                                      },
+                                      "kind": "Literal",
+                                      "line": 4
+                                    }
+                                  },
+                                  "kind": "Index",
+                                  "line": 4
+                                },
+                                "op": "!=",
+                                "right": {
+                                  "fields": {
+                                    "value": "/"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 4
+                                }
+                              },
+                              "kind": "Binary",
+                              "line": 4
+                            }
+                          },
+                          "kind": "Binary",
+                          "line": 4
+                        },
+                        "else_body": [
+                          {
+                            "fields": {
+                              "value": {
+                                "fields": {
+                                  "items": [
+                                    [
+                                      {
+                                        "fields": {
+                                          "value": "status"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 5
+                                      },
+                                      {
+                                        "fields": {
+                                          "value": "OK"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 5
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        "fields": {
+                                          "value": "jenis"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 5
+                                      },
+                                      {
+                                        "fields": {
+                                          "value": "BINARY"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 5
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        "fields": {
+                                          "value": "kiri"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 5
+                                      },
+                                      {
+                                        "fields": {
+                                          "collection": {
+                                            "fields": {
+                                              "name": "token"
+                                            },
+                                            "kind": "Variable",
+                                            "line": 5
+                                          },
+                                          "index": {
+                                            "fields": {
+                                              "value": 0
+                                            },
+                                            "kind": "Literal",
+                                            "line": 5
+                                          }
+                                        },
+                                        "kind": "Index",
+                                        "line": 5
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        "fields": {
+                                          "value": "operator"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 5
+                                      },
+                                      {
+                                        "fields": {
+                                          "collection": {
+                                            "fields": {
+                                              "name": "token"
+                                            },
+                                            "kind": "Variable",
+                                            "line": 5
+                                          },
+                                          "index": {
+                                            "fields": {
+                                              "value": 1
+                                            },
+                                            "kind": "Literal",
+                                            "line": 5
+                                          }
+                                        },
+                                        "kind": "Index",
+                                        "line": 5
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        "fields": {
+                                          "value": "kanan"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 5
+                                      },
+                                      {
+                                        "fields": {
+                                          "collection": {
+                                            "fields": {
+                                              "name": "token"
+                                            },
+                                            "kind": "Variable",
+                                            "line": 5
+                                          },
+                                          "index": {
+                                            "fields": {
+                                              "value": 2
+                                            },
+                                            "kind": "Literal",
+                                            "line": 5
+                                          }
+                                        },
+                                        "kind": "Index",
+                                        "line": 5
+                                      }
+                                    ]
+                                  ]
+                                },
+                                "kind": "Dict",
+                                "line": 5
+                              }
+                            },
+                            "kind": "Return",
+                            "line": 5
+                          }
+                        ],
+                        "then_body": [
+                          {
+                            "fields": {
+                              "value": {
+                                "fields": {
+                                  "items": [
+                                    [
+                                      {
+                                        "fields": {
+                                          "value": "status"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 5
+                                      },
+                                      {
+                                        "fields": {
+                                          "value": "PARSE_ERROR"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 5
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        "fields": {
+                                          "value": "alasan"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 5
+                                      },
+                                      {
+                                        "fields": {
+                                          "value": "OPERATOR_TIDAK_DIDUKUNG"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 5
+                                      }
+                                    ]
+                                  ]
+                                },
+                                "kind": "Dict",
+                                "line": 5
+                              }
+                            },
+                            "kind": "Return",
+                            "line": 5
+                          }
+                        ]
+                      },
+                      "kind": "If",
+                      "line": 4
+                    }
+                  ],
+                  "then_body": [
+                    {
+                      "fields": {
+                        "value": {
+                          "fields": {
+                            "items": [
+                              [
+                                {
+                                  "fields": {
+                                    "value": "status"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 4
+                                },
+                                {
+                                  "fields": {
+                                    "value": "PARSE_ERROR"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 4
+                                }
+                              ],
+                              [
+                                {
+                                  "fields": {
+                                    "value": "alasan"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 4
+                                },
+                                {
+                                  "fields": {
+                                    "value": "BUTUH_TIGA_TOKEN"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 4
+                                }
+                              ]
+                            ]
+                          },
+                          "kind": "Dict",
+                          "line": 4
+                        }
+                      },
+                      "kind": "Return",
+                      "line": 4
+                    }
+                  ]
+                },
+                "kind": "If",
+                "line": 3
+              }
+            ],
+            "name": "parse_aritmetika",
+            "params": [
+              "token"
+            ]
+          },
+          "kind": "Function",
+          "line": 2
+        },
+        {
+          "fields": {
+            "body": [
+              {
+                "fields": {
+                  "condition": {
+                    "fields": {
+                      "left": {
+                        "fields": {
+                          "args": [
+                            {
+                              "fields": {
+                                "name": "tokens"
+                              },
+                              "kind": "Variable",
+                              "line": 4
+                            }
+                          ],
+                          "name": "panjang"
+                        },
+                        "kind": "Call",
+                        "line": 4
+                      },
+                      "op": "!=",
+                      "right": {
+                        "fields": {
+                          "value": 4
+                        },
+                        "kind": "Literal",
+                        "line": 4
+                      }
+                    },
+                    "kind": "Binary",
+                    "line": 4
+                  },
+                  "else_body": [
+                    {
+                      "fields": {
+                        "condition": {
+                          "fields": {
+                            "left": {
+                              "fields": {
+                                "left": {
+                                  "fields": {
+                                    "left": {
+                                      "fields": {
+                                        "left": {
+                                          "fields": {
+                                            "collection": {
+                                              "fields": {
+                                                "collection": {
+                                                  "fields": {
+                                                    "name": "tokens"
+                                                  },
+                                                  "kind": "Variable",
+                                                  "line": 5
+                                                },
+                                                "index": {
+                                                  "fields": {
+                                                    "value": 0
+                                                  },
+                                                  "kind": "Literal",
+                                                  "line": 5
+                                                }
+                                              },
+                                              "kind": "Index",
+                                              "line": 5
+                                            },
+                                            "index": {
+                                              "fields": {
+                                                "value": "jenis"
+                                              },
+                                              "kind": "Literal",
+                                              "line": 5
+                                            }
+                                          },
+                                          "kind": "Index",
+                                          "line": 5
+                                        },
+                                        "op": "!=",
+                                        "right": {
+                                          "fields": {
+                                            "value": "INTEGER"
+                                          },
+                                          "kind": "Literal",
+                                          "line": 5
+                                        }
+                                      },
+                                      "kind": "Binary",
+                                      "line": 5
+                                    },
+                                    "op": "atau",
+                                    "right": {
+                                      "fields": {
+                                        "left": {
+                                          "fields": {
+                                            "collection": {
+                                              "fields": {
+                                                "collection": {
+                                                  "fields": {
+                                                    "name": "tokens"
+                                                  },
+                                                  "kind": "Variable",
+                                                  "line": 5
+                                                },
+                                                "index": {
+                                                  "fields": {
+                                                    "value": 1
+                                                  },
+                                                  "kind": "Literal",
+                                                  "line": 5
+                                                }
+                                              },
+                                              "kind": "Index",
+                                              "line": 5
+                                            },
+                                            "index": {
+                                              "fields": {
+                                                "value": "jenis"
+                                              },
+                                              "kind": "Literal",
+                                              "line": 5
+                                            }
+                                          },
+                                          "kind": "Index",
+                                          "line": 5
+                                        },
+                                        "op": "!=",
+                                        "right": {
+                                          "fields": {
+                                            "value": "OP"
+                                          },
+                                          "kind": "Literal",
+                                          "line": 5
+                                        }
+                                      },
+                                      "kind": "Binary",
+                                      "line": 5
+                                    }
+                                  },
+                                  "kind": "Binary",
+                                  "line": 5
+                                },
+                                "op": "atau",
+                                "right": {
+                                  "fields": {
+                                    "left": {
+                                      "fields": {
+                                        "collection": {
+                                          "fields": {
+                                            "collection": {
+                                              "fields": {
+                                                "name": "tokens"
+                                              },
+                                              "kind": "Variable",
+                                              "line": 5
+                                            },
+                                            "index": {
+                                              "fields": {
+                                                "value": 2
+                                              },
+                                              "kind": "Literal",
+                                              "line": 5
+                                            }
+                                          },
+                                          "kind": "Index",
+                                          "line": 5
+                                        },
+                                        "index": {
+                                          "fields": {
+                                            "value": "jenis"
+                                          },
+                                          "kind": "Literal",
+                                          "line": 5
+                                        }
+                                      },
+                                      "kind": "Index",
+                                      "line": 5
+                                    },
+                                    "op": "!=",
+                                    "right": {
+                                      "fields": {
+                                        "value": "INTEGER"
+                                      },
+                                      "kind": "Literal",
+                                      "line": 5
+                                    }
+                                  },
+                                  "kind": "Binary",
+                                  "line": 5
+                                }
+                              },
+                              "kind": "Binary",
+                              "line": 5
+                            },
+                            "op": "atau",
+                            "right": {
+                              "fields": {
+                                "left": {
+                                  "fields": {
+                                    "collection": {
+                                      "fields": {
+                                        "collection": {
+                                          "fields": {
+                                            "name": "tokens"
+                                          },
+                                          "kind": "Variable",
+                                          "line": 5
+                                        },
+                                        "index": {
+                                          "fields": {
+                                            "value": 3
+                                          },
+                                          "kind": "Literal",
+                                          "line": 5
+                                        }
+                                      },
+                                      "kind": "Index",
+                                      "line": 5
+                                    },
+                                    "index": {
+                                      "fields": {
+                                        "value": "jenis"
+                                      },
+                                      "kind": "Literal",
+                                      "line": 5
+                                    }
+                                  },
+                                  "kind": "Index",
+                                  "line": 5
+                                },
+                                "op": "!=",
+                                "right": {
+                                  "fields": {
+                                    "value": "EOF"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 5
+                                }
+                              },
+                              "kind": "Binary",
+                              "line": 5
+                            }
+                          },
+                          "kind": "Binary",
+                          "line": 5
+                        },
+                        "else_body": [
+                          {
+                            "fields": {
+                              "condition": {
+                                "fields": {
+                                  "left": {
+                                    "fields": {
+                                      "left": {
+                                        "fields": {
+                                          "left": {
+                                            "fields": {
+                                              "left": {
+                                                "fields": {
+                                                  "collection": {
+                                                    "fields": {
+                                                      "collection": {
+                                                        "fields": {
+                                                          "name": "tokens"
+                                                        },
+                                                        "kind": "Variable",
+                                                        "line": 6
+                                                      },
+                                                      "index": {
+                                                        "fields": {
+                                                          "value": 1
+                                                        },
+                                                        "kind": "Literal",
+                                                        "line": 6
+                                                      }
+                                                    },
+                                                    "kind": "Index",
+                                                    "line": 6
+                                                  },
+                                                  "index": {
+                                                    "fields": {
+                                                      "value": "nilai"
+                                                    },
+                                                    "kind": "Literal",
+                                                    "line": 6
+                                                  }
+                                                },
+                                                "kind": "Index",
+                                                "line": 6
+                                              },
+                                              "op": "!=",
+                                              "right": {
+                                                "fields": {
+                                                  "value": "+"
+                                                },
+                                                "kind": "Literal",
+                                                "line": 6
+                                              }
+                                            },
+                                            "kind": "Binary",
+                                            "line": 6
+                                          },
+                                          "op": "dan",
+                                          "right": {
+                                            "fields": {
+                                              "left": {
+                                                "fields": {
+                                                  "collection": {
+                                                    "fields": {
+                                                      "collection": {
+                                                        "fields": {
+                                                          "name": "tokens"
+                                                        },
+                                                        "kind": "Variable",
+                                                        "line": 6
+                                                      },
+                                                      "index": {
+                                                        "fields": {
+                                                          "value": 1
+                                                        },
+                                                        "kind": "Literal",
+                                                        "line": 6
+                                                      }
+                                                    },
+                                                    "kind": "Index",
+                                                    "line": 6
+                                                  },
+                                                  "index": {
+                                                    "fields": {
+                                                      "value": "nilai"
+                                                    },
+                                                    "kind": "Literal",
+                                                    "line": 6
+                                                  }
+                                                },
+                                                "kind": "Index",
+                                                "line": 6
+                                              },
+                                              "op": "!=",
+                                              "right": {
+                                                "fields": {
+                                                  "value": "-"
+                                                },
+                                                "kind": "Literal",
+                                                "line": 6
+                                              }
+                                            },
+                                            "kind": "Binary",
+                                            "line": 6
+                                          }
+                                        },
+                                        "kind": "Binary",
+                                        "line": 6
+                                      },
+                                      "op": "dan",
+                                      "right": {
+                                        "fields": {
+                                          "left": {
+                                            "fields": {
+                                              "collection": {
+                                                "fields": {
+                                                  "collection": {
+                                                    "fields": {
+                                                      "name": "tokens"
+                                                    },
+                                                    "kind": "Variable",
+                                                    "line": 6
+                                                  },
+                                                  "index": {
+                                                    "fields": {
+                                                      "value": 1
+                                                    },
+                                                    "kind": "Literal",
+                                                    "line": 6
+                                                  }
+                                                },
+                                                "kind": "Index",
+                                                "line": 6
+                                              },
+                                              "index": {
+                                                "fields": {
+                                                  "value": "nilai"
+                                                },
+                                                "kind": "Literal",
+                                                "line": 6
+                                              }
+                                            },
+                                            "kind": "Index",
+                                            "line": 6
+                                          },
+                                          "op": "!=",
+                                          "right": {
+                                            "fields": {
+                                              "value": "*"
+                                            },
+                                            "kind": "Literal",
+                                            "line": 6
+                                          }
+                                        },
+                                        "kind": "Binary",
+                                        "line": 6
+                                      }
+                                    },
+                                    "kind": "Binary",
+                                    "line": 6
+                                  },
+                                  "op": "dan",
+                                  "right": {
+                                    "fields": {
+                                      "left": {
+                                        "fields": {
+                                          "collection": {
+                                            "fields": {
+                                              "collection": {
+                                                "fields": {
+                                                  "name": "tokens"
+                                                },
+                                                "kind": "Variable",
+                                                "line": 6
+                                              },
+                                              "index": {
+                                                "fields": {
+                                                  "value": 1
+                                                },
+                                                "kind": "Literal",
+                                                "line": 6
+                                              }
+                                            },
+                                            "kind": "Index",
+                                            "line": 6
+                                          },
+                                          "index": {
+                                            "fields": {
+                                              "value": "nilai"
+                                            },
+                                            "kind": "Literal",
+                                            "line": 6
+                                          }
+                                        },
+                                        "kind": "Index",
+                                        "line": 6
+                                      },
+                                      "op": "!=",
+                                      "right": {
+                                        "fields": {
+                                          "value": "/"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 6
+                                      }
+                                    },
+                                    "kind": "Binary",
+                                    "line": 6
+                                  }
+                                },
+                                "kind": "Binary",
+                                "line": 6
+                              },
+                              "else_body": [
+                                {
+                                  "fields": {
+                                    "value": {
+                                      "fields": {
+                                        "items": [
+                                          [
+                                            {
+                                              "fields": {
+                                                "value": "status"
+                                              },
+                                              "kind": "Literal",
+                                              "line": 7
+                                            },
+                                            {
+                                              "fields": {
+                                                "value": "OK"
+                                              },
+                                              "kind": "Literal",
+                                              "line": 7
+                                            }
+                                          ],
+                                          [
+                                            {
+                                              "fields": {
+                                                "value": "jenis"
+                                              },
+                                              "kind": "Literal",
+                                              "line": 7
+                                            },
+                                            {
+                                              "fields": {
+                                                "value": "BINARY"
+                                              },
+                                              "kind": "Literal",
+                                              "line": 7
+                                            }
+                                          ],
+                                          [
+                                            {
+                                              "fields": {
+                                                "value": "kiri"
+                                              },
+                                              "kind": "Literal",
+                                              "line": 7
+                                            },
+                                            {
+                                              "fields": {
+                                                "args": [
+                                                  {
+                                                    "fields": {
+                                                      "collection": {
+                                                        "fields": {
+                                                          "collection": {
+                                                            "fields": {
+                                                              "name": "tokens"
+                                                            },
+                                                            "kind": "Variable",
+                                                            "line": 7
+                                                          },
+                                                          "index": {
+                                                            "fields": {
+                                                              "value": 0
+                                                            },
+                                                            "kind": "Literal",
+                                                            "line": 7
+                                                          }
+                                                        },
+                                                        "kind": "Index",
+                                                        "line": 7
+                                                      },
+                                                      "index": {
+                                                        "fields": {
+                                                          "value": "nilai"
+                                                        },
+                                                        "kind": "Literal",
+                                                        "line": 7
+                                                      }
+                                                    },
+                                                    "kind": "Index",
+                                                    "line": 7
+                                                  }
+                                                ],
+                                                "name": "bilangan"
+                                              },
+                                              "kind": "Call",
+                                              "line": 7
+                                            }
+                                          ],
+                                          [
+                                            {
+                                              "fields": {
+                                                "value": "operator"
+                                              },
+                                              "kind": "Literal",
+                                              "line": 7
+                                            },
+                                            {
+                                              "fields": {
+                                                "collection": {
+                                                  "fields": {
+                                                    "collection": {
+                                                      "fields": {
+                                                        "name": "tokens"
+                                                      },
+                                                      "kind": "Variable",
+                                                      "line": 7
+                                                    },
+                                                    "index": {
+                                                      "fields": {
+                                                        "value": 1
+                                                      },
+                                                      "kind": "Literal",
+                                                      "line": 7
+                                                    }
+                                                  },
+                                                  "kind": "Index",
+                                                  "line": 7
+                                                },
+                                                "index": {
+                                                  "fields": {
+                                                    "value": "nilai"
+                                                  },
+                                                  "kind": "Literal",
+                                                  "line": 7
+                                                }
+                                              },
+                                              "kind": "Index",
+                                              "line": 7
+                                            }
+                                          ],
+                                          [
+                                            {
+                                              "fields": {
+                                                "value": "kanan"
+                                              },
+                                              "kind": "Literal",
+                                              "line": 7
+                                            },
+                                            {
+                                              "fields": {
+                                                "args": [
+                                                  {
+                                                    "fields": {
+                                                      "collection": {
+                                                        "fields": {
+                                                          "collection": {
+                                                            "fields": {
+                                                              "name": "tokens"
+                                                            },
+                                                            "kind": "Variable",
+                                                            "line": 7
+                                                          },
+                                                          "index": {
+                                                            "fields": {
+                                                              "value": 2
+                                                            },
+                                                            "kind": "Literal",
+                                                            "line": 7
+                                                          }
+                                                        },
+                                                        "kind": "Index",
+                                                        "line": 7
+                                                      },
+                                                      "index": {
+                                                        "fields": {
+                                                          "value": "nilai"
+                                                        },
+                                                        "kind": "Literal",
+                                                        "line": 7
+                                                      }
+                                                    },
+                                                    "kind": "Index",
+                                                    "line": 7
+                                                  }
+                                                ],
+                                                "name": "bilangan"
+                                              },
+                                              "kind": "Call",
+                                              "line": 7
+                                            }
+                                          ]
+                                        ]
+                                      },
+                                      "kind": "Dict",
+                                      "line": 7
+                                    }
+                                  },
+                                  "kind": "Return",
+                                  "line": 7
+                                }
+                              ],
+                              "then_body": [
+                                {
+                                  "fields": {
+                                    "value": {
+                                      "fields": {
+                                        "items": [
+                                          [
+                                            {
+                                              "fields": {
+                                                "value": "status"
+                                              },
+                                              "kind": "Literal",
+                                              "line": 7
+                                            },
+                                            {
+                                              "fields": {
+                                                "value": "PARSE_ERROR"
+                                              },
+                                              "kind": "Literal",
+                                              "line": 7
+                                            }
+                                          ],
+                                          [
+                                            {
+                                              "fields": {
+                                                "value": "alasan"
+                                              },
+                                              "kind": "Literal",
+                                              "line": 7
+                                            },
+                                            {
+                                              "fields": {
+                                                "value": "OPERATOR_TIDAK_DIDUKUNG"
+                                              },
+                                              "kind": "Literal",
+                                              "line": 7
+                                            }
+                                          ]
+                                        ]
+                                      },
+                                      "kind": "Dict",
+                                      "line": 7
+                                    }
+                                  },
+                                  "kind": "Return",
+                                  "line": 7
+                                }
+                              ]
+                            },
+                            "kind": "If",
+                            "line": 6
+                          }
+                        ],
+                        "then_body": [
+                          {
+                            "fields": {
+                              "value": {
+                                "fields": {
+                                  "items": [
+                                    [
+                                      {
+                                        "fields": {
+                                          "value": "status"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 6
+                                      },
+                                      {
+                                        "fields": {
+                                          "value": "PARSE_ERROR"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 6
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        "fields": {
+                                          "value": "alasan"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 6
+                                      },
+                                      {
+                                        "fields": {
+                                          "value": "BENTUK_TOKEN_TIDAK_VALID"
+                                        },
+                                        "kind": "Literal",
+                                        "line": 6
+                                      }
+                                    ]
+                                  ]
+                                },
+                                "kind": "Dict",
+                                "line": 6
+                              }
+                            },
+                            "kind": "Return",
+                            "line": 6
+                          }
+                        ]
+                      },
+                      "kind": "If",
+                      "line": 5
+                    }
+                  ],
+                  "then_body": [
+                    {
+                      "fields": {
+                        "value": {
+                          "fields": {
+                            "items": [
+                              [
+                                {
+                                  "fields": {
+                                    "value": "status"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 5
+                                },
+                                {
+                                  "fields": {
+                                    "value": "PARSE_ERROR"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 5
+                                }
+                              ],
+                              [
+                                {
+                                  "fields": {
+                                    "value": "alasan"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 5
+                                },
+                                {
+                                  "fields": {
+                                    "value": "BUTUH_TIGA_TOKEN_DAN_EOF"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 5
+                                }
+                              ]
+                            ]
+                          },
+                          "kind": "Dict",
+                          "line": 5
+                        }
+                      },
+                      "kind": "Return",
+                      "line": 5
+                    }
+                  ]
+                },
+                "kind": "If",
+                "line": 4
+              }
+            ],
+            "name": "parse_source_expression",
+            "params": [
+              "tokens"
+            ]
+          },
+          "kind": "Function",
+          "line": 3
+        },
+        {
+          "fields": {
+            "name": "hasil",
+            "value": {
+              "fields": {
+                "args": [
+                  {
+                    "fields": {
+                      "items": [
+                        {
+                          "fields": {
+                            "value": 7
+                          },
+                          "kind": "Literal",
+                          "line": 4
+                        },
+                        {
+                          "fields": {
+                            "value": "+"
+                          },
+                          "kind": "Literal",
+                          "line": 4
+                        },
+                        {
+                          "fields": {
+                            "value": 35
+                          },
+                          "kind": "Literal",
+                          "line": 4
+                        }
+                      ]
+                    },
+                    "kind": "List",
+                    "line": 4
+                  }
+                ],
+                "name": "parse_aritmetika"
+              },
+              "kind": "Call",
+              "line": 4
+            }
+          },
+          "kind": "Declare",
+          "line": 4
+        },
+        {
+          "fields": {
+            "value": {
+              "fields": {
+                "collection": {
+                  "fields": {
+                    "name": "hasil"
+                  },
+                  "kind": "Variable",
+                  "line": 5
+                },
+                "index": {
+                  "fields": {
+                    "value": "status"
+                  },
+                  "kind": "Literal",
+                  "line": 5
+                }
+              },
+              "kind": "Index",
+              "line": 5
+            }
+          },
+          "kind": "Print",
+          "line": 5
+        },
+        {
+          "fields": {
+            "value": {
+              "fields": {
+                "collection": {
+                  "fields": {
+                    "name": "hasil"
+                  },
+                  "kind": "Variable",
+                  "line": 6
+                },
+                "index": {
+                  "fields": {
+                    "value": "kiri"
+                  },
+                  "kind": "Literal",
+                  "line": 6
+                }
+              },
+              "kind": "Index",
+              "line": 6
+            }
+          },
+          "kind": "Print",
+          "line": 6
+        },
+        {
+          "fields": {
+            "value": {
+              "fields": {
+                "collection": {
+                  "fields": {
+                    "name": "hasil"
+                  },
+                  "kind": "Variable",
+                  "line": 7
+                },
+                "index": {
+                  "fields": {
+                    "value": "operator"
+                  },
+                  "kind": "Literal",
+                  "line": 7
+                }
+              },
+              "kind": "Index",
+              "line": 7
+            }
+          },
+          "kind": "Print",
+          "line": 7
+        },
+        {
+          "fields": {
+            "value": {
+              "fields": {
+                "collection": {
+                  "fields": {
+                    "name": "hasil"
+                  },
+                  "kind": "Variable",
+                  "line": 8
+                },
+                "index": {
+                  "fields": {
+                    "value": "kanan"
+                  },
+                  "kind": "Literal",
+                  "line": 8
+                }
+              },
+              "kind": "Index",
+              "line": 8
+            }
+          },
+          "kind": "Print",
+          "line": 8
+        },
+        {
+          "fields": {
+            "name": "source_ast",
+            "value": {
+              "fields": {
+                "args": [
+                  {
+                    "fields": {
+                      "items": [
+                        {
+                          "fields": {
+                            "items": [
+                              [
+                                {
+                                  "fields": {
+                                    "value": "jenis"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                },
+                                {
+                                  "fields": {
+                                    "value": "INTEGER"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                }
+                              ],
+                              [
+                                {
+                                  "fields": {
+                                    "value": "nilai"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                },
+                                {
+                                  "fields": {
+                                    "value": "7"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                }
+                              ]
+                            ]
+                          },
+                          "kind": "Dict",
+                          "line": 9
+                        },
+                        {
+                          "fields": {
+                            "items": [
+                              [
+                                {
+                                  "fields": {
+                                    "value": "jenis"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                },
+                                {
+                                  "fields": {
+                                    "value": "OP"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                }
+                              ],
+                              [
+                                {
+                                  "fields": {
+                                    "value": "nilai"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                },
+                                {
+                                  "fields": {
+                                    "value": "+"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                }
+                              ]
+                            ]
+                          },
+                          "kind": "Dict",
+                          "line": 9
+                        },
+                        {
+                          "fields": {
+                            "items": [
+                              [
+                                {
+                                  "fields": {
+                                    "value": "jenis"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                },
+                                {
+                                  "fields": {
+                                    "value": "INTEGER"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                }
+                              ],
+                              [
+                                {
+                                  "fields": {
+                                    "value": "nilai"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                },
+                                {
+                                  "fields": {
+                                    "value": "35"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                }
+                              ]
+                            ]
+                          },
+                          "kind": "Dict",
+                          "line": 9
+                        },
+                        {
+                          "fields": {
+                            "items": [
+                              [
+                                {
+                                  "fields": {
+                                    "value": "jenis"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                },
+                                {
+                                  "fields": {
+                                    "value": "EOF"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                }
+                              ],
+                              [
+                                {
+                                  "fields": {
+                                    "value": "nilai"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                },
+                                {
+                                  "fields": {
+                                    "value": "EOF"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 9
+                                }
+                              ]
+                            ]
+                          },
+                          "kind": "Dict",
+                          "line": 9
+                        }
+                      ]
+                    },
+                    "kind": "List",
+                    "line": 9
+                  }
+                ],
+                "name": "parse_source_expression"
+              },
+              "kind": "Call",
+              "line": 9
+            }
+          },
+          "kind": "Declare",
+          "line": 9
+        },
+        {
+          "fields": {
+            "value": {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "value": "SOURCE_"
+                  },
+                  "kind": "Literal",
+                  "line": 10
+                },
+                "op": "+",
+                "right": {
+                  "fields": {
+                    "collection": {
+                      "fields": {
+                        "name": "source_ast"
+                      },
+                      "kind": "Variable",
+                      "line": 10
+                    },
+                    "index": {
+                      "fields": {
+                        "value": "status"
+                      },
+                      "kind": "Literal",
+                      "line": 10
+                    }
+                  },
+                  "kind": "Index",
+                  "line": 10
+                }
+              },
+              "kind": "Binary",
+              "line": 10
+            }
+          },
+          "kind": "Print",
+          "line": 10
+        },
+        {
+          "fields": {
+            "value": {
+              "fields": {
+                "collection": {
+                  "fields": {
+                    "name": "source_ast"
+                  },
+                  "kind": "Variable",
+                  "line": 11
+                },
+                "index": {
+                  "fields": {
+                    "value": "kiri"
+                  },
+                  "kind": "Literal",
+                  "line": 11
+                }
+              },
+              "kind": "Index",
+              "line": 11
+            }
+          },
+          "kind": "Print",
+          "line": 11
+        },
+        {
+          "fields": {
+            "value": {
+              "fields": {
+                "collection": {
+                  "fields": {
+                    "name": "source_ast"
+                  },
+                  "kind": "Variable",
+                  "line": 12
+                },
+                "index": {
+                  "fields": {
+                    "value": "operator"
+                  },
+                  "kind": "Literal",
+                  "line": 12
+                }
+              },
+              "kind": "Index",
+              "line": 12
+            }
+          },
+          "kind": "Print",
+          "line": 12
+        },
+        {
+          "fields": {
+            "value": {
+              "fields": {
+                "collection": {
+                  "fields": {
+                    "name": "source_ast"
+                  },
+                  "kind": "Variable",
+                  "line": 13
+                },
+                "index": {
+                  "fields": {
+                    "value": "kanan"
+                  },
+                  "kind": "Literal",
+                  "line": 13
+                }
+              },
+              "kind": "Index",
+              "line": 13
+            }
+          },
+          "kind": "Print",
+          "line": 13
+        },
+        {
+          "fields": {
+            "name": "invalid_ast",
+            "value": {
+              "fields": {
+                "args": [
+                  {
+                    "fields": {
+                      "items": [
+                        {
+                          "fields": {
+                            "items": [
+                              [
+                                {
+                                  "fields": {
+                                    "value": "jenis"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                },
+                                {
+                                  "fields": {
+                                    "value": "INTEGER"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                }
+                              ],
+                              [
+                                {
+                                  "fields": {
+                                    "value": "nilai"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                },
+                                {
+                                  "fields": {
+                                    "value": "7"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                }
+                              ]
+                            ]
+                          },
+                          "kind": "Dict",
+                          "line": 14
+                        },
+                        {
+                          "fields": {
+                            "items": [
+                              [
+                                {
+                                  "fields": {
+                                    "value": "jenis"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                },
+                                {
+                                  "fields": {
+                                    "value": "OP"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                }
+                              ],
+                              [
+                                {
+                                  "fields": {
+                                    "value": "nilai"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                },
+                                {
+                                  "fields": {
+                                    "value": "%"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                }
+                              ]
+                            ]
+                          },
+                          "kind": "Dict",
+                          "line": 14
+                        },
+                        {
+                          "fields": {
+                            "items": [
+                              [
+                                {
+                                  "fields": {
+                                    "value": "jenis"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                },
+                                {
+                                  "fields": {
+                                    "value": "INTEGER"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                }
+                              ],
+                              [
+                                {
+                                  "fields": {
+                                    "value": "nilai"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                },
+                                {
+                                  "fields": {
+                                    "value": "35"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                }
+                              ]
+                            ]
+                          },
+                          "kind": "Dict",
+                          "line": 14
+                        },
+                        {
+                          "fields": {
+                            "items": [
+                              [
+                                {
+                                  "fields": {
+                                    "value": "jenis"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                },
+                                {
+                                  "fields": {
+                                    "value": "EOF"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                }
+                              ],
+                              [
+                                {
+                                  "fields": {
+                                    "value": "nilai"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                },
+                                {
+                                  "fields": {
+                                    "value": "EOF"
+                                  },
+                                  "kind": "Literal",
+                                  "line": 14
+                                }
+                              ]
+                            ]
+                          },
+                          "kind": "Dict",
+                          "line": 14
+                        }
+                      ]
+                    },
+                    "kind": "List",
+                    "line": 14
+                  }
+                ],
+                "name": "parse_source_expression"
+              },
+              "kind": "Call",
+              "line": 14
+            }
+          },
+          "kind": "Declare",
+          "line": 14
+        },
+        {
+          "fields": {
+            "value": {
+              "fields": {
+                "collection": {
+                  "fields": {
+                    "name": "invalid_ast"
+                  },
+                  "kind": "Variable",
+                  "line": 15
+                },
+                "index": {
+                  "fields": {
+                    "value": "status"
+                  },
+                  "kind": "Literal",
+                  "line": 15
+                }
+              },
+              "kind": "Index",
+              "line": 15
+            }
+          },
+          "kind": "Print",
+          "line": 15
+        }
+      ]
+    },
+    "kind": "Program",
+    "line": 2
+  },
+  "source_map": [
+    {
+      "line": 2,
+      "path": "$"
+    },
+    {
+      "line": 2,
+      "path": "$.fields.body[0]"
+    },
+    {
+      "line": 3,
+      "path": "$.fields.body[0].fields.body[0]"
+    },
+    {
+      "line": 3,
+      "path": "$.fields.body[0].fields.body[0].fields.condition"
+    },
+    {
+      "line": 3,
+      "path": "$.fields.body[0].fields.body[0].fields.condition.fields.left"
+    },
+    {
+      "line": 3,
+      "path": "$.fields.body[0].fields.body[0].fields.condition.fields.left.fields.args[0]"
+    },
+    {
+      "line": 3,
+      "path": "$.fields.body[0].fields.body[0].fields.condition.fields.right"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0]"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.left"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.left.fields.collection"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.left.fields.index"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.right"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.left"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.left.fields.collection"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.left.fields.index"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.right"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.right"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.left"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.left.fields.collection"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.left.fields.index"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.right"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.right"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.right.fields.left"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.right.fields.left.fields.collection"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.right.fields.left.fields.index"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.condition.fields.right.fields.right"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[0][0]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[0][1]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[1][0]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[1][1]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[2][0]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[2][1]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[2][1].fields.collection"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[2][1].fields.index"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[3][0]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[3][1]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[3][1].fields.collection"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[3][1].fields.index"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[4][0]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[4][1]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[4][1].fields.collection"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[4][1].fields.index"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.then_body[0]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.then_body[0].fields.value"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.then_body[0].fields.value.fields.items[0][0]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.then_body[0].fields.value.fields.items[0][1]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.then_body[0].fields.value.fields.items[1][0]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[0].fields.body[0].fields.else_body[0].fields.then_body[0].fields.value.fields.items[1][1]"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.then_body[0]"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.then_body[0].fields.value"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.then_body[0].fields.value.fields.items[0][0]"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.then_body[0].fields.value.fields.items[0][1]"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.then_body[0].fields.value.fields.items[1][0]"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[0].fields.body[0].fields.then_body[0].fields.value.fields.items[1][1]"
+    },
+    {
+      "line": 3,
+      "path": "$.fields.body[1]"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[1].fields.body[0]"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[1].fields.body[0].fields.condition"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[1].fields.body[0].fields.condition.fields.left"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[1].fields.body[0].fields.condition.fields.left.fields.args[0]"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[1].fields.body[0].fields.condition.fields.right"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.left"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.left.fields.collection"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.left.fields.collection.fields.collection"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.left.fields.collection.fields.index"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.left.fields.index"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.right"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.left"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.left.fields.collection"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.left.fields.collection.fields.collection"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.left.fields.collection.fields.index"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.left.fields.index"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.right"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.right"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.left"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.left.fields.collection"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.left.fields.collection.fields.collection"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.left.fields.collection.fields.index"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.left.fields.index"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.right"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.right"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.right.fields.left"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.right.fields.left.fields.collection"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.right.fields.left.fields.collection.fields.collection"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.right.fields.left.fields.collection.fields.index"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.right.fields.left.fields.index"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.condition.fields.right.fields.right"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0]"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.left"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.left.fields.collection"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.left.fields.collection.fields.collection"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.left.fields.collection.fields.index"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.left.fields.index"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.left.fields.right"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.left"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.left.fields.collection"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.left.fields.collection.fields.collection"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.left.fields.collection.fields.index"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.left.fields.index"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.left.fields.right.fields.right"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.right"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.left"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.left.fields.collection"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.left.fields.collection.fields.collection"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.left.fields.collection.fields.index"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.left.fields.index"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.left.fields.right.fields.right"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.right"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.right.fields.left"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.right.fields.left.fields.collection"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.right.fields.left.fields.collection.fields.collection"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.right.fields.left.fields.collection.fields.index"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.right.fields.left.fields.index"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.condition.fields.right.fields.right"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[0][0]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[0][1]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[1][0]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[1][1]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[2][0]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[2][1]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[2][1].fields.args[0]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[2][1].fields.args[0].fields.collection"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[2][1].fields.args[0].fields.collection.fields.collection"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[2][1].fields.args[0].fields.collection.fields.index"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[2][1].fields.args[0].fields.index"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[3][0]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[3][1]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[3][1].fields.collection"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[3][1].fields.collection.fields.collection"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[3][1].fields.collection.fields.index"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[3][1].fields.index"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[4][0]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[4][1]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[4][1].fields.args[0]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[4][1].fields.args[0].fields.collection"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[4][1].fields.args[0].fields.collection.fields.collection"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[4][1].fields.args[0].fields.collection.fields.index"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.else_body[0].fields.value.fields.items[4][1].fields.args[0].fields.index"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.then_body[0]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.then_body[0].fields.value"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.then_body[0].fields.value.fields.items[0][0]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.then_body[0].fields.value.fields.items[0][1]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.then_body[0].fields.value.fields.items[1][0]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.else_body[0].fields.then_body[0].fields.value.fields.items[1][1]"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.then_body[0]"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.then_body[0].fields.value"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.then_body[0].fields.value.fields.items[0][0]"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.then_body[0].fields.value.fields.items[0][1]"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.then_body[0].fields.value.fields.items[1][0]"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[1].fields.body[0].fields.else_body[0].fields.then_body[0].fields.value.fields.items[1][1]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.then_body[0]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.then_body[0].fields.value"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.then_body[0].fields.value.fields.items[0][0]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.then_body[0].fields.value.fields.items[0][1]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.then_body[0].fields.value.fields.items[1][0]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[1].fields.body[0].fields.then_body[0].fields.value.fields.items[1][1]"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[2]"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[2].fields.value"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[2].fields.value.fields.args[0]"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[2].fields.value.fields.args[0].fields.items[0]"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[2].fields.value.fields.args[0].fields.items[1]"
+    },
+    {
+      "line": 4,
+      "path": "$.fields.body[2].fields.value.fields.args[0].fields.items[2]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[3]"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[3].fields.value"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[3].fields.value.fields.collection"
+    },
+    {
+      "line": 5,
+      "path": "$.fields.body[3].fields.value.fields.index"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[4]"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[4].fields.value"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[4].fields.value.fields.collection"
+    },
+    {
+      "line": 6,
+      "path": "$.fields.body[4].fields.value.fields.index"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[5]"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[5].fields.value"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[5].fields.value.fields.collection"
+    },
+    {
+      "line": 7,
+      "path": "$.fields.body[5].fields.value.fields.index"
+    },
+    {
+      "line": 8,
+      "path": "$.fields.body[6]"
+    },
+    {
+      "line": 8,
+      "path": "$.fields.body[6].fields.value"
+    },
+    {
+      "line": 8,
+      "path": "$.fields.body[6].fields.value.fields.collection"
+    },
+    {
+      "line": 8,
+      "path": "$.fields.body[6].fields.value.fields.index"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[0]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[0].fields.items[0][0]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[0].fields.items[0][1]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[0].fields.items[1][0]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[0].fields.items[1][1]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[1]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[1].fields.items[0][0]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[1].fields.items[0][1]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[1].fields.items[1][0]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[1].fields.items[1][1]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[2]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[2].fields.items[0][0]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[2].fields.items[0][1]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[2].fields.items[1][0]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[2].fields.items[1][1]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[3]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[3].fields.items[0][0]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[3].fields.items[0][1]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[3].fields.items[1][0]"
+    },
+    {
+      "line": 9,
+      "path": "$.fields.body[7].fields.value.fields.args[0].fields.items[3].fields.items[1][1]"
+    },
+    {
+      "line": 10,
+      "path": "$.fields.body[8]"
+    },
+    {
+      "line": 10,
+      "path": "$.fields.body[8].fields.value"
+    },
+    {
+      "line": 10,
+      "path": "$.fields.body[8].fields.value.fields.left"
+    },
+    {
+      "line": 10,
+      "path": "$.fields.body[8].fields.value.fields.right"
+    },
+    {
+      "line": 10,
+      "path": "$.fields.body[8].fields.value.fields.right.fields.collection"
+    },
+    {
+      "line": 10,
+      "path": "$.fields.body[8].fields.value.fields.right.fields.index"
+    },
+    {
+      "line": 11,
+      "path": "$.fields.body[9]"
+    },
+    {
+      "line": 11,
+      "path": "$.fields.body[9].fields.value"
+    },
+    {
+      "line": 11,
+      "path": "$.fields.body[9].fields.value.fields.collection"
+    },
+    {
+      "line": 11,
+      "path": "$.fields.body[9].fields.value.fields.index"
+    },
+    {
+      "line": 12,
+      "path": "$.fields.body[10]"
+    },
+    {
+      "line": 12,
+      "path": "$.fields.body[10].fields.value"
+    },
+    {
+      "line": 12,
+      "path": "$.fields.body[10].fields.value.fields.collection"
+    },
+    {
+      "line": 12,
+      "path": "$.fields.body[10].fields.value.fields.index"
+    },
+    {
+      "line": 13,
+      "path": "$.fields.body[11]"
+    },
+    {
+      "line": 13,
+      "path": "$.fields.body[11].fields.value"
+    },
+    {
+      "line": 13,
+      "path": "$.fields.body[11].fields.value.fields.collection"
+    },
+    {
+      "line": 13,
+      "path": "$.fields.body[11].fields.value.fields.index"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[0]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[0].fields.items[0][0]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[0].fields.items[0][1]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[0].fields.items[1][0]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[0].fields.items[1][1]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[1]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[1].fields.items[0][0]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[1].fields.items[0][1]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[1].fields.items[1][0]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[1].fields.items[1][1]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[2]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[2].fields.items[0][0]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[2].fields.items[0][1]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[2].fields.items[1][0]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[2].fields.items[1][1]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[3]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[3].fields.items[0][0]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[3].fields.items[0][1]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[3].fields.items[1][0]"
+    },
+    {
+      "line": 14,
+      "path": "$.fields.body[12].fields.value.fields.args[0].fields.items[3].fields.items[1][1]"
+    },
+    {
+      "line": 15,
+      "path": "$.fields.body[13]"
+    },
+    {
+      "line": 15,
+      "path": "$.fields.body[13].fields.value"
+    },
+    {
+      "line": 15,
+      "path": "$.fields.body[13].fields.value.fields.collection"
+    },
+    {
+      "line": 15,
+      "path": "$.fields.body[13].fields.value.fields.index"
+    }
+  ],
+  "source_name": "parser.cuk"
+}
