@@ -1377,32 +1377,41 @@ static int run_range(int first,int last) {
             if(!err) printval(v);
         } else {
             char name[128]={0};
+            const char *statement_start=p;
             if(!identifier(name,sizeof name)) syntax_fail("pernyataan belum didukung");
             else {
-                int indexed=0; Val idx=num(0);
-                if(take("[")) {
-                    indexed=1; idx=expr();
-                    if(!take("]")) syntax_fail("kurung siku tutup ']' diharapkan");
-                }
-                if(!take("=")) syntax_fail("tanda '=' diharapkan");
-                else {
-                    Val v=expr();
-                    if(!endline()) syntax_fail("karakter tambahan setelah ekspresi");
-                    if(!hasvar(name)) fail("variabel belum dibuat");
-                    if(!err) for(int k=0;k<nvars;k++)
-                        if(!strcmp(vars[k].name,name)) {
-                            if(!indexed) vars[k].v=v;
-                            else {
-                                if (vars[k].v.t == DICT) {
-                                    dict_set(vars[k].v.dict,idx,v);
-                                } else {
-                                    size_t at=0;
-                                    if(list_index(vars[k].v,idx,&at))
-                                        vars[k].v.list->items[at]=v;
+                ws();
+                if(*p=='(') {
+                    /* A call used as a statement executes and discards its return value. */
+                    p=statement_start;
+                    (void)expr();
+                    if(!endline()) syntax_fail("karakter tambahan setelah pemanggilan fungsi");
+                } else {
+                    int indexed=0; Val idx=num(0);
+                    if(take("[")) {
+                        indexed=1; idx=expr();
+                        if(!take("]")) syntax_fail("kurung siku tutup ']' diharapkan");
+                    }
+                    if(!take("=")) syntax_fail("tanda '=' diharapkan");
+                    else {
+                        Val v=expr();
+                        if(!endline()) syntax_fail("karakter tambahan setelah ekspresi");
+                        if(!hasvar(name)) fail("variabel belum dibuat");
+                        if(!err) for(int k=0;k<nvars;k++)
+                            if(!strcmp(vars[k].name,name)) {
+                                if(!indexed) vars[k].v=v;
+                                else {
+                                    if (vars[k].v.t == DICT) {
+                                        dict_set(vars[k].v.dict,idx,v);
+                                    } else {
+                                        size_t at=0;
+                                        if(list_index(vars[k].v,idx,&at))
+                                            vars[k].v.list->items[at]=v;
+                                    }
                                 }
+                                break;
                             }
-                            break;
-                        }
+                    }
                 }
             }
         }
