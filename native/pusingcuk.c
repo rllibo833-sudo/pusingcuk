@@ -49,6 +49,7 @@ static int run_range(int first, int last);
 static Val call_user_function(const char *name, Val *args, int argc);
 static Val call_native_format_builtin(const char *name, Val *args, int argc, int *handled);
 static Val call_native_io_builtin(const char *name, Val *args, int argc, int *handled);
+static int json_render_alloc(Val value, char **out, size_t *length);
 
 static void fail(const char *msg) {
     if (suppress_eval) return;
@@ -1168,9 +1169,15 @@ static Val call_native_format_builtin(const char *name, Val *args, int argc, int
     if (argc != 1) { fail("built-in format membutuhkan tepat satu argumen"); return num(0); }
     Val value = args[0];
     if (!strcmp(name, "json_teks")) {
-        char out[SZ] = {0}; size_t used = 0;
-        if (!json_write_value(value, out, sizeof out, &used, 0)) return string("");
-        return string(out);
+        char *out = NULL;
+        size_t used = 0;
+        if (!json_render_alloc(value, &out, &used)) {
+            fail("json_teks() hasil JSON tidak valid atau melewati batas 16 MiB");
+            return string("");
+        }
+        Val result = string_n(out, used);
+        free(out);
+        return result;
     }
     if (!strcmp(name, "jadi_json")) {
         if (value.t != STR) { fail("jadi_json membutuhkan satu teks JSON"); return num(0); }
@@ -1187,7 +1194,7 @@ static Val call_native_format_builtin(const char *name, Val *args, int argc, int
     }
     if (!strcmp(name, "json_baca")) {
         if (value.t != STR) { fail("json_baca() membutuhkan teks JSON"); return num(0); }
-        if(strlen(value.s)>1023){fail("json_baca() input melebihi batas 1023 byte");return num(0);}
+        if(strlen(value.s)>MAX_PROJECT_FILE_BYTES){fail("json_baca() input melewati batas 16 MiB");return num(0);}
         JsonParser jp = {value.s, 0, 1};
         Val parsed = json_parse_value(&jp, 0);
         json_ws(&jp);

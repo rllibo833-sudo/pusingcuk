@@ -44,7 +44,6 @@ class IRCukCodegenParityTests(unittest.TestCase):
 
     def run_codegen(self, ir):
         payload = json.dumps(ir, ensure_ascii=False, separators=(",", ":"))
-        self.assertLessEqual(len(payload.encode()), 1023, "IR exceeds native json_baca builtin limit")
         result = subprocess.run(
             [self.native_binary, str(CODEGEN)],
             cwd=ROOT, input=payload + chr(10), capture_output=True, text=True, timeout=30,
@@ -52,7 +51,6 @@ class IRCukCodegenParityTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertFalse(result.stdout.startswith("BYTECODE_ERROR:"), result.stdout)
         output = result.stdout.strip()
-        self.assertLessEqual(len(output.encode()), 1023, "bytecode exceeds native json_teks builtin limit")
         actual = json.loads(output)
         self.assertEqual(actual["format"], "pusingcuk-bytecode")
         self.assertEqual(actual["bytecode_version"], 1)
@@ -70,6 +68,18 @@ class IRCukCodegenParityTests(unittest.TestCase):
             with self.subTest(source=index):
                 ir = from_source(source, "probe.cuk")
                 self.assertEqual(self.run_codegen(ir), compile_ir(ir))
+
+    def test_large_ir_and_bytecode_exceed_legacy_1k_limit(self):
+        source = program(*(f"hedeh {value}" for value in range(100)))
+        ir = from_source(source, "large-codegen.cuk")
+        payload = json.dumps(ir, ensure_ascii=False, separators=(",", ":"))
+        self.assertGreater(len(payload.encode("utf-8")), 1023)
+
+        actual = self.run_codegen(ir)
+        expected = compile_ir(ir)
+        encoded = json.dumps(actual, ensure_ascii=False, separators=(",", ":"))
+        self.assertGreater(len(encoded.encode("utf-8")), 1023)
+        self.assertEqual(actual, expected)
 
     def test_builtin_name_cannot_be_redefined_as_function(self):
         source = program("fungsi panjang(nilai)", "    balek nilai", "selesai fungsi")
