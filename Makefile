@@ -114,11 +114,13 @@ test-native: native test-cli test-registered-rules
 	grep -qx '1e+308' $(CURDIR)/pusingcuk-numeric-large.out
 	@$(NATIVE_BIN) tests/native/string_concat_overflow.pusingcuk > $(CURDIR)/pusingcuk-string-large.out
 	@wc -c < $(CURDIR)/pusingcuk-string-large.out | grep -qx '1025'
-	@actual="$($(NATIVE_BIN) tests/native/list_overflow.pusingcuk)"; test "$actual" = "257"
-	@actual="$($(NATIVE_BIN) tests/native/dictionary_overflow.pusingcuk)"; test "$actual" = "257"
+	@$(NATIVE_BIN) tests/native/list_overflow.pusingcuk > $(CURDIR)/pusingcuk-list-large.out
+	@grep -qx '257' $(CURDIR)/pusingcuk-list-large.out
+	@$(NATIVE_BIN) tests/native/dictionary_overflow.pusingcuk > $(CURDIR)/pusingcuk-dict-large.out
+	@grep -qx '257' $(CURDIR)/pusingcuk-dict-large.out
 	@$(NATIVE_BIN) tests/native/string_concat_limit.pusingcuk > $(CURDIR)/pusingcuk-string-limit.out
 	@wc -c < $(CURDIR)/pusingcuk-string-limit.out | grep -qx '1024'
-	@rm -f $(CURDIR)/pusingcuk-string-limit.out $(CURDIR)/pusingcuk-string-large.out
+	@rm -f $(CURDIR)/pusingcuk-string-limit.out $(CURDIR)/pusingcuk-string-large.out $(CURDIR)/pusingcuk-list-large.out $(CURDIR)/pusingcuk-dict-large.out
 
 	@actual="$$($(NATIVE_BIN) examples/core/anggaran_threshold.cuk)"; \
 	 expected="$$(printf 'DALAM_BATAS\nDALAM_BATAS\nPERLU_PERSETUJUAN\nINPUT_TIDAK_VALID\nINPUT_TIDAK_VALID')"; \
