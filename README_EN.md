@@ -7,7 +7,9 @@ The project combines approachable Indonesian syntax with a reference interpreter
 
 **Status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. This is development software, not a stable release. Backend support differs and must be checked against the compatibility matrix and fixtures.
 
-**Self-hosting status:** a native two-generation `.cuk` frontend bootstrap now uses the C runtime as a trusted seed. `make native-selfhost-bootstrap2` recompiles the frontend into stage 1 and stage 2 and compares IR from the same deterministic probe byte-for-byte, reporting both SHA-256 hashes. Treat it as verified only when CI passes for the same commit. This proves the tested frontend/codegen path, not full language parity across every backend. Python remains in reference/development tools and canonical full-schema IR validation. Read the [canonical self-hosting status](docs/SELF_HOSTING_STATE.md) and the [native bootstrap gate](tools/native-selfhost-bootstrap2.sh) for scope and evidence.
+**Bootstrap milestone:** the native two-generation frontend bootstrap is preserved as an engineering milestone, with scope and limitations documented in [the canonical status](docs/SELF_HOSTING_STATE.md). It is no longer the project's only development priority; verification claims must still be tied to CI and reproducible evidence.
+
+**Next product focus:** practical compiler interoperability and useful terminal applications, including an exploratory path for compiling Jeklyn-oriented programs into `.cuk`-powered terminal tools. This is a proposed direction, not an implemented Jeklyn compiler. See [project focus](docs/PROJECT_FOCUS.md).
 
 ## Run your first program
 
