@@ -106,6 +106,7 @@ class NativeBootstrapPipelineTests(unittest.TestCase):
         self.assertEqual(result.stdout, "okelah\nokelah\nokelah\n")
 
     def test_end_to_end_native_compile_path_needs_no_python_compiler(self):
+        # A normal module wrapper must be ignored by the .cuk parser, not rejected as a statement.
         source = self.directory / "native-source.cuk"
         source.write_text(
             "jancuk\n"
