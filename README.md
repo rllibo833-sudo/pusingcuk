@@ -124,7 +124,7 @@ For local AI tooling, any device-specific runtime claims require a real on-devic
 - [Compatibility matrix](docs/COMPATIBILITY.md) and [conformance fixtures](docs/CONFORMANCE_FIXTURES.md)
 - [Technical dictionary](docs/DICTIONARY.md) · [Indonesian Warung dictionary](docs/KAMUS_PUSINGCUK.md)
 - [Project overview](docs/PROJECT_OVERVIEW.md) · [project vision](docs/VISION.md) · [ecosystem implementation roadmap](docs/ECOSYSTEM_ROADMAP.md)
-- [Self-hosting status & next steps](docs/SELF_HOSTING_STATE.md) · [self-hosting frontend](examples/self_hosting/compiler.cuk) · [bootstrap evidence implementation](compiler/bootstrap.py)
+- [Self-hosting status](docs/SELF_HOSTING_STATE.md) · [canonical frontend](examples/self_hosting/compiler.cuk) · [native two-stage bootstrap gate](tools/native-selfhost-bootstrap2.sh) · [Python parity harness](compiler/bootstrap.py)
 - [Contributing](CONTRIBUTING.md) · [security policy](SECURITY.md)
 
 Metadata paket pada `main` adalah `0.8.0.dev0`.
