@@ -8,7 +8,7 @@ LANGUAGE_VERSION ?= 0.6-dev
 PREFIX ?= /usr/local
 DESTDIR ?=
 
-.PHONY: native run-native native-selfhost-frontend run-native-selfhost-frontend native-compile run-native-compile run-native-evaluator native-bootstrap run-native-bootstrap test test-native test-cli test-registered-rules version language-version install package
+.PHONY: native run-native native-selfhost-frontend run-native-selfhost-frontend native-compile run-native-compile run-native-evaluator native-bootstrap run-native-bootstrap native-selfhost-bootstrap2 test test-native test-cli test-registered-rules version language-version install package
 
 version:
 	@printf '%s\n' '$(VERSION)'
@@ -54,6 +54,10 @@ native-bootstrap:
 run-native-bootstrap: native-bootstrap
 	@test -n "$(FILE)" || (echo "Gunakan: make run-native-bootstrap FILE=program.cuk" >&2; exit 2)
 	"$(BOOTSTRAP_BIN)" "$(FILE)"
+
+# Full two-stage .cuk frontend bootstrap, executed by the native runtime/VM only.
+native-selfhost-bootstrap2: native
+	sh tools/native-selfhost-bootstrap2.sh "$(NATIVE_BIN)"
 
 install: native
 	install -d "$(DESTDIR)$(PREFIX)/bin"
