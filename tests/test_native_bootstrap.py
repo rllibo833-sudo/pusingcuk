@@ -37,15 +37,15 @@ class NativeBootstrapTests(unittest.TestCase):
  def test_if_else_and_nested_if_emit_canonical_ir(self):
   with tempfile.TemporaryDirectory() as d:
    d=Path(d);b=d/"cukc";built=self.build(b);self.assertEqual(built.returncode,0,built.stderr)
-   source=("jancuk\\n"
-           "njir 1 < 2\\n"
-           "    hedeh 7\\n"
-           "kampret\\n"
-           "    njir 2 < 3\\n"
-           "        hedeh 8\\n"
-           "    selesai njir\\n"
-           "selesai njir\\n"
-           "selesai jancuk\\n")
+   source=("jancuk\n"
+           "njir 1 < 2\n"
+           "    hedeh 7\n"
+           "kampret\n"
+           "    njir 2 < 3\n"
+           "        hedeh 8\n"
+           "    selesai njir\n"
+           "selesai njir\n"
+           "selesai jancuk\n")
    src=d/"conditional.cuk";src.write_text(source,encoding="utf-8")
    out=subprocess.run([str(b),str(src)],capture_output=True,text=True,timeout=5)
    self.assertEqual(out.returncode,0,out.stderr)
