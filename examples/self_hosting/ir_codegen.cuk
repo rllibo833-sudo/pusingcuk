@@ -1,0 +1,230 @@
+# IR v1 -> canonical PusingCuk bytecode v1.
+jancuk
+
+fungsi emit(s, op, arg, line)
+    s["code"] = s["code"] + [[op, arg, line]]
+selesai fungsi
+
+fungsi ekspresi(n, s)
+    lah k = n["kind"]
+    lah f = n["fields"]
+    lah l = n["line"]
+    njir k == "Try" atau k == "Attribute"
+        s["error"] = "baris " + teks(l) + ": node belum didukung: " + k
+    selesai njir
+    njir k == "Literal"
+        emit(s, "CONST", f["value"], l)
+    selesai njir
+    njir k == "Variable"
+        emit(s, "LOAD", f["name"], l)
+    selesai njir
+    njir k == "List"
+        untuk x dalam f["items"]
+            ekspresi(x, s)
+        selesai untuk
+        emit(s, "MAKE_LIST", panjang(f["items"]), l)
+    selesai njir
+    njir k == "Dict"
+        untuk p dalam f["items"]
+            ekspresi(p[0], s)
+            ekspresi(p[1], s)
+        selesai untuk
+        emit(s, "MAKE_DICT", panjang(f["items"]), l)
+    selesai njir
+    njir k == "Index"
+        ekspresi(f["collection"], s)
+        ekspresi(f["index"], s)
+        emit(s, "GET", s["null"], l)
+    selesai njir
+    njir k == "Unary"
+        ekspresi(f["value"], s)
+        emit(s, "UNARY", f["op"], l)
+    selesai njir
+    njir k == "Binary"
+        njir f["op"] == "dan" atau f["op"] == "atau"
+            ekspresi(f["left"], s)
+            emit(s, "TO_BOOL", s["null"], l)
+            lah b = panjang(s["code"])
+            njir f["op"] == "dan"
+                emit(s, "JUMP_IF_FALSE", s["null"], l)
+            kampret
+                emit(s, "JUMP_IF_TRUE", s["null"], l)
+            selesai njir
+            ekspresi(f["right"], s)
+            emit(s, "TO_BOOL", s["null"], l)
+            lah e = panjang(s["code"])
+            emit(s, "JUMP", s["null"], l)
+            s["code"][b][1] = panjang(s["code"])
+            emit(s, "CONST", f["op"] == "atau", l)
+            s["code"][e][1] = panjang(s["code"])
+        kampret
+            ekspresi(f["left"], s)
+            ekspresi(f["right"], s)
+            emit(s, "BINARY", f["op"], l)
+        selesai njir
+    selesai njir
+    njir k == "Call"
+        untuk a dalam f["args"]
+            ekspresi(a, s)
+        selesai untuk
+        emit(s, "CALL", [f["name"], panjang(f["args"])], l)
+    selesai njir
+    njir k != "Literal" dan k != "Variable" dan k != "List" dan k != "Dict" dan k != "Index" dan k != "Unary" dan k != "Binary" dan k != "Call" dan k != "Try" dan k != "Attribute"
+        s["error"] = "baris " + teks(l) + ": ekspresi belum didukung: " + k
+    selesai njir
+selesai fungsi
+
+fungsi pernyataan(items, s, in_function)
+    untuk n dalam items
+        lah k = n["kind"]
+        lah f = n["fields"]
+        lah l = n["line"]
+        njir k == "Try" atau k == "Attribute"
+            s["error"] = "baris " + teks(l) + ": node belum didukung: " + k
+        selesai njir
+        njir k == "Declare"
+            ekspresi(f["value"], s)
+            emit(s, "DECLARE", f["name"], l)
+        selesai njir
+        njir k == "Assign"
+            ekspresi(f["value"], s)
+            emit(s, "STORE", f["name"], l)
+        selesai njir
+        njir k == "Input"
+            ekspresi(f["prompt"], s)
+            emit(s, "INPUT", f["name"], l)
+        selesai njir
+        njir k == "Print"
+            ekspresi(f["value"], s)
+            emit(s, "PRINT", s["null"], l)
+        selesai njir
+        njir k == "Call"
+            ekspresi(n, s)
+            emit(s, "POP", s["null"], l)
+        selesai njir
+        njir k == "IndexAssign"
+            ekspresi(f["collection"], s)
+            ekspresi(f["index"], s)
+            ekspresi(f["value"], s)
+            emit(s, "SET_INDEX", s["null"], l)
+        selesai njir
+        njir k == "If"
+            ekspresi(f["condition"], s)
+            lah b = panjang(s["code"])
+            emit(s, "JUMP_IF_FALSE", s["null"], l)
+            pernyataan(f["then_body"], s, in_function)
+            njir panjang(f["else_body"]) > 0
+                lah e = panjang(s["code"])
+                emit(s, "JUMP", s["null"], l)
+                s["code"][b][1] = panjang(s["code"])
+                pernyataan(f["else_body"], s, in_function)
+                s["code"][e][1] = panjang(s["code"])
+            kampret
+                s["code"][b][1] = panjang(s["code"])
+            selesai njir
+        selesai njir
+        njir k == "While"
+            lah start = panjang(s["code"])
+            ekspresi(f["condition"], s)
+            lah end = panjang(s["code"])
+            emit(s, "JUMP_IF_FALSE", s["null"], l)
+            pernyataan(f["body"], s, in_function)
+            emit(s, "JUMP", start, l)
+            s["code"][end][1] = panjang(s["code"])
+        selesai njir
+        njir k == "For"
+            ekspresi(f["iterable"], s)
+            lah slot = s["slot"]
+            s["slot"] = slot + 1
+            emit(s, "ITER_INIT", slot, l)
+            lah start = panjang(s["code"])
+            lah end = panjang(s["code"])
+            emit(s, "ITER_NEXT", [slot, f["name"], s["null"]], l)
+            pernyataan(f["body"], s, in_function)
+            emit(s, "JUMP", start, l)
+            s["code"][end][1] = [slot, f["name"], panjang(s["code"])]
+        selesai njir
+        njir k == "Return"
+            njir bukan in_function
+                s["error"] = "baris " + teks(l) + ": balek hanya boleh di dalam fungsi"
+            kampret
+                njir teks(f["value"]) == "None"
+                    emit(s, "CONST", s["null"], l)
+                kampret
+                    ekspresi(f["value"], s)
+                selesai njir
+                emit(s, "RETURN", s["null"], l)
+            selesai njir
+        selesai njir
+        njir k == "Function"
+            s["error"] = "baris " + teks(l) + ": fungsi hanya boleh di tingkat teratas"
+        selesai njir
+        njir k != "Declare" dan k != "Assign" dan k != "Input" dan k != "Print" dan k != "Call" dan k != "IndexAssign" dan k != "If" dan k != "While" dan k != "For" dan k != "Return" dan k != "Function" dan k != "Try" dan k != "Attribute"
+            s["error"] = "baris " + teks(l) + ": pernyataan belum didukung: " + k
+        selesai njir
+        njir s["error"] != ""
+            balek salah
+        selesai njir
+    selesai untuk
+selesai fungsi
+
+fungsi compile_function(n)
+    lah f = n["fields"]
+    lah s = {"code": [], "slot": 0, "error": "", "null": json_baca("null")}
+    pernyataan(f["body"], s, benar)
+    njir s["error"] != ""
+        balek {"error": s["error"], "params": f["params"], "code": []}
+    selesai njir
+    njir panjang(s["code"]) == 0 atau s["code"][panjang(s["code"]) - 1][0] != "RETURN"
+        emit(s, "CONST", s["null"], n["line"])
+        emit(s, "RETURN", s["null"], n["line"])
+    selesai njir
+    balek {"error": "", "params": f["params"], "code": s["code"]}
+selesai fungsi
+
+fungsi compile_ir(d)
+    njir d["format"] != "pusingcuk-ir" atau d["ir_version"] != 1 atau d["program"]["kind"] != "Program"
+        balek {"error": "IR_STAGE_INVALID_ENVELOPE", "bytecode": {}}
+    selesai njir
+    lah body = d["program"]["fields"]["body"]
+    lah names = []
+    lah functions = {}
+    untuk n dalam body
+        njir n["kind"] == "Function"
+            lah name = n["fields"]["name"]
+            untuk prior dalam names
+                njir prior == name
+                    balek {"error": "fungsi duplikat: " + name, "bytecode": {}}
+                selesai njir
+            selesai untuk
+            names = names + [name]
+            lah fn = compile_function(n)
+            njir fn["error"] != ""
+                balek {"error": fn["error"], "bytecode": {}}
+            selesai njir
+            functions[name] = {"params": fn["params"], "code": fn["code"]}
+        selesai njir
+    selesai untuk
+    lah s = {"code": [], "slot": 0, "error": "", "null": json_baca("null")}
+    lah top = []
+    untuk n dalam body
+        njir n["kind"] != "Function"
+            top = top + [n]
+        selesai njir
+    selesai untuk
+    pernyataan(top, s, salah)
+    njir s["error"] != ""
+        balek {"error": s["error"], "bytecode": {}}
+    selesai njir
+    balek {"error": "", "bytecode": {"format": "pusingcuk-bytecode", "bytecode_version": 1, "language_version": d["language_version"], "source_name": d["source_name"], "functions": functions, "code": s["code"]}}
+selesai fungsi
+
+tanya raw = ""
+lah ir = json_baca(raw)
+lah hasil = compile_ir(ir)
+njir hasil["error"] != ""
+    hedeh "BYTECODE_ERROR:" + hasil["error"]
+kampret
+    hedeh json_teks(hasil["bytecode"])
+selesai njir
+selesai jancuk
