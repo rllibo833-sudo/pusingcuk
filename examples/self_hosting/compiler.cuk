@@ -654,11 +654,11 @@ fungsi parse_program(tokens)
                     line_tokens = []
                 kampret
                     njir line_tokens[0]["nilai"] == "kampret" dan panjang(line_tokens) == 1
-                    current = contexts[depth]
-                    njir current["jenis"] != "IF" atau current["aktif_else"]
-                        balek node_gagal(i)
-                    selesai njir
-                    current["aktif_else"] = benar
+                        current = contexts[depth]
+                        njir current["jenis"] != "IF" atau current["aktif_else"]
+                            balek node_gagal(i)
+                        selesai njir
+                        current["aktif_else"] = benar
                 kampret
                     njir panjang(line_tokens) == 2 dan line_tokens[0]["nilai"] == "selesai"
                         current = contexts[depth]
