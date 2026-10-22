@@ -14,7 +14,9 @@ Python-free runtime, native C: **79 dari 79 fixture aktif lulus**. Ini cakupan f
 
 **Status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. Not yet a stable release.
 
-**Self-hosting status:** the native two-generation frontend bootstrap is implemented through the C runtime seed. `make native-selfhost-bootstrap2` recompiles the frontend source into stage 1 and stage 2 and requires byte-identical IR for the same probe (with matching SHA-256 output). See [the canonical bootstrap status](docs/SELF_HOSTING_STATE.md); treat the gate as verified only when CI passes on the same commit. This proves the tested frontend/codegen path, not full language parity across all backends. Python remains in reference/development tools and canonical full-schema IR validation.
+**Bootstrap milestone:** the native two-generation frontend bootstrap is preserved as an engineering milestone, with its verification scope and limits documented in [the canonical bootstrap status](docs/SELF_HOSTING_STATE.md). It is no longer the project's only development priority; future claims remain tied to CI and reproducible evidence.
+
+**Next product focus:** practical compiler interoperability and useful terminal applications, including an exploratory path for compiling Jeklyn-oriented programs into `.cuk`-powered terminal tools. This is a proposed direction, not an implemented Jeklyn compiler. See [project focus](docs/PROJECT_FOCUS.md).
 
 ## Run your first program
 
@@ -110,7 +112,7 @@ For local AI tooling, any device-specific runtime claims require a real on-devic
 | Area | Purpose |
 |---|---|
 | Language core | Lexer, parser, AST, reference interpreter, specification, and semantic contract |
-| Compiler | IR and experimental JavaScript, Python, Go (curated subset), HTML, JSON IR, and VM targets |
+| Compiler | IR and experimental JavaScript, Python, Go (curated subset), HTML, JSON IR, and VM targets; focus on useful compiler workflows over adding more ecosystem layers |
 | Native runtime | C implementation for a tested subset of the language |
 | Library and vocabulary | Built-ins, machine-readable contracts, keywords, and aliases |
 | Conformance | Tests and fixtures for explicitly supported targets |
