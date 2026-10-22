@@ -769,6 +769,7 @@ fungsi parse_program(tokens)
                     selesai njir
                 selesai njir
             selesai njir
+            selesai njir
             line_tokens = []
             njir tokens[i]["jenis"] == "EOF"
                 njir depth != 0
