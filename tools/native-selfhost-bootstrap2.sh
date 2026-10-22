@@ -13,6 +13,18 @@ cd "$root"
 tmp=$(mktemp -d "${TMPDIR:-/tmp}/pusingcuk-bootstrap2.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 
+require_ir() {
+    file=$1
+    label=$2
+    if grep -q '^SELFHOST_' "$file" ||
+       ! grep -q '"format":"pusingcuk-ir"' "$file" ||
+       ! grep -q '"ir_version":1' "$file"; then
+        echo "bootstrap gagal: $label bukan keluaran IR v1 yang valid" >&2
+        cat "$file" >&2
+        exit 1
+    fi
+}
+
 # Assemble the frontend and JSON driver into one valid .cuk module.
 sed '$d' examples/self_hosting/compiler.cuk > "$tmp/frontend.cuk"
 sed '1d;$d' examples/self_hosting/compiler_driver.cuk >> "$tmp/frontend.cuk"
@@ -22,10 +34,7 @@ printf '%s\n' 'selesai jancuk' >> "$tmp/frontend.cuk"
 "$native" --json-quote "$tmp/frontend.cuk" > "$tmp/source.json"
 printf '{"source_name":"compiler.cuk","source":%s}\n' "$(cat "$tmp/source.json")" > "$tmp/bootstrap.payload"
 tools/run_native_selfhost_frontend.sh "$native" "$tmp/bootstrap.payload" > "$tmp/stage0.compiler.ir"
-if grep -q '^SELFHOST_' "$tmp/stage0.compiler.ir"; then
-    cat "$tmp/stage0.compiler.ir" >&2
-    exit 1
-fi
+require_ir "$tmp/stage0.compiler.ir" "stage-0 compiler"
 
 # Stage 0 .cuk code generator emits executable stage-1 frontend bytecode.
 "$native" examples/self_hosting/ir_codegen.cuk < "$tmp/stage0.compiler.ir" > "$tmp/stage1.bytecode"
@@ -37,10 +46,7 @@ fi
 # Stage 1 recompiles the same frontend source. This output, not a probe,
 # is the input used to build the stage-2 frontend.
 "$native" --run-bytecode "$tmp/stage1.bytecode" < "$tmp/bootstrap.payload" > "$tmp/stage1.compiler.ir"
-if grep -q '^SELFHOST_' "$tmp/stage1.compiler.ir"; then
-    cat "$tmp/stage1.compiler.ir" >&2
-    exit 1
-fi
+require_ir "$tmp/stage1.compiler.ir" "stage-1 compiler"
 if ! cmp -s "$tmp/stage0.compiler.ir" "$tmp/stage1.compiler.ir"; then
     echo "bootstrap gagal: IR frontend stage-0 dan stage-1 berbeda" >&2
     diff -u "$tmp/stage0.compiler.ir" "$tmp/stage1.compiler.ir" >&2 || true
@@ -59,15 +65,9 @@ printf '%s\n' 'jancuk' 'hedeh 123' 'selesai jancuk' > "$tmp/probe.cuk"
 "$native" --json-quote "$tmp/probe.cuk" > "$tmp/probe.source.json"
 printf '{"source_name":"probe.cuk","source":%s}\n' "$(cat "$tmp/probe.source.json")" > "$tmp/probe.payload"
 "$native" --run-bytecode "$tmp/stage1.bytecode" < "$tmp/probe.payload" > "$tmp/stage1.probe.ir"
-if grep -q '^SELFHOST_' "$tmp/stage1.probe.ir"; then
-    cat "$tmp/stage1.probe.ir" >&2
-    exit 1
-fi
+require_ir "$tmp/stage1.probe.ir" "stage-1 probe"
 "$native" --run-bytecode "$tmp/stage2.bytecode" < "$tmp/probe.payload" > "$tmp/stage2.probe.ir"
-if grep -q '^SELFHOST_' "$tmp/stage2.probe.ir"; then
-    cat "$tmp/stage2.probe.ir" >&2
-    exit 1
-fi
+require_ir "$tmp/stage2.probe.ir" "stage-2 probe"
 
 # Require identical bytes and print comparable SHA-256 evidence.
 if ! cmp -s "$tmp/stage1.probe.ir" "$tmp/stage2.probe.ir"; then
