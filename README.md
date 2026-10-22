@@ -14,7 +14,7 @@ Python-free runtime, native C: **79 dari 79 fixture aktif lulus**. Ini cakupan f
 
 **Status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. Not yet a stable release.
 
-**Self-hosting status:** the `.cuk` frontend parses its own compiler source and emits canonical IR without a parser fallback. `compiler.bootstrap` now compares the Evaluator-hosted frontend with the same `.cuk` frontend compiled to PusingCuk bytecode and executed by the VM; their IR, target bytecode and program output must match. The driver is still built using the Python reference parser and bytecode compiler, so this is **not yet full self-hosting**.
+**Self-hosting status:** the native two-generation frontend bootstrap is implemented through the C runtime seed. `make native-selfhost-bootstrap2` recompiles the frontend source into stage 1 and stage 2 and requires byte-identical IR for the same probe (with matching SHA-256 output). See [the canonical bootstrap status](docs/SELF_HOSTING_STATE.md); treat the gate as verified only when CI passes on the same commit. This proves the tested frontend/codegen path, not full language parity across all backends. Python remains in reference/development tools and canonical full-schema IR validation.
 
 ## Run your first program
 
