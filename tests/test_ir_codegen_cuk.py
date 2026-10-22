@@ -81,6 +81,27 @@ class IRCukCodegenParityTests(unittest.TestCase):
         self.assertGreater(len(encoded.encode("utf-8")), 1023)
         self.assertEqual(actual, expected)
 
+    def test_jadi_json_accepts_large_payload(self):
+        source = self._temporary.name
+        program_path = Path(source) / "large-json-input.cuk"
+        program_path.write_text(
+            "jancuk\n"
+            'tanya raw = ""\n'
+            "lah parsed = jadi_json(raw)\n"
+            'hedeh panjang(parsed["items"])\n'
+            "selesai jancuk\n",
+            encoding="utf-8",
+        )
+        payload = json.dumps({"items": list(range(1000))}, separators=(",", ":"))
+        self.assertGreater(len(payload.encode("utf-8")), 1023)
+        result = subprocess.run(
+            [self.native_binary, str(program_path)],
+            cwd=ROOT, input=payload + chr(10), capture_output=True,
+            text=True, timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "1000\n")
+
     def test_builtin_name_cannot_be_redefined_as_function(self):
         source = program("fungsi panjang(nilai)", "    balek nilai", "selesai fungsi")
         ir = from_source(source, "builtin-collision.cuk")

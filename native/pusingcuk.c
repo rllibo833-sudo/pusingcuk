@@ -1181,7 +1181,7 @@ static Val call_native_format_builtin(const char *name, Val *args, int argc, int
     }
     if (!strcmp(name, "jadi_json")) {
         if (value.t != STR) { fail("jadi_json membutuhkan satu teks JSON"); return num(0); }
-        if(strlen(value.s)>1023){fail("jadi_json input melebihi batas 1023 byte");return num(0);}
+        if(strlen(value.s)>MAX_PROJECT_FILE_BYTES){fail("jadi_json input melewati batas 16 MiB");return num(0);}
         int previous_suppress = suppress_eval;
         suppress_eval = 1;
         JsonParser jp = {value.s, 0, 1};
