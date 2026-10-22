@@ -51,10 +51,10 @@ Let a person describe an application in ordinary language, produce a supported `
 - Use `examples/self_hosting/compiler.cuk` as the current `.cuk`-authored frontend; `source_lexer.cuk` entries below are dated history from an earlier prototype.
 - Keep one current implementation status in [SELF_HOSTING_STATE.md](SELF_HOSTING_STATE.md). This roadmap states direction; it does not duplicate the changing test/status checklist.
 - Integrate with the canonical IR v1, bytecode VM and existing backends. Do not create parallel IR envelopes or separate target manifests.
-- The current adapter still hosts execution, IR validation and bytecode generation on Python. Its repeatable-build check does not prove an independent compiler.
-- **Bootstrap exit gate:** stage 1 must produce a runnable compiler artifact; that artifact must compile the compiler source again as stage 2; compare usable artifacts and run the same applicable conformance suite on the same commit. Until then, describe the work as partial self-hosting, not a standalone compiler.
+- The `compiler/self_hosted.py` adapter and `compiler/bootstrap.py` parity harness still use Python; treat them as development/reference paths, not as the native bootstrap gate.
+- **Bootstrap status:** the native two-generation frontend loop is implemented in `make native-selfhost-bootstrap2`; it recompiles the same frontend source and compares stage-1/stage-2 probe IR byte-for-byte. The remaining M2A acceptance gate is same-SHA CI evidence plus the applicable conformance suite on the stage-2 toolchain. Until that broader gate is satisfied, claim only the tested frontend/codegen subset—not a fully self-hosted, production-ready toolchain.
 
-**Exit evidence:** self-parse/parity and VM execution pass in CI, followed by a repeatable two-stage bootstrap that does not use the Python frontend/compiler path for stage-2 compilation.
+**Exit evidence:** self-parse/parity, the native two-stage bootstrap, and conformance of the applicable stage-2 toolchain pass in CI on one commit, without using Python to parse/compile during the native stage-2 path.
 
 ### M3 — Reality Engine
 
