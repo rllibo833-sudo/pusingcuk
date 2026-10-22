@@ -103,7 +103,7 @@ class NativeBootstrapPipelineTests(unittest.TestCase):
             capture_output=True, text=True, timeout=10,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout, "BENAR\nBENAR\nBENAR\n")
+        self.assertEqual(result.stdout, "okelah\nokelah\nokelah\n")
 
     def test_native_only_pipeline_compiles_and_runs_functions(self):
         source = self.directory / "function.cuk"
