@@ -12,7 +12,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /workspace
 COPY . .
 
-# All language paths (Python reference, C runtime, native frontend and .cuk
-# compilation) are invoked inside this image. No host Python/C compiler needed.
-ENTRYPOINT ["make"]
-CMD ["test"]
+# The image contains the complete build environment. Commands remain explicit
+# so callers can run Python, the native compiler, bootstrap, or the full suite.
+CMD ["make", "test"]
