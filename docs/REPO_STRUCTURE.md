@@ -22,6 +22,7 @@ Dokumen ini adalah peta direktori kanonis. Tidak perlu membuat README status bar
 | `android-studio/`, `editors/` | Integrasi IDE/editor |
 | `archive/legacy/` | Interpreter, program, dan artefak historis yang tidak lagi kanonis |
 | `artifacts/` | Hasil matriks yang dikomit bila memang menjadi baseline; artefak CI per-run tetap di Actions |
+| `ir_lexer.json`, `ir_parser.json`, `ir_compiler.json` (root) | Snapshot IR yang dihasilkan; bukan source kanonis atau output gerbang native saat ini. Periksa konsumen eksternal/legacy sebelum memindahkan atau menghapusnya. |
 
 ## Titik masuk yang sering tertukar
 
@@ -31,6 +32,7 @@ Dokumen ini adalah peta direktori kanonis. Tidak perlu membuat README status bar
 - `site/playground.html`: playground statis GitHub Pages. Contoh browser harus diverifikasi oleh `tools/check_playground_examples.py`; jangan menganggap interpreter Python tersedia di browser.
 - `tools/ci_fixture_matrix.py` dan `tools/differential_runner.py`: matrix dan differential checks.
 - `tools/reality_engine.py`: gate usulan berdasarkan bukti; bukan bukti otomatis bahwa fitur baru sudah diimplementasikan.
+- `tools/native-selfhost-bootstrap2.sh`: gate bootstrap frontend native dua generasi. `compiler/bootstrap.py` adalah harness parity Python terpisah, bukan bukti bootstrap native.
 - `library/assistant.py` dan `library/ai_service.py`: orkestrasi AI/adaptor lokal; bukan model dasar yang dilatih sendiri.
 
 ## Root-level compatibility entry points
@@ -48,6 +50,7 @@ Draft issue yang sebelumnya berada di root dipindahkan ke [development/ISSUE_BAC
 - `tests/conformance/baseline_summary.json`: snapshot hasil yang dihasilkan dari matriks.
 - `docs/COMPATIBILITY.md`: ringkasan kompatibilitas yang dihasilkan/ditinjau dari kontrak dan hasil fixture.
 - `docs/PROJECT_STATUS_AND_ROADMAP.md`: satu-satunya roadmap aktif.
+- `docs/SELF_HOSTING_STATE.md`: satu-satunya status aktif bootstrap/self-hosting; milestone di audit/roadmap bertanggal bersifat historis.
 - `scripts/gen_docs_from_spec.py` dan `tools/generate_compatibility.py`: generator dokumen; jangan mengedit manual bagian di dalam marker yang dikelola generator.
 
 ## Aturan kebersihan
