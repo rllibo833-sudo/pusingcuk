@@ -6,10 +6,10 @@ if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
 fi
 native=$1
 source=$2
-program_input=\${3-}
+program_input=${3-}
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 cd "$root"
-tmp=$(mktemp -d "\${TMPDIR:-/tmp}/pusingcuk-native-compile.XXXXXX")
+tmp=$(mktemp -d "${TMPDIR:-/tmp}/pusingcuk-native-compile.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 "$native" --json-quote "$source" > "$tmp/source.json"
 printf '{"source_name":"input.cuk","source":%s}\n' "$(cat "$tmp/source.json")" > "$tmp/payload.json"
