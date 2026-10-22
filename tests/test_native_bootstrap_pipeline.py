@@ -145,6 +145,49 @@ class NativeBootstrapPipelineTests(unittest.TestCase):
         self.assertEqual(execution.returncode, 0, execution.stderr)
         self.assertEqual(execution.stdout, "42\n")
 
+    def test_bytecode_loader_rejects_truncated_and_malformed_json(self):
+        for payload in ("", "{", '{"format":"pusingcuk-bytecode"'):
+            with self.subTest(payload=payload):
+                bytecode_file = self.directory / "malformed.bytecode.json"
+                bytecode_file.write_text(payload, encoding="utf-8")
+                result = subprocess.run(
+                    [str(self.native), "--run-bytecode", str(bytecode_file)],
+                    cwd=ROOT, capture_output=True, text=True, timeout=15,
+                )
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("PVM:", result.stderr)
+
+    def test_bytecode_loader_rejects_invalid_code_and_function_tables(self):
+        cases = (
+            {"format": "pusingcuk-bytecode", "code": "not-a-list", "functions": {}},
+            {"format": "pusingcuk-bytecode", "code": [], "functions": []},
+            {"format": "pusingcuk-bytecode", "code": [], "functions": {"broken": {"params": "not-a-list", "code": []}}},
+            {"format": "pusingcuk-bytecode", "code": [], "functions": {"broken": {"params": [1], "code": []}}},
+            {"format": "pusingcuk-bytecode", "code": [], "functions": {"broken": {"params": [], "code": [["CONST"]]}}},
+        )
+        bytecode_file = self.directory / "invalid-structure.bytecode.json"
+        for document in cases:
+            with self.subTest(document=document):
+                bytecode_file.write_text(json.dumps(document), encoding="utf-8")
+                result = subprocess.run(
+                    [str(self.native), "--run-bytecode", str(bytecode_file)],
+                    cwd=ROOT, capture_output=True, text=True, timeout=15,
+                )
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("PVM:", result.stderr)
+
+    def test_bytecode_loader_enforces_json_size_limit(self):
+        bytecode_file = self.directory / "oversized.bytecode.json"
+        # PVM_MAX_JSON_BYTES is 32 MiB; one byte over must fail before JSON parsing.
+        with bytecode_file.open("wb") as stream:
+            stream.truncate(32 * 1024 * 1024 + 1)
+        result = subprocess.run(
+            [str(self.native), "--run-bytecode", str(bytecode_file)],
+            cwd=ROOT, capture_output=True, text=True, timeout=15,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("ukuran bytecode tidak valid", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()
