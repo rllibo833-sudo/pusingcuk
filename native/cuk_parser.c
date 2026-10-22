@@ -57,8 +57,42 @@ static CukAst*function(Parser*p){
  return n;
 bad:cuk_ast_free(n);return NULL;
 }
+static CukAst*conditional(Parser*p,int in_function){
+ const CukToken*start=take(p);CukAst*n=node(CUK_AST_IF,start->line);if(!n)return NULL;
+ CukAst*condition=expr(p,1);if(!condition)goto bad;
+ if(!child(n,condition)){cuk_ast_free(condition);goto bad;}
+ if(!is(p,CUK_T_NEWLINE,NULL)){snprintf(p->out->error,sizeof p->out->error,"baris baru wajib setelah kondisi njir");p->out->error_line=tok(p)->line;p->out->error_column=tok(p)->column;goto bad;}
+ skip_lines(p);
+ while(!is(p,CUK_T_KEYWORD,"kampret")&&!is(p,CUK_T_KEYWORD,"selesai")&&!is(p,CUK_T_EOF,NULL)){
+  CukAst*s=statement(p,in_function);if(!s)goto bad;
+  if(!child(n,s)){cuk_ast_free(s);goto bad;}
+  n->then_count++;
+  if(is(p,CUK_T_NEWLINE,NULL))skip_lines(p);
+  else if(!is(p,CUK_T_KEYWORD,"kampret")&&!is(p,CUK_T_KEYWORD,"selesai")){
+   snprintf(p->out->error,sizeof p->out->error,"harus ada baris baru antarpernyataan njir");p->out->error_line=tok(p)->line;p->out->error_column=tok(p)->column;goto bad;
+  }
+ }
+ if(is(p,CUK_T_KEYWORD,"kampret")){
+  take(p);
+  if(!is(p,CUK_T_NEWLINE,NULL)){snprintf(p->out->error,sizeof p->out->error,"baris baru wajib setelah kampret");p->out->error_line=tok(p)->line;p->out->error_column=tok(p)->column;goto bad;}
+  skip_lines(p);
+  while(!is(p,CUK_T_KEYWORD,"selesai")&&!is(p,CUK_T_EOF,NULL)){
+   CukAst*s=statement(p,in_function);if(!s)goto bad;
+   if(!child(n,s)){cuk_ast_free(s);goto bad;}
+   if(is(p,CUK_T_NEWLINE,NULL))skip_lines(p);
+   else if(!is(p,CUK_T_KEYWORD,"selesai")){
+    snprintf(p->out->error,sizeof p->out->error,"harus ada baris baru antarpernyataan kampret");p->out->error_line=tok(p)->line;p->out->error_column=tok(p)->column;goto bad;
+   }
+  }
+ }
+ if(!need(p,CUK_T_KEYWORD,"selesai","blok njir harus ditutup dengan 'selesai njir'"))goto bad;
+ if(!need(p,CUK_T_KEYWORD,"njir","penutup kondisi harus 'selesai njir'"))goto bad;
+ return n;
+bad:cuk_ast_free(n);return NULL;
+}
 static CukAst*statement(Parser*p,int in_function){
  const CukToken*start=tok(p);CukAst*s=NULL;CukAst*v=NULL;
+ if(is(p,CUK_T_KEYWORD,"njir"))return conditional(p,in_function);
  if(is(p,CUK_T_KEYWORD,"fungsi")){if(in_function){snprintf(p->out->error,sizeof p->out->error,"fungsi bersarang belum didukung");p->out->error_line=start->line;p->out->error_column=start->column;return NULL;}return function(p);}
  if(is(p,CUK_T_KEYWORD,"balek")){
   if(!in_function){snprintf(p->out->error,sizeof p->out->error,"'balek' hanya boleh di dalam fungsi");p->out->error_line=start->line;p->out->error_column=start->column;return NULL;}
