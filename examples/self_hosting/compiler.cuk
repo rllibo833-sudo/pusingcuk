@@ -1483,6 +1483,9 @@ fungsi ir_document(program, source_name)
 selesai fungsi
 
 
+# Marker kompatibilitas: self_hosted_frontend.py mengambil prefix sebelum deklarasi ini.
+lah contoh = ""
+
 # Driver produksi: compiler .cuk membaca payload JSON melalui stdin.
 # Jalankan dengan runtime native C; tidak ada Python yang mem-parsing source target.
 tanya input_payload_json = ""
