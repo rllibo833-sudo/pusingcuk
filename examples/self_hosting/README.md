@@ -38,3 +38,8 @@ Ini menghilangkan Python dari jalur kompilasi dan eksekusi program, tetapi belum
 
 
 Frontend `.cuk` memperlakukan pembungkus modul `jancuk` / `selesai jancuk` sebagai delimiter berkas, bukan statement di dalam program. Ini diperlukan agar source target yang normal bisa diproses lewat frontend native.
+
+
+## Evaluator AST yang ditulis dalam `.cuk`
+
+`evaluator.cuk` bukan lagi evaluator satu node aritmetika: ia mengevaluasi AST secara rekursif untuk literal, variable, unary/binary operator, list/dictionary, indexing, built-in dasar, dan statement deklarasi/assignment/output. `make run-native-evaluator` menjalankannya langsung di runtime native. Evaluator ini masih subset, belum menggantikan seluruh runtime bahasa atau membuktikan bootstrap compiler penuh.
