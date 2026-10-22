@@ -52,7 +52,7 @@ test-cli: native
 	@actual="$$(printf 'jancuk\nhedeh 123\nselesai jancuk\n' | $(NATIVE_BIN) -)"; test "$$actual" = "123"
 	@if $(NATIVE_BIN) >/dev/null 2>&1; then echo 'runtime tanpa argumen seharusnya gagal' >&2; exit 1; else status=$$?; test "$$status" -eq 2; fi
 	@if $(NATIVE_BIN) --opsi-tidak-ada >/dev/null 2>&1; then echo 'opsi tidak dikenal seharusnya gagal' >&2; exit 1; else status=$$?; test "$$status" -eq 2; fi
-	@set -eu; syntax_log="$(mktemp)"; missing_log="$(mktemp)"; trap 'rm -f "$syntax_log" "$missing_log"' EXIT; \
+	@set -eu; syntax_log=".pusingcuk-syntax-test.log"; missing_log=".pusingcuk-missing-test.log"; rm -f "$syntax_log" "$missing_log"; trap 'rm -f "$syntax_log" "$missing_log"' EXIT; \
 	if $(NATIVE_BIN) tests/conformance/malformed_expression.pusingcuk >/dev/null 2>"$$syntax_log"; then echo 'sintaks rusak seharusnya gagal' >&2; exit 1; else status=$$?; test "$$status" -eq 2; fi; \
 	grep -q '^Kesalahan sintaks:' "$$syntax_log"; \
 	missing="$(CURDIR)/.pusingcuk-missing-cli-test"; test ! -e "$$missing"; \
