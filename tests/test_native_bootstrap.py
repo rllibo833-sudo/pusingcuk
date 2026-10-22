@@ -22,9 +22,21 @@ class NativeBootstrapTests(unittest.TestCase):
    out=subprocess.run([str(b),str(src)],capture_output=True,text=True,timeout=5);self.assertEqual(out.returncode,0,out.stderr)
    doc=json.loads(out.stdout);from compiler.ir import validate;validate(doc)
    self.assertEqual(doc["program"]["fields"]["body"][0]["fields"]["value"]["fields"]["op"],"-")
+ def test_functions_calls_and_returns_emit_canonical_ir(self):
+  with tempfile.TemporaryDirectory() as d:
+   d=Path(d);b=d/"cukc";built=self.build(b);self.assertEqual(built.returncode,0,built.stderr)
+   source='jancuk\nfungsi tambah(a, b)\n    balek a + b\nselesai fungsi\nhedeh tambah(20, 22)\nselesai jancuk\n'
+   src=d/"function.cuk";src.write_text(source,encoding="utf-8")
+   out=subprocess.run([str(b),str(src)],capture_output=True,text=True,timeout=5);self.assertEqual(out.returncode,0,out.stderr)
+   doc=json.loads(out.stdout)
+   from compiler.ir import validate,from_source
+   validate(doc);canonical=from_source(source,"function.cuk")
+   self.assertEqual(doc["program"],canonical["program"])
+   self.assertEqual(doc["source_map"],canonical["source_map"])
+   self.assertEqual(doc["features"],canonical["features"])
  def test_unsupported_syntax_fails_closed(self):
   with tempfile.TemporaryDirectory() as d:
    d=Path(d);b=d/"cukc";built=self.build(b);self.assertEqual(built.returncode,0,built.stderr)
-   src=d/"bad.cuk";src.write_text("jancuk\nfungsi sapa()\nselesai jancuk\n",encoding="utf-8")
+   src=d/"bad.cuk";src.write_text("jancuk\nnjir benar\n    hedeh 1\nselesai njir\nselesai jancuk\n",encoding="utf-8")
    out=subprocess.run([str(b),str(src)],capture_output=True,text=True,timeout=5);self.assertNotEqual(out.returncode,0);self.assertEqual(out.stdout,"")
 if __name__=="__main__":unittest.main()
