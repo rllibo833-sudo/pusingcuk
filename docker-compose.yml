@@ -10,7 +10,7 @@ services:
       - .:/workspace
     environment:
       CC: ${CC:-gcc}
-    command: ["test"]
+    command: ["make", "test"]
 
   bootstrap:
     build:
@@ -21,4 +21,4 @@ services:
     working_dir: /workspace
     volumes:
       - .:/workspace
-    command: ["run-native-compile", "FILE=examples/self_hosting/evaluator.cuk"]
+    command: ["make", "run-native-compile", "FILE=examples/self_hosting/evaluator.cuk"]
