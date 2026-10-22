@@ -55,9 +55,14 @@ run-native-bootstrap: native-bootstrap
 	@test -n "$(FILE)" || (echo "Gunakan: make run-native-bootstrap FILE=program.cuk" >&2; exit 2)
 	"$(BOOTSTRAP_BIN)" "$(FILE)"
 
-# Full two-stage .cuk frontend bootstrap, executed by the native runtime/VM only.
-native-selfhost-bootstrap2: native
-	sh tools/native-selfhost-bootstrap2.sh "$(NATIVE_BIN)"
+# The .cuk frontend scans its own source (>10k chars). Keep normal runtime
+# safety defaults, but use a temporary native seed with a larger loop budget here.
+native-selfhost-bootstrap2:
+	@set -eu; \
+	  native_seed=$(mktemp "${TMPDIR:-/tmp}/pusingcuk-native-bootstrap.XXXXXX"); \
+	  trap 'rm -f "$native_seed"' EXIT HUP INT TERM; \
+	  $(CC) $(CFLAGS) -DPUSINGCUK_MAX_ITERATIONS=1000000 native/pusingcuk.c $(LDLIBS) -o "$native_seed"; \
+	  sh tools/native-selfhost-bootstrap2.sh "$native_seed"
 
 install: native
 	install -d "$(DESTDIR)$(PREFIX)/bin"
