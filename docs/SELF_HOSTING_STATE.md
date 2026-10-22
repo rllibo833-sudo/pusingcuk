@@ -1,42 +1,58 @@
-# Self-hosting state — engineering handoff
+# Status self-hosting .cuk — sumber kebenaran
 
-Dokumen ini adalah satu-satunya handoff aktif menuju compiler .cuk mandiri. SPEC.md tetap menjadi kontrak bahasa; compiler/ir.py menetapkan envelope dan validasi IR v1.
+**Diperbarui:** 22 Oktober 2026. Dokumen ini adalah status aktif self-hosting; milestone lama di roadmap dan audit bertanggal merupakan riwayat, bukan status terbaru.
 
-## Arsitektur yang benar-benar ada
+## Status yang sudah dicapai
 
-- examples/self_hosting/compiler.cuk: lexer/parser .cuk, AST sementara, dan serializer AST → IR v1. Grammar mencakup deklarasi, assignment variabel/indeks, output, ekspresi, pemanggilan fungsi, fungsi/return, kondisi, loop, list, dictionary, index, dan akses member sederhana.
-- compiler/self_hosted_frontend.py: menjalankan sumber compiler .cuk melalui `Evaluator` pada `evaluator.py`, mengambil JSON IR, lalu memvalidasinya dengan validator Python. Ini menghindari CLI/launcher tambahan, bukan menghilangkan host Python. Jalur ini tidak boleh fallback ke parser Python referensi.
-- compiler/ir.py: IR v1 kanonis beserta validator schema, path, source map dan feature.
-- compiler/bytecode.py + compiler/vm.py: backend bytecode dan VM Python untuk IR v1.
-- compiler/bootstrap.py: membandingkan dua jalur eksekusi frontend untuk source yang sama. Stage 1 berjalan melalui Python Evaluator; stage 2 menjalankan frontend .cuk yang dikompilasi menjadi bytecode PusingCuk dan dieksekusi oleh VM. IR, bytecode, dan output harus identik.
-- Batas stage 2 saat ini: driver frontend masih dibentuk memakai parser referensi Python dan dikompilasi oleh compiler bytecode Python. Runtime frontend sudah diuji di VM, tetapi proses membangun driver belum mandiri.
+Frontend compiler `.cuk` kini memiliki jalur bootstrap dua generasi yang menggunakan runtime native C sebagai seed, tanpa Python menjalankan parser, codegen, atau VM pada jalur tersebut. Gerbang utama adalah:
 
-## Gate pembuktian
+`make native-selfhost-bootstrap2`
 
-1. tests/test_compiled_frontend_vm.py membandingkan IR frontend .cuk dengan parser referensi ketika frontend mem-parsing compiler.cuk itu sendiri; tes yang sama memastikan hasilnya dapat masuk ke bytecode VM.
-2. compiler.bootstrap membuktikan parity antara frontend .cuk yang dijalankan via Evaluator dan frontend yang dijalankan dari bytecode VM, untuk subset yang didukung.
-3. Setiap IR harus lolos compiler.ir.validate; source map, fitur, bytecode, dan output dibandingkan dari kedua jalur.
-4. Tahap berikutnya adalah membuat driver .cuk dapat menghasilkan compiler tahap berikutnya tanpa parser referensi atau compiler bytecode Python. Baru sesudah artefak hasil stage 1 menjalankan stage 2 dan lulus konformansi, status boleh disebut self-hosted penuh.
-5. Jangan mengubah kegagalan menjadi fallback. Gunakan manifest dan suite yang ada; jangan membuat branch, daemon, status report per-fitur, atau suite duplikat.
+Alurnya:
+1. Menggabungkan `examples/self_hosting/compiler.cuk` dan `compiler_driver.cuk` sebagai sumber frontend/driver.
+2. Runtime native C menjalankan frontend sumber untuk menghasilkan IR v1 tahap awal.
+3. `examples/self_hosting/ir_codegen.cuk` mengubah IR tersebut menjadi bytecode frontend tahap 1.
+4. Frontend tahap 1 dijalankan untuk mengompilasi ulang sumber frontend yang sama. IR yang dihasilkan dibandingkan byte-for-byte dengan IR tahap awal.
+5. Codegen `.cuk` mengubah IR hasil tahap 1 menjadi bytecode frontend tahap 2. Kedua generasi kemudian memproses probe yang sama; hasil IR dibandingkan memakai `cmp` dan SHA-256.
 
-## Kontrak compiler tahap kedua
+**Makna bukti:** dua generasi frontend memberi keluaran IR identik untuk probe yang sama. Gerbang hanya dianggap lulus jika perintah tersebut sukses pada commit yang sama dengan hasil CI; keberadaan skrip atau dua hash dari commit berbeda bukan bukti CI.
 
-IR v1 tetap menjadi antarmuka antar-tahap. Stage 1 menerima satu dokumen JSON IR dari stdin, menolak JSON tidak valid atau envelope yang bukan pusingcuk-ir versi 1, lalu mengeluarkan dokumen JSON yang sama secara semantik melalui json_teks. Ini adalah tahap transport/round-trip IR, **bukan** klaim bahwa seluruh schema node sudah divalidasi oleh .cuk; validasi schema penuh masih dilakukan oleh gate kanonis sampai validator mandiri tersedia.
+## Bedakan jalur-jalur ini
 
-- Sumber prototipe: examples/self_hosting/ir_stage.cuk.
-- Input: satu baris JSON berisi envelope IR v1.
-- Output sukses: satu baris JSON IR; metadata format, ir_version, dan root program.kind == Program wajib sesuai kontrak.
-- Output gagal: IR_STAGE_INVALID_JSON atau IR_STAGE_INVALID_ENVELOPE; jangan fallback ke parser atau compiler lain.
-- Stabilitas byte-for-byte belum diasumsikan. Gate harus membandingkan JSON hasil parse secara semantik terlebih dahulu; byte-identical baru diwajibkan setelah serializer .cuk memiliki urutan kunci kanonis.
+- **Native bootstrap:** `tools/native-selfhost-bootstrap2.sh` dan target Make `native-selfhost-bootstrap2`. Inilah gerbang bootstrap native dua generasi.
+- **Kompilasi program native:** `make native-compile FILE=program.cuk`. Jalur ini memakai frontend dan codegen `.cuk`, lalu bytecode VM pada runtime C; Python tidak menjalankan langkah kompilasi atau program tersebut.
+- **Harness parity Python:** `compiler/bootstrap.py` membandingkan frontend yang berjalan melalui Python Evaluator dengan frontend dalam VM Python. Ini masih berguna sebagai tes pembanding, tetapi **bukan** bukti bootstrap native tanpa Python.
+- **Validator IR kanonis:** `compiler/ir.py` tetap menjadi validator skema IR penuh pada toolchain Python. Pemeriksaan envelope di jalur `.cuk` bukan klaim bahwa seluruh validator skema sudah ditulis ulang dalam `.cuk`.
 
-## Urutan kerja
+## Sumber aktif
 
-1. **Phase 1 — IR round-trip:** jalankan prototipe IR stage dengan fixture IR kanonis yang sudah ada; validasi envelope, round-trip semantik, dan penolakan input rusak.
-2. **Phase 2 — IR → bytecode:** pindahkan aturan compiler/bytecode.py ke .cuk; keluaran harus lolos compiler.bytecode.validate_bytecode dan dapat dijalankan oleh VM yang sama.
-3. **Phase 3 — loop dua tahap:** Compiler₁ membangun Compiler₂ dari sumber compiler yang sama; bandingkan IR/bytecode kanonis dan jalankan konformansi menggunakan artefak Compiler₂.
-4. **Phase 4 — gate CI:** tambahkan bootstrap-loop-verify setelah phase 1–3 dapat dieksekusi end-to-end. Jangan membuat gate hijau yang hanya memanggil compiler Python dua kali.
-5. Nyatakan self-hosting penuh hanya setelah tahap tersebut lulus di CI dari commit yang sama.
+| Berkas | Peran |
+|---|---|
+| `examples/self_hosting/compiler.cuk` | Lexer, parser, AST sementara, dan serialisasi AST ke IR v1 |
+| `examples/self_hosting/compiler_driver.cuk` | Driver JSON untuk menjalankan frontend dari stdin |
+| `examples/self_hosting/ir_codegen.cuk` | Codegen IR v1 ke bytecode PusingCuk v1 |
+| `native/pusingcuk.c` | Runtime/VM native C yang menjadi seed bootstrap tepercaya |
+| `tools/native-selfhost-bootstrap2.sh` | Menguji pembentukan generasi 1 dan 2 serta identitas keluaran probe |
+| `tools/cukc-native.sh` | Jalur kompilasi native end-to-end |
+| `compiler/bootstrap.py` | Harness parity Python yang terpisah, bukan bootstrap native |
 
-## Klaim yang belum boleh dibuat
+`source_lexer.cuk`, `parser.cuk`, `evaluator.cuk`, `interpreter.cuk`, dan `codegen.cuk` adalah contoh/milestone mini; jangan menganggap semuanya sebagai jalur compiler kanonis.
 
-IR v1, bytecode VM, backend multi-target, parser source .cuk, dan bukti build berulang bukan bukti terpisah bahwa compiler sudah mandiri penuh. Status tetap belum self-hosted penuh sampai bootstrap dua tahap mandiri benar-benar terverifikasi.
+## Gate dan perintah verifikasi
+
+```sh
+make native
+make native-selfhost-bootstrap2
+make native-compile FILE=examples/hello.cuk
+python -m unittest tests.test_native_bootstrap_pipeline -v
+```
+
+Workflow `.github/workflows/tests.yml` menjalankan tes native dan `make native-selfhost-bootstrap2`. Workflow contoh juga memeriksa sintaks semua berkas `.cuk` di `examples/`; kegagalan pada contoh harus diperbaiki, bukan diabaikan. Untuk klaim hasil terkini, cek workflow yang menyebut SHA commit yang sama.
+
+## Batas klaim
+
+- Bootstrap ini membuktikan loop frontend/codegen native pada subset yang diuji, bukan kesetaraan semua fitur bahasa di seluruh backend.
+- Runtime C tetap menjadi seed tepercaya. Ini tidak berarti runtime, VM, atau seluruh compiler ditulis dalam `.cuk`.
+- Tool pengembangan, interpreter referensi, paket Python, dan validator IR kanonis masih memakai Python. Yang bebas Python adalah jalur native compile/run yang didokumentasikan, bukan seluruh repositori.
+- Bootstrap dan tes konformansi bukan sandbox sistem operasi. Jangan jalankan program tak tepercaya dengan asumsi terisolasi.
+- Status rilis tetap eksperimental; bootstrap yang lulus tidak membuat semua backend setara atau perangkat lunak otomatis siap produksi.
