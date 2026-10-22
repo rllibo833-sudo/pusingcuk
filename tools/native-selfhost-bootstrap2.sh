@@ -9,7 +9,10 @@ fi
 native=$1
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 cd "$root"
-tmp=$(mktemp -d "${TMPDIR:-/tmp}/pusingcuk-bootstrap2.XXXXXX")
+tmp_base=${TMPDIR:-${PREFIX:+$PREFIX/tmp}}
+tmp_base=${tmp_base:-/tmp}
+mkdir -p "$tmp_base"
+tmp=$(mktemp "$tmp_base/pusingcuk-bootstrap2.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 
 # Assemble the self-hosted frontend and its driver into one valid .cuk module.
