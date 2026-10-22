@@ -48,3 +48,6 @@ false
 ## Native compiler driver
 
  tools/cukc-native.sh menyusun kontrak source JSON, frontend .cuk, IR v1, codegen bytecode .cuk, dan native VM. make native-compile FILE=program.cuk adalah entrypoint tanpa Python setelah runtime C dibangun. Opsi --json-quote FILE pada runtime native melakukan escaping source tanpa Python atau jq.
+
+
+Kontrak frontend self-hosting: `jancuk` dan `selesai jancuk` adalah delimiter modul sumber dan diabaikan sebagai statement saat parsing program target. Regresi kontrak ini dijalankan oleh `tests/test_native_bootstrap_pipeline.py` melalui `tools/cukc-native.sh`.
