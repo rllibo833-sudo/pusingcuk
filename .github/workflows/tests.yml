@@ -1,9 +1,12 @@
-name: PusingCuk core
+name: PusingCuk core (Docker)
 on:
   push:
     branches: [main]
     paths:
       - ".github/workflows/**"
+      - "Dockerfile"
+      - ".dockerignore"
+      - "docker-compose.yml"
       - "*.py"
       - "scripts/**"
       - "tools/**"
@@ -14,47 +17,21 @@ on:
       - "MANIFEST.in"
       - "README.md"
       - "CHANGELOG.md"
-      - "pusingcuk_new.py"
-      - "interpreter.py"
-      - "evaluator.py"
-      - "lexer.py"
-      - "scripts/check_alias_sync.py"
-      - "scripts/gen_docs_from_spec.py"
-      - "docs/AI_ENGINE_READINESS.md"
       - "docs/**"
-      - "docs/COMPATIBILITY.md"
-      - "docs/CONFORMANCE_FIXTURES.md"
-      - "tools/evolve_daemon.py"
-      - "tools/evolve_language.py"
-      - "parser.py"
-      - "ast_nodes.py"
       - "compiler/**"
       - "library/**"
       - "native/**"
       - "tests/**"
-      - "tools/conformance.py"
-      - "tools/validate_target_manifests.py"
-      - "tools/diagnostic_repair_loop.py"
-      - "tools/datacenter_v6.py"
-      - "datacenter_v6.py"
-      - "tests/test_v6_evolution_safety.py"
-      - "tools/local_ai_adapter.py"
-      - "tools/reality_engine.py"
       - "examples/**"
       - "halo.cuk"
       - "Makefile"
       - "pyproject.toml"
   pull_request:
     paths:
-      - "scripts/check_alias_sync.py"
-      - "scripts/gen_docs_from_spec.py"
-      - "docs/**"
-      - "tools/evolve_daemon.py"
-      - "tools/evolve_language.py"
-      - "tools/datacenter_v6.py"
-      - "datacenter_v6.py"
-      - "tests/test_v6_evolution_safety.py"
       - ".github/workflows/**"
+      - "Dockerfile"
+      - ".dockerignore"
+      - "docker-compose.yml"
       - "*.py"
       - "scripts/**"
       - "tools/**"
@@ -65,19 +42,11 @@ on:
       - "MANIFEST.in"
       - "README.md"
       - "CHANGELOG.md"
-      - "pusingcuk_new.py"
-      - "evaluator.py"
-      - "lexer.py"
-      - "parser.py"
-      - "ast_nodes.py"
+      - "docs/**"
       - "compiler/**"
       - "library/**"
       - "native/**"
       - "tests/**"
-      - "tools/conformance.py"
-      - "tools/diagnostic_repair_loop.py"
-      - "tools/local_ai_adapter.py"
-      - "tools/reality_engine.py"
       - "examples/**"
       - "halo.cuk"
       - "Makefile"
@@ -89,98 +58,28 @@ concurrency:
   group: pusingcuk-core-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  python:
+  container:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12"]
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: ${{ matrix.python-version }}
-      - run: python scripts/check_alias_sync.py
-      - run: python scripts/gen_docs_from_spec.py --check
-      - run: python tools/validate_target_manifests.py
-      - name: Verify safe file APIs and deterministic IR-to-VM pipeline
-        run: |
-          python - <<'PY'
-          import hashlib
-          import io
-          import json
-          import subprocess
-          import sys
-          import tempfile
-          from pathlib import Path
-          from evaluator import capture
-          from compiler.ir import from_source as canonical_from_source, dumps
-          from compiler.self_hosted_frontend import from_source as self_hosted_from_source
-          from compiler.bytecode import compile_ir
-          from compiler.vm import VirtualMachine
-
-          root = Path.cwd()
-          with tempfile.TemporaryDirectory(dir=root) as temp_name:
-              relative = Path(temp_name).relative_to(root).as_posix()
-              source = "jancuk\n" + (
-                  f'lah ok = tulis_file("{relative}/probe.txt", "halo")\n'
-                  f'lah isi = baca_file("{relative}/probe.txt")\n'
-                  'hedeh isi\n'
-              ) + "selesai jancuk\n"
-              assert capture(source, project_root=root).strip() == "halo"
-              # Runtime API is checked above. Compiler path below uses the .cuk
-              # lexer/parser; ignore source locations when comparing AST semantics.
-              frontend_source = "lah nilai = (2 + 3) * 4\nhedeh nilai\n"
-              ir1 = self_hosted_from_source(frontend_source, "frontend_probe.cuk")
-              ir2 = self_hosted_from_source(frontend_source, "frontend_probe.cuk")
-              canonical_source = "jancuk\n" + frontend_source + "selesai jancuk\n"
-              canonical_ir = canonical_from_source(canonical_source, "frontend_probe.cuk")
-              def without_locations(value):
-                  if isinstance(value, dict):
-                      return {key: without_locations(item) for key, item in value.items() if key != "line"}
-                  if isinstance(value, list):
-                      return [without_locations(item) for item in value]
-                  return value
-              assert without_locations(ir1["program"]) == without_locations(canonical_ir["program"]), "self-hosted frontend AST diverges from canonical parser"
-              assert dumps(ir1) == dumps(ir2), "IR serialization is not deterministic"
-              bytecode1 = compile_ir(ir1)
-              bytecode2 = compile_ir(ir2)
-              artifact1 = json.dumps(bytecode1, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
-              artifact2 = json.dumps(bytecode2, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
-              assert hashlib.sha256(artifact1).digest() == hashlib.sha256(artifact2).digest(), "bytecode stage hash mismatch"
-              output = io.StringIO()
-              VirtualMachine(bytecode1, output_stream=output).run()
-              assert output.getvalue().strip() == "20", output.getvalue()
-
-              # Exercise the public module CLI and require valid, newline-terminated JSON.
-              cli_source = Path(temp_name) / "cli_probe.cuk"
-              cli_artifact = Path(temp_name) / "cli_probe.bytecode.json"
-              cli_source.write_text(frontend_source, encoding="utf-8")
-              subprocess.run(
-                  [sys.executable, "-m", "compiler", "--emit-bytecode", str(cli_artifact), str(cli_source)],
-                  cwd=root, check=True, capture_output=True, text=True, timeout=30,
-              )
-              encoded = cli_artifact.read_text(encoding="utf-8")
-              assert encoded.endswith("\n"), "CLI bytecode artifact must end with newline"
-              cli_bytecode = json.loads(encoded)
-              cli_output = io.StringIO()
-              VirtualMachine(cli_bytecode, output_stream=cli_output).run()
-              assert cli_output.getvalue().strip() == "20", cli_output.getvalue()
-          print("Safe file APIs + .cuk frontend -> IR v1 -> bytecode -> VM + public CLI: OK")
-          PY
-      - run: python -m unittest discover -s tests -v
-      - if: matrix.python-version == '3.12'
-        run: python tools/conformance.py
-  native:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    strategy:
-      fail-fast: false
-      matrix:
         compiler: [gcc, clang]
-    env:
-      CC: ${{ matrix.compiler }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - run: make test-native
+      - name: Build the canonical development image
+        run: docker build --build-arg PYTHON_VERSION=${{ matrix.python-version }} -t pusingcuk-ci .
+      - name: Run all repository gates inside Docker
+        run: |
+          docker run --rm -e CC=${{ matrix.compiler }} pusingcuk-ci sh -lc '
+            set -eu
+            python scripts/check_alias_sync.py
+            python scripts/gen_docs_from_spec.py --check
+            python tools/validate_target_manifests.py
+            python -m unittest discover -s tests -v
+            if python -c "import sys; sys.exit(0 if sys.version_info[:2] == (3, 12) else 1)"; then
+              python tools/conformance.py
+            fi
+            make test-native
+          '
