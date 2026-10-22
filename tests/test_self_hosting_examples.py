@@ -1,6 +1,7 @@
 """Runtime smoke tests for the staged .cuk self-hosting prototypes."""
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 import unittest
@@ -33,12 +34,27 @@ class SelfHostingExampleTests(unittest.TestCase):
         )
 
     def test_source_lexer_scans_source_text(self) -> None:
-        self.run_example(
-            "compiler.cuk",
-            "IDENT:lah\nIDENT:x\nOP:=\nINTEGER:12\nOP:+\nINTEGER:3\n"
-            "NEWLINE:NEWLINE\nIDENT:hedeh\nIDENT:x\nNEWLINE:NEWLINE\nEOF:EOF\n"
-            "PRECEDENCE_OK\n14\nPARENS_OK\n20\nMODULO_OK\n2\nUNARY_OK\n-12\nINVALID_PARSE_ERROR\nPROGRAM_OK\n5\n9\n20\n9\n20\nINVALID_ASSIGNMENT_RUNTIME_ERROR_UNDECLARED_ASSIGNMENT\nINVALID_PROGRAM_PARSE_ERROR\n",
+        payload = {
+            "source_name": "lexer_smoke.cuk",
+            "source": "lah x = 12 + 3\\nhedeh x\\n",
+        }
+        result = subprocess.run(
+            [sys.executable, str(CLI), str(EXAMPLES / "compiler.cuk")],
+            cwd=ROOT,
+            input=json.dumps(payload),
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=15,
+            check=False,
         )
+        self.assertEqual(result.returncode, 0, msg=result.stderr)
+        self.assertEqual(result.stderr, "")
+        document = json.loads(result.stdout)
+        self.assertEqual(document["format"], "pusingcuk-ir")
+        self.assertEqual(document["ir_version"], 1)
+        self.assertEqual(document["source_name"], "lexer_smoke.cuk")
+        self.assertIn("operators", document["features"])
 
     def test_parser_builds_arithmetic_node(self) -> None:
         self.run_example(

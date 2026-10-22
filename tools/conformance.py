@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the manifest-driven Pusingcuk cross-runtime conformance suite."""
+"""Run manifest-driven cross-runtime conformance checks."""
 from __future__ import annotations
 
 import json
