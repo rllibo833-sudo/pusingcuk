@@ -446,13 +446,15 @@ const pcCsvRow = (value) => {
   return result;
 };
 
-const pcInputLines = (typeof process !== "undefined" && typeof require === "function" &&
-  typeof module !== "undefined" && require.main === module)
-  ? require("fs").readFileSync(0, "utf8").split(/\r?\n/)
-  : [];
+// Read stdin lazily: generated programs that never call input() must not
+// block waiting for terminal EOF merely because the runtime was initialized.
+let pcInputLines = null;
 let pcInputIndex = 0;
 const pcInput = (prompt) => {
-  if (typeof process !== "undefined" && typeof process.stdout !== "undefined") {
+  if (typeof process !== "undefined" && typeof process.stdout !== "undefined" &&
+      typeof require === "function" && typeof module !== "undefined" && require.main === module) {
+    if (pcInputLines === null)
+      pcInputLines = require("fs").readFileSync(0, "utf8").split(/\r?\n/);
     process.stdout.write(pcString(prompt));
     if (pcInputIndex >= pcInputLines.length) return "";
     return pcInputLines[pcInputIndex++];
