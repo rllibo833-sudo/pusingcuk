@@ -12,21 +12,26 @@
 
 #define NV 256
 #define SZ 1024
+#define MAX_LIST_ITEMS 65536
+#define MAX_DICT_ITEMS 65536
+#define MAX_LIST_ALLOCATIONS 100000
+#define MAX_STRING_ALLOCATIONS 4000000
+#define MAX_RUNTIME_STRING_BYTES (32u * 1024u * 1024u)
+#define MAX_PROJECT_FILE_BYTES (16u * 1024u * 1024u)
 
 typedef enum { NUM, STR, BOOL, LIST, RANGE, DICT, NIL } Type;
 typedef struct Val Val;
 typedef struct List List;
 typedef struct Dict Dict;
-struct Val { Type t; double n; int b; char s[SZ]; List *list; Dict *dict; double range_start, range_end, range_step; };
-#define MAX_LIST_ITEMS 256
+struct Val { Type t; double n; int b; char *s; List *list; Dict *dict; double range_start, range_end, range_step; };
 struct List { size_t len, capacity; Val *items; };
-#define MAX_DICT_ITEMS 256
-struct Dict { size_t len; Val keys[MAX_DICT_ITEMS]; Val values[MAX_DICT_ITEMS]; };
-#define MAX_LIST_ALLOCATIONS 100000
+struct Dict { size_t len, capacity; Val *keys; Val *values; };
 static List *allocated_lists[MAX_LIST_ALLOCATIONS];
 static size_t allocated_list_count;
 static Dict *allocated_dicts[MAX_LIST_ALLOCATIONS];
 static size_t allocated_dict_count;
+static char **allocated_strings;
+static size_t allocated_string_count, allocated_string_capacity;
 typedef struct { char name[128]; Val v; } Var;
 static Var vars[NV];
 static int nvars, err, syntax_err, line_no;
@@ -43,6 +48,7 @@ static void format_number(double value, char *output, size_t output_size);
 static int run_range(int first, int last);
 static Val call_user_function(const char *name, Val *args, int argc);
 static Val call_native_format_builtin(const char *name, Val *args, int argc, int *handled);
+static Val call_native_io_builtin(const char *name, Val *args, int argc, int *handled);
 
 static void fail(const char *msg) {
     if (suppress_eval) return;
@@ -102,8 +108,118 @@ static int append_list(List *list, Val value) {
     return 1;
 }
 static Val boolean(int x) { Val v={0}; v.t=BOOL; v.b=!!x; return v; }
+static Val string_n(const char *s, size_t len) {
+    Val v={0};
+    if (!s || len > MAX_RUNTIME_STRING_BYTES) {
+        fail("sumber teks native tidak valid atau terlalu panjang");
+        v.t=NIL; return v;
+    }
+    if (allocated_string_count >= MAX_STRING_ALLOCATIONS) {
+        fail("terlalu banyak alokasi teks native"); v.t=NIL; return v;
+    }
+    char *owned=malloc(len+1);
+    if(!owned){fail("memori teks native habis");v.t=NIL;return v;}
+    memcpy(owned,s,len);owned[len]='\0';
+    if(allocated_string_count==allocated_string_capacity){
+        size_t next=allocated_string_capacity?allocated_string_capacity*2:256;
+        if(next>MAX_STRING_ALLOCATIONS)next=MAX_STRING_ALLOCATIONS;
+        char **items=realloc(allocated_strings,next*sizeof *items);
+        if(!items){free(owned);fail("memori pelacak teks native habis");v.t=NIL;return v;}
+        allocated_strings=items;allocated_string_capacity=next;
+    }
+    allocated_strings[allocated_string_count++]=owned;
+    v.t=STR;v.s=owned;return v;
+}
 static Val string(const char *s) {
-    Val v={0}; v.t=STR; snprintf(v.s,sizeof v.s,"%s",s); return v;
+    if(!s)s="";
+    return string_n(s,strlen(s));
+}
+static Val concatenate_text(const char *left,const char *right) {
+    if(!left)left="";
+    if(!right)right="";
+    size_t a=strlen(left),b=strlen(right);
+    if(b>MAX_RUNTIME_STRING_BYTES||a>MAX_RUNTIME_STRING_BYTES-b){
+        fail("hasil penggabungan teks native melewati batas 32 MiB");
+        return (Val){.t=NIL};
+    }
+    char *temporary=malloc(a+b+1);
+    if(!temporary){fail("memori penggabungan teks habis");return (Val){.t=NIL};}
+    memcpy(temporary,left,a);memcpy(temporary+a,right,b+1);
+    Val result=string_n(temporary,a+b);free(temporary);return result;
+}
+static int safe_project_path(const char *path) {
+    if(!path||!path[0]||path[0]=='/'||path[0]=='\\')return 0;
+    if(isalpha((unsigned char)path[0])&&path[1]==':')return 0;
+    const char *part=path;
+    for(const char *q=path;;q++){
+        if(*q=='/'||*q=='\\'||*q=='\0'){
+            size_t n=(size_t)(q-part);
+            if(n==2&&part[0]=='.'&&part[1]=='.')return 0;
+            if(n==1&&part[0]=='.')return 0;
+            if(*q=='\0')break;
+            part=q+1;
+        }
+    }
+    return 1;
+}
+static char *read_project_file(const char *path,size_t *length) {
+    if(length)*length=0;
+    if(!safe_project_path(path))return NULL;
+    FILE *file=fopen(path,"rb");
+    if(!file)return NULL;
+    if(fseek(file,0,SEEK_END)!=0){fclose(file);return NULL;}
+    long size=ftell(file);
+    if(size<0||(unsigned long)size>MAX_PROJECT_FILE_BYTES){fclose(file);return NULL;}
+    if(fseek(file,0,SEEK_SET)!=0){fclose(file);return NULL;}
+    char *buffer=malloc((size_t)size+1);
+    if(!buffer){fclose(file);return NULL;}
+    size_t got=fread(buffer,1,(size_t)size,file);
+    int failed=ferror(file)||got!=(size_t)size;
+    fclose(file);
+    if(failed){free(buffer);return NULL;}
+    buffer[got]='\0';
+    if(length)*length=got;
+    return buffer;
+}
+static int write_project_file(const char *path,const char *data,size_t length) {
+    if(!safe_project_path(path)||!data||length>MAX_PROJECT_FILE_BYTES)return 0;
+    FILE *file=fopen(path,"wb");
+    if(!file)return 0;
+    size_t written=fwrite(data,1,length,file);
+    int close_ok=fclose(file)==0;
+    return written==length&&close_ok;
+}
+static char *read_line_dynamic(FILE *stream,size_t limit,size_t *length) {
+    size_t cap=256,used=0;
+    if(limit<cap)cap=limit+1;
+    char *buffer=malloc(cap?cap:1);
+    if(!buffer)return NULL;
+    int ch;
+    while((ch=fgetc(stream))!=EOF&&ch!='\n'){
+        if(used>=limit){while(ch!=EOF&&ch!='\n')ch=fgetc(stream);free(buffer);return NULL;}
+        if(used+1>=cap){
+            size_t next=cap?cap*2:256;
+            if(next>limit+1)next=limit+1;
+            char *grown=realloc(buffer,next);
+            if(!grown){free(buffer);return NULL;}
+            buffer=grown;cap=next;
+        }
+        buffer[used++]=(char)ch;
+    }
+    if(ch==EOF&&ferror(stream)){free(buffer);return NULL;}
+    if(ch==EOF&&used==0){free(buffer);return NULL;}
+    if(used&&buffer[used-1]=='\r')used--;
+    buffer[used]='\0';
+    if(length)*length=used;
+    return buffer;
+}
+static void cleanup_runtime_allocations(void) {
+    for(size_t i=0;i<allocated_list_count;i++){free(allocated_lists[i]->items);free(allocated_lists[i]);}
+    for(size_t i=0;i<allocated_dict_count;i++){free(allocated_dicts[i]->keys);free(allocated_dicts[i]->values);free(allocated_dicts[i]);}
+    for(size_t i=0;i<allocated_string_count;i++)free(allocated_strings[i]);
+    free(allocated_strings);
+    allocated_strings=NULL;allocated_string_count=allocated_string_capacity=0;
+    allocated_list_count=allocated_dict_count=0;
 }
 static void ws(void) { while (*p && isspace((unsigned char)*p)) p++; }
 static int take(const char *s) {
@@ -189,6 +305,16 @@ static int dict_set(Dict *dict, Val key, Val value) {
         if (equal(dict->keys[i],key)) { dict->values[i]=value; return 1; }
     }
     if (dict->len >= MAX_DICT_ITEMS) { fail("kamus terlalu besar"); return 0; }
+    if(dict->len==dict->capacity){
+        size_t next=dict->capacity?dict->capacity*2:8;
+        if(next>MAX_DICT_ITEMS)next=MAX_DICT_ITEMS;
+        Val *keys=realloc(dict->keys,next*sizeof *keys);
+        if(!keys){fail("memori kunci kamus habis");return 0;}
+        dict->keys=keys;
+        Val *values=realloc(dict->values,next*sizeof *values);
+        if(!values){fail("memori nilai kamus habis");return 0;}
+        dict->values=values;dict->capacity=next;
+    }
     dict->keys[dict->len]=key;
     dict->values[dict->len]=value;
     dict->len++;
@@ -259,7 +385,8 @@ static int is_builtin_name(const char *name) {
     static const char *const names[] = {
         "panjang", "teks", "bilangan", "desimal", "logika", "rentang",
         "mutlak", "minimum", "maksimum", "bulatkan", "akar", "bawah",
-        "atas", "pangkat", "sinus", "kosinus", "jumlah", "rata_rata", "median", "logaritma", "log10", "json_teks", "json_baca", "html_aman", "csv_baris", "jadi_json"
+        "atas", "pangkat", "sinus", "kosinus", "jumlah", "rata_rata", "median", "logaritma", "log10", "json_teks", "json_baca", "html_aman", "csv_baris", "jadi_json",
+        "baca_file", "baca", "baca_json", "tulis_file", "tulis", "tulis_json"
     };
     for (size_t i = 0; i < sizeof names / sizeof names[0]; i++)
         if (!strcmp(name, names[i])) return 1;
@@ -608,6 +735,9 @@ static Val primary(void) {
             int format_handled = 0;
             Val format_result = call_native_format_builtin(name, args, argc, &format_handled);
             if (format_handled) return format_result;
+            int io_handled = 0;
+            Val io_result = call_native_io_builtin(name, args, argc, &io_handled);
+            if (io_handled) return io_result;
             int builtin_handled = 0;
             Val builtin_result = call_native_numeric_builtin(name, args, argc, &builtin_handled);
             if (builtin_handled) return builtin_result;
@@ -705,14 +835,7 @@ static Val add(void) {
         if (take("+")) {
             Val b=mul();
             if (a.t==STR && b.t==STR) {
-                char tmp[SZ];
-                size_t a_len = strlen(a.s), b_len = strlen(b.s);
-                if (a_len + b_len >= sizeof tmp) {
-                    fail("hasil string terlalu panjang"); return string("");
-                }
-                memcpy(tmp, a.s, a_len);
-                memcpy(tmp + a_len, b.s, b_len + 1);
-                a = string(tmp);
+                a = concatenate_text(a.s,b.s);
             } else if (a.t==NUM && b.t==NUM) a=checked_num(a.n+b.n,"hasil angka desimal terlalu besar atau tidak valid");
             else if (a.t==LIST && b.t==LIST) {
                 List *combined = new_list();
@@ -1051,6 +1174,7 @@ static Val call_native_format_builtin(const char *name, Val *args, int argc, int
     }
     if (!strcmp(name, "jadi_json")) {
         if (value.t != STR) { fail("jadi_json membutuhkan satu teks JSON"); return num(0); }
+        if(strlen(value.s)>1023){fail("jadi_json input melebihi batas 1023 byte");return num(0);}
         int previous_suppress = suppress_eval;
         suppress_eval = 1;
         JsonParser jp = {value.s, 0, 1};
@@ -1063,6 +1187,7 @@ static Val call_native_format_builtin(const char *name, Val *args, int argc, int
     }
     if (!strcmp(name, "json_baca")) {
         if (value.t != STR) { fail("json_baca() membutuhkan teks JSON"); return num(0); }
+        if(strlen(value.s)>1023){fail("json_baca() input melebihi batas 1023 byte");return num(0);}
         JsonParser jp = {value.s, 0, 1};
         Val parsed = json_parse_value(&jp, 0);
         json_ws(&jp);
@@ -1353,23 +1478,12 @@ static int run_range(int first,int last) {
             if(!endline()) syntax_fail("karakter tambahan setelah prompt input");
             if(!err && prompt.t!=STR) fail("prompt tanya harus berupa teks");
             if(!err) {
-                char input[SZ];
                 fputs(prompt.s,stdout);
                 fflush(stdout);
-                if(!fgets(input,sizeof input,stdin)) {
-                    fail("gagal membaca input pengguna"); 
-                } else {
-                    size_t len=strlen(input);
-                    if(len && input[len-1]=='\n') input[--len]=0;
-                    if(len && input[len-1]=='\r') input[--len]=0;
-                    if(len==sizeof input-1 && !feof(stdin)) {
-                        int ch;
-                        while((ch=getchar())!='\n' && ch!=EOF) {}
-                        fail("input terlalu panjang");
-                    } else {
-                        setvar(name,string(input));
-                    }
-                }
+                size_t len=0;
+                char *input=read_line_dynamic(stdin,MAX_RUNTIME_STRING_BYTES,&len);
+                if(!input)fail("gagal membaca input pengguna atau input melebihi 32 MiB");
+                else {setvar(name,string_n(input,len));free(input);}
             }
         } else if(word("hedeh")) {
             Val v=expr();
@@ -1517,8 +1631,9 @@ static int pvm_binary(PvmState *vm, const char *op) {
     }
     if (!strcmp(op,"==")||!strcmp(op,"!=")) { int eq=equal(a,b); return pvm_push(vm,boolean(!strcmp(op,"==")?eq:!eq)); }
     if (!strcmp(op,"+") && a.t==STR && b.t==STR) {
-        char out[SZ]; int n=snprintf(out,sizeof out,"%s%s",a.s,b.s);
-        if(n<0||(size_t)n>=sizeof out){fail("teks PVM terlalu panjang");return 0;} return pvm_push(vm,string(out));
+        Val joined=concatenate_text(a.s,b.s);
+        if(err)return 0;
+        return pvm_push(vm,joined);
     }
     if(a.t!=NUM||b.t!=NUM){fail("operator PVM membutuhkan angka");return 0;}
     if(!strcmp(op,"+"))return pvm_push(vm,checked_num(a.n+b.n,"hasil angka tidak finite"));
@@ -1549,11 +1664,11 @@ Val pvm_execute(PvmState *vm,const PvmInstruction *code,size_t count,unsigned de
             if(!in->name||prompt.t!=STR){fail("INPUT PVM membutuhkan nama dan prompt teks");break;}
             if(pvm_find_var(in->name)>=0){fail("INPUT PVM: variabel sudah dibuat");break;}
             if(nvars>=NV){fail("slot variabel INPUT PVM habis");break;}
-            char input[SZ];fputs(prompt.s,stdout);fflush(stdout);
-            if(!fgets(input,sizeof input,stdin)){fail("gagal membaca input bytecode");break;}
-            size_t len=strlen(input);if(len&&input[len-1]=='\n')input[--len]=0;if(len&&input[len-1]=='\r')input[--len]=0;
-            if(len==sizeof input-1&&!feof(stdin)){int ch;while((ch=getchar())!='\n'&&ch!=EOF){}fail("input bytecode terlalu panjang");break;}
-            snprintf(vars[nvars].name,sizeof vars[nvars].name,"%s",in->name);vars[nvars++].v=string(input);break;
+            fputs(prompt.s,stdout);fflush(stdout);
+            size_t len=0;char *input=read_line_dynamic(stdin,MAX_RUNTIME_STRING_BYTES,&len);
+            if(!input){fail("gagal membaca input bytecode atau input melebihi 32 MiB");break;}
+            snprintf(vars[nvars].name,sizeof vars[nvars].name,"%s",in->name);
+            vars[nvars++].v=string_n(input,len);free(input);break;
         }
         case PVM_POP:(void)pvm_pop(vm);break;
         case PVM_GET:{
@@ -1642,6 +1757,8 @@ Val pvm_execute(PvmState *vm,const PvmInstruction *code,size_t count,unsigned de
             if(conversion_handled){if(!err)pvm_push(vm,conversion);break;}
             int format_handled=0;Val formatted=call_native_format_builtin(in->name,args,in->argc,&format_handled);
             if(format_handled){if(!err)pvm_push(vm,formatted);break;}
+            int io_handled=0;Val io_value=call_native_io_builtin(in->name,args,in->argc,&io_handled);
+            if(io_handled){if(!err)pvm_push(vm,io_value);break;}
             int numeric_handled=0;Val numeric=call_native_numeric_builtin(in->name,args,in->argc,&numeric_handled);
             if(numeric_handled){if(!err)pvm_push(vm,numeric);break;}
             if(is_builtin_name(in->name)){fail("built-in belum didukung pada PVM native");break;}
@@ -1649,6 +1766,7 @@ Val pvm_execute(PvmState *vm,const PvmInstruction *code,size_t count,unsigned de
             for(size_t i=0;i<vm->function_count;i++)if(vm->functions[i].name&&!strcmp(vm->functions[i].name,in->name)){fn=&vm->functions[i];break;}
             if(!fn||fn->param_count!=in->argc||in->argc>MAX_PARAMS){fail("fungsi PVM tidak ditemukan atau aritas salah");break;}
             int oldn=nvars;Var *saved=malloc(sizeof vars);if(!saved){fail("memori CALL PVM habis");break;}memcpy(saved,vars,sizeof vars);
+            nvars=0;
             for(int i=0;i<in->argc&&!err;i++){if(nvars>=NV){fail("variabel CALL PVM melampaui batas");break;}snprintf(vars[nvars].name,sizeof vars[nvars].name,"%s",fn->params[i]);vars[nvars++].v=args[i];}
             Val result=pvm_execute(vm,fn->code,fn->code_count,depth+1);memcpy(vars,saved,sizeof vars);free(saved);nvars=oldn;if(!err)pvm_push(vm,result);break;
         }
@@ -1770,10 +1888,126 @@ static int pvm_load_and_run(const char *path) {
         free(fn_code);
     }
     free(functions);
-    for(size_t i=0;i<allocated_list_count;i++){free(allocated_lists[i]->items);free(allocated_lists[i]);}
-    for(size_t i=0;i<allocated_dict_count;i++)free(allocated_dicts[i]);
-    allocated_list_count=0;allocated_dict_count=0;
+    cleanup_runtime_allocations();
     return status;
+}
+
+
+static size_t json_measure_string(const char *value) {
+    size_t size=2;
+    for(const unsigned char *q=(const unsigned char *)value;*q;q++){
+        size_t add=1;
+        if(*q=='"'||*q=='\\'||*q=='\b'||*q=='\f'||*q=='\n'||*q=='\r'||*q=='\t')add=2;
+        else if(*q<0x20)add=6;
+        if(size>MAX_PROJECT_FILE_BYTES-add)return MAX_PROJECT_FILE_BYTES+1;
+        size+=add;
+    }
+    return size;
+}
+static size_t json_measure_value(Val value,unsigned depth) {
+    if(depth>JSON_MAX_DEPTH)return MAX_PROJECT_FILE_BYTES+1;
+    if(value.t==NIL)return 4;
+    if(value.t==BOOL)return value.b?4:5;
+    if(value.t==STR)return json_measure_string(value.s?value.s:"");
+    if(value.t==NUM){
+        if(!isfinite(value.n))return MAX_PROJECT_FILE_BYTES+1;
+        if(floor(value.n)==value.n&&fabs(value.n)>JSON_MAX_SAFE_INTEGER)return MAX_PROJECT_FILE_BYTES+1;
+        char number[64];
+        if(value.n==0)snprintf(number,sizeof number,"0");else format_number(value.n,number,sizeof number);
+        return strlen(number);
+    }
+    size_t size=2;
+    if(value.t==LIST){
+        if(!value.list)return MAX_PROJECT_FILE_BYTES+1;
+        for(size_t i=0;i<value.list->len;i++){
+            size_t add=json_measure_value(value.list->items[i],depth+1);
+            size_t comma=i?1:0;
+            if(add>MAX_PROJECT_FILE_BYTES||add+comma>MAX_PROJECT_FILE_BYTES||size>MAX_PROJECT_FILE_BYTES-(add+comma))return MAX_PROJECT_FILE_BYTES+1;
+            size+=add+comma;
+        }
+        return size;
+    }
+    if(value.t==DICT){
+        if(!value.dict)return MAX_PROJECT_FILE_BYTES+1;
+        for(size_t i=0;i<value.dict->len;i++){
+            Val key=value.dict->keys[i];
+            if(key.t!=STR)return MAX_PROJECT_FILE_BYTES+1;
+            size_t key_size=json_measure_string(key.s?key.s:"");
+            size_t value_size=json_measure_value(value.dict->values[i],depth+1);
+            if(key_size>MAX_PROJECT_FILE_BYTES||value_size>MAX_PROJECT_FILE_BYTES)return MAX_PROJECT_FILE_BYTES+1;
+            size_t comma=i?1:0;
+            size_t add=key_size+1+value_size+comma;
+            if(add>MAX_PROJECT_FILE_BYTES||size>MAX_PROJECT_FILE_BYTES-add)return MAX_PROJECT_FILE_BYTES+1;
+            size+=add;
+        }
+        return size;
+    }
+    return MAX_PROJECT_FILE_BYTES+1;
+}
+static int json_render_alloc(Val value,char **out,size_t *length) {
+    size_t size=json_measure_value(value,0);
+    if(size>MAX_PROJECT_FILE_BYTES)return 0;
+    char *buffer=malloc(size+1);
+    if(!buffer)return 0;
+    size_t used=0;
+    if(!json_write_value(value,buffer,size+1,&used,0)){free(buffer);return 0;}
+    if(length)*length=used;
+    *out=buffer;return 1;
+}
+static Val call_native_io_builtin(const char *name,Val *args,int argc,int *handled) {
+    static const char *const names[]={"baca_file","baca","baca_json","tulis_file","tulis","tulis_json"};
+    *handled=0;
+    for(size_t i=0;i<sizeof names/sizeof names[0];i++)if(!strcmp(name,names[i])){*handled=1;break;}
+    if(!*handled)return num(0);
+    int writing=!strcmp(name,"tulis_file")||!strcmp(name,"tulis");
+    int writing_json=!strcmp(name,"tulis_json");
+    int reading_json=!strcmp(name,"baca_json");
+    if(argc!=(writing||writing_json?2:1)){
+        fail("built-in file membutuhkan jumlah argumen yang tidak sesuai");
+        return boolean(0);
+    }
+    if(args[0].t!=STR){
+        fail("path file harus berupa teks");
+        return boolean(0);
+    }
+    if(writing||writing_json){
+        if(args[1].t!=STR&&!writing_json){
+            fail("teks file harus berupa string");
+            return boolean(0);
+        }
+        if(writing){
+            size_t size=strlen(args[1].s?args[1].s:"");
+            return boolean(write_project_file(args[0].s,args[1].s?args[1].s:"",size));
+        }
+        int previous_suppress=suppress_eval;
+        int previous_err=err;
+        suppress_eval=1;err=0;
+        char *rendered=NULL;size_t length=0;
+        int ok=json_render_alloc(args[1],&rendered,&length);
+        suppress_eval=previous_suppress;err=previous_err;
+        if(!ok){free(rendered);return boolean(0);}
+        int written=write_project_file(args[0].s,rendered,length);
+        free(rendered);
+        return boolean(written);
+    }
+    size_t length=0;
+    char *content=read_project_file(args[0].s,&length);
+    if(!content)return boolean(0);
+    if(!reading_json){
+        Val result=string_n(content,length);
+        free(content);
+        return result;
+    }
+    int previous_suppress=suppress_eval;
+    int previous_err=err;
+    suppress_eval=1;err=0;
+    JsonParser jp={content,0,1};
+    Val parsed=json_parse_value(&jp,0);
+    json_ws(&jp);
+    int valid=jp.valid&&!err&&jp.source[jp.pos]=='\0';
+    suppress_eval=previous_suppress;err=previous_err;
+    free(content);
+    return valid?parsed:boolean(0);
 }
 
 #ifndef PUSINGCUK_VERSION
@@ -1846,10 +2080,6 @@ int main(int argc,char **argv) {
     if (register_top_level_functions()) run_range(0,program_count);
     int result=syntax_err?2:(err?1:0);
     for(int i=0;i<program_count;i++) free(program_lines[i]);
-    for(size_t i=0;i<allocated_list_count;i++) {
-        free(allocated_lists[i]->items);
-        free(allocated_lists[i]);
-    }
-    for(size_t i=0;i<allocated_dict_count;i++) free(allocated_dicts[i]);
+    cleanup_runtime_allocations();
     return result;
 }

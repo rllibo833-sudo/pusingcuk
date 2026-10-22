@@ -41,6 +41,40 @@ class NativeBootstrapPipelineTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.tmp.cleanup()
 
+    def test_native_file_builtins_handle_large_text_and_collections(self):
+        compiler_source = (ROOT / "examples" / "self_hosting" / "compiler.cuk").read_text(encoding="utf-8")
+        large_json = ROOT / ".pusingcuk-native-large-input.json"
+        large_text_out = ROOT / ".pusingcuk-native-large-text.txt"
+        large_json_out = ROOT / ".pusingcuk-native-large-output.json"
+        driver = self.directory / "file_builtins.cuk"
+        payload = {"items": list(range(400))}
+        large_json.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+        driver.write_text(
+            "jancuk\n"
+            'lah source = baca_file("examples/self_hosting/compiler.cuk")\n'
+            "hedeh panjang(source)\n"
+            'lah data = baca_json(".pusingcuk-native-large-input.json")\n'
+            'hedeh panjang(data["items"])\n'
+            'lah wrote_text = tulis_file(".pusingcuk-native-large-text.txt", source)\n'
+            "hedeh wrote_text\n"
+            'lah wrote_json = tulis_json(".pusingcuk-native-large-output.json", data)\n'
+            "hedeh wrote_json\n"
+            "selesai jancuk\n",
+            encoding="utf-8",
+        )
+        try:
+            result = subprocess.run(
+                [str(self.native), str(driver)], cwd=ROOT,
+                capture_output=True, text=True, timeout=30,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.splitlines(), [str(len(compiler_source)), "400", "okelah", "okelah"])
+            self.assertEqual(large_text_out.read_text(encoding="utf-8"), compiler_source)
+            self.assertEqual(json.loads(large_json_out.read_text(encoding="utf-8")), payload)
+        finally:
+            for path in (large_json, large_text_out, large_json_out):
+                path.unlink(missing_ok=True)
+
     def test_native_seed_codegen_and_vm_run_without_python_compiler(self):
         source = self.directory / "hello.cuk"
         source.write_text("jancuk\nhedeh 42\nselesai jancuk\n", encoding="utf-8")
