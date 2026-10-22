@@ -35,3 +35,6 @@ Jangan klaim .cuk self-hosted penuh sampai tahap pertama membangun compiler yang
 Setelah runtime native dibangun dengan make native, jalankan make native-compile FILE=program.cuk. Jalur ini meng-encode source melalui opsi native --json-quote, menjalankan compiler.cuk dan compiler_driver.cuk di runtime C untuk menghasilkan IR v1, menjalankan ir_codegen.cuk untuk menghasilkan bytecode, lalu mengeksekusinya dengan VM native. INPUT=berkas.txt dapat diberikan untuk stdin program hasil kompilasi. Tidak ada Python yang menjalankan parser, frontend, codegen, atau VM pada jalur ini.
 
 Ini menghilangkan Python dari jalur kompilasi dan eksekusi program, tetapi belum membuktikan compiler mandiri penuh: runtime C masih menjadi seed tepercaya, dan bootstrap tahap 2/3 compiler belum dibuktikan.
+
+
+Frontend `.cuk` memperlakukan pembungkus modul `jancuk` / `selesai jancuk` sebagai delimiter berkas, bukan statement di dalam program. Ini diperlukan agar source target yang normal bisa diproses lewat frontend native.
