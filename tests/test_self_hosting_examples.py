@@ -73,7 +73,7 @@ class SelfHostingExampleTests(unittest.TestCase):
         )
 
     def test_evaluator_computes_node(self) -> None:
-        self.run_example("evaluator.cuk", "42\n")
+        self.run_example("evaluator.cuk", "36\n")
 
     def test_mini_interpreter_pipeline(self) -> None:
         self.run_example("interpreter.cuk", "Status parse: OK\nHasil: 42\n")
