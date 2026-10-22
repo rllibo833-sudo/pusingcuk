@@ -659,7 +659,7 @@ static Val primary(void) {
             if (c=='\\') {
                 if (!*p) { syntax_fail("escape string tidak lengkap"); break; }
                 c=*p++;
-                if (c=='n') c='\n'; else if (c=='t') c='\t';
+                if (c=='n') c='\n'; else if (c=='t') c='\t'; else if (c=='r') c='\r';
                 else if (c!='"' && c!='\\') { syntax_fail("escape string tidak dikenal"); }
             }
             if (n+1<SZ) buf[n++]=c; else fail("string terlalu panjang");

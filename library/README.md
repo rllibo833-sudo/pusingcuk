@@ -33,3 +33,8 @@ python pusingcuk_new.py library/loops_functions_genz.pusingcuk
 Interpreter referensi Python mendukung kontrak built-in lebih luas daripada beberapa backend. Native C, JavaScript, transpiler Python/HTML, dan VM memiliki cakupan berbeda. Lihat [kompatibilitas](../docs/COMPATIBILITY.md), [katalog built-in](../docs/language/BUILTINS.md), dan `builtin_contract.json`.
 
 PusingCuk tidak menjamin sandbox OS untuk kode tidak tepercaya.
+
+
+## String literal escapes
+
+String literals on the native C runtime accept `\\n`, `\\t`, `\\r`, `\\"`, and `\\\\`. The self-hosting lexer uses carriage-return escapes when scanning source text, so native execution must preserve this contract.

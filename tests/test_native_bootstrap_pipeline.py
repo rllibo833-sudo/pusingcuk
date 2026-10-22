@@ -75,6 +75,19 @@ class NativeBootstrapPipelineTests(unittest.TestCase):
             for path in (large_json, large_text_out, large_json_out):
                 path.unlink(missing_ok=True)
 
+    def test_native_runtime_accepts_carriage_return_escape_used_by_frontend(self):
+        source = self.directory / "carriage_return.cuk"
+        source.write_text(
+            'jancuk\\nhedeh panjang("a\\\\rb")\\nselesai jancuk\\n',
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [str(self.native), str(source)], cwd=ROOT,
+            capture_output=True, text=True, timeout=10,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "3\\n")
+
     def test_native_only_pipeline_compiles_and_runs_functions(self):
         source = self.directory / "function.cuk"
         source.write_text(
