@@ -75,10 +75,18 @@ fungsi ekspresi(n, s)
 selesai fungsi
 
 fungsi pernyataan(items, s, in_function)
+    lah k = ""
+    lah f = {}
+    lah l = 1
+    b = 0
+    e = 0
+    start = 0
+    end = 0
+    slot = 0
     untuk n dalam items
-        lah k = n["kind"]
-        lah f = n["fields"]
-        lah l = n["line"]
+        k = n["kind"]
+        f = n["fields"]
+        l = n["line"]
         njir k == "Try" atau k == "Attribute"
             s["error"] = "baris " + teks(l) + ": node belum didukung: " + k
         selesai njir
@@ -110,11 +118,11 @@ fungsi pernyataan(items, s, in_function)
         selesai njir
         njir k == "If"
             ekspresi(f["condition"], s)
-            lah b = panjang(s["code"])
+            b = panjang(s["code"])
             emit(s, "JUMP_IF_FALSE", s["null"], l)
             pernyataan(f["then_body"], s, in_function)
             njir panjang(f["else_body"]) > 0
-                lah e = panjang(s["code"])
+                e = panjang(s["code"])
                 emit(s, "JUMP", s["null"], l)
                 s["code"][b][1] = panjang(s["code"])
                 pernyataan(f["else_body"], s, in_function)
@@ -124,9 +132,9 @@ fungsi pernyataan(items, s, in_function)
             selesai njir
         selesai njir
         njir k == "While"
-            lah start = panjang(s["code"])
+            start = panjang(s["code"])
             ekspresi(f["condition"], s)
-            lah end = panjang(s["code"])
+            end = panjang(s["code"])
             emit(s, "JUMP_IF_FALSE", s["null"], l)
             pernyataan(f["body"], s, in_function)
             emit(s, "JUMP", start, l)
@@ -134,11 +142,11 @@ fungsi pernyataan(items, s, in_function)
         selesai njir
         njir k == "For"
             ekspresi(f["iterable"], s)
-            lah slot = s["slot"]
+            slot = s["slot"]
             s["slot"] = slot + 1
             emit(s, "ITER_INIT", slot, l)
-            lah start = panjang(s["code"])
-            lah end = panjang(s["code"])
+            start = panjang(s["code"])
+            end = panjang(s["code"])
             emit(s, "ITER_NEXT", [slot, f["name"], s["null"]], l)
             pernyataan(f["body"], s, in_function)
             emit(s, "JUMP", start, l)
@@ -189,16 +197,19 @@ fungsi compile_ir(d)
     lah body = d["program"]["fields"]["body"]
     lah names = []
     lah functions = {}
+    lah name = ""
+    lah duplicate = salah
+    lah fn = {}
     untuk n dalam body
         njir n["kind"] == "Function"
-            lah name = n["fields"]["name"]
+            name = n["fields"]["name"]
             untuk prior dalam names
                 njir prior == name
                     balek {"error": "fungsi duplikat: " + name, "bytecode": {}}
                 selesai njir
             selesai untuk
             names = names + [name]
-            lah fn = compile_function(n)
+            fn = compile_function(n)
             njir fn["error"] != ""
                 balek {"error": fn["error"], "bytecode": {}}
             selesai njir
