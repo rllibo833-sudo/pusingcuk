@@ -8,7 +8,7 @@ LANGUAGE_VERSION ?= 0.6-dev
 PREFIX ?= /usr/local
 DESTDIR ?=
 
-.PHONY: native run-native native-bootstrap run-native-bootstrap test test-native test-cli test-registered-rules version language-version install package
+.PHONY: native run-native native-selfhost-frontend run-native-selfhost-frontend native-bootstrap run-native-bootstrap test test-native test-cli test-registered-rules version language-version install package
 
 version:
 	@printf '%s\n' '$(VERSION)'
@@ -27,6 +27,14 @@ native:
 run-native: native
 	@test -n "$(FILE)" || (echo "Gunakan: make run-native FILE=program.cuk" >&2; exit 2)
 	"$(NATIVE_BIN)" "$(FILE)"
+
+
+# Jalankan compiler.cuk melalui runtime C; stdin berisi JSON {source_name, source}.
+native-selfhost-frontend: native
+	@test -n "$(PAYLOAD)" || (echo 'Gunakan: make run-native-selfhost-frontend PAYLOAD=payload.json' >&2; exit 2)
+	"$(NATIVE_BIN)" examples/self_hosting/compiler.cuk < "$(PAYLOAD)"
+
+run-native-selfhost-frontend: native-selfhost-frontend
 
 # Native source frontend: .cuk -> native lexer/parser/AST -> IR v1 JSON.
 native-bootstrap:

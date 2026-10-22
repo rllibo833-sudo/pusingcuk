@@ -19,6 +19,10 @@ Parser frontend menangani deklarasi, assignment variabel dan indeks, output, pem
 
 parser.cuk, evaluator.cuk, interpreter.cuk, dan codegen.cuk tetap dipertahankan sebagai contoh mini tahap compiler; semuanya bukan implementasi compiler lengkap.
 
+## Menjalankan frontend `.cuk` dengan runtime native C
+
+`compiler.cuk` menyediakan driver JSON pada stdin. Bangun runtime C dengan `make native`, lalu jalankan `./pusingcuk-native examples/self_hosting/compiler.cuk < payload.json`, dengan payload JSON yang memiliki `source_name` dan `source`. Jalur ini menjalankan lexer/parser/AST/IR yang ditulis dalam `.cuk` melalui runtime native C; Python tidak mem-parsing source target. Tes `test_checked_in_cuk_frontend_runs_on_native_c_runtime` membandingkan IR-nya dengan kontrak referensi.
+
 ## Status self-hosting
 
 Frontend .cuk kini memiliki tes yang mem-parsing sumber frontend-nya sendiri dan membandingkan AST IR dengan parser referensi. Eksekusi frontend masih di-host oleh `Evaluator` Python di `evaluator.py` (runtime yang juga digunakan oleh `pusingcuk_new.py`); validasi IR dan kompilasi bytecode juga masih memakai implementasi Python. compiler/bootstrap.py saat ini hanya memverifikasi pengulangan build pada jalur host yang sama, bukan bootstrap mandiri dua tahap.

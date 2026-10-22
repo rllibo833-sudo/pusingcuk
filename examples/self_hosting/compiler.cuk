@@ -1483,51 +1483,20 @@ fungsi ir_document(program, source_name)
 selesai fungsi
 
 
-lah contoh = "lah x = 12 + 3\nhedeh x # komentar\n"
-render_tokens(pindai(contoh))
-
-lah ast = parse_source(pindai("2 + 3 * 4"))
-hedeh "PRECEDENCE_" + ast["status"]
-njir ast["status"] == "OK"
-    hedeh evaluasi(ast["node"], {})
+# Driver produksi: compiler .cuk membaca payload JSON melalui stdin.
+# Jalankan dengan runtime native C; tidak ada Python yang mem-parsing source target.
+tanya input_payload_json = ""
+lah input_payload = jadi_json(input_payload_json)
+njir input_payload == salah
+    hedeh "SELFHOST_INPUT_ERROR"
+kampret
+    lah ir_source_name = input_payload["source_name"]
+    lah source_input = input_payload["source"]
+    lah hasil_parse = parse_program(pindai(source_input))
+    njir hasil_parse["status"] != "OK"
+        hedeh "SELFHOST_PARSE_ERROR:" + teks(hasil_parse["index"])
+    kampret
+        hedeh ir_document(hasil_parse["node"], ir_source_name)
+    selesai njir
 selesai njir
-
-lah ast_group = parse_source(pindai("(2 + 3) * 4"))
-hedeh "PARENS_" + ast_group["status"]
-njir ast_group["status"] == "OK"
-    hedeh evaluasi(ast_group["node"], {})
-selesai njir
-
-lah ast_modulo = parse_source(pindai("17 % 5"))
-hedeh "MODULO_" + ast_modulo["status"]
-njir ast_modulo["status"] == "OK"
-    hedeh evaluasi(ast_modulo["node"], {})
-selesai njir
-
-lah ast_negative = parse_source(pindai("-3 * 4"))
-hedeh "UNARY_" + ast_negative["status"]
-njir ast_negative["status"] == "OK"
-    hedeh evaluasi(ast_negative["node"], {})
-selesai njir
-
-lah ast_invalid = parse_source(pindai("7 %"))
-hedeh "INVALID_" + ast_invalid["status"]
-
-lah ast_program = parse_program(pindai("lah x = 2 + 3\nx = x + 4\nhedeh x\nlah y = (x + 1) * 2\nhedeh y\n"))
-hedeh "PROGRAM_" + ast_program["status"]
-njir ast_program["status"] == "OK"
-    lah hasil_program = jalankan_program(ast_program["node"])
-    hedeh panjang(ast_program["node"]["statements"])
-    hedeh hasil_program["output"][0]
-    hedeh hasil_program["output"][1]
-    hedeh hasil_program["lingkungan"]["x"]
-    hedeh hasil_program["lingkungan"]["y"]
-selesai njir
-
-lah ast_assignment_invalid = parse_program(pindai("z = 9\n"))
-lah hasil_assignment_invalid = jalankan_program(ast_assignment_invalid["node"])
-hedeh "INVALID_ASSIGNMENT_" + hasil_assignment_invalid["status"]
-
-lah ast_program_invalid = parse_program(pindai("lah = 4\n"))
-hedeh "INVALID_PROGRAM_" + ast_program_invalid["status"]
 selesai jancuk

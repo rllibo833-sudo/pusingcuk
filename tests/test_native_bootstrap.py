@@ -56,6 +56,37 @@ class NativeBootstrapTests(unittest.TestCase):
    self.assertEqual(doc["source_map"],canonical["source_map"])
    self.assertEqual(doc["features"],canonical["features"])
    self.assertIn("control-flow",doc["features"])
+ def test_checked_in_cuk_frontend_runs_on_native_c_runtime(self):
+  with tempfile.TemporaryDirectory() as d:
+   d=Path(d);binary=d/"pusingcuk-native"
+   built=subprocess.run([CC,"-std=c11","-O2","-Wall","-Wextra","-Wno-misleading-indentation","native/pusingcuk.c","-lm","-o",str(binary)],cwd=ROOT,text=True,capture_output=True,timeout=60)
+   self.assertEqual(built.returncode,0,built.stderr)
+   compiler=ROOT/"examples/self_hosting/compiler.cuk"
+   source=("jancuk\n"
+           "lah data = [1, 2, 3]\n"
+           "data[1] = 7\n"
+           "lah mapping = {\"value\": data[1]}\n"
+           "fungsi pilih(a)\n"
+           "    njir a > 0\n"
+           "        balek mapping[\"value\"]\n"
+           "    kampret\n"
+           "        balek 0\n"
+           "    selesai njir\n"
+           "selesai fungsi\n"
+           "hedeh pilih(1)\n"
+           "selesai jancuk\n")
+   payload=json.dumps({"source_name":"native-selfhost-probe.cuk","source":source},ensure_ascii=False,separators=(",",":"))+"\n"
+   out=subprocess.run([str(binary),str(compiler)],input=payload,capture_output=True,text=True,timeout=60)
+   self.assertEqual(out.returncode,0,out.stderr)
+   lines=out.stdout.splitlines()
+   self.assertTrue(lines, "native .cuk frontend emitted no IR")
+   doc=json.loads(lines[-1])
+   from compiler.ir import validate,from_source
+   validate(doc)
+   canonical=from_source(source,"native-selfhost-probe.cuk")
+   self.assertEqual(doc["program"],canonical["program"])
+   self.assertEqual(doc["source_map"],canonical["source_map"])
+   self.assertEqual(doc["features"],canonical["features"])
  def test_unsupported_syntax_fails_closed(self):
   with tempfile.TemporaryDirectory() as d:
    d=Path(d);b=d/"cukc";built=self.build(b);self.assertEqual(built.returncode,0,built.stderr)
