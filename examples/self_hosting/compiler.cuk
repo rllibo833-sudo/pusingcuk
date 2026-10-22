@@ -649,7 +649,11 @@ fungsi parse_program(tokens)
     mumet i < panjang(tokens)
         njir tokens[i]["jenis"] == "NEWLINE" atau tokens[i]["jenis"] == "EOF"
             njir panjang(line_tokens) > 0
-                njir line_tokens[0]["nilai"] == "kampret" dan panjang(line_tokens) == 1
+                njir (line_tokens[0]["nilai"] == "jancuk" dan panjang(line_tokens) == 1) atau (line_tokens[0]["nilai"] == "selesai" dan panjang(line_tokens) == 2 dan line_tokens[1]["nilai"] == "jancuk")
+                    # Wrapper berkas .cuk adalah batas modul, bukan statement program.
+                    line_tokens = []
+                kampret
+                    njir line_tokens[0]["nilai"] == "kampret" dan panjang(line_tokens) == 1
                     current = contexts[depth]
                     njir current["jenis"] != "IF" atau current["aktif_else"]
                         balek node_gagal(i)
