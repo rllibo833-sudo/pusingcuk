@@ -45,7 +45,7 @@ run-native-compile: native-compile
 
 # Jalankan evaluator AST yang ditulis dalam .cuk pada runtime native, tanpa Python.
 run-native-evaluator: native
-	tools/run-native-evaluator.sh "$(NATIVE_BIN)"
+	sh tools/run-native-evaluator.sh "$(NATIVE_BIN)"
 
 # Native source frontend: .cuk -> native lexer/parser/AST -> IR v1 JSON.
 native-bootstrap:
