@@ -1285,7 +1285,10 @@ static void printval(Val v) {
 
 #define MAX_LINES 20000
 #define MAX_STEPS 100000
-#define MAX_ITER 10000
+#ifndef PUSINGCUK_MAX_ITERATIONS
+#define PUSINGCUK_MAX_ITERATIONS 10000
+#endif
+#define MAX_ITER PUSINGCUK_MAX_ITERATIONS
 static char *program_lines[MAX_LINES];
 static int program_count, steps;
 
