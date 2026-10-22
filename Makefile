@@ -8,7 +8,7 @@ LANGUAGE_VERSION ?= 0.6-dev
 PREFIX ?= /usr/local
 DESTDIR ?=
 
-.PHONY: native run-native native-selfhost-frontend run-native-selfhost-frontend native-compile run-native-compile native-bootstrap run-native-bootstrap test test-native test-cli test-registered-rules version language-version install package
+.PHONY: native run-native native-selfhost-frontend run-native-selfhost-frontend native-compile run-native-compile run-native-evaluator native-bootstrap run-native-bootstrap test test-native test-cli test-registered-rules version language-version install package
 
 version:
 	@printf '%s\n' '$(VERSION)'
@@ -42,6 +42,10 @@ native-compile: native
 	@if [ -n "$(INPUT)" ]; then tools/cukc-native.sh "$(NATIVE_BIN)" "$(FILE)" "$(INPUT)"; else tools/cukc-native.sh "$(NATIVE_BIN)" "$(FILE)"; fi
 
 run-native-compile: native-compile
+
+# Jalankan evaluator AST yang ditulis dalam .cuk pada runtime native, tanpa Python.
+run-native-evaluator: native
+	tools/run-native-evaluator.sh "$(NATIVE_BIN)"
 
 # Native source frontend: .cuk -> native lexer/parser/AST -> IR v1 JSON.
 native-bootstrap:
