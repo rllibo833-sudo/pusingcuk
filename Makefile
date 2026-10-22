@@ -112,18 +112,13 @@ test-native: native test-cli test-registered-rules
 	fi; \
 	$(NATIVE_BIN) tests/native/numeric_large_finite.pusingcuk > $(CURDIR)/pusingcuk-numeric-large.out; \
 	grep -qx '1e+308' $(CURDIR)/pusingcuk-numeric-large.out
-	@if $(NATIVE_BIN) tests/native/string_concat_overflow.pusingcuk >/dev/null 2>&1; then \
-		echo 'penggabungan string melebihi batas seharusnya gagal' >&2; exit 1; \
-	fi
-	@if $(NATIVE_BIN) tests/native/list_overflow.pusingcuk >/dev/null 2>&1; then \
-		echo 'list melebihi 256 item seharusnya gagal' >&2; exit 1; \
-	fi
-	@if $(NATIVE_BIN) tests/native/dictionary_overflow.pusingcuk >/dev/null 2>&1; then \
-		echo 'kamus melebihi 256 entri seharusnya gagal' >&2; exit 1; \
-	fi
+	@$(NATIVE_BIN) tests/native/string_concat_overflow.pusingcuk > $(CURDIR)/pusingcuk-string-large.out
+	@wc -c < $(CURDIR)/pusingcuk-string-large.out | grep -qx '1025'
+	@actual="$($(NATIVE_BIN) tests/native/list_overflow.pusingcuk)"; test "$actual" = "257"
+	@actual="$($(NATIVE_BIN) tests/native/dictionary_overflow.pusingcuk)"; test "$actual" = "257"
 	@$(NATIVE_BIN) tests/native/string_concat_limit.pusingcuk > $(CURDIR)/pusingcuk-string-limit.out
 	@wc -c < $(CURDIR)/pusingcuk-string-limit.out | grep -qx '1024'
-	@rm -f $(CURDIR)/pusingcuk-string-limit.out
+	@rm -f $(CURDIR)/pusingcuk-string-limit.out $(CURDIR)/pusingcuk-string-large.out
 
 	@actual="$$($(NATIVE_BIN) examples/core/anggaran_threshold.cuk)"; \
 	 expected="$$(printf 'DALAM_BATAS\nDALAM_BATAS\nPERLU_PERSETUJUAN\nINPUT_TIDAK_VALID\nINPUT_TIDAK_VALID')"; \
