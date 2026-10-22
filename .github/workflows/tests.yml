@@ -94,4 +94,11 @@ jobs:
             make native-compile FILE=examples/self_hosting/ir_stage.cuk INPUT="$bootstrap_ir" > "$bootstrap_ir.out"
             grep -q '"format":"pusingcuk-ir"' "$bootstrap_ir.out"
             rm -f "$bootstrap_ir" "$bootstrap_ir.out"
+            # Compile and execute the .cuk frontend+driver itself through the native VM.
+            sed "\$d" examples/self_hosting/compiler.cuk > "$bootstrap_ir.selfhost.cuk"
+            sed "1d;\$d" examples/self_hosting/compiler_driver.cuk >> "$bootstrap_ir.selfhost.cuk"
+            printf "%s\n" "selesai jancuk" >> "$bootstrap_ir.selfhost.cuk"
+            printf "%s\n" "{\"source_name\":\"probe.cuk\",\"source\":\"jancuk\\nhedeh 123\\nselesai jancuk\\n\"}" > "$bootstrap_ir.payload"
+            make native-compile FILE="$bootstrap_ir.selfhost.cuk" INPUT="$bootstrap_ir.payload" > "$bootstrap_ir.selfhost.out"
+            grep -q '"format":"pusingcuk-ir"' "$bootstrap_ir.selfhost.out"
           '
