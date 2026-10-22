@@ -1476,7 +1476,6 @@ typedef struct { PvmOp op; Val value; const char *name; const char *operator_nam
 typedef struct { const char *name; const char **params; int param_count; const PvmInstruction *code; size_t code_count; } PvmFunction;
 typedef struct { Val iterable; size_t index; int active; } PvmIterator;
 typedef struct { Val stack[PVM_MAX_STACK]; size_t top; unsigned steps; const PvmFunction *functions; size_t function_count; PvmIterator iterators[10001]; } PvmState;
-static void pvm_init(PvmState *vm) { memset(vm,0,sizeof *vm); }
 static int pvm_push(PvmState *vm, Val v) {
     if (vm->top >= PVM_MAX_STACK) { fail("PVM stack melampaui batas"); return 0; }
     vm->stack[vm->top++] = v; return 1;

@@ -1,31 +1,58 @@
-"""End-to-end parity tests for the .cuk IR v1 bytecode generator."""
+"""Parity tests for .cuk IR code generation executed by the native C runtime."""
 from __future__ import annotations
+
 import json
+import shutil
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+
 from compiler.bytecode import compile_ir
 from compiler.ir import from_source
 
 ROOT = Path(__file__).resolve().parents[1]
 CODEGEN = ROOT / "examples" / "self_hosting" / "ir_codegen.cuk"
 
+
 def program(*lines):
     return chr(10).join(("jancuk", *lines, "selesai jancuk", ""))
 
+
 class IRCukCodegenParityTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        compiler = next((shutil.which(name) for name in ("cc", "gcc", "clang") if shutil.which(name)), None)
+        if compiler is None:
+            raise unittest.SkipTest("native C compiler is not installed")
+        cls._temporary = tempfile.TemporaryDirectory(prefix="pusingcuk-native-codegen-")
+        cls.native_binary = str(Path(cls._temporary.name) / "pusingcuk-native")
+        subprocess.run(
+            [
+                compiler, "-std=c11", "-O2", "-Wall", "-Wextra",
+                str(ROOT / "native" / "pusingcuk.c"), "-lm", "-o", cls.native_binary,
+            ],
+            cwd=ROOT, check=True, capture_output=True, text=True, timeout=90,
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        temporary = getattr(cls, "_temporary", None)
+        if temporary is not None:
+            temporary.cleanup()
+
     def run_codegen(self, ir):
         payload = json.dumps(ir, ensure_ascii=False, separators=(",", ":"))
-        self.assertLessEqual(len(payload.encode()), 1023, "IR exceeds json_baca builtin limit")
+        self.assertLessEqual(len(payload.encode()), 1023, "IR exceeds native json_baca builtin limit")
         result = subprocess.run(
-            [sys.executable, str(ROOT / "pusingcuk_new.py"), str(CODEGEN)],
+            [self.native_binary, str(CODEGEN)],
             cwd=ROOT, input=payload + chr(10), capture_output=True, text=True, timeout=30,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertFalse(result.stdout.startswith("BYTECODE_ERROR:"), result.stdout)
         output = result.stdout.strip()
-        self.assertLessEqual(len(output.encode()), 1023, "bytecode exceeds json_teks builtin limit")
+        self.assertLessEqual(len(output.encode()), 1023, "bytecode exceeds native json_teks builtin limit")
         actual = json.loads(output)
         self.assertEqual(actual["format"], "pusingcuk-bytecode")
         self.assertEqual(actual["bytecode_version"], 1)
@@ -51,7 +78,7 @@ class IRCukCodegenParityTests(unittest.TestCase):
             "fields": {"body": [], "handler_name": None, "handler": [], "final": []},
         }]
         result = subprocess.run(
-            [sys.executable, str(ROOT / "pusingcuk_new.py"), str(CODEGEN)],
+            [self.native_binary, str(CODEGEN)],
             cwd=ROOT, input=json.dumps(ir, separators=(",", ":")) + chr(10),
             capture_output=True, text=True, timeout=30,
         )
@@ -65,13 +92,14 @@ class IRCukCodegenParityTests(unittest.TestCase):
             "kind": "Return", "line": 1, "fields": {"value": None},
         }]
         result = subprocess.run(
-            [sys.executable, str(ROOT / "pusingcuk_new.py"), str(CODEGEN)],
+            [self.native_binary, str(CODEGEN)],
             cwd=ROOT, input=json.dumps(ir, separators=(",", ":")) + chr(10),
             capture_output=True, text=True, timeout=30,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("BYTECODE_ERROR:", result.stdout)
         self.assertIn("balek hanya boleh di dalam fungsi", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
