@@ -618,9 +618,9 @@ static Val primary(void) {
             return call_user_function(name, args, argc);
         }
         if (suppress_eval) {
-            if (take("[")) {
+            while (take("[")) {
                 (void)expr();
-                if (!take("]")) syntax_fail("kurung siku tutup ']' diharapkan");
+                if (!take("]")) { syntax_fail("kurung siku tutup ']' diharapkan"); return num(0); }
             }
             return num(0);
         }
@@ -631,32 +631,34 @@ static Val primary(void) {
                 value=vars[i].v; found=1; break;
             }
         if (!found) { fail("variabel belum dibuat"); return num(0); }
-        if (take("[")) {
+        while (take("[")) {
             Val idx=expr();
-            if (!take("]")) syntax_fail("kurung siku tutup ']' diharapkan");
+            if (!take("]")) { syntax_fail("kurung siku tutup ']' diharapkan"); return num(0); }
             if (value.t == STR) {
                 size_t start=0, end=0;
                 if (!string_index(value,idx,&start,&end)) return string("");
                 char ch[SZ]; size_t len=end-start;
                 memcpy(ch,value.s+start,len); ch[len]=0;
-                return string(ch);
-            }
-            if (value.t == DICT) return dict_get(value.dict,idx);
-            if (value.t == RANGE) {
+                value=string(ch);
+            } else if (value.t == DICT) {
+                value=dict_get(value.dict,idx);
+            } else if (value.t == RANGE) {
                 double length = range_length(value);
                 if (idx.t != NUM || !isfinite(idx.n) || idx.n < 0 ||
                     idx.n != trunc(idx.n) || idx.n >= length) {
                     fail("indeks rentang di luar batas atau bukan bilangan bulat");
                     return num(0);
                 }
-                return checked_safe_integer(
+                value=checked_safe_integer(
                     value.range_start + idx.n * value.range_step,
                     "indeks rentang menghasilkan angka tidak valid",
                     "indeks rentang di luar rentang aman lintas target");
+            } else {
+                size_t at=0;
+                if (!list_index(value,idx,&at)) return num(0);
+                value=value.list->items[at];
             }
-            size_t at=0;
-            if (!list_index(value,idx,&at)) return num(0);
-            return value.list->items[at];
+            if (err) return num(0);
         }
         return value;
     }
@@ -1471,8 +1473,8 @@ static Val call_user_function(const char *name, Val *args, int argc) {
 #define PVM_MAX_STACK 4096
 #define PVM_MAX_STEPS 10000000
 #define PVM_MAX_DEPTH 64
-typedef enum { PVM_CONST, PVM_LOAD, PVM_BINARY, PVM_CALL, PVM_RETURN, PVM_DECLARE, PVM_STORE, PVM_POP, PVM_GET, PVM_MAKE_LIST, PVM_MAKE_DICT, PVM_UNARY, PVM_TO_BOOL, PVM_JUMP, PVM_JUMP_IF_FALSE, PVM_ITER_INIT, PVM_ITER_NEXT, PVM_PRINT } PvmOp;
-typedef struct { PvmOp op; Val value; const char *name; const char *operator_name; int argc; int target; int slot; const char *iter_name; } PvmInstruction;
+typedef enum { PVM_CONST, PVM_LOAD, PVM_BINARY, PVM_CALL, PVM_RETURN, PVM_DECLARE, PVM_STORE, PVM_INPUT, PVM_POP, PVM_GET, PVM_SET_INDEX, PVM_MAKE_LIST, PVM_MAKE_DICT, PVM_UNARY, PVM_TO_BOOL, PVM_JUMP, PVM_JUMP_IF_FALSE, PVM_JUMP_IF_TRUE, PVM_ITER_INIT, PVM_ITER_NEXT, PVM_PRINT } PvmOp;
+typedef struct { PvmOp op; Val value; const char *name; const char *operator_name; int argc; int target; int slot; const char *iter_name; int line; } PvmInstruction;
 typedef struct { const char *name; const char **params; int param_count; const PvmInstruction *code; size_t code_count; } PvmFunction;
 typedef struct { Val iterable; size_t index; int active; } PvmIterator;
 typedef struct { Val stack[PVM_MAX_STACK]; size_t top; unsigned steps; const PvmFunction *functions; size_t function_count; PvmIterator iterators[10001]; } PvmState;
@@ -1513,7 +1515,7 @@ Val pvm_execute(PvmState *vm,const PvmInstruction *code,size_t count,unsigned de
     if(depth>PVM_MAX_DEPTH){fail("kedalaman CALL PVM terlampaui");return (Val){.t=NIL};}
     size_t base=vm->top;
     for(size_t pc=0;pc<count&&!err;){
-        const PvmInstruction *in=&code[pc];
+        const PvmInstruction *in=&code[pc];line_no=in->line>0?in->line:1;
         if(++vm->steps>PVM_MAX_STEPS){fail("batas instruksi PVM tercapai");break;}
         pc++;
         switch(in->op){
@@ -1526,6 +1528,17 @@ Val pvm_execute(PvmState *vm,const PvmInstruction *code,size_t count,unsigned de
             snprintf(vars[nvars].name,sizeof vars[nvars].name,"%s",in->name);vars[nvars++].v=v;break;
         }
         case PVM_STORE:{int i=in->name?pvm_find_var(in->name):-1;if(i<0){fail("STORE PVM: variabel belum dibuat");break;}Val v=pvm_pop(vm);if(!err)vars[i].v=v;break;}
+        case PVM_INPUT:{
+            Val prompt=pvm_pop(vm);if(err)break;
+            if(!in->name||prompt.t!=STR){fail("INPUT PVM membutuhkan nama dan prompt teks");break;}
+            if(pvm_find_var(in->name)>=0){fail("INPUT PVM: variabel sudah dibuat");break;}
+            if(nvars>=NV){fail("slot variabel INPUT PVM habis");break;}
+            char input[SZ];fputs(prompt.s,stdout);fflush(stdout);
+            if(!fgets(input,sizeof input,stdin)){fail("gagal membaca input bytecode");break;}
+            size_t len=strlen(input);if(len&&input[len-1]=='\n')input[--len]=0;if(len&&input[len-1]=='\r')input[--len]=0;
+            if(len==sizeof input-1&&!feof(stdin)){int ch;while((ch=getchar())!='\n'&&ch!=EOF){}fail("input bytecode terlalu panjang");break;}
+            snprintf(vars[nvars].name,sizeof vars[nvars].name,"%s",in->name);vars[nvars++].v=string(input);break;
+        }
         case PVM_POP:(void)pvm_pop(vm);break;
         case PVM_GET:{
             Val key=pvm_pop(vm), collection=pvm_pop(vm), result={.t=NIL};if(err)break;
@@ -1534,6 +1547,13 @@ Val pvm_execute(PvmState *vm,const PvmInstruction *code,size_t count,unsigned de
             else if(collection.t==STR){size_t a,b;if(string_index(collection,key,&a,&b)){char tmp[SZ];size_t n=b-a;if(n>=sizeof tmp)n=sizeof tmp;memcpy(tmp,collection.s+a,n);tmp[n]='\0';result=string(tmp);}}
             else fail("GET PVM hanya mendukung dict, list, dan teks");
             if(!err)pvm_push(vm,result);break;
+        }
+        case PVM_SET_INDEX:{
+            Val value=pvm_pop(vm),key=pvm_pop(vm),collection=pvm_pop(vm);if(err)break;
+            if(collection.t==LIST&&collection.list){size_t idx;if(list_index(collection,key,&idx))collection.list->items[idx]=value;}
+            else if(collection.t==DICT&&collection.dict)dict_set(collection.dict,key,value);
+            else fail("SET_INDEX PVM hanya mendukung list dan dictionary");
+            break;
         }
         case PVM_MAKE_LIST:{
             int n=in->argc;if(n<0||n>MAX_LIST_ITEMS|| (size_t)n>vm->top-base){fail("MAKE_LIST operand tidak valid");break;}
@@ -1557,9 +1577,11 @@ Val pvm_execute(PvmState *vm,const PvmInstruction *code,size_t count,unsigned de
         case PVM_TO_BOOL:{Val v=pvm_pop(vm);if(!err)pvm_push(vm,boolean(truth(v)));break;}
         case PVM_JUMP:
             if(in->target<0||(size_t)in->target>count){fail("target JUMP PVM di luar kode");break;}pc=(size_t)in->target;break;
-        case PVM_JUMP_IF_FALSE:{
+        case PVM_JUMP_IF_FALSE:
+        case PVM_JUMP_IF_TRUE:{
             Val v=pvm_pop(vm);if(err)break;
-            if(!truth(v)){if(in->target<0||(size_t)in->target>count)fail("target JUMP_IF_FALSE di luar kode");else pc=(size_t)in->target;}break;
+            int should_jump=(in->op==PVM_JUMP_IF_FALSE)?!truth(v):truth(v);
+            if(should_jump){if(in->target<0||(size_t)in->target>count)fail("target conditional jump PVM di luar kode");else pc=(size_t)in->target;}break;
         }
         case PVM_ITER_INIT:{
             Val iterable=pvm_pop(vm);if(err)break;
@@ -1600,6 +1622,13 @@ Val pvm_execute(PvmState *vm,const PvmInstruction *code,size_t count,unsigned de
                 if(args[0].t==NUM)n=args[0].n;else if(args[0].t==STR){errno=0;n=strtod(args[0].s,&end);if(errno||end==args[0].s||*end||!isfinite(n)){fail("konversi angka PVM gagal");break;}}else {fail("konversi angka PVM menerima angka atau teks");break;}
                 pvm_push(vm,checked_num(n,"konversi angka tidak finite"));break;
             }
+            int conversion_handled=0;Val conversion=call_native_conversion_builtin(in->name,args,in->argc,&conversion_handled);
+            if(conversion_handled){if(!err)pvm_push(vm,conversion);break;}
+            int format_handled=0;Val formatted=call_native_format_builtin(in->name,args,in->argc,&format_handled);
+            if(format_handled){if(!err)pvm_push(vm,formatted);break;}
+            int numeric_handled=0;Val numeric=call_native_numeric_builtin(in->name,args,in->argc,&numeric_handled);
+            if(numeric_handled){if(!err)pvm_push(vm,numeric);break;}
+            if(is_builtin_name(in->name)){fail("built-in belum didukung pada PVM native");break;}
             const PvmFunction *fn=NULL;
             for(size_t i=0;i<vm->function_count;i++)if(vm->functions[i].name&&!strcmp(vm->functions[i].name,in->name)){fn=&vm->functions[i];break;}
             if(!fn||fn->param_count!=in->argc||in->argc>MAX_PARAMS){fail("fungsi PVM tidak ditemukan atau aritas salah");break;}
@@ -1612,6 +1641,123 @@ Val pvm_execute(PvmState *vm,const PvmInstruction *code,size_t count,unsigned de
         }
     }
     Val result=vm->top>base?pvm_pop(vm):(Val){.t=NIL};vm->top=base;return result;
+}
+
+#define PVM_MAX_CODE 100000
+#define PVM_MAX_JSON_BYTES (32u * 1024u * 1024u)
+static char *pvm_copy_text(const char *s) {
+    size_t n=strlen(s)+1; char *out=malloc(n); if(out)memcpy(out,s,n); return out;
+}
+static Val pvm_field(Val object,const char *key) {
+    if(object.t!=DICT||!object.dict)return (Val){.t=NIL};
+    for(size_t i=0;i<object.dict->len;i++)
+        if(object.dict->keys[i].t==STR&&!strcmp(object.dict->keys[i].s,key))return object.dict->values[i];
+    return (Val){.t=NIL};
+}
+static int pvm_integer(Val v,int *out) {
+    if(v.t!=NUM||!isfinite(v.n)||v.n<0||v.n>10000000||floor(v.n)!=v.n)return 0;
+    *out=(int)v.n;return 1;
+}
+static int pvm_decode_code(Val encoded,PvmInstruction **out,size_t *out_count) {
+    if(encoded.t!=LIST||!encoded.list||encoded.list->len>PVM_MAX_CODE)return 0;
+    size_t count=encoded.list->len;
+    PvmInstruction *code=calloc(count?count:1,sizeof *code);if(!code)return 0;
+    for(size_t i=0;i<count;i++){
+        Val ins=encoded.list->items[i];
+        if(ins.t!=LIST||!ins.list||ins.list->len!=3){free(code);return 0;}
+        Val ov=ins.list->items[0],arg=ins.list->items[1],line_value=ins.list->items[2];
+        int source_line=0;
+        if(ov.t!=STR||!pvm_integer(line_value,&source_line))goto bad;
+        const char *op=ov.s;PvmInstruction *p=&code[i];p->line=source_line;
+        if(!strcmp(op,"CONST")){p->op=PVM_CONST;p->value=arg;}
+        else if(!strcmp(op,"LOAD")){p->op=PVM_LOAD;if(arg.t!=STR)goto bad;p->name=pvm_copy_text(arg.s);}
+        else if(!strcmp(op,"DECLARE")){p->op=PVM_DECLARE;if(arg.t!=STR)goto bad;p->name=pvm_copy_text(arg.s);}
+        else if(!strcmp(op,"STORE")){p->op=PVM_STORE;if(arg.t!=STR)goto bad;p->name=pvm_copy_text(arg.s);}
+        else if(!strcmp(op,"INPUT")){p->op=PVM_INPUT;if(arg.t!=STR)goto bad;p->name=pvm_copy_text(arg.s);}
+        else if(!strcmp(op,"SET_INDEX"))p->op=PVM_SET_INDEX;
+        else if(!strcmp(op,"POP"))p->op=PVM_POP;
+        else if(!strcmp(op,"GET"))p->op=PVM_GET;
+        else if(!strcmp(op,"PRINT"))p->op=PVM_PRINT;
+        else if(!strcmp(op,"MAKE_LIST")){p->op=PVM_MAKE_LIST;if(!pvm_integer(arg,&p->argc))goto bad;}
+        else if(!strcmp(op,"MAKE_DICT")){p->op=PVM_MAKE_DICT;if(!pvm_integer(arg,&p->argc))goto bad;}
+        else if(!strcmp(op,"UNARY")){p->op=PVM_UNARY;if(arg.t!=STR)goto bad;p->operator_name=pvm_copy_text(arg.s);}
+        else if(!strcmp(op,"BINARY")){p->op=PVM_BINARY;if(arg.t!=STR)goto bad;p->operator_name=pvm_copy_text(arg.s);}
+        else if(!strcmp(op,"TO_BOOL"))p->op=PVM_TO_BOOL;
+        else if(!strcmp(op,"JUMP")||!strcmp(op,"JUMP_IF_FALSE")||!strcmp(op,"JUMP_IF_TRUE")){
+            p->op=!strcmp(op,"JUMP")?PVM_JUMP:!strcmp(op,"JUMP_IF_TRUE")?PVM_JUMP_IF_TRUE:PVM_JUMP_IF_FALSE;if(!pvm_integer(arg,&p->target))goto bad;
+        }
+        else if(!strcmp(op,"ITER_INIT")){p->op=PVM_ITER_INIT;if(!pvm_integer(arg,&p->slot)||p->slot>=10001)goto bad;}
+        else if(!strcmp(op,"ITER_NEXT")){
+            if(arg.t!=LIST||!arg.list||arg.list->len!=3)goto bad;
+            p->op=PVM_ITER_NEXT;
+            if(!pvm_integer(arg.list->items[0],&p->slot)||p->slot>=10001||arg.list->items[1].t!=STR||!pvm_integer(arg.list->items[2],&p->target))goto bad;
+            p->iter_name=pvm_copy_text(arg.list->items[1].s);
+        }
+        else if(!strcmp(op,"CALL")){
+            if(arg.t!=LIST||!arg.list||arg.list->len!=2||arg.list->items[0].t!=STR||!pvm_integer(arg.list->items[1],&p->argc)||p->argc>MAX_PARAMS)goto bad;
+            p->op=PVM_CALL;p->name=pvm_copy_text(arg.list->items[0].s);
+        }
+        else if(!strcmp(op,"RETURN"))p->op=PVM_RETURN;
+        else goto bad;
+        if((p->name==NULL&&(!strcmp(op,"LOAD")||!strcmp(op,"DECLARE")||!strcmp(op,"STORE")||!strcmp(op,"CALL")))||
+           (p->operator_name==NULL&&(!strcmp(op,"UNARY")||!strcmp(op,"BINARY")))||
+           (p->iter_name==NULL&&!strcmp(op,"ITER_NEXT")))goto bad;
+    }
+    *out=code;*out_count=count;return 1;
+bad:
+    for(size_t j=0;j<count;j++){free((void*)code[j].name);free((void*)code[j].operator_name);free((void*)code[j].iter_name);}free(code);return 0;
+}
+static int pvm_load_and_run(const char *path) {
+    FILE *file=fopen(path,"rb");if(!file){fprintf(stderr,"PVM: tidak bisa membuka %s: %s\n",path,strerror(errno));return 1;}
+    if(fseek(file,0,SEEK_END)!=0){fclose(file);return 1;}long size=ftell(file);
+    if(size<0||(unsigned long)size>PVM_MAX_JSON_BYTES){fclose(file);fprintf(stderr,"PVM: ukuran bytecode tidak valid\n");return 1;}
+    rewind(file);char *source=malloc((size_t)size+1);if(!source){fclose(file);return 1;}
+    size_t got=fread(source,1,(size_t)size,file);fclose(file);source[got]='\0';
+    JsonParser jp={source,0,1};Val document=json_parse_value(&jp,0);json_ws(&jp);
+    if(!jp.valid||err||source[jp.pos]!='\0'||document.t!=DICT){fprintf(stderr,"PVM: JSON bytecode tidak valid\n");free(source);return 1;}
+    Val root_code=pvm_field(document,"code"), encoded_functions=pvm_field(document,"functions");
+    PvmInstruction *code=NULL;size_t count=0;
+    if(!pvm_decode_code(root_code,&code,&count)){fprintf(stderr,"PVM: array code tidak valid\n");free(source);return 1;}
+    PvmFunction *functions=NULL;size_t function_count=0;
+    if(encoded_functions.t!=DICT||!encoded_functions.dict){fprintf(stderr,"PVM: tabel functions tidak valid\n");free(source);free(code);return 1;}
+    function_count=encoded_functions.dict->len;
+    if(function_count>MAX_FUNCTIONS){fprintf(stderr,"PVM: terlalu banyak fungsi\n");free(source);free(code);return 1;}
+    functions=calloc(function_count?function_count:1,sizeof *functions);
+    if(!functions){free(source);free(code);return 1;}
+    int ok=1;
+    for(size_t i=0;i<function_count&&ok;i++){
+        Val fnname=encoded_functions.dict->keys[i],entry=encoded_functions.dict->values[i];
+        Val params=pvm_field(entry,"params"),fncode=pvm_field(entry,"code");
+        if(fnname.t!=STR||params.t!=LIST||!params.list||params.list->len>MAX_PARAMS){ok=0;break;}
+        functions[i].name=pvm_copy_text(fnname.s);functions[i].param_count=(int)params.list->len;
+        const char **names=calloc(params.list->len?params.list->len:1,sizeof *names);
+        if(!functions[i].name||!names){free(names);ok=0;break;}functions[i].params=names;
+        for(size_t j=0;j<params.list->len;j++){if(params.list->items[j].t!=STR){ok=0;break;}names[j]=pvm_copy_text(params.list->items[j].s);if(!names[j]){ok=0;break;}}
+        if(ok&&!pvm_decode_code(fncode,(PvmInstruction**)&functions[i].code,&functions[i].code_count))ok=0;
+    }
+    if(!ok){fprintf(stderr,"PVM: fungsi bytecode malformed\n");free(source);free(code);free(functions);return 1;}
+    PvmState *vm=calloc(1,sizeof *vm);
+    if(!vm){fprintf(stderr,"PVM: memori mesin virtual habis\n");free(source);free(code);free(functions);return 1;}
+    vm->functions=functions;vm->function_count=function_count;
+    nvars=0;err=0;syntax_err=0;call_depth=0;returning=0;line_no=1;
+    (void)pvm_execute(vm,code,count,0);
+    int status=err?1:0;
+    free(vm);
+    for(size_t j=0;j<count;j++){free((void*)code[j].name);free((void*)code[j].operator_name);free((void*)code[j].iter_name);}
+    free(source);free(code);
+    for(size_t i=0;i<function_count;i++){
+        free((void*)functions[i].name);
+        for(int j=0;j<functions[i].param_count;j++)free((void*)functions[i].params[j]);
+        free((void*)functions[i].params);
+        PvmInstruction *fn_code=(PvmInstruction*)functions[i].code;
+        for(size_t j=0;j<functions[i].code_count;j++){free((void*)fn_code[j].name);free((void*)fn_code[j].operator_name);free((void*)fn_code[j].iter_name);}
+        free(fn_code);
+    }
+    free(functions);
+    for(size_t i=0;i<allocated_list_count;i++){free(allocated_lists[i]->items);free(allocated_lists[i]);}
+    for(size_t i=0;i<allocated_dict_count;i++)free(allocated_dicts[i]);
+    allocated_list_count=0;allocated_dict_count=0;
+    return status;
 }
 
 #ifndef PUSINGCUK_VERSION
@@ -1632,6 +1778,7 @@ static void print_usage(FILE *out, const char *program) {
 }
 
 int main(int argc,char **argv) {
+    if (argc == 3 && !strcmp(argv[1], "--run-bytecode")) return pvm_load_and_run(argv[2]);
     if (argc == 2 && (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v"))) {
         printf("Pusingcuk native %s\n", PUSINGCUK_VERSION);
         return 0;
