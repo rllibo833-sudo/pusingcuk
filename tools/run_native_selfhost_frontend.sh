@@ -11,4 +11,4 @@ trap 'rm -f "$tmp"' EXIT HUP INT TERM
 sed '$d' examples/self_hosting/compiler.cuk > "$tmp"
 cat examples/self_hosting/compiler_driver.cuk >> "$tmp"
 printf '%s\n' 'selesai jancuk' >> "$tmp"
-exec "$native" "$tmp" < "$payload"
+"$native" "$tmp" < "$payload"
