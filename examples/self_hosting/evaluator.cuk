@@ -1,31 +1,182 @@
-# Evaluator AST mini: menerima node binary sederhana dan menghasilkan angka.
-# AST ini adalah data biasa; program ini belum mengevaluasi AST bahasa .cuk penuh.
+# Evaluator AST rekursif untuk subset ekspresi dan statement .cuk.
+# Kontrak node mengikuti bentuk AST dari examples/self_hosting/compiler.cuk.
 jancuk
 
-fungsi evaluasi(node)
-    njir node["jenis"] != "BINARY"
-        balek "EVAL_ERROR: JENIS_NODE_TIDAK_DIDUKUNG"
-    kampret
-        njir node["operator"] == "+"
-            balek node["kiri"] + node["kanan"]
+fungsi lingkungan_baru()
+    balek {}
+selesai fungsi
+
+fungsi evaluasi(node, env)
+    lah jenis = node["jenis"]
+    njir jenis == "INTEGER" atau jenis == "FLOAT" atau jenis == "STRING" atau jenis == "BOOLEAN"
+        balek node["nilai"]
+    selesai njir
+    njir jenis == "VARIABLE"
+        njir node["nama"] dalam env
+            balek env[node["nama"]]
+        kampret
+            balek "EVAL_ERROR:VARIABEL_TIDAK_DIDEFINISIKAN:" + node["nama"]
+        selesai njir
+    selesai njir
+    njir jenis == "UNARY"
+        lah nilai = evaluasi(node["nilai"], env)
+        njir node["operator"] == "bukan"
+            balek bukan nilai
         kampret
             njir node["operator"] == "-"
-                balek node["kiri"] - node["kanan"]
+                balek 0 - nilai
             kampret
-                njir node["operator"] == "*"
-                    balek node["kiri"] * node["kanan"]
+                njir node["operator"] == "+"
+                    balek nilai
                 kampret
-                    njir node["operator"] == "/"
-                        balek node["kiri"] / node["kanan"]
+                    balek "EVAL_ERROR:OPERATOR_UNARY_TIDAK_DIDUKUNG"
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+    njir jenis == "BINARY"
+        lah kiri = evaluasi(node["kiri"], env)
+        lah kanan = evaluasi(node["kanan"], env)
+        lah op = node["operator"]
+        njir op == "+"
+            balek kiri + kanan
+        kampret
+            njir op == "-"
+                balek kiri - kanan
+            kampret
+                njir op == "*"
+                    balek kiri * kanan
+                kampret
+                    njir op == "/"
+                        njir kanan == 0
+                            balek "EVAL_ERROR:PEMBAGIAN_NOL"
+                        kampret
+                            balek kiri / kanan
+                        selesai njir
                     kampret
-                        balek "EVAL_ERROR: OPERATOR_TIDAK_DIDUKUNG"
+                        njir op == "%"
+                            njir kanan == 0
+                                balek "EVAL_ERROR:MODULO_NOL"
+                            kampret
+                                balek kiri % kanan
+                            selesai njir
+                        kampret
+                            njir op == "=="
+                                balek kiri == kanan
+                            kampret
+                                njir op == "!="
+                                    balek kiri != kanan
+                                kampret
+                                    njir op == "<"
+                                        balek kiri < kanan
+                                    kampret
+                                        njir op == "<="
+                                            balek kiri <= kanan
+                                        kampret
+                                            njir op == ">"
+                                                balek kiri > kanan
+                                            kampret
+                                                njir op == ">="
+                                                    balek kiri >= kanan
+                                                kampret
+                                                    njir op == "dan"
+                                                        balek kiri dan kanan
+                                                    kampret
+                                                        njir op == "atau"
+                                                            balek kiri atau kanan
+                                                        kampret
+                                                            balek "EVAL_ERROR:OPERATOR_TIDAK_DIDUKUNG:" + op
+                                                        selesai njir
+                                                    selesai njir
+                                                selesai njir
+                                            selesai njir
+                                        selesai njir
+                                    selesai njir
+                                selesai njir
+                            selesai njir
+                        selesai njir
                     selesai njir
                 selesai njir
             selesai njir
         selesai njir
     selesai njir
+    njir jenis == "LIST"
+        lah hasil = []
+        untuk item dalam node["items"]
+            hasil = hasil + [evaluasi(item, env)]
+        selesai untuk
+        balek hasil
+    selesai njir
+    njir jenis == "DICT"
+        lah hasil = {}
+        untuk pasangan dalam node["items"]
+            hasil[teks(evaluasi(pasangan[0], env))] = evaluasi(pasangan[1], env)
+        selesai untuk
+        balek hasil
+    selesai njir
+    njir jenis == "INDEX"
+        lah koleksi = evaluasi(node["koleksi"], env)
+        lah indeks = evaluasi(node["index"], env)
+        njir indeks dalam koleksi
+            balek koleksi[indeks]
+        kampret
+            balek "EVAL_ERROR:INDEKS_TIDAK_DITEMUKAN"
+        selesai njir
+    selesai njir
+    njir jenis == "CALL"
+        lah args = []
+        untuk arg dalam node["args"]
+            args = args + [evaluasi(arg, env)]
+        selesai untuk
+        njir node["nama"] == "panjang" dan panjang(args) == 1
+            balek panjang(args[0])
+        kampret
+            njir node["nama"] == "teks" dan panjang(args) == 1
+                balek teks(args[0])
+            kampret
+                njir node["nama"] == "bilangan" dan panjang(args) == 1
+                    balek bilangan(args[0])
+                kampret
+                    njir node["nama"] == "desimal" dan panjang(args) == 1
+                        balek desimal(args[0])
+                    kampret
+                        balek "EVAL_ERROR:PEMANGGILAN_TIDAK_DIDUKUNG:" + node["nama"]
+                    selesai njir
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+    balek "EVAL_ERROR:JENIS_NODE_TIDAK_DIDUKUNG:" + jenis
 selesai fungsi
 
-lah contoh_ast = {"jenis": "BINARY", "kiri": 7, "operator": "+", "kanan": 35}
-hedeh evaluasi(contoh_ast)
+fungsi jalankan_pernyataan(pernyataan, env)
+    lah jenis = pernyataan["jenis"]
+    njir jenis == "DECLARE" atau jenis == "ASSIGN"
+        env[pernyataan["nama"]] = evaluasi(pernyataan["nilai"], env)
+        balek env[pernyataan["nama"]]
+    selesai njir
+    njir jenis == "PRINT"
+        balek evaluasi(pernyataan["nilai"], env)
+    selesai njir
+    njir jenis == "EXPR"
+        balek evaluasi(pernyataan["nilai"], env)
+    selesai njir
+    balek "EVAL_ERROR:STATEMENT_TIDAK_DIDUKUNG:" + jenis
+selesai fungsi
+
+fungsi evaluasi_program(program)
+    lah env = lingkungan_baru()
+    lah hasil = salah
+    untuk pernyataan dalam program["statements"]
+        hasil = jalankan_pernyataan(pernyataan, env)
+        njir teks(hasil) dalam "EVAL_ERROR"
+            balek hasil
+        selesai njir
+    selesai untuk
+    balek hasil
+selesai fungsi
+
+# Contoh AST ekspresi rekursif: (7 + 5) * 3 = 36.
+lah contoh_ast = {"jenis": "BINARY", "kiri": {"jenis": "BINARY", "kiri": {"jenis": "INTEGER", "nilai": 7}, "operator": "+", "kanan": {"jenis": "INTEGER", "nilai": 5}}, "operator": "*", "kanan": {"jenis": "INTEGER", "nilai": 3}}
+hedeh evaluasi(contoh_ast, lingkungan_baru())
 selesai jancuk
