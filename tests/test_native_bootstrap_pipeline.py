@@ -78,7 +78,7 @@ class NativeBootstrapPipelineTests(unittest.TestCase):
     def test_native_runtime_accepts_carriage_return_escape_used_by_frontend(self):
         source = self.directory / "carriage_return.cuk"
         source.write_text(
-            'jancuk\\nhedeh panjang("a\\\\rb")\\nselesai jancuk\\n',
+            'jancuk\nhedeh panjang("a\\rb")\nselesai jancuk\n',
             encoding="utf-8",
         )
         result = subprocess.run(
@@ -86,7 +86,24 @@ class NativeBootstrapPipelineTests(unittest.TestCase):
             capture_output=True, text=True, timeout=10,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout, "3\\n")
+        self.assertEqual(result.stdout, "3\n")
+
+    def test_native_runtime_compares_text_lexicographically(self):
+        source = self.directory / "text_comparison.cuk"
+        source.write_text(
+            'jancuk\n'
+            'hedeh "alpha" < "beta"\n'
+            'hedeh "same" <= "same"\n'
+            'hedeh "z" > "a"\n'
+            'selesai jancuk\n',
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [str(self.native), str(source)], cwd=ROOT,
+            capture_output=True, text=True, timeout=10,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "BENAR\nBENAR\nBENAR\n")
 
     def test_native_only_pipeline_compiles_and_runs_functions(self):
         source = self.directory / "function.cuk"

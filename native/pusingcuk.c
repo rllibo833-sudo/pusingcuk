@@ -862,20 +862,24 @@ static Val compare(void) {
         else if (take("!=")) { Val b=add(); a=boolean(!equal(a,b)); }
         else if (take("<=")) {
             Val b=add();
-            if(a.t!=NUM||b.t!=NUM){fail("perbandingan membutuhkan angka");return boolean(0);}
-            a=boolean(a.n<=b.n);
+            if(a.t==STR&&b.t==STR) a=boolean(strcmp(a.s?a.s:"",b.s?b.s:"")<=0);
+            else if(a.t==NUM&&b.t==NUM) a=boolean(a.n<=b.n);
+            else {fail("perbandingan membutuhkan dua angka atau dua teks");return boolean(0);}
         } else if (take(">=")) {
             Val b=add();
-            if(a.t!=NUM||b.t!=NUM){fail("perbandingan membutuhkan angka");return boolean(0);}
-            a=boolean(a.n>=b.n);
+            if(a.t==STR&&b.t==STR) a=boolean(strcmp(a.s?a.s:"",b.s?b.s:"")>=0);
+            else if(a.t==NUM&&b.t==NUM) a=boolean(a.n>=b.n);
+            else {fail("perbandingan membutuhkan dua angka atau dua teks");return boolean(0);}
         } else if (take("<")) {
             Val b=add();
-            if(a.t!=NUM||b.t!=NUM){fail("perbandingan membutuhkan angka");return boolean(0);}
-            a=boolean(a.n<b.n);
+            if(a.t==STR&&b.t==STR) a=boolean(strcmp(a.s?a.s:"",b.s?b.s:"")<0);
+            else if(a.t==NUM&&b.t==NUM) a=boolean(a.n<b.n);
+            else {fail("perbandingan membutuhkan dua angka atau dua teks");return boolean(0);}
         } else if (take(">")) {
             Val b=add();
-            if(a.t!=NUM||b.t!=NUM){fail("perbandingan membutuhkan angka");return boolean(0);}
-            a=boolean(a.n>b.n);
+            if(a.t==STR&&b.t==STR) a=boolean(strcmp(a.s?a.s:"",b.s?b.s:"")>0);
+            else if(a.t==NUM&&b.t==NUM) a=boolean(a.n>b.n);
+            else {fail("perbandingan membutuhkan dua angka atau dua teks");return boolean(0);}
         } else break;
     }
     return a;

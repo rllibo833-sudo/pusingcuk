@@ -1,7 +1,7 @@
 # Lexer source nyata untuk subset bahasa .cuk.
 # Dukungan: identifier ASCII, integer, string sederhana, operator,
 # tanda baca, komentar #, newline, dan EOF.
-# Dukungan string: escape newline/tab/CR, kutip, dan backslash; runtime native dan lexer .cuk harus sepakat pada escape ini. Angka pecahan/eksponen belum didukung.
+# Kontrak native: perbandingan teks memakai urutan leksikografis; escape newline/tab/CR, kutip, dan backslash harus konsisten. Angka pecahan/eksponen belum didukung.
 jancuk
 
 fungsi huruf(c)

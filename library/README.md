@@ -43,3 +43,4 @@ String literals on the native C runtime accept `\\n`, `\\t`, `\\r`, `\\"`, and `
 ## Self-hosting frontend driver
 
 `examples/self_hosting/compiler.cuk` contains the reusable lexer/parser/IR implementation and remains parseable by its own frontend. `examples/self_hosting/compiler_driver.cuk` is the stdin JSON entrypoint. `tools/run_native_selfhost_frontend.sh` joins them at execution time, so driver-only input syntax does not contaminate the compiler source being self-parsed.
+false
