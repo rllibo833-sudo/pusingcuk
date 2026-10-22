@@ -12,11 +12,7 @@ fungsi evaluasi(node, env)
         balek node["nilai"]
     selesai njir
     njir jenis == "VARIABLE"
-        njir node["nama"] dalam env
-            balek env[node["nama"]]
-        kampret
-            balek "EVAL_ERROR:VARIABEL_TIDAK_DIDEFINISIKAN:" + node["nama"]
-        selesai njir
+        balek env[node["nama"]]
     selesai njir
     njir jenis == "UNARY"
         lah nilai = evaluasi(node["nilai"], env)
@@ -117,11 +113,7 @@ fungsi evaluasi(node, env)
     njir jenis == "INDEX"
         lah koleksi = evaluasi(node["koleksi"], env)
         lah indeks = evaluasi(node["index"], env)
-        njir indeks dalam koleksi
-            balek koleksi[indeks]
-        kampret
-            balek "EVAL_ERROR:INDEKS_TIDAK_DITEMUKAN"
-        selesai njir
+        balek koleksi[indeks]
     selesai njir
     njir jenis == "CALL"
         lah args = []
@@ -169,9 +161,6 @@ fungsi evaluasi_program(program)
     lah hasil = salah
     untuk pernyataan dalam program["statements"]
         hasil = jalankan_pernyataan(pernyataan, env)
-        njir teks(hasil) dalam "EVAL_ERROR"
-            balek hasil
-        selesai njir
     selesai untuk
     balek hasil
 selesai fungsi
