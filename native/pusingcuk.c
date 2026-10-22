@@ -1799,13 +1799,34 @@ static int pvm_integer(Val v,int *out) {
     if(v.t!=NUM||!isfinite(v.n)||v.n<0||v.n>10000000||floor(v.n)!=v.n)return 0;
     *out=(int)v.n;return 1;
 }
+static void pvm_free_code(PvmInstruction *code,size_t count) {
+    if(!code)return;
+    for(size_t i=0;i<count;i++){
+        free((void*)code[i].name);
+        free((void*)code[i].operator_name);
+        free((void*)code[i].iter_name);
+    }
+    free(code);
+}
+static void pvm_free_functions(PvmFunction *functions,size_t count) {
+    if(!functions)return;
+    for(size_t i=0;i<count;i++){
+        free((void*)functions[i].name);
+        if(functions[i].params){
+            for(int j=0;j<functions[i].param_count;j++)free((void*)functions[i].params[j]);
+            free((void*)functions[i].params);
+        }
+        pvm_free_code((PvmInstruction*)functions[i].code,functions[i].code_count);
+    }
+    free(functions);
+}
 static int pvm_decode_code(Val encoded,PvmInstruction **out,size_t *out_count) {
     if(encoded.t!=LIST||!encoded.list||encoded.list->len>PVM_MAX_CODE)return 0;
     size_t count=encoded.list->len;
     PvmInstruction *code=calloc(count?count:1,sizeof *code);if(!code)return 0;
     for(size_t i=0;i<count;i++){
         Val ins=encoded.list->items[i];
-        if(ins.t!=LIST||!ins.list||ins.list->len!=3){free(code);return 0;}
+        if(ins.t!=LIST||!ins.list||ins.list->len!=3){pvm_free_code(code,count);return 0;}
         Val ov=ins.list->items[0],arg=ins.list->items[1],line_value=ins.list->items[2];
         int source_line=0;
         if(ov.t!=STR||!pvm_integer(line_value,&source_line))goto bad;
@@ -1846,25 +1867,34 @@ static int pvm_decode_code(Val encoded,PvmInstruction **out,size_t *out_count) {
     }
     *out=code;*out_count=count;return 1;
 bad:
-    for(size_t j=0;j<count;j++){free((void*)code[j].name);free((void*)code[j].operator_name);free((void*)code[j].iter_name);}free(code);return 0;
+    pvm_free_code(code,count);return 0;
 }
 static int pvm_load_and_run(const char *path) {
     FILE *file=fopen(path,"rb");if(!file){fprintf(stderr,"PVM: tidak bisa membuka %s: %s\n",path,strerror(errno));return 1;}
     if(fseek(file,0,SEEK_END)!=0){fclose(file);return 1;}long size=ftell(file);
     if(size<0||(unsigned long)size>PVM_MAX_JSON_BYTES){fclose(file);fprintf(stderr,"PVM: ukuran bytecode tidak valid\n");return 1;}
     rewind(file);char *source=malloc((size_t)size+1);if(!source){fclose(file);return 1;}
-    size_t got=fread(source,1,(size_t)size,file);fclose(file);source[got]='\0';
+    size_t expected=(size_t)size;
+    size_t got=fread(source,1,expected,file);
+    int read_error=ferror(file);
+    int close_error=fclose(file)!=0;
+    if(read_error||close_error||got!=expected){
+        fprintf(stderr,"PVM: bytecode gagal dibaca lengkap\n");
+        free(source);
+        return 1;
+    }
+    source[got]='\0';
     JsonParser jp={source,0,1};Val document=json_parse_value(&jp,0);json_ws(&jp);
     if(!jp.valid||err||source[jp.pos]!='\0'||document.t!=DICT){fprintf(stderr,"PVM: JSON bytecode tidak valid\n");free(source);return 1;}
     Val root_code=pvm_field(document,"code"), encoded_functions=pvm_field(document,"functions");
     PvmInstruction *code=NULL;size_t count=0;
     if(!pvm_decode_code(root_code,&code,&count)){fprintf(stderr,"PVM: array code tidak valid\n");free(source);return 1;}
     PvmFunction *functions=NULL;size_t function_count=0;
-    if(encoded_functions.t!=DICT||!encoded_functions.dict){fprintf(stderr,"PVM: tabel functions tidak valid\n");free(source);free(code);return 1;}
+    if(encoded_functions.t!=DICT||!encoded_functions.dict){fprintf(stderr,"PVM: tabel functions tidak valid\n");free(source);pvm_free_code(code,count);return 1;}
     function_count=encoded_functions.dict->len;
-    if(function_count>MAX_FUNCTIONS){fprintf(stderr,"PVM: terlalu banyak fungsi\n");free(source);free(code);return 1;}
+    if(function_count>MAX_FUNCTIONS){fprintf(stderr,"PVM: terlalu banyak fungsi\n");free(source);pvm_free_code(code,count);return 1;}
     functions=calloc(function_count?function_count:1,sizeof *functions);
-    if(!functions){free(source);free(code);return 1;}
+    if(!functions){free(source);pvm_free_code(code,count);return 1;}
     int ok=1;
     for(size_t i=0;i<function_count&&ok;i++){
         Val fnname=encoded_functions.dict->keys[i],entry=encoded_functions.dict->values[i];
@@ -1876,25 +1906,17 @@ static int pvm_load_and_run(const char *path) {
         for(size_t j=0;j<params.list->len;j++){if(params.list->items[j].t!=STR){ok=0;break;}names[j]=pvm_copy_text(params.list->items[j].s);if(!names[j]){ok=0;break;}}
         if(ok&&!pvm_decode_code(fncode,(PvmInstruction**)&functions[i].code,&functions[i].code_count))ok=0;
     }
-    if(!ok){fprintf(stderr,"PVM: fungsi bytecode malformed\n");free(source);free(code);free(functions);return 1;}
+    if(!ok){fprintf(stderr,"PVM: fungsi bytecode malformed\n");free(source);pvm_free_code(code,count);pvm_free_functions(functions,function_count);return 1;}
     PvmState *vm=calloc(1,sizeof *vm);
-    if(!vm){fprintf(stderr,"PVM: memori mesin virtual habis\n");free(source);free(code);free(functions);return 1;}
+    if(!vm){fprintf(stderr,"PVM: memori mesin virtual habis\n");free(source);pvm_free_code(code,count);pvm_free_functions(functions,function_count);return 1;}
     vm->functions=functions;vm->function_count=function_count;
     nvars=0;err=0;syntax_err=0;call_depth=0;returning=0;line_no=1;
     (void)pvm_execute(vm,code,count,0);
     int status=err?1:0;
     free(vm);
-    for(size_t j=0;j<count;j++){free((void*)code[j].name);free((void*)code[j].operator_name);free((void*)code[j].iter_name);}
-    free(source);free(code);
-    for(size_t i=0;i<function_count;i++){
-        free((void*)functions[i].name);
-        for(int j=0;j<functions[i].param_count;j++)free((void*)functions[i].params[j]);
-        free((void*)functions[i].params);
-        PvmInstruction *fn_code=(PvmInstruction*)functions[i].code;
-        for(size_t j=0;j<functions[i].code_count;j++){free((void*)fn_code[j].name);free((void*)fn_code[j].operator_name);free((void*)fn_code[j].iter_name);}
-        free(fn_code);
-    }
-    free(functions);
+    free(source);
+    pvm_free_code(code,count);
+    pvm_free_functions(functions,function_count);
     cleanup_runtime_allocations();
     return status;
 }
