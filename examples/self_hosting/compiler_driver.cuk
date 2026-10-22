@@ -6,11 +6,19 @@ njir input_payload == salah
 kampret
     lah ir_source_name = input_payload["source_name"]
     lah source_input = input_payload["source"]
-    lah hasil_parse = parse_program(pindai(source_input))
-    njir hasil_parse["status"] != "OK"
-        hedeh "SELFHOST_PARSE_ERROR:" + teks(hasil_parse["index"])
+    njir source_input == "__read_source_path__"
+        lah source_path = input_payload["source_path"]
+        source_input = baca_file(source_path)
+    selesai njir
+    njir source_input == salah
+        hedeh "SELFHOST_SOURCE_READ_ERROR"
     kampret
-        hedeh ir_document(hasil_parse["node"], ir_source_name)
+        lah hasil_parse = parse_program(pindai(source_input))
+        njir hasil_parse["status"] != "OK"
+            hedeh "SELFHOST_PARSE_ERROR:" + teks(hasil_parse["index"])
+        kampret
+            hedeh ir_document(hasil_parse["node"], ir_source_name)
+        selesai njir
     selesai njir
 selesai njir
 selesai jancuk
