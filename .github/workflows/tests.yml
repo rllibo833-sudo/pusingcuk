@@ -88,11 +88,11 @@ jobs:
             trap "rm -f \"$bootstrap_ir\" \"$bootstrap_ir.cuk\" \"$bootstrap_ir.out\"" EXIT
             printf "%s\\n" "jancuk" "lah value = 7" "hedeh value" "selesai jancuk" > "$bootstrap_ir.cuk"
             make run-native-bootstrap FILE="$bootstrap_ir.cuk" > "$bootstrap_ir"
-            grep -q '"format":"pusingcuk-ir"' "$bootstrap_ir"
+            grep -q "\\\"format\\\":\\\"pusingcuk-ir\\\"" "$bootstrap_ir"
             rm -f "$bootstrap_ir.cuk"
             printf "%s\\n" "{\\"format\\":\\"pusingcuk-ir\\",\\"ir_version\\":1,\\"program\\":{\\"kind\\":\\"Program\\"}}" > "$bootstrap_ir"
             make native-compile FILE=examples/self_hosting/ir_stage.cuk INPUT="$bootstrap_ir" > "$bootstrap_ir.out"
-            grep -q '"format":"pusingcuk-ir"' "$bootstrap_ir.out"
+            grep -q "\\\"format\\\":\\\"pusingcuk-ir\\\"" "$bootstrap_ir.out"
             rm -f "$bootstrap_ir" "$bootstrap_ir.out"
             make native-selfhost-bootstrap2
           '
