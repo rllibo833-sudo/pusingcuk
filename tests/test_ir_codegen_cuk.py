@@ -1,4 +1,4 @@
-""""End-to-end parity tests for the .cuk IR v1 bytecode generator."""
+"""End-to-end parity tests for the .cuk IR v1 bytecode generator."""
 from __future__ import annotations
 import json
 import subprocess
