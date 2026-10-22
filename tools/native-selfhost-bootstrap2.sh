@@ -55,7 +55,9 @@ if grep -q '^BYTECODE_ERROR:' "$tmp/stage2.bytecode"; then
 fi
 
 # Run the stage-1 and stage-2 frontends on the exact same deterministic probe.
-printf '%s\n' '{"source_name":"probe.cuk","source":"jancuk\\nhedeh 123\\nselesai jancuk\\n"}' > "$tmp/probe.payload"
+printf '%s\n' 'jancuk' 'hedeh 123' 'selesai jancuk' > "$tmp/probe.cuk"
+"$native" --json-quote "$tmp/probe.cuk" > "$tmp/probe.source.json"
+printf '{"source_name":"probe.cuk","source":%s}\n' "$(cat "$tmp/probe.source.json")" > "$tmp/probe.payload"
 "$native" --run-bytecode "$tmp/stage1.bytecode" < "$tmp/probe.payload" > "$tmp/stage1.probe.ir"
 if grep -q '^SELFHOST_' "$tmp/stage1.probe.ir"; then
     cat "$tmp/stage1.probe.ir" >&2
