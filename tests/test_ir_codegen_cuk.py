@@ -11,13 +11,16 @@ from compiler.ir import from_source
 ROOT = Path(__file__).resolve().parents[1]
 CODEGEN = ROOT / "examples" / "self_hosting" / "ir_codegen.cuk"
 
+def program(*lines):
+    return chr(10).join(("jancuk", *lines, "selesai jancuk", ""))
+
 class IRCukCodegenParityTests(unittest.TestCase):
     def run_codegen(self, ir):
         payload = json.dumps(ir, ensure_ascii=False, separators=(",", ":"))
         self.assertLessEqual(len(payload.encode()), 1023, "IR exceeds json_baca builtin limit")
         result = subprocess.run(
             [sys.executable, str(ROOT / "pusingcuk_new.py"), str(CODEGEN)],
-            cwd=ROOT, input=payload + "\\n", capture_output=True, text=True, timeout=30,
+            cwd=ROOT, input=payload + chr(10), capture_output=True, text=True, timeout=30,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertFalse(result.stdout.startswith("BYTECODE_ERROR:"), result.stdout)
@@ -30,11 +33,11 @@ class IRCukCodegenParityTests(unittest.TestCase):
 
     def test_ir_to_bytecode_matches_python_reference(self):
         sources = (
-            "jancuk\\nhedeh 7\\nselesai jancuk\\n",
-            "jancuk\\nlah x = 2 + 3\\nhedeh x\\nselesai jancuk\\n",
-            "jancuk\\nmumet salah\\n    hedeh 1\\nselesai mumet\\nselesai jancuk\\n",
-            "jancuk\\nuntuk x dalam [1]\\n    hedeh x\\nselesai untuk\\nselesai jancuk\\n",
-            "jancuk\\nfungsi f(x)\\n    balek x\\nselesai fungsi\\nhedeh f(2)\\nselesai jancuk\\n",
+            program("hedeh 7"),
+            program("lah x = 2 + 3", "hedeh x"),
+            program("mumet salah", "    hedeh 1", "selesai mumet"),
+            program("untuk x dalam [1]", "    hedeh x", "selesai untuk"),
+            program("fungsi f(x)", "    balek x", "selesai fungsi", "hedeh f(2)"),
         )
         for index, source in enumerate(sources):
             with self.subTest(source=index):
@@ -42,14 +45,14 @@ class IRCukCodegenParityTests(unittest.TestCase):
                 self.assertEqual(self.run_codegen(ir), compile_ir(ir))
 
     def test_try_is_rejected_without_fallback(self):
-        ir = from_source("jancuk\\nhedeh 1\\nselesai jancuk\\n", "reject.cuk")
+        ir = from_source(program("hedeh 1"), "reject.cuk")
         ir["program"]["fields"]["body"] = [{
             "kind": "Try", "line": 1,
             "fields": {"body": [], "handler_name": None, "handler": [], "final": []},
         }]
         result = subprocess.run(
             [sys.executable, str(ROOT / "pusingcuk_new.py"), str(CODEGEN)],
-            cwd=ROOT, input=json.dumps(ir, separators=(",", ":")) + "\\n",
+            cwd=ROOT, input=json.dumps(ir, separators=(",", ":")) + chr(10),
             capture_output=True, text=True, timeout=30,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -57,13 +60,13 @@ class IRCukCodegenParityTests(unittest.TestCase):
         self.assertIn("Try", result.stdout)
 
     def test_return_outside_function_is_rejected(self):
-        ir = from_source("jancuk\\nhedeh 1\\nselesai jancuk\\n", "reject.cuk")
+        ir = from_source(program("hedeh 1"), "reject.cuk")
         ir["program"]["fields"]["body"] = [{
             "kind": "Return", "line": 1, "fields": {"value": None},
         }]
         result = subprocess.run(
             [sys.executable, str(ROOT / "pusingcuk_new.py"), str(CODEGEN)],
-            cwd=ROOT, input=json.dumps(ir, separators=(",", ":")) + "\\n",
+            cwd=ROOT, input=json.dumps(ir, separators=(",", ":")) + chr(10),
             capture_output=True, text=True, timeout=30,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
