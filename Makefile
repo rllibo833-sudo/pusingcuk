@@ -32,7 +32,7 @@ run-native: native
 # Jalankan compiler.cuk melalui runtime C; stdin berisi JSON {source_name, source}.
 native-selfhost-frontend: native
 	@test -n "$(PAYLOAD)" || (echo 'Gunakan: make run-native-selfhost-frontend PAYLOAD=payload.json' >&2; exit 2)
-	"$(NATIVE_BIN)" examples/self_hosting/compiler.cuk < "$(PAYLOAD)"
+	tools/run_native_selfhost_frontend.sh "$(NATIVE_BIN)" "$(PAYLOAD)"
 
 run-native-selfhost-frontend: native-selfhost-frontend
 

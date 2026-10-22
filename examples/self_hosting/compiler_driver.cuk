@@ -1,0 +1,15 @@
+# Driver produksi untuk compiler.cuk. Gabungkan setelah compiler.cuk tanpa wrapper penutup.
+tanya input_payload_json = ""
+lah input_payload = jadi_json(input_payload_json)
+njir input_payload == salah
+    hedeh "SELFHOST_INPUT_ERROR"
+kampret
+    lah ir_source_name = input_payload["source_name"]
+    lah source_input = input_payload["source"]
+    lah hasil_parse = parse_program(pindai(source_input))
+    njir hasil_parse["status"] != "OK"
+        hedeh "SELFHOST_PARSE_ERROR:" + teks(hasil_parse["index"])
+    kampret
+        hedeh ir_document(hasil_parse["node"], ir_source_name)
+    selesai njir
+selesai njir

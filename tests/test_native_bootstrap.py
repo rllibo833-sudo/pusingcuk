@@ -61,7 +61,10 @@ class NativeBootstrapTests(unittest.TestCase):
    d=Path(d);binary=d/"pusingcuk-native"
    built=subprocess.run([CC,"-std=c11","-O2","-Wall","-Wextra","-Wno-misleading-indentation","native/pusingcuk.c","-lm","-o",str(binary)],cwd=ROOT,text=True,capture_output=True,timeout=60)
    self.assertEqual(built.returncode,0,built.stderr)
-   compiler=ROOT/"examples/self_hosting/compiler.cuk"
+   compiler=d/"compiler_combined.cuk"
+   compiler_source=(ROOT/"examples/self_hosting/compiler.cuk").read_text(encoding="utf-8").rsplit("selesai jancuk",1)[0]
+   driver_source=(ROOT/"examples/self_hosting/compiler_driver.cuk").read_text(encoding="utf-8")
+   compiler.write_text(compiler_source+driver_source+"selesai jancuk\\n",encoding="utf-8")
    source=("jancuk\n"
            "lah data = [1, 2, 3]\n"
            "data[1] = 7\n"

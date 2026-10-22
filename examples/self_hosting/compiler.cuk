@@ -1486,20 +1486,4 @@ selesai fungsi
 # Marker kompatibilitas: self_hosted_frontend.py mengambil prefix sebelum deklarasi ini.
 lah contoh = ""
 
-# Driver produksi: compiler .cuk membaca payload JSON melalui stdin.
-# Jalankan dengan runtime native C; tidak ada Python yang mem-parsing source target.
-tanya input_payload_json = ""
-lah input_payload = jadi_json(input_payload_json)
-njir input_payload == salah
-    hedeh "SELFHOST_INPUT_ERROR"
-kampret
-    lah ir_source_name = input_payload["source_name"]
-    lah source_input = input_payload["source"]
-    lah hasil_parse = parse_program(pindai(source_input))
-    njir hasil_parse["status"] != "OK"
-        hedeh "SELFHOST_PARSE_ERROR:" + teks(hasil_parse["index"])
-    kampret
-        hedeh ir_document(hasil_parse["node"], ir_source_name)
-    selesai njir
-selesai njir
 selesai jancuk

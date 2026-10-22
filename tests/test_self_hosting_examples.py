@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -38,16 +39,24 @@ class SelfHostingExampleTests(unittest.TestCase):
             "source_name": "lexer_smoke.cuk",
             "source": "lah x = 12 + 3\\nhedeh x\\n",
         }
-        result = subprocess.run(
-            [sys.executable, str(CLI), str(EXAMPLES / "compiler.cuk")],
-            cwd=ROOT,
-            input=json.dumps(payload),
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            timeout=15,
-            check=False,
+        frontend = (
+            (EXAMPLES / "compiler.cuk").read_text(encoding="utf-8").rsplit("selesai jancuk", 1)[0]
+            + (EXAMPLES / "compiler_driver.cuk").read_text(encoding="utf-8")
+            + "selesai jancuk\\n"
         )
+        with tempfile.TemporaryDirectory() as directory:
+            combined = Path(directory) / "compiler_combined.cuk"
+            combined.write_text(frontend, encoding="utf-8")
+            result = subprocess.run(
+                [sys.executable, str(CLI), str(combined)],
+                cwd=ROOT,
+                input=json.dumps(payload),
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=15,
+                check=False,
+            )
         self.assertEqual(result.returncode, 0, msg=result.stderr)
         self.assertEqual(result.stderr, "")
         document = json.loads(result.stdout)
