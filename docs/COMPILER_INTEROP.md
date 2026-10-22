@@ -127,7 +127,7 @@ Sebuah program hanya portabel ke target jika seluruh fitur dan capability yang d
 5. Tambahkan IR versi awal, validator IR, dan source map.
 6. Buat satu backend kedua sebagai proof-of-concept setelah IR stabil; bandingkan output dan error dengan fixture.
 7. Baru setelah itu tambah optimizer, package/module system, WASM, web backend, dan FFI.
-8. Self-hosting adalah sasaran jauh, bukan prasyarat compiler yang berguna.
+8. Bootstrap frontend `.cuk` dua generasi kini memiliki gerbang native melalui runtime C seed. Ini membuktikan frontend/codegen pada subset yang diuji, bukan bahwa runtime C sudah ditulis dalam `.cuk` atau semua backend setara. Lihat [status self-hosting kanonis](SELF_HOSTING_STATE.md).
 
 ## Kriteria penerimaan backend baru
 
