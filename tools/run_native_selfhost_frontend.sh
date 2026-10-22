@@ -7,7 +7,10 @@ fi
 native=$1
 payload=$2
 # Compile the frontend with the native runtime; the driver is appended as a module.
-tmp=$(mktemp "${TMPDIR:-/tmp}/pusingcuk-selfhost.XXXXXX.cuk")
+tmp_base=${TMPDIR:-${PREFIX:+$PREFIX/tmp}}
+tmp_base=${tmp_base:-/tmp}
+mkdir -p "$tmp_base"
+tmp=$(mktemp "$tmp_base/pusingcuk-selfhost.XXXXXX.cuk")
 trap 'rm -f "$tmp"' EXIT HUP INT TERM
 sed '$d' examples/self_hosting/compiler.cuk > "$tmp"
 sed '1d;$d' examples/self_hosting/compiler_driver.cuk >> "$tmp"
