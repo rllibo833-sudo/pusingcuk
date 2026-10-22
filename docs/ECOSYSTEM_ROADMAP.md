@@ -2,6 +2,8 @@
 
 > This roadmap describes the implementation order and acceptance evidence. A listed component is not considered complete merely because its files exist.
 
+> **Status correction — 2026-10-22:** the later native frontend bootstrap supersedes the dated prototype notes below where they say bootstrap is not implemented. The active gate is `make native-selfhost-bootstrap2`; its canonical status, tested path and limits are in [`docs/SELF_HOSTING_STATE.md`](SELF_HOSTING_STATE.md). This milestone covers the frontend/codegen subset with a native C seed. The broader M2A acceptance gate still requires same-SHA CI evidence and conformance testing of the stage-2 toolchain; do not infer full-language or all-backend parity.
+
 ## Product goal
 
 Let a person describe an application in ordinary language, produce a supported `.cuk` program, verify its behavior, and receive a usable artifact with clear limits. The first delivery path must work with a browser and free repository automation; it must not depend on a paid API, hosted database, or always-on server.
@@ -126,4 +128,4 @@ A first Rust source backend is wired into the existing IR v1 CLI. Its declared s
 
 ### Frontend-to-IR integration (2026-10-21)
 
-The self-hosted `.cuk` lexer/parser can now be selected via `--frontend selfhosted`. Its parsed AST is wrapped in the canonical validated IR v1 envelope and sent through existing backend selection, with parity tests against the canonical frontend for the supported declaration/assignment/output arithmetic subset. This is a real integration slice, not a full frontend replacement and not a bootstrap proof. Repeated bootstrap remains blocked on implementing the compiler itself in `.cuk`.
+The self-hosted `.cuk` lexer/parser can now be selected via `--frontend selfhosted`. Its parsed AST is wrapped in the canonical validated IR v1 envelope and sent through existing backend selection, with parity tests against the canonical frontend for the supported declaration/assignment/output arithmetic subset. This is a real integration slice, not a full frontend replacement and not a bootstrap proof. That earlier statement is superseded for the frontend bootstrap: the native two-generation gate is now defined in `tools/native-selfhost-bootstrap2.sh`. This prototype integration remains a limited AST-to-IR/backend slice; it is not itself the gate and does not replace stage-2 conformance evidence.
