@@ -1387,10 +1387,11 @@ static int run_range(int first,int last) {
                     (void)expr();
                     if(!endline()) syntax_fail("karakter tambahan setelah pemanggilan fungsi");
                 } else {
-                    int indexed=0; Val idx=num(0);
-                    if(take("[")) {
-                        indexed=1; idx=expr();
-                        if(!take("]")) syntax_fail("kurung siku tutup ']' diharapkan");
+                    Val indices[MAX_PARAMS];int index_count=0;
+                    while(!err&&take("[")) {
+                        if(index_count>=MAX_PARAMS){syntax_fail("target assignment terlalu dalam");break;}
+                        indices[index_count++]=expr();
+                        if(!take("]")){syntax_fail("kurung siku tutup ']' diharapkan");break;}
                     }
                     if(!take("=")) syntax_fail("tanda '=' diharapkan");
                     else {
@@ -1399,15 +1400,21 @@ static int run_range(int first,int last) {
                         if(!hasvar(name)) fail("variabel belum dibuat");
                         if(!err) for(int k=0;k<nvars;k++)
                             if(!strcmp(vars[k].name,name)) {
-                                if(!indexed) vars[k].v=v;
+                                if(index_count==0) vars[k].v=v;
                                 else {
-                                    if (vars[k].v.t == DICT) {
-                                        dict_set(vars[k].v.dict,idx,v);
-                                    } else {
-                                        size_t at=0;
-                                        if(list_index(vars[k].v,idx,&at))
-                                            vars[k].v.list->items[at]=v;
+                                    Val parent=vars[k].v;
+                                    for(int depth=0;depth<index_count-1&&!err;depth++) {
+                                        if(parent.t==DICT) parent=dict_get(parent.dict,indices[depth]);
+                                        else if(parent.t==LIST) {
+                                            size_t at=0;
+                                            if(list_index(parent,indices[depth],&at)) parent=parent.list->items[at];
+                                        } else fail("target assignment berantai harus berupa list atau dictionary");
                                     }
+                                    if(!err&&parent.t==DICT) dict_set(parent.dict,indices[index_count-1],v);
+                                    else if(!err&&parent.t==LIST) {
+                                        size_t at=0;
+                                        if(list_index(parent,indices[index_count-1],&at)) parent.list->items[at]=v;
+                                    } else if(!err) fail("target assignment berantai harus berupa list atau dictionary");
                                 }
                                 break;
                             }

@@ -156,7 +156,7 @@ fungsi pernyataan(items, s, in_function)
             njir bukan in_function
                 s["error"] = "baris " + teks(l) + ": balek hanya boleh di dalam fungsi"
             kampret
-                njir teks(f["value"]) == "None"
+                njir f["value"] == s["null"]
                     emit(s, "CONST", s["null"], l)
                 kampret
                     ekspresi(f["value"], s)
