@@ -63,7 +63,8 @@ class NativeBootstrapTests(unittest.TestCase):
    self.assertEqual(built.returncode,0,built.stderr)
    compiler=d/"compiler_combined.cuk"
    compiler_source=(ROOT/"examples/self_hosting/compiler.cuk").read_text(encoding="utf-8").rsplit("selesai jancuk",1)[0]
-   driver_source="\\n".join((ROOT/"examples/self_hosting/compiler_driver.cuk").read_text(encoding="utf-8").splitlines()[1:-1])+"\\n"
+   driver_lines=(ROOT/"examples/self_hosting/compiler_driver.cuk").read_text(encoding="utf-8").splitlines()
+   driver_source="\n".join(driver_lines[1:-1])+"\n"
    compiler.write_text(compiler_source+driver_source+"selesai jancuk\\n",encoding="utf-8")
    source=("jancuk\n"
            "lah data = [1, 2, 3]\n"

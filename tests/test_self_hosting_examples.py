@@ -37,12 +37,13 @@ class SelfHostingExampleTests(unittest.TestCase):
     def test_source_lexer_scans_source_text(self) -> None:
         payload = {
             "source_name": "lexer_smoke.cuk",
-            "source": "lah x = 12 + 3\\nhedeh x\\n",
+            "source": "lah x = 12 + 3\nhedeh x\n",
         }
+        driver_lines = (EXAMPLES / "compiler_driver.cuk").read_text(encoding="utf-8").splitlines()
         frontend = (
             (EXAMPLES / "compiler.cuk").read_text(encoding="utf-8").rsplit("selesai jancuk", 1)[0]
-            + (EXAMPLES / "compiler_driver.cuk").read_text(encoding="utf-8").splitlines()[1:-1]
-            and "\\n".join((EXAMPLES / "compiler_driver.cuk").read_text(encoding="utf-8").splitlines()[1:-1]) + "\\nselesai jancuk\\n"
+            + "\n".join(driver_lines[1:-1])
+            + "\nselesai jancuk\n"
         )
         with tempfile.TemporaryDirectory() as directory:
             combined = Path(directory) / "compiler_combined.cuk"
