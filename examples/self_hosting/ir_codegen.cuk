@@ -78,11 +78,11 @@ fungsi pernyataan(items, s, in_function)
     lah k = ""
     lah f = {}
     lah l = 1
-    b = 0
-    e = 0
-    start = 0
-    end = 0
-    slot = 0
+    lah b = 0
+    lah e = 0
+    lah start = 0
+    lah end = 0
+    lah slot = 0
     untuk n dalam items
         k = n["kind"]
         f = n["fields"]
