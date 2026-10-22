@@ -9,7 +9,10 @@ source=$2
 program_input=${3-}
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 cd "$root"
-tmp=$(mktemp -d "${TMPDIR:-/tmp}/pusingcuk-native-compile.XXXXXX")
+tmp_base=${TMPDIR:-${PREFIX:+$PREFIX/tmp}}
+tmp_base=${tmp_base:-/tmp}
+mkdir -p "$tmp_base"
+tmp=$(mktemp "$tmp_base/pusingcuk-native-compile.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 "$native" --json-quote "$source" > "$tmp/source.json"
 printf '{"source_name":"input.cuk","source":%s}\n' "$(cat "$tmp/source.json")" > "$tmp/payload.json"
