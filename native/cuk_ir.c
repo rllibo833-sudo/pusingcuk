@@ -31,7 +31,7 @@ int cuk_ir_write_json(FILE*out,const CukAst*root,const char*source_name){
  if(!out||!root||root->kind!=CUK_AST_PROGRAM||!source_name||!*source_name||strchr(source_name,'/')||strchr(source_name,'\\')||!strcmp(source_name,".")||!strcmp(source_name,".."))return 0;
  int f[6]={1,0,0,0,0,0};flags(root,f);
  fputs("{\"format\":\"pusingcuk-ir\",\"ir_version\":1,\"language_version\":\"0.6-dev\",\"source_name\":",out);js(out,source_name);
- fputs(",\"features\":[",out);int comma=0;const char*names[]={"core","console-output","operators","variables","functions","calls"};const int order[]={1,0,2,3,4,5};
+ fputs(",\"features\":[",out);int comma=0;const char*names[]={"core","console-output","operators","variables","functions","calls"};const int order[]={5,1,0,4,2,3};
  for(size_t i=0;i<6;i++){int ix=order[i];if(f[ix]){if(comma)fputc(',',out);js(out,names[ix]);comma=1;}}
  fputs("],\"source_map\":[",out);int sm_comma=0;sm_entry(out,root,"$",&sm_comma);fputs("],\"program\":",out);nj(out,root);fputs("}\n",out);return !ferror(out);
 }
