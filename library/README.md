@@ -51,3 +51,8 @@ false
 
 
 Kontrak frontend self-hosting: `jancuk` dan `selesai jancuk` adalah delimiter modul sumber dan diabaikan sebagai statement saat parsing program target. Regresi kontrak ini dijalankan oleh `tests/test_native_bootstrap_pipeline.py` melalui `tools/cukc-native.sh`.
+
+
+## Evaluator AST `.cuk`
+
+`examples/self_hosting/evaluator.cuk` kini memuat evaluator AST rekursif untuk literal, variable, unary/binary operator, list/dictionary, indexing, built-in dasar, dan statement dasar. Jalankan melalui runtime native dengan `make run-native-evaluator`; jalur ini tidak memakai Python untuk menjalankan evaluator.
