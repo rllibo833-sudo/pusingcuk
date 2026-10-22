@@ -1,45 +1,44 @@
-# Self-hosting .cuk frontend
+# Self-hosting frontend
 
-Folder ini menyimpan contoh bertahap untuk membangun toolchain PusingCuk dengan bahasa .cuk sendiri. Berkas compiler.cuk menjadi sumber lexer, parser program/ekspresi, AST, dan serializer IR v1.
+Folder ini berisi sumber dan gerbang aktif untuk bootstrap frontend PusingCuk menggunakan `.cuk`. Untuk status terkini dan batas klaim, gunakan [status self-hosting kanonis](../../docs/SELF_HOSTING_STATE.md); catatan mini yang lebih lama di folder ini bukan jalur utama compiler.
 
-## Jalur aktif
+## Jalur kanonis
 
-compiler/self_hosted_frontend.py menjalankan sumber compiler .cuk melalui class `Evaluator` di `evaluator.py`, lalu memvalidasi dokumen IR v1. Jalur default compiler adalah:
+- `compiler.cuk`: lexer, parser program/ekspresi, AST sementara, dan serialisasi ke IR v1.
+- `compiler_driver.cuk`: driver JSON yang memproses `source_name` dan `source`.
+- `ir_codegen.cuk`: codegen `.cuk` yang menerjemahkan IR v1 ke bytecode PusingCuk v1.
+- `native/pusingcuk.c`: runtime/VM C yang menjadi seed bootstrap tepercaya.
+- `tools/native-selfhost-bootstrap2.sh`: gerbang dua generasi native tanpa Python.
 
-source .cuk → lexer/parser .cuk → AST → IR v1 → bytecode → VM
+## Membuat IR atau bytecode melalui toolchain referensi
 
-Parser frontend menangani deklarasi, assignment variabel dan indeks, output, pemanggilan fungsi, fungsi/return, kondisi njir/kampret, loop mumet/untuk, literal list/dictionary, indexing, unary/binary expression, dan akses member sederhana. Semua hasil serializer melewati validator IR kanonis; hal ini tidak menjamin seluruh semantik runtime tersedia di semua backend.
+```sh
+python -m compiler examples/hello.cuk --check
+python -m compiler examples/hello.cuk --emit-ir /tmp/hello.ir.json
+python -m compiler examples/hello.cuk --emit-bytecode /tmp/hello.bytecode.json
+python -m unittest tests.test_compiled_frontend_vm -v
+```
 
-## Perintah
+Perintah Python di atas merupakan jalur pengembangan/referensi. Jangan samakan dengan bukti jalur native bebas Python.
 
-    python -m compiler examples/hello.cuk --check
-    python -m compiler examples/hello.cuk --emit-ir /tmp/hello.ir.json
-    python -m compiler examples/hello.cuk --emit-bytecode /tmp/hello.bytecode.json
-    python -m unittest tests.test_compiled_frontend_vm -v
+## Jalur native compile/run
 
-parser.cuk, evaluator.cuk, interpreter.cuk, dan codegen.cuk tetap dipertahankan sebagai contoh mini tahap compiler; semuanya bukan implementasi compiler lengkap.
+Bangun runtime, lalu kompilasi dan jalankan program melalui native frontend dan bytecode VM:
 
-## Menjalankan frontend `.cuk` dengan runtime native C
+```sh
+make native
+make native-compile FILE=examples/hello.cuk
+make native-selfhost-bootstrap2
+```
 
-`compiler.cuk` menyediakan driver JSON pada stdin. Bangun runtime C dengan `make native`, lalu jalankan `./pusingcuk-native examples/self_hosting/compiler.cuk < payload.json`, dengan payload JSON yang memiliki `source_name` dan `source`. Jalur ini menjalankan lexer/parser/AST/IR yang ditulis dalam `.cuk` melalui runtime native C; Python tidak mem-parsing source target. Tes `test_checked_in_cuk_frontend_runs_on_native_c_runtime` membandingkan IR-nya dengan kontrak referensi.
+Target `native-compile` menjalankan frontend dan codegen `.cuk` di runtime C; Python tidak menjalankan parser atau VM pada jalur tersebut. Target bootstrap menjalankan frontend generasi 1 dan 2 pada input probe yang sama, memeriksa IR identik dan menampilkan SHA-256 untuk kedua keluaran. Hasil hanya berlaku jika target selesai sukses pada commit yang sama dengan run CI.
 
-## Status self-hosting
+## Apa arti keberhasilan bootstrap?
 
-Frontend .cuk kini memiliki tes yang mem-parsing sumber frontend-nya sendiri dan membandingkan AST IR dengan parser referensi. Eksekusi frontend masih di-host oleh `Evaluator` Python di `evaluator.py` (runtime yang juga digunakan oleh `pusingcuk_new.py`); validasi IR dan kompilasi bytecode juga masih memakai implementasi Python. compiler/bootstrap.py saat ini hanya memverifikasi pengulangan build pada jalur host yang sama, bukan bootstrap mandiri dua tahap.
+Bootstrap membuktikan generasi frontend/codegen yang diuji mampu membangun dan menjalankan generasi berikutnya dengan keluaran probe identik. **Runtime C masih merupakan seed**. Ini bukan klaim bahwa runtime C telah diganti dengan `.cuk`, semua semantik bahasa sudah ada di codegen native, seluruh backend setara, atau seluruh repositori bebas Python.
 
-Jangan klaim .cuk self-hosted penuh sampai tahap pertama membangun compiler yang dapat dijalankan sebagai compiler tahap kedua, lalu compiler tahap kedua mengompilasi ulang sumber compiler dan menghasilkan artefak yang cocok tanpa Python mem-parsing atau mengompilasi program.
+Validator IR kanonis penuh tetap tersedia di `compiler/ir.py` dalam jalur Python. Runtime native memeriksa envelope dan fitur yang diperlukan oleh codegen subsetnya. Bootstrap bukan sandbox sistem operasi; jangan menjalankan source tak tepercaya dengan asumsi isolasi.
 
+## Contoh mini/historis
 
-## Jalur kompilasi native tanpa Python
-
-Setelah runtime native dibangun dengan make native, jalankan make native-compile FILE=program.cuk. Jalur ini meng-encode source melalui opsi native --json-quote, menjalankan compiler.cuk dan compiler_driver.cuk di runtime C untuk menghasilkan IR v1, menjalankan ir_codegen.cuk untuk menghasilkan bytecode, lalu mengeksekusinya dengan VM native. INPUT=berkas.txt dapat diberikan untuk stdin program hasil kompilasi. Tidak ada Python yang menjalankan parser, frontend, codegen, atau VM pada jalur ini.
-
-Ini menghilangkan Python dari jalur kompilasi dan eksekusi program, tetapi belum membuktikan compiler mandiri penuh: runtime C masih menjadi seed tepercaya, dan bootstrap tahap 2/3 compiler belum dibuktikan.
-
-
-Frontend `.cuk` memperlakukan pembungkus modul `jancuk` / `selesai jancuk` sebagai delimiter berkas, bukan statement di dalam program. Ini diperlukan agar source target yang normal bisa diproses lewat frontend native.
-
-
-## Evaluator AST yang ditulis dalam `.cuk`
-
-`evaluator.cuk` bukan lagi evaluator satu node aritmetika: ia mengevaluasi AST secara rekursif untuk literal, variable, unary/binary operator, list/dictionary, indexing, built-in dasar, dan statement deklarasi/assignment/output. `make run-native-evaluator` menjalankannya langsung di runtime native. Evaluator ini masih subset, belum menggantikan seluruh runtime bahasa atau membuktikan bootstrap compiler penuh.
+`parser.cuk`, `evaluator.cuk`, `interpreter.cuk`, `codegen.cuk`, dan prototipe `source_lexer.cuk` dipertahankan untuk pembelajaran/evolusi bertahap. Berkas tersebut bukan pengganti jalur kanonis `compiler.cuk` + `compiler_driver.cuk` + `ir_codegen.cuk`.
