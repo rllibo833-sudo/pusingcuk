@@ -18,6 +18,10 @@
 #define MAX_STRING_ALLOCATIONS 4000000
 #define MAX_RUNTIME_STRING_BYTES (32u * 1024u * 1024u)
 #define MAX_PROJECT_FILE_BYTES (16u * 1024u * 1024u)
+#define PVM_MAX_FILES 64
+static FILE* pvm_files[PVM_MAX_FILES]={0};
+static int pvm_file_alloc(FILE* f){ for(int i=0;i<PVM_MAX_FILES;i++) if(!pvm_files[i]){pvm_files[i]=f; return i+1;} return 0; }
+static FILE* pvm_file_get(int h){ if(h<=0||h>PVM_MAX_FILES) return NULL; return pvm_files[h-1]; }
 
 typedef enum { NUM, STR, BOOL, LIST, RANGE, DICT, NIL } Type;
 typedef struct Val Val;
@@ -56,6 +60,14 @@ static void fail(const char *msg) {
     if (!err) fprintf(stderr, "Kesalahan runtime: Baris %d: %s\n", line_no, msg);
     err = 1;
 }
+static int is_file_builtin(const char* name){ return !strcmp(name,"buka")||!strcmp(name,"ngintip")||!strcmp(name,"coret")||!strcmp(name,"tutup"); }
+static Val call_file_builtin(const char* name, Val* args, int argc, int* handled){
+ *handled=is_file_builtin(name); if(!*handled){ Val v={0}; v.t=NIL; return v; }
+ if(!strcmp(name,"buka")){ if(argc!=2){ fail("buka() 2 arg"); Val v={0}; v.t=NIL; return v; } if(args[0].t!=STR||args[1].t!=STR){ fail("buka() teks"); Val v={0}; v.t=NIL; return v; } FILE* f=fopen(args[0].s, args[1].s); if(!f){ fail("buka() gagal"); Val v={0}; v.t=NIL; return v; } int h=pvm_file_alloc(f); if(!h){ fclose(f); fail("batas file"); Val v={0}; v.t=NIL; return v; } Val v={0}; v.t=NUM; v.n=(double)h; return v; }
+ if(!strcmp(name,"ngintip")){ if(argc!=1){ fail("ngintip() 1 arg"); Val v={0}; v.t=NIL; return v; } int h=(int)args[0].n; FILE* f=pvm_file_get(h); if(!f){ fail("ngintip() invalid"); Val v={0}; v.t=NIL; return v; } fseek(f,0,SEEK_END); long sz=ftell(f); fseek(f,0,SEEK_SET); if(sz<0) sz=0; if(sz>8*1024*1024){ fail("file besar"); Val v={0}; v.t=NIL; return v; } char* buf=malloc(sz+1); size_t r=fread(buf,1,sz,f); buf[r]=0; Val v={0}; v.t=STR; snprintf(v.s,sizeof v.s,"%s",buf); free(buf); return v; }
+ if(!strcmp(name,"coret")){ if(argc!=2){ fail("coret() 2 arg"); Val v={0}; v.t=NIL; return v; } int h=(int)args[0].n; FILE* f=pvm_file_get(h); if(!f||args[1].t!=STR){ fail("coret() invalid"); Val v={0}; v.t=NIL; return v; } fputs(args[1].s,f); fflush(f); Val v={0}; v.t=NIL; return v; }
+ if(!strcmp(name,"tutup")){ if(argc!=1){ fail("tutup() 1 arg"); Val v={0}; v.t=NIL; return v; } int h=(int)args[0].n; FILE* f=pvm_file_get(h); if(!f){ fail("tutup() invalid"); Val v={0}; v.t=NIL; return v; } fclose(f); pvm_files[h-1]=NULL; Val v={0}; v.t=NIL; return v; }
+ Val v={0}; v.t=NIL; return v; }
 static void syntax_fail(const char *msg) {
     if (!err) {
         fprintf(stderr, "Kesalahan sintaks: Baris %d: %s\n", line_no, msg);
@@ -731,6 +743,7 @@ static Val primary(void) {
                 return rangeval(start, end, step);
             }
             int conversion_handled = 0;
+            Val file_result; int file_handled=0; file_result = call_file_builtin(name, args, argc, &file_handled); if(file_handled){ return file_result; }
             Val conversion_result = call_native_conversion_builtin(name, args, argc, &conversion_handled);
             if (conversion_handled) return conversion_result;
             int format_handled = 0;

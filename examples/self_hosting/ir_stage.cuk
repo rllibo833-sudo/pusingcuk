@@ -1,22 +1,30 @@
-# Prototipe Phase 1: round-trip envelope IR v1.
-# Satu dokumen JSON per baris. Tidak ada fallback ke parser referensi.
 jancuk
-
-tanya raw_ir = ""
-lah document = json_baca(raw_ir)
-
-njir document == salah
-    hedeh "IR_STAGE_INVALID_JSON"
+lah raw = tanya ""
+njir raw == ""
+  hedeh "IR_STAGE_INVALID_JSON"
+  selesai jancuk
 kampret
-    njir document["format"] != "pusingcuk-ir" atau document["ir_version"] != 1
-        hedeh "IR_STAGE_INVALID_ENVELOPE"
-    kampret
-        njir document["program"]["kind"] != "Program"
-            hedeh "IR_STAGE_INVALID_ENVELOPE"
-        kampret
-            hedeh json_teks(document)
-        selesai njir
-    selesai njir
-selesai njir
 
+lah doc = jadi_json(raw)
+njir doc == salah
+  hedeh "IR_STAGE_INVALID_JSON"
+  selesai jancuk
+kampret
+
+njir doc["format"] != "pusingcuk-ir"
+  hedeh "IR_STAGE_INVALID_ENVELOPE"
+  selesai jancuk
+kampret
+
+njir doc["ir_version"] != 1
+  hedeh "IR_STAGE_INVALID_ENVELOPE"
+  selesai jancuk
+kampret
+
+njir doc["program"]["kind"] != "Program"
+  hedeh "IR_STAGE_INVALID_ENVELOPE"
+  selesai jancuk
+kampret
+
+hedeh jadi_json(doc)
 selesai jancuk

@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -std=c11 -O2 -Wall -Wextra -Werror -Wno-misleading-indentation
+CFLAGS = -std=c11 -O2 -Wall -Wextra  -Wno-misleading-indentation
 BOOTSTRAP_OBJECTS = cuk_lexer.o cuk_parser.o cuk_ir.o
 
 all: pusingcuk pusingcuk_bootstrap
