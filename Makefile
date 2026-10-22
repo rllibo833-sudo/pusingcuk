@@ -8,7 +8,7 @@ LANGUAGE_VERSION ?= 0.6-dev
 PREFIX ?= /usr/local
 DESTDIR ?=
 
-.PHONY: native run-native native-selfhost-frontend run-native-selfhost-frontend native-bootstrap run-native-bootstrap test test-native test-cli test-registered-rules version language-version install package
+.PHONY: native run-native native-selfhost-frontend run-native-selfhost-frontend native-compile run-native-compile native-bootstrap run-native-bootstrap test test-native test-cli test-registered-rules version language-version install package
 
 version:
 	@printf '%s\n' '$(VERSION)'
@@ -35,6 +35,13 @@ native-selfhost-frontend: native
 	tools/run_native_selfhost_frontend.sh "$(NATIVE_BIN)" "$(PAYLOAD)"
 
 run-native-selfhost-frontend: native-selfhost-frontend
+
+# Full native production path: .cuk source -> frontend -> IR v1 -> .cuk codegen -> bytecode -> native VM.
+native-compile: native
+	@test -n "$(FILE)" || (echo "Gunakan: make native-compile FILE=program.cuk [INPUT=stdin.txt]" >&2; exit 2)
+	@if [ -n "$(INPUT)" ]; then tools/cukc-native.sh "$(NATIVE_BIN)" "$(FILE)" "$(INPUT)"; else tools/cukc-native.sh "$(NATIVE_BIN)" "$(FILE)"; fi
+
+run-native-compile: native-compile
 
 # Native source frontend: .cuk -> native lexer/parser/AST -> IR v1 JSON.
 native-bootstrap:

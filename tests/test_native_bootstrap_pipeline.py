@@ -105,6 +105,28 @@ class NativeBootstrapPipelineTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "okelah\nokelah\nokelah\n")
 
+    def test_end_to_end_native_compile_path_needs_no_python_compiler(self):
+        source = self.directory / "native-source.cuk"
+        source.write_text(
+            "jancuk\n"
+            "fungsi pilih(x)\n"
+            "    njir x > 0\n"
+            "        balek x + 40\n"
+            "    kampret\n"
+            "        balek 0\n"
+            "    selesai njir\n"
+            "selesai fungsi\n"
+            "hedeh pilih(2)\n"
+            "selesai jancuk\n",
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [str(ROOT / "tools" / "cukc-native.sh"), str(self.native), str(source)],
+            cwd=ROOT, capture_output=True, text=True, timeout=60,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "42\n")
+
     def test_native_only_pipeline_compiles_and_runs_functions(self):
         source = self.directory / "function.cuk"
         source.write_text(

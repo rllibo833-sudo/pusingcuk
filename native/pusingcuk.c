@@ -2056,11 +2056,71 @@ static void print_usage(FILE *out, const char *program) {
         "           (ekstensi .pusingcuk tetap diterima)\n\n"
         "Opsi:\n"
         "  -h, --help       Tampilkan bantuan\n"
-        "  -v, --version    Tampilkan versi runtime\n",
+        "  -v, --version    Tampilkan versi runtime\n"
+        "  --json-quote FILE  Encode isi file sebagai satu string JSON\n",
         PUSINGCUK_VERSION, program, program, program);
 }
 
+static int json_quote_file(const char *path) {
+    FILE *file = fopen(path, "rb");
+    if (!file) {
+        fprintf(stderr, "Kesalahan membaca source untuk JSON: %s: %s\n", path, strerror(errno));
+        return 3;
+    }
+    if (fseek(file, 0, SEEK_END) != 0) {
+        fprintf(stderr, "Kesalahan mengukur source: %s\n", path);
+        fclose(file);
+        return 1;
+    }
+    long measured = ftell(file);
+    if (measured < 0 || measured > 8 * 1024 * 1024) {
+        fprintf(stderr, "Source untuk JSON melebihi batas 8 MiB\n");
+        fclose(file);
+        return 2;
+    }
+    rewind(file);
+    size_t length = (size_t)measured;
+    char *source = malloc(length + 1);
+    size_t capacity = length * 6 + 3;
+    char *encoded = malloc(capacity);
+    if (!source || !encoded) {
+        fprintf(stderr, "Memori tidak cukup untuk meng-encode source JSON\n");
+        free(source);
+        free(encoded);
+        fclose(file);
+        return 2;
+    }
+    size_t read_count = fread(source, 1, length, file);
+    int read_error = ferror(file);
+    fclose(file);
+    if (read_error || read_count != length) {
+        fprintf(stderr, "Gagal membaca source lengkap: %s\n", path);
+        free(source);
+        free(encoded);
+        return 1;
+    }
+    if (memchr(source, '\0', length) != NULL) {
+        fprintf(stderr, "Source mengandung byte NUL\n");
+        free(source);
+        free(encoded);
+        return 2;
+    }
+    source[length] = '\0';
+    size_t used = 0;
+    if (!json_write_string(source, encoded, capacity, &used)) {
+        fprintf(stderr, "Gagal meng-encode source sebagai JSON\n");
+        free(source);
+        free(encoded);
+        return 1;
+    }
+    puts(encoded);
+    free(source);
+    free(encoded);
+    return 0;
+}
+
 int main(int argc,char **argv) {
+    if (argc == 3 && !strcmp(argv[1], "--json-quote")) return json_quote_file(argv[2]);
     if (argc == 3 && !strcmp(argv[1], "--run-bytecode")) return pvm_load_and_run(argv[2]);
     if (argc == 2 && (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v"))) {
         printf("Pusingcuk native %s\n", PUSINGCUK_VERSION);

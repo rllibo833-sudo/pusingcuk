@@ -28,3 +28,10 @@ parser.cuk, evaluator.cuk, interpreter.cuk, dan codegen.cuk tetap dipertahankan 
 Frontend .cuk kini memiliki tes yang mem-parsing sumber frontend-nya sendiri dan membandingkan AST IR dengan parser referensi. Eksekusi frontend masih di-host oleh `Evaluator` Python di `evaluator.py` (runtime yang juga digunakan oleh `pusingcuk_new.py`); validasi IR dan kompilasi bytecode juga masih memakai implementasi Python. compiler/bootstrap.py saat ini hanya memverifikasi pengulangan build pada jalur host yang sama, bukan bootstrap mandiri dua tahap.
 
 Jangan klaim .cuk self-hosted penuh sampai tahap pertama membangun compiler yang dapat dijalankan sebagai compiler tahap kedua, lalu compiler tahap kedua mengompilasi ulang sumber compiler dan menghasilkan artefak yang cocok tanpa Python mem-parsing atau mengompilasi program.
+
+
+## Jalur kompilasi native tanpa Python
+
+Setelah runtime native dibangun dengan make native, jalankan make native-compile FILE=program.cuk. Jalur ini meng-encode source melalui opsi native --json-quote, menjalankan compiler.cuk dan compiler_driver.cuk di runtime C untuk menghasilkan IR v1, menjalankan ir_codegen.cuk untuk menghasilkan bytecode, lalu mengeksekusinya dengan VM native. INPUT=berkas.txt dapat diberikan untuk stdin program hasil kompilasi. Tidak ada Python yang menjalankan parser, frontend, codegen, atau VM pada jalur ini.
+
+Ini menghilangkan Python dari jalur kompilasi dan eksekusi program, tetapi belum membuktikan compiler mandiri penuh: runtime C masih menjadi seed tepercaya, dan bootstrap tahap 2/3 compiler belum dibuktikan.
