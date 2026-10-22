@@ -10,8 +10,9 @@ fi
 native=$1
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 cd "$root"
-tmp=$(mktemp -d "${TMPDIR:-/tmp}/pusingcuk-bootstrap2.XXXXXX")
+tmp=$(mktemp -d "$root/.pusingcuk-bootstrap2.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
+source_rel="${tmp#"$root"/}/frontend.cuk"
 
 require_ir() {
     file=$1
@@ -43,8 +44,9 @@ sed '1d;$d' examples/self_hosting/compiler_driver.cuk >> "$tmp/frontend.cuk"
 printf '%s\n' 'selesai jancuk' >> "$tmp/frontend.cuk"
 
 # Stage 0: seed native runtime executes the frontend source to emit its IR.
-"$native" --json-quote "$tmp/frontend.cuk" > "$tmp/source.json"
-printf '{"source_name":"compiler.cuk","source":%s}\n' "$(cat "$tmp/source.json")" > "$tmp/bootstrap.payload"
+# Pass a repository-relative file path: compiler.cuk is larger than the
+# native JSON parser's intentional 1,023-byte scalar-string limit.
+printf '{"source_name":"compiler.cuk","source":"__read_source_path__","source_path":"%s"}\n' "$source_rel" > "$tmp/bootstrap.payload"
 tools/run_native_selfhost_frontend.sh "$native" "$tmp/bootstrap.payload" > "$tmp/stage0.compiler.ir"
 require_ir "$tmp/stage0.compiler.ir" "stage-0 compiler"
 
