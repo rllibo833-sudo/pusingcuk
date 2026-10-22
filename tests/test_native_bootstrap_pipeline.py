@@ -75,6 +75,45 @@ class NativeBootstrapPipelineTests(unittest.TestCase):
             for path in (large_json, large_text_out, large_json_out):
                 path.unlink(missing_ok=True)
 
+    def test_native_only_pipeline_compiles_and_runs_functions(self):
+        source = self.directory / "function.cuk"
+        source.write_text(
+            "jancuk\n"
+            "fungsi tambah(a, b)\n"
+            "    balek a + b\n"
+            "selesai fungsi\n"
+            "hedeh tambah(20, 22)\n"
+            "selesai jancuk\n",
+            encoding="utf-8",
+        )
+        stage_zero = subprocess.run(
+            [str(self.seed), str(source)], cwd=ROOT,
+            capture_output=True, text=True, timeout=15,
+        )
+        self.assertEqual(stage_zero.returncode, 0, stage_zero.stderr)
+        ir = json.loads(stage_zero.stdout)
+        self.assertEqual(ir["program"]["fields"]["body"][0]["kind"], "Function")
+        self.assertIn("functions", ir["features"])
+        self.assertIn("calls", ir["features"])
+
+        codegen = subprocess.run(
+            [str(self.native), str(CODEGEN)], cwd=ROOT,
+            input=stage_zero.stdout, capture_output=True, text=True, timeout=30,
+        )
+        self.assertEqual(codegen.returncode, 0, codegen.stderr)
+        self.assertFalse(codegen.stdout.startswith("BYTECODE_ERROR:"), codegen.stdout)
+        bytecode = json.loads(codegen.stdout)
+        self.assertIn("tambah", bytecode["functions"])
+
+        bytecode_file = self.directory / "function.bytecode.json"
+        bytecode_file.write_text(codegen.stdout, encoding="utf-8")
+        execution = subprocess.run(
+            [str(self.native), "--run-bytecode", str(bytecode_file)],
+            cwd=ROOT, capture_output=True, text=True, timeout=15,
+        )
+        self.assertEqual(execution.returncode, 0, execution.stderr)
+        self.assertEqual(execution.stdout, "42\n")
+
     def test_native_seed_codegen_and_vm_run_without_python_compiler(self):
         source = self.directory / "hello.cuk"
         source.write_text("jancuk\nhedeh 42\nselesai jancuk\n", encoding="utf-8")
