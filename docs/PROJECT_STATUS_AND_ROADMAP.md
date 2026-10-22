@@ -77,7 +77,7 @@ Perangkat Android pengguna dengan Termux adalah adapter dan data center lokal ba
 
 ### CI correction for nested codegen (2026-10-21)
 
-The first core run after the nested C-expression generator failed because `tests/test_self_hosting_examples.py` still expected the old flat expression (`7 + 35`). The fixture now expects the nested output and unsupported-operator signal. This is a test expectation correction, not evidence of cross-language parity or self-hosting; wait for the corrected commit's complete CI result.
+The first core run after the nested C-expression generator failed because `tests/test_self_hosting_examples.py` still expected the old flat expression (`7 + 35`). The fixture now expects the nested output and unsupported-operator signal. That fixture correction alone is not evidence of cross-language parity or self-hosting. Current native bootstrap evidence and limitations are documented in [SELF_HOSTING_STATE.md](SELF_HOSTING_STATE.md); verify it against CI for the relevant commit.
 
 
 ### Target Rust tahap awal (2026-10-21)
