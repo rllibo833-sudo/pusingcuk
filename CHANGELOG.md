@@ -9,6 +9,13 @@ Catatan ringkas perubahan yang sudah dilakukan. Versi paket dan versi bahasa ada
 
 ## Unreleased
 
+### Native self-hosting frontend — 2026-10-22
+
+- Corrected the native two-generation bootstrap so stage 1 recompiles the same frontend source and its IR is used to build stage 2; stage 1 and stage 2 must emit byte-identical IR for the same probe. The gate reports both SHA-256 hashes.
+- Fixed nested control-flow delimiters in `examples/self_hosting/ir_stage.cuk`, which had caused the repository-wide example syntax check to fail.
+- Scope: this is evidence for the tested frontend/codegen subset on the native C bootstrap seed. It does not claim every language feature or backend is equivalent, nor that all development and validation tools are Python-free.
+
+
 ### Cuk Reality Engine — catatan branch khusus, belum menjadi kemampuan `main`
 
 Semua butir pada bagian ini berasal dari pekerjaan branch `cuk-reality-engine`; jangan anggap sebagai implementasi `main` kecuali source, fixture, dan CI yang relevan memang sudah masuk ke branch utama. Audit 20 Oktober 2026 menemukan branch tersebut masih divergen dari `main`.

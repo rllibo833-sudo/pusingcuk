@@ -1,5 +1,10 @@
 # Python bytecode and test/tool caches
 __pycache__/
+.cache/
+.tox/
+.nox/
+.hypothesis/
+__pycache__/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
@@ -70,5 +75,4 @@ pusingcuk-*.actual
 artifacts/
 next_prompt.txt
 archive/datacenter_lama/
-__pycache__/
 fix_parser_all.py

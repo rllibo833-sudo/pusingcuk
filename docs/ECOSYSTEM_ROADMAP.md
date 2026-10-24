@@ -2,6 +2,8 @@
 
 > This roadmap describes the implementation order and acceptance evidence. A listed component is not considered complete merely because its files exist.
 
+> **Status correction — 2026-10-22:** the later native frontend bootstrap supersedes the dated prototype notes below where they say bootstrap is not implemented. The active gate is `make native-selfhost-bootstrap2`; its canonical status, tested path and limits are in [`docs/SELF_HOSTING_STATE.md`](SELF_HOSTING_STATE.md). This milestone covers the frontend/codegen subset with a native C seed. The broader M2A acceptance gate still requires same-SHA CI evidence and conformance testing of the stage-2 toolchain; do not infer full-language or all-backend parity.
+
 ## Product goal
 
 Let a person describe an application in ordinary language, produce a supported `.cuk` program, verify its behavior, and receive a usable artifact with clear limits. The first delivery path must work with a browser and free repository automation; it must not depend on a paid API, hosted database, or always-on server.
@@ -44,15 +46,18 @@ Let a person describe an application in ordinary language, produce a supported `
 
 **Exit evidence:** per-target parity results with fixture IDs and no untested support claims.
 
-### M2A — Self-hosting language tools
+### M2A — Self-hosting language tools (maintenance milestone)
+
+- The bootstrap work is retained and should receive regression fixes when needed; it is not the default destination for ongoing feature development. Avoid expanding self-hosting infrastructure unless a concrete product need requires it.
+- Prioritize usable compiler workflows, terminal applications, and interop experiments. The Jeklyn-to-`.cuk` idea remains exploratory until a language contract, source examples, and target design are agreed.
 
 - Use `examples/self_hosting/compiler.cuk` as the current `.cuk`-authored frontend; `source_lexer.cuk` entries below are dated history from an earlier prototype.
 - Keep one current implementation status in [SELF_HOSTING_STATE.md](SELF_HOSTING_STATE.md). This roadmap states direction; it does not duplicate the changing test/status checklist.
 - Integrate with the canonical IR v1, bytecode VM and existing backends. Do not create parallel IR envelopes or separate target manifests.
-- The current adapter still hosts execution, IR validation and bytecode generation on Python. Its repeatable-build check does not prove an independent compiler.
-- **Bootstrap exit gate:** stage 1 must produce a runnable compiler artifact; that artifact must compile the compiler source again as stage 2; compare usable artifacts and run the same applicable conformance suite on the same commit. Until then, describe the work as partial self-hosting, not a standalone compiler.
+- The `compiler/self_hosted.py` adapter and `compiler/bootstrap.py` parity harness still use Python; treat them as development/reference paths, not as the native bootstrap gate.
+- **Bootstrap status:** the native two-generation frontend loop is implemented in `make native-selfhost-bootstrap2`; it recompiles the same frontend source and compares stage-1/stage-2 probe IR byte-for-byte. The remaining M2A acceptance gate is same-SHA CI evidence plus the applicable conformance suite on the stage-2 toolchain. Until that broader gate is satisfied, claim only the tested frontend/codegen subset—not a fully self-hosted, production-ready toolchain.
 
-**Exit evidence:** self-parse/parity and VM execution pass in CI, followed by a repeatable two-stage bootstrap that does not use the Python frontend/compiler path for stage-2 compilation.
+**Exit evidence:** self-parse/parity, the native two-stage bootstrap, and conformance of the applicable stage-2 toolchain pass in CI on one commit, without using Python to parse/compile during the native stage-2 path.
 
 ### M3 — Reality Engine
 
@@ -126,4 +131,4 @@ A first Rust source backend is wired into the existing IR v1 CLI. Its declared s
 
 ### Frontend-to-IR integration (2026-10-21)
 
-The self-hosted `.cuk` lexer/parser can now be selected via `--frontend selfhosted`. Its parsed AST is wrapped in the canonical validated IR v1 envelope and sent through existing backend selection, with parity tests against the canonical frontend for the supported declaration/assignment/output arithmetic subset. This is a real integration slice, not a full frontend replacement and not a bootstrap proof. Repeated bootstrap remains blocked on implementing the compiler itself in `.cuk`.
+The self-hosted `.cuk` lexer/parser can now be selected via `--frontend selfhosted`. Its parsed AST is wrapped in the canonical validated IR v1 envelope and sent through existing backend selection, with parity tests against the canonical frontend for the supported declaration/assignment/output arithmetic subset. This is a real integration slice, not a full frontend replacement and not a bootstrap proof. That earlier statement is superseded for the frontend bootstrap: the native two-generation gate is now defined in `tools/native-selfhost-bootstrap2.sh`. This prototype integration remains a limited AST-to-IR/backend slice; it is not itself the gate and does not replace stage-2 conformance evidence.

@@ -14,7 +14,9 @@ Python-free runtime, native C: **79 dari 79 fixture aktif lulus**. Ini cakupan f
 
 **Status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. Not yet a stable release.
 
-**Self-hosting status:** the `.cuk` frontend parses its own compiler source and emits canonical IR without a parser fallback. `compiler.bootstrap` now compares the Evaluator-hosted frontend with the same `.cuk` frontend compiled to PusingCuk bytecode and executed by the VM; their IR, target bytecode and program output must match. The driver is still built using the Python reference parser and bytecode compiler, so this is **not yet full self-hosting**.
+**Bootstrap milestone:** the native two-generation frontend bootstrap is preserved as an engineering milestone, with its verification scope and limits documented in [the canonical bootstrap status](docs/SELF_HOSTING_STATE.md). It is no longer the project's only development priority; future claims remain tied to CI and reproducible evidence.
+
+**Next product focus:** practical compiler interoperability and useful terminal applications, including an exploratory path for compiling Jeklyn-oriented programs into `.cuk`-powered terminal tools. This is a proposed direction, not an implemented Jeklyn compiler. See [project focus](docs/PROJECT_FOCUS.md).
 
 ## Run your first program
 
@@ -110,7 +112,7 @@ For local AI tooling, any device-specific runtime claims require a real on-devic
 | Area | Purpose |
 |---|---|
 | Language core | Lexer, parser, AST, reference interpreter, specification, and semantic contract |
-| Compiler | IR and experimental JavaScript, Python, Go (curated subset), HTML, JSON IR, and VM targets |
+| Compiler | IR and experimental JavaScript, Python, Go (curated subset), HTML, JSON IR, and VM targets; focus on useful compiler workflows over adding more ecosystem layers |
 | Native runtime | C implementation for a tested subset of the language |
 | Library and vocabulary | Built-ins, machine-readable contracts, keywords, and aliases |
 | Conformance | Tests and fixtures for explicitly supported targets |
@@ -124,7 +126,7 @@ For local AI tooling, any device-specific runtime claims require a real on-devic
 - [Compatibility matrix](docs/COMPATIBILITY.md) and [conformance fixtures](docs/CONFORMANCE_FIXTURES.md)
 - [Technical dictionary](docs/DICTIONARY.md) · [Indonesian Warung dictionary](docs/KAMUS_PUSINGCUK.md)
 - [Project overview](docs/PROJECT_OVERVIEW.md) · [project vision](docs/VISION.md) · [ecosystem implementation roadmap](docs/ECOSYSTEM_ROADMAP.md)
-- [Self-hosting status & next steps](docs/SELF_HOSTING_STATE.md) · [self-hosting frontend](examples/self_hosting/compiler.cuk) · [bootstrap evidence implementation](compiler/bootstrap.py)
+- [Self-hosting status](docs/SELF_HOSTING_STATE.md) · [canonical frontend](examples/self_hosting/compiler.cuk) · [native two-stage bootstrap gate](tools/native-selfhost-bootstrap2.sh) · [Python parity harness](compiler/bootstrap.py)
 - [Contributing](CONTRIBUTING.md) · [security policy](SECURITY.md)
 
 Metadata paket pada `main` adalah `0.8.0.dev0`.

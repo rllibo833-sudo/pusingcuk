@@ -24,9 +24,11 @@ Contoh tersebut sengaja berfokus pada program deterministik tanpa input terminal
 | `terminal_bot.cuk` | Bot berbasis input | Memerlukan terminal; bukan contoh browser |
 | `json_demo.cuk` | JSON built-ins | Dukungan berbeda antar-target; jangan gunakan sebagai contoh universal sebelum matrix lulus |
 
-## Prototipe self-hosting
+## Self-hosting frontend
 
-`self_hosting/` berisi program `.cuk` untuk mengeksplorasi tahap lexer, parser, evaluator, interpreter mini, code generation, dan kontrak runtime. `source_lexer.cuk` kini menghubungkan lexer, recursive-descent parser, AST, dan evaluator untuk ekspresi integer dengan prioritas operator dan tanda kurung. `parser.cuk` terpisah juga menerima token terstruktur. Keduanya belum setara dengan compiler bahasa penuh. Ini adalah prototipe kecil, **bukan** compiler PusingCuk yang self-hosted. Batasan dan urutan menuju bootstrap sungguhan dijelaskan di [`self_hosting/README.md`](self_hosting/README.md).
+Jalur kanonis berada di `self_hosting/compiler.cuk`, `compiler_driver.cuk`, dan `ir_codegen.cuk`. Bootstrap dua generasi native diuji melalui `make native-selfhost-bootstrap2` (runtime C menjadi seed; Python tidak menjalankan frontend/codegen/VM pada jalur ini). Status, batas bukti, dan makna hash tercatat di [status self-hosting](../docs/SELF_HOSTING_STATE.md) dan [README folder](self_hosting/README.md).
+
+`source_lexer.cuk`, `parser.cuk`, `evaluator.cuk`, `interpreter.cuk`, serta `codegen.cuk` adalah prototipe mini/historis, bukan jalur kompilasi kanonis atau bukti mandiri secara terpisah.
 
 Jalankan pemeriksaan runtime otomatis dari root repository dengan `python -m unittest discover -s tests -p 'test_self_hosting_examples.py' -v`. Lulus di interpreter referensi bukan bukti dukungan pada runtime lain; dukungan lintas target harus dibuktikan terpisah.
 

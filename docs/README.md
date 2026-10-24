@@ -23,6 +23,7 @@ This documentation is organized around reader needs rather than the order in whi
 - [Conformance fixtures](CONFORMANCE_FIXTURES.md) — behavior covered by tests.
 - [Compiler targets](COMPILER_TARGETS.md), [IR v1](IR_V1.md), [C backend](C_BACKEND.md), [C++17 backend](CPP_BACKEND.md), [JavaScript backend](JS_BACKEND.md), and [bytecode VM](BYTECODE_VM.md).
 - [Native runtime](NATIVE_RUNTIME.md) and [Termux guide](NATIVE_TERMUX.md).
+- [Native self-hosting/bootstrap status](SELF_HOSTING_STATE.md) — canonical current status, gate, and limitations.
 - [Tooling](TOOLING.md) and [editor support](EDITOR_SUPPORT.md).
 
 ## 4. PusingCuk AI and integrations

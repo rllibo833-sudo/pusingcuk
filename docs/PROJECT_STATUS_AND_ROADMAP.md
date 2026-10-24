@@ -51,10 +51,10 @@ Status implementasi saat ini dirawat di [SELF_HOSTING_STATE.md](SELF_HOSTING_STA
 
 - Sumber frontend aktif adalah `examples/self_hosting/compiler.cuk`. `source_lexer.cuk` pada catatan bertanggal di bawah adalah prototipe historis, bukan jalur compiler aktif.
 - Frontend `.cuk` memuat lexer, parser ekspresi/program, fungsi dan return, kondisi/loop, list/dictionary/index, pemanggilan/member sederhana, serta serializer IR v1. Tes penerimaan membandingkan IR dengan parser referensi dan mengirim program collection/control-flow ke bytecode VM.
-- `compiler.bootstrap` kini membandingkan frontend yang berjalan lewat Python Evaluator dengan frontend `.cuk` yang dikompilasi ke bytecode PusingCuk dan dijalankan oleh VM. IR v1, bytecode program target, dan output harus identik untuk subset yang diuji.
-- Ini belum self-hosting penuh: driver generic masih dibentuk memakai parser referensi Python dan `compiler.bytecode.compile_ir`; validasi IR dan backend bytecode juga masih Python. Hasil ini membuktikan parity runtime frontend di VM, bukan kemampuan compiler membangun compiler tahap berikutnya secara mandiri.
-- Gate berikutnya: hapus ketergantungan parser referensi dan compiler bytecode Python dari pembentukan driver; compiler tahap pertama harus menghasilkan artefak yang dapat menjalankan tahap kedua, mengompilasi ulang sumber compiler, dan menghasilkan artefak identik sebelum konformansi relevan dijalankan. Jangan menandai bootstrap penuh sebelum bukti tersebut lulus di CI pada SHA yang sama.
-- Gunakan `compiler/bootstrap.py`, manifest konformansi, `tools/ci_fixture_matrix.py`, dan tes yang sudah ada. Jangan membuat runner, manifest, atau status report duplikat. Ollama/AI helper bukan prasyarat compiler inti.
+- Bootstrap aktif ada di `tools/native-selfhost-bootstrap2.sh` dan dijalankan oleh `make native-selfhost-bootstrap2`: runtime C seed menjalankan frontend sumber, frontend tahap 1 mengompilasi ulang sumber frontend yang sama, lalu dua generasi dijalankan pada probe yang sama dan keluaran IR dibandingkan byte-for-byte serta SHA-256. Detail jalur dan batas klaim berada di [SELF_HOSTING_STATE.md](SELF_HOSTING_STATE.md).
+- `compiler/bootstrap.py` adalah harness parity Python lama (Evaluator vs Python bytecode VM), bukan gerbang bootstrap native dan bukan bukti jalur bebas Python.
+- Bootstrap native membuktikan subset frontend/codegen yang diuji; belum berarti semua fixture/semantik berjalan melalui compiler tahap 2 atau semua backend setara. Runtime C tetap seed tepercaya, dan validator skema IR penuh tetap diimplementasikan pada jalur Python.
+- Keberhasilan harus dipastikan dari `make native-selfhost-bootstrap2` dan run CI pada SHA yang sama; jangan menyalin status/angka CI historis ke klaim untuk HEAD. Gunakan manifest dan tes yang sudah ada, tanpa membuat runner atau manifest duplikat. Ollama/AI helper bukan prasyarat compiler inti.
 
 ## Aturan perubahan
 
@@ -77,7 +77,7 @@ Perangkat Android pengguna dengan Termux adalah adapter dan data center lokal ba
 
 ### CI correction for nested codegen (2026-10-21)
 
-The first core run after the nested C-expression generator failed because `tests/test_self_hosting_examples.py` still expected the old flat expression (`7 + 35`). The fixture now expects the nested output and unsupported-operator signal. This is a test expectation correction, not evidence of cross-language parity or self-hosting; wait for the corrected commit's complete CI result.
+The first core run after the nested C-expression generator failed because `tests/test_self_hosting_examples.py` still expected the old flat expression (`7 + 35`). The fixture now expects the nested output and unsupported-operator signal. That fixture correction alone is not evidence of cross-language parity or self-hosting. Current native bootstrap evidence and limitations are documented in [SELF_HOSTING_STATE.md](SELF_HOSTING_STATE.md); verify it against CI for the relevant commit.
 
 
 ### Target Rust tahap awal (2026-10-21)

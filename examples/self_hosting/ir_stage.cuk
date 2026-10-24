@@ -1,30 +1,25 @@
 jancuk
 lah raw = tanya ""
 njir raw == ""
-  hedeh "IR_STAGE_INVALID_JSON"
-  selesai jancuk
+    hedeh "IR_STAGE_INVALID_JSON"
 kampret
-
-lah doc = jadi_json(raw)
-njir doc == salah
-  hedeh "IR_STAGE_INVALID_JSON"
-  selesai jancuk
-kampret
-
-njir doc["format"] != "pusingcuk-ir"
-  hedeh "IR_STAGE_INVALID_ENVELOPE"
-  selesai jancuk
-kampret
-
-njir doc["ir_version"] != 1
-  hedeh "IR_STAGE_INVALID_ENVELOPE"
-  selesai jancuk
-kampret
-
-njir doc["program"]["kind"] != "Program"
-  hedeh "IR_STAGE_INVALID_ENVELOPE"
-  selesai jancuk
-kampret
-
-hedeh jadi_json(doc)
+    lah doc = jadi_json(raw)
+    njir doc == salah
+        hedeh "IR_STAGE_INVALID_JSON"
+    kampret
+        njir doc["format"] != "pusingcuk-ir"
+            hedeh "IR_STAGE_INVALID_ENVELOPE"
+        kampret
+            njir doc["ir_version"] != 1
+                hedeh "IR_STAGE_INVALID_ENVELOPE"
+            kampret
+                njir doc["program"]["kind"] != "Program"
+                    hedeh "IR_STAGE_INVALID_ENVELOPE"
+                kampret
+                    hedeh jadi_json(doc)
+                selesai njir
+            selesai njir
+        selesai njir
+    selesai njir
+selesai njir
 selesai jancuk

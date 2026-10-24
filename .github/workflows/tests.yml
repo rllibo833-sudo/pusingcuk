@@ -77,6 +77,8 @@ jobs:
             python scripts/check_alias_sync.py
             python scripts/gen_docs_from_spec.py --check
             python tools/validate_target_manifests.py
+            # Run the native frontend self-host gate before unrelated legacy suite failures can mask it.
+            make native-selfhost-bootstrap2
             python -m unittest discover -s tests -v
             if python -c "import sys; sys.exit(0 if sys.version_info[:2] == (3, 12) else 1)"; then
               python tools/conformance.py
@@ -94,5 +96,4 @@ jobs:
             make native-compile FILE=examples/self_hosting/ir_stage.cuk INPUT="$bootstrap_ir" > "$bootstrap_ir.out"
             grep -q "\"format\":\"pusingcuk-ir\"" "$bootstrap_ir.out"
             rm -f "$bootstrap_ir" "$bootstrap_ir.out"
-            make native-selfhost-bootstrap2
           '

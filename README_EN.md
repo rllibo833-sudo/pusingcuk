@@ -7,6 +7,10 @@ The project combines approachable Indonesian syntax with a reference interpreter
 
 **Status:** language contract `0.6-dev`; Python package `0.8.0.dev0`. This is development software, not a stable release. Backend support differs and must be checked against the compatibility matrix and fixtures.
 
+**Bootstrap milestone:** the native two-generation frontend bootstrap is preserved as an engineering milestone, with scope and limitations documented in [the canonical status](docs/SELF_HOSTING_STATE.md). It is no longer the project's only development priority; verification claims must still be tied to CI and reproducible evidence.
+
+**Next product focus:** practical compiler interoperability and useful terminal applications, including an exploratory path for compiling Jeklyn-oriented programs into `.cuk`-powered terminal tools. This is a proposed direction, not an implemented Jeklyn compiler. See [project focus](docs/PROJECT_FOCUS.md).
+
 ## Run your first program
 
 Requirements: Python 3.11 or 3.12.
