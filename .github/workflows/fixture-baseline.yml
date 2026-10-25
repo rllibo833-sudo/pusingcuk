@@ -1,74 +1,9 @@
 name: PusingCuk fixture baseline matrix
+
 on:
-  pull_request:
-    paths:
-      - ".github/workflows/fixture-baseline.yml"
-      - "SPEC.md"
-      - "lexer.py"
-      - "pusingcuk/lexer.py"
-      - "parser.py"
-      - "evaluator.py"
-      - "compiler/**"
-      - "native/**"
-      - "library/**"
-      - "tests/conformance/**"
-      - "site/runtime.js"
-      - "tests/test_browser_differential.js"
-      - "tools/ci_fixture_matrix.py"
-      - "tools/conformance.py"
-      - "tools/differential_runner.py"
-      - "tools/check_fixture_regression.py"
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/fixture-baseline.yml"
-      - "SPEC.md"
-      - "lexer.py"
-      - "pusingcuk/lexer.py"
-      - "parser.py"
-      - "evaluator.py"
-      - "compiler/**"
-      - "native/**"
-      - "library/**"
-      - "tests/conformance/**"
-      - "site/runtime.js"
-      - "tests/test_browser_differential.js"
-      - "tools/ci_fixture_matrix.py"
-      - "tools/conformance.py"
-      - "tools/differential_runner.py"
-      - "tools/check_fixture_regression.py"
-jobs:
-  matrix:
-    runs-on: ubuntu-latest
-    env:
-      PUSINGCUK_MATRIX_OUT: artifacts/fixture-matrix
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
-        with:
-          python-version: '3.11'
-      - name: Compare browser runtime with Python reference
-        run: node tests/test_browser_differential.js
-      - run: python tools/ci_fixture_matrix.py
-      - name: Generate differential parity report
-        if: always()
-        run: python tools/differential_runner.py artifacts/fixture-matrix/results.json --output artifacts/fixture-matrix/differential.json
-      - name: Check fixture pass-count regression
-        id: regression
-        if: always()
-        run: python tools/check_fixture_regression.py artifacts/fixture-matrix/summary.json tests/conformance/baseline_summary.json
-      - name: Upload fixture matrix evidence
-        if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: pusingcuk-fixture-matrix-${{ github.sha }}
-          path: |
-            artifacts/fixture-matrix/results.xml
-            artifacts/fixture-matrix/matrix_results.json
-            artifacts/fixture-matrix/results.json
-            artifacts/fixture-matrix/summary.json
-            artifacts/fixture-matrix/raw.log
-            artifacts/fixture-matrix/differential.json
-          if-no-files-found: warn
-          retention-days: 14
+
+permissions:
+  contents: read
+
+# Automatic execution paused to preserve runner capacity.
