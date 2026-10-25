@@ -1,56 +1,5 @@
 name: PusingCuk core (Docker)
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/**"
-      - "Dockerfile"
-      - ".dockerignore"
-      - "docker-compose.yml"
-      - "*.py"
-      - "scripts/**"
-      - "tools/**"
-      - "site/**"
-      - "requirements*.txt"
-      - "setup.py"
-      - "pusingcuk.spec"
-      - "MANIFEST.in"
-      - "README.md"
-      - "CHANGELOG.md"
-      - "docs/**"
-      - "compiler/**"
-      - "library/**"
-      - "native/**"
-      - "tests/**"
-      - "examples/**"
-      - "halo.cuk"
-      - "Makefile"
-      - "pyproject.toml"
-  pull_request:
-    paths:
-      - ".github/workflows/**"
-      - "Dockerfile"
-      - ".dockerignore"
-      - "docker-compose.yml"
-      - "*.py"
-      - "scripts/**"
-      - "tools/**"
-      - "site/**"
-      - "requirements*.txt"
-      - "setup.py"
-      - "pusingcuk.spec"
-      - "MANIFEST.in"
-      - "README.md"
-      - "CHANGELOG.md"
-      - "docs/**"
-      - "compiler/**"
-      - "library/**"
-      - "native/**"
-      - "tests/**"
-      - "examples/**"
-      - "halo.cuk"
-      - "Makefile"
-      - "pyproject.toml"
   workflow_dispatch:
 permissions:
   contents: read
