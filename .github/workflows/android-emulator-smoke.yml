@@ -6,5 +6,4 @@ on:
 permissions:
   contents: read
 
-# Expensive automation is paused to preserve runner capacity.
-# Run manually from GitHub Actions when explicitly needed.
+# Automatic execution paused to preserve runner capacity.
