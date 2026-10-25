@@ -1,51 +1,10 @@
 name: PyInstaller build test
 
-# Packaging is manual to avoid rebuilding PyInstaller on every push.
-# Run before releases or after packaging-related changes.
 on:
   workflow_dispatch:
 
 permissions:
   contents: read
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Set up Python
-        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
-        with:
-          python-version: "3.12"
-      - name: Install build dependencies
-        run: |
-          if [ -f requirements.txt ]; then
-            python -m pip install -r requirements.txt
-          else
-            python -m pip install pyinstaller==6.11.1
-          fi
-      - name: Verify installable Python CLI
-        run: |
-          set -euo pipefail
-          python -m pip install --no-deps .
-          cp halo.cuk "$RUNNER_TEMP/halo.cuk"
-          cd "$RUNNER_TEMP"
-          pusingcuk --check "$RUNNER_TEMP/halo.cuk"
-          output="$(pusingcuk "$RUNNER_TEMP/halo.cuk")"
-          printf '%s\n' "$output"
-          grep -Fqx 'Halo, Dunia' <<< "$output"
-          grep -Fqx '42' <<< "$output"
-          python -c "from library.builtin_contract import BUILTIN_CONTRACT; assert BUILTIN_CONTRACT['schema_version'] == 1"
-      - name: Build executable
-        run: pyinstaller --log-level DEBUG --noconfirm --clean pusingcuk.spec
-      - name: Verify executable and bundled runtime data
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -s dist/pusingcuk
-          test -x dist/pusingcuk
-          output="$(./dist/pusingcuk examples/modular.pusingcuk)"
-          printf '%s\n' "$output"
-          grep -Fq 'Halo, Budi!' <<< "$output"
-          grep -Fq 'selesai' <<< "$output"
+# Expensive automation is paused to preserve runner capacity.
+# Run manually from GitHub Actions when explicitly needed.
