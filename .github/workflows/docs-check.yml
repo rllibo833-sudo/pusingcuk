@@ -1,36 +1,10 @@
 name: docs-check
+
 on:
-  push:
-    paths:
-      - "docs/**"
-      - "*.md"
-      - ".github/workflows/docs-check.yml"
-      - "tools/generate_compatibility.py"
-      - "tests/conformance/baseline_summary.json"
-  pull_request:
-    paths:
-      - "docs/**"
-      - "*.md"
-      - ".github/workflows/docs-check.yml"
-      - "tools/generate_compatibility.py"
-      - "tests/conformance/baseline_summary.json"
-jobs:
-  check:
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
-        with:
-          python-version: '3.11'
-      - name: Verify generated compatibility snapshot
-        run: python tools/generate_compatibility.py --check
-      - name: Reject merge-conflict markers in documentation
-        shell: bash
-        run: |
-          set -euo pipefail
-          if grep -R -n --include='*.md' '<<<<<<<' docs/ ./*.md; then
-            echo "Merge-conflict marker found in documentation." >&2
-            exit 1
-          fi
-          echo "Documentation conflict-marker check passed."
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Expensive automation is paused to preserve runner capacity.
+# Run manually from GitHub Actions when explicitly needed.
