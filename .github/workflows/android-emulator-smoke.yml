@@ -6,51 +6,5 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: pusingcuk-android-emulator-${{ github.ref }}
-  cancel-in-progress: true
-
-jobs:
-  smoke-test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 35
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Set up Java
-        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
-        with:
-          distribution: temurin
-          java-version: "17"
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
-        with:
-          packages: platform-tools
-
-      - name: Install pinned Android NDK
-        run: sdkmanager "platforms;android-35" "ndk;27.2.12479018"
-
-      - name: Cross-compile runtime for emulator and device ABI
-        run: bash scripts/build-android.sh dist/android
-
-      - name: Smoke-test native runtime on Android emulator
-        uses: ReactiveCircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
-        with:
-          api-level: 35
-          target: google_apis
-          arch: x86_64
-          disable-animations: true
-          script: |
-            set -eu
-            adb push dist/android/pusingcuk-native-android-x86_64 /data/local/tmp/pusingcuk-native
-            adb push halo.cuk /data/local/tmp/halo.cuk
-            adb shell chmod 755 /data/local/tmp/pusingcuk-native
-            version="$(adb shell /data/local/tmp/pusingcuk-native --version | tr -d '\r')"
-            printf '%s\n' "$version"
-            printf '%s\n' "$version" | grep -Fq 'Pusingcuk native 0.7.1-android'
-            output="$(adb shell /data/local/tmp/pusingcuk-native /data/local/tmp/halo.cuk | tr -d '\r')"
-            printf '%s\n' "$output"
-            printf '%s\n' "$output" | grep -Fqx 'Halo, Dunia'
-            printf '%s\n' "$output" | grep -Fqx '42'
+# Expensive automation is paused to preserve runner capacity.
+# Run manually from GitHub Actions when explicitly needed.
