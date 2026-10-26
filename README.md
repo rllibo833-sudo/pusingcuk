@@ -90,6 +90,10 @@ This table is generated from SPEC.md. It documents accepted spellings; it does n
 | zonk | salah |
 <!-- END GENERATED SPEC ALIASES -->
 
+## Work across the RLI project ecosystem
+
+[PusingCuk](https://github.com/rllibo833-sudo/pusingcuk) is part of an independent open-source portfolio with [Steadfast](https://github.com/rllibo833-sudo/Steadfast) for repository/work governance and [Mnemos-RLI](https://github.com/rllibo833-sudo/mnemos-RLI) for artifact and dependency evidence. The projects are not yet one automatically orchestrated application; see the [ecosystem map](https://github.com/rllibo833-sudo/Steadfast/blob/main/ECOSYSTEM.md) for current boundaries and a practical workflow.
+
 ## The three parts of the ecosystem
 
 - **The .cuk language:** specification, interpreter, compiler, and runtime. See [IDENTITY.md](IDENTITY.md).
