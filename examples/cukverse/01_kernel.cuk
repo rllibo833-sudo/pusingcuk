@@ -1,0 +1,84 @@
+# CukVerse — Kernel Control Center
+# Fase 1: pemeriksaan kesiapan subsistem.
+# Sumber: sintaks yang dipakai di examples/warung.cuk dan examples/rekap_anggaran.cuk.
+# Catatan: status saat ini disimulasikan; belum memanggil layanan eksternal.
+
+jancuk
+
+fungsi status_modul(aktif, dependensi_sehat)
+    njir aktif == 1 dan dependensi_sehat == 1
+        balek "SIAP"
+    kampret
+        njir aktif == 1 dan dependensi_sehat == 0
+            balek "MENUNGGU_DEPENDENSI"
+        kampret
+            balek "NONAKTIF"
+        selesai njir
+    selesai njir
+selesai fungsi
+
+fungsi hitung_siap(core, store, net, desk, build, guard)
+    balek core + store + net + desk + build + guard
+selesai fungsi
+
+# Nilai 1 = tersedia/sehat, 0 = belum tersedia/tidak sehat.
+lah core_aktif = 1
+lah core_dep = 1
+lah store_aktif = 1
+lah store_dep = 0
+lah net_aktif = 1
+lah net_dep = 0
+lah desk_aktif = 1
+lah desk_dep = 1
+lah build_aktif = 1
+lah build_dep = 1
+lah guard_aktif = 1
+lah guard_dep = 1
+
+lah status_core = status_modul(core_aktif, core_dep)
+lah status_store = status_modul(store_aktif, store_dep)
+lah status_net = status_modul(net_aktif, net_dep)
+lah status_desk = status_modul(desk_aktif, desk_dep)
+lah status_build = status_modul(build_aktif, build_dep)
+lah status_guard = status_modul(guard_aktif, guard_dep)
+
+lah jumlah_siap = core_dep + desk_dep + build_dep + guard_dep
+lah jumlah_modul = 6
+lah jumlah_tertunda = jumlah_modul - jumlah_siap
+
+hedeh "========================================"
+hedeh " CUKVERSE KERNEL CONTROL CENTER"
+hedeh " Fase 1 / pemeriksaan subsistem"
+hedeh "========================================"
+hedeh "CORE:"
+hedeh status_core
+hedeh "STORE:"
+hedeh status_store
+hedeh "NET:"
+hedeh status_net
+hedeh "DESK:"
+hedeh status_desk
+hedeh "BUILD:"
+hedeh status_build
+hedeh "GUARD:"
+hedeh status_guard
+hedeh "----------------------------------------"
+hedeh "Jumlah modul:"
+hedeh jumlah_modul
+hedeh "Modul siap:"
+hedeh jumlah_siap
+hedeh "Modul tertunda:"
+hedeh jumlah_tertunda
+
+njir jumlah_siap == jumlah_modul
+    hedeh "Kondisi sistem: SEMUA MODUL SIAP"
+kampret
+    njir jumlah_siap > 0
+        hedeh "Kondisi sistem: BERJALAN TERBATAS"
+    kampret
+        hedeh "Kondisi sistem: BELUM SIAP"
+    selesai njir
+selesai njir
+
+hedeh "Catatan: laporan ini memakai data simulasi, bukan probe runtime."
+selesai jancuk
