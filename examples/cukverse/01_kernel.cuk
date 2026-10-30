@@ -1,7 +1,8 @@
 # CukVerse — Kernel Control Center
 # Fase 1: pemeriksaan kesiapan subsistem.
-# Sumber: sintaks yang dipakai di examples/warung.cuk dan examples/rekap_anggaran.cuk.
-# Catatan: status saat ini disimulasikan; belum memanggil layanan eksternal.
+# Sintaks disusun dari pola program di examples/warung.cuk,
+# examples/rekap_anggaran.cuk, dan examples/core/anggaran_threshold.cuk.
+# Status masih simulasi; belum memanggil layanan eksternal.
 
 jancuk
 
@@ -42,7 +43,14 @@ lah status_desk = status_modul(desk_aktif, desk_dep)
 lah status_build = status_modul(build_aktif, build_dep)
 lah status_guard = status_modul(guard_aktif, guard_dep)
 
-lah jumlah_siap = core_dep + desk_dep + build_dep + guard_dep
+# Modul hanya dihitung siap jika aktif DAN dependensinya sehat.
+lah siap_core = core_aktif * core_dep
+lah siap_store = store_aktif * store_dep
+lah siap_net = net_aktif * net_dep
+lah siap_desk = desk_aktif * desk_dep
+lah siap_build = build_aktif * build_dep
+lah siap_guard = guard_aktif * guard_dep
+lah jumlah_siap = hitung_siap(siap_core, siap_store, siap_net, siap_desk, siap_build, siap_guard)
 lah jumlah_modul = 6
 lah jumlah_tertunda = jumlah_modul - jumlah_siap
 
